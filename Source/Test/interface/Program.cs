@@ -7,8 +7,7 @@ namespace Insight.WS.Test.Interface
 {
     static class Program
     {
-        //private const string BassAddress = "http://localhost:6280/Interface/";
-        private const string BassAddress = "http://120.27.142.125:6280/Interface/";
+        private const string BassAddress = "http://localhost/Interface/";
 
         /// <summary>
         /// 应用程序的主入口点。
