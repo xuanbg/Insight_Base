@@ -1,0 +1,8 @@
+/Release
+/Source/packages
+bin
+obj
+Debug
+*.suo
+/Images
+Insight Setup
