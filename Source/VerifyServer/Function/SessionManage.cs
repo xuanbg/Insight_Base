@@ -75,6 +75,7 @@ namespace Insight.WS.Verify
                 return obj;
             }
 
+            obj.ID = session.ID;
             var verify = new Verify(obj);
             var result = verify.ReturnSession();
             if (result.LoginResult.GetHashCode() > 1) return result;
