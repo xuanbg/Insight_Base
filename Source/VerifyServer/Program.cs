@@ -1,6 +1,6 @@
 ﻿using System.ServiceProcess;
 
-namespace Insight.WS.Server
+namespace Insight.WS.Verify
 {
     static class Program
     {

@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Insight.WS.Server
+namespace Insight.WS.Verify
 {
     using System;
     using System.Collections.Generic;

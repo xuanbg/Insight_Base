@@ -23,6 +23,18 @@
           <Property Name="CreatorUserId" Type="uniqueidentifier" />
           <Property Name="CreateTime" Type="datetime" Nullable="false" />
         </EntityType>
+        <Function Name="Authority" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="UserId" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="DeptId" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="ActionId" Type="uniqueidentifier" Mode="In" />
+          <ReturnType>
+            <CollectionType>
+              <RowType>
+                <Property Name="ActionId" Type="uniqueidentifier" Nullable="false" />
+              </RowType>
+            </CollectionType>
+          </ReturnType>
+        </Function>
         <EntityContainer Name="UserModelStoreContainer">
           <EntitySet Name="SYS_User" EntityType="Self.SYS_User" Schema="dbo" store:Type="Tables" />
         </EntityContainer>
@@ -50,6 +62,11 @@
         </EntityType>
         <EntityContainer Name="WSEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="SYS_User" EntityType="Self.SYS_User" />
+          <FunctionImport Name="Authority" IsComposable="true" ReturnType="Collection(Guid)">
+            <Parameter Name="UserId" Mode="In" Type="Guid" />
+            <Parameter Name="DeptId" Mode="In" Type="Guid" />
+            <Parameter Name="ActionId" Mode="In" Type="Guid" />
+          </FunctionImport>
         </EntityContainer>
       </Schema>
     </edmx:ConceptualModels>
@@ -76,6 +93,7 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="Authority" FunctionName="UserModel.Store.Authority" />
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

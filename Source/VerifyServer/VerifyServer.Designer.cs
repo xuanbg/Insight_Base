@@ -1,4 +1,4 @@
-﻿namespace Insight.WS.Server
+﻿namespace Insight.WS.Verify
 {
     partial class VerifyServer
     {

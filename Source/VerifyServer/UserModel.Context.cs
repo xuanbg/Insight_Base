@@ -7,11 +7,13 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Insight.WS.Server
+namespace Insight.WS.Verify
 {
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
+    using System.Data.Entity.Core.Objects;
+    using System.Linq;
     
     public partial class WSEntities : DbContext
     {
@@ -26,5 +28,23 @@ namespace Insight.WS.Server
         }
     
         public virtual DbSet<SYS_User> SYS_User { get; set; }
+    
+        [DbFunction("WSEntities", "Authority")]
+        public virtual IQueryable<Nullable<System.Guid>> Authority(Nullable<System.Guid> userId, Nullable<System.Guid> deptId, Nullable<System.Guid> actionId)
+        {
+            var userIdParameter = userId.HasValue ?
+                new ObjectParameter("UserId", userId) :
+                new ObjectParameter("UserId", typeof(System.Guid));
+    
+            var deptIdParameter = deptId.HasValue ?
+                new ObjectParameter("DeptId", deptId) :
+                new ObjectParameter("DeptId", typeof(System.Guid));
+    
+            var actionIdParameter = actionId.HasValue ?
+                new ObjectParameter("ActionId", actionId) :
+                new ObjectParameter("ActionId", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.CreateQuery<Nullable<System.Guid>>("[WSEntities].[Authority](@UserId, @DeptId, @ActionId)", userIdParameter, deptIdParameter, actionIdParameter);
+        }
     }
 }

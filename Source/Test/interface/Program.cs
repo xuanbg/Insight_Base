@@ -85,8 +85,7 @@ namespace Insight.WS.Test.Interface
         private static void Logout()
         {
             var url = BassAddress + "user/signout";
-            var data = Serialize(UserSession.ID);
-            var result = HttpRequest(url, "POST", "", data);
+            var result = HttpRequest(url, "POST");
             if (result.Successful)
             {
                 Console.Write($"用户 {UserSession.LoginName} 注销成功");

@@ -85,15 +85,14 @@ namespace Insight.WS.Service.SuperDentist
         /// <summary>
         /// 注销
         /// </summary>
-        /// <param name="id">SessionID</param>
         /// <returns>JsonResult</returns>
-        public JsonResult Logout(int id)
+        public JsonResult Logout()
         {
             var result = Verify();
-            if (result == null || !result.Successful) return result;
+            if (!result.Successful) return result;
 
-            SetOnlineStatus(id, false);
-            return result;
+            var us = GetAuthorization<Session>();
+            return SetUserOffline(us, us.LoginName) ? result : result.NotFound();
         }
 
     }

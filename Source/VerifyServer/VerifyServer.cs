@@ -1,7 +1,7 @@
 ﻿using System.ServiceProcess;
-using static Insight.WS.Server.Util;
+using static Insight.WS.Verify.Util;
 
-namespace Insight.WS.Server
+namespace Insight.WS.Verify
 {
     public partial class VerifyServer : ServiceBase
     {
