@@ -81,7 +81,6 @@
     <Compile Include="ExtendClass\Entities.cs" />
     <Compile Include="ExtendClass\JsonResult.cs" />
     <Compile Include="ExtendClass\Services.cs" />
-    <Compile Include="ExtendClass\VerifyRecord.cs" />
     <Compile Include="Function\DataAccess.cs" />
     <Compile Include="Function\General.cs" />
     <Compile Include="Function\Util.cs" />
