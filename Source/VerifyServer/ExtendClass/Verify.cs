@@ -23,7 +23,7 @@ namespace Insight.WS.Verify
         {
             Session = obj;
             Basis = obj.ID < Sessions.Count ? Sessions[obj.ID] : GetSession(obj);
-            if (Basis.UserId != obj.UserId)
+            if (Basis.LoginName != obj.LoginName)
             {
                 Basis = GetSession(obj);
             }
