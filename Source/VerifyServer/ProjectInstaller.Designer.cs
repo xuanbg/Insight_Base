@@ -1,4 +1,4 @@
-﻿namespace Insight.WS.Server
+﻿namespace Insight.WS.Base
 {
     partial class ProjectInstaller
     {
@@ -28,27 +28,27 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.serviceProcessInstaller = new System.ServiceProcess.ServiceProcessInstaller();
-            this.serviceInstaller = new System.ServiceProcess.ServiceInstaller();
+            serviceProcessInstaller = new System.ServiceProcess.ServiceProcessInstaller();
+            serviceInstaller = new System.ServiceProcess.ServiceInstaller();
             // 
             // serviceProcessInstaller
             // 
-            this.serviceProcessInstaller.Account = System.ServiceProcess.ServiceAccount.LocalSystem;
-            this.serviceProcessInstaller.Password = null;
-            this.serviceProcessInstaller.Username = null;
+            serviceProcessInstaller.Account = System.ServiceProcess.ServiceAccount.LocalSystem;
+            serviceProcessInstaller.Password = null;
+            serviceProcessInstaller.Username = null;
             // 
             // serviceInstaller
             // 
-            this.serviceInstaller.Description = "Insight 接口验证服务";
-            this.serviceInstaller.DisplayName = "Insight 接口验证服务";
-            this.serviceInstaller.ServiceName = "Insight VerifyServer Service";
-            this.serviceInstaller.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
+            serviceInstaller.Description = "Insight 基础服务";
+            serviceInstaller.DisplayName = "Insight 基础服务";
+            serviceInstaller.ServiceName = "Insight Base Service";
+            serviceInstaller.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
             // 
             // ProjectInstaller
             // 
-            this.Installers.AddRange(new System.Configuration.Install.Installer[] {
-            this.serviceProcessInstaller,
-            this.serviceInstaller});
+            Installers.AddRange(new System.Configuration.Install.Installer[] {
+            serviceProcessInstaller,
+            serviceInstaller});
 
         }
 

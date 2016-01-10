@@ -1,6 +1,6 @@
 ﻿using System.ServiceProcess;
 
-namespace Insight.WS.Verify
+namespace Insight.WS.Base
 {
     static class Program
     {
@@ -11,7 +11,7 @@ namespace Insight.WS.Verify
         {
             var servicesToRun = new ServiceBase[] 
             { 
-                new VerifyServer() 
+                new BaseServer() 
             };
             ServiceBase.Run(servicesToRun);
         }
