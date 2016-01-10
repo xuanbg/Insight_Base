@@ -39,6 +39,16 @@ namespace Insight.WS.Base.Common
         /// </summary>
         public static readonly Random Random = new Random(Environment.TickCount);
 
+        /// <summary>
+        /// 接口最后兼容版本
+        /// </summary>
+        private static readonly string CompatibleVersion = GetAppSetting("CompatibleVersion");
+
+        /// <summary>
+        /// 接口最新版本
+        /// </summary>
+        private static readonly string UpdateVersion = GetAppSetting("UpdateVersion");
+
         #endregion
 
         #region 静态公共方法
@@ -83,14 +93,23 @@ namespace Insight.WS.Base.Common
         public static T GetAuthorization<T>()
         {
             var woc = WebOperationContext.Current;
-            var auth = woc.IncomingRequest.Headers[HttpRequestHeader.Authorization];
+            var headers = woc.IncomingRequest.Headers;
+            if (!CompareVersion(headers))
+            {
+                woc.OutgoingResponse.StatusCode = HttpStatusCode.NotAcceptable;
+                return default(T);
+            }
+
+            var auth = headers[HttpRequestHeader.Authorization];
             if (string.IsNullOrEmpty(auth))
             {
                 woc.OutgoingResponse.StatusCode = HttpStatusCode.Unauthorized;
                 return default(T);
             }
 
-            SetResponseParam();
+            var type = headers[HttpRequestHeader.ContentType];
+            if (type == "application/x-gzip") SetResponseParam();
+
             try
             {
                 var buffer = Convert.FromBase64String(auth);
@@ -133,7 +152,7 @@ namespace Insight.WS.Base.Common
         /// <param name="msg">Log消息</param>
         /// <param name="type">Log类型（默认Error）</param>
         /// <param name="source">事件源（默认Insight VerifyServer Service）</param>
-        public static void LogToEvent(string msg, EventLogEntryType type = EventLogEntryType.Error, string source = "Insight VerifyServer Service")
+        public static void LogToEvent(string msg, EventLogEntryType type = EventLogEntryType.Error, string source = "Insight Base Service")
         {
             EventLog.WriteEntry(source, msg, type);
         }
@@ -238,6 +257,20 @@ namespace Insight.WS.Base.Common
             var response = WebOperationContext.Current.OutgoingResponse;
             response.Headers[HttpResponseHeader.ContentEncoding] = "gzip";
             response.ContentType = "application/x-gzip";
+        }
+
+        /// <summary>
+        /// 验证版本是否兼容
+        /// </summary>
+        /// <param name="headers"></param>
+        /// <returns></returns>
+        private static bool CompareVersion(WebHeaderCollection headers)
+        {
+            var accept = headers[HttpRequestHeader.Accept].Split(Convert.ToChar(";"));
+            if (accept.Length < 2) return false;
+
+            var ver = Convert.ToInt32(accept[1].Substring(9));
+            return ver >= Convert.ToInt32(CompatibleVersion) && ver <= Convert.ToInt32(UpdateVersion);
         }
 
         #endregion

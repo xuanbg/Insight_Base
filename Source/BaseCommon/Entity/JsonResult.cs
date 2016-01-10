@@ -58,6 +58,21 @@
         }
 
         /// <summary>
+        /// 返回资源创建成功（201）的成功信息
+        /// </summary>
+        /// <param name="data">承载的数据（可选）</param>
+        /// <returns>JsonResult</returns>
+        public JsonResult Created(string data = null)
+        {
+            Successful = true;
+            Code = "201";
+            Name = "Created";
+            Message = "资源创建成功";
+            Data = data;
+            return this;
+        }
+
+        /// <summary>
         /// 返回用户多地登录（202）的错误信息
         /// </summary>
         /// <returns>JsonResult</returns>
@@ -67,6 +82,20 @@
             Code = "202";
             Name = "MultipleLogin";
             Message = "用户已在其他设备登录";
+            return this;
+        }
+
+        /// <summary>
+        /// 返回无可用内容（204）的成功信息
+        /// </summary>
+        /// <returns>JsonResult</returns>
+        public JsonResult NoContent()
+        {
+            Successful = true;
+            Code = "204";
+            Name = "NoContent";
+            Message = "无可用内容";
+            Data = "";
             return this;
         }
 
