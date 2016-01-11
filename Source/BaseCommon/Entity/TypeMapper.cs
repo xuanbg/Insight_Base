@@ -1,6 +1,6 @@
 ﻿using System.ServiceModel.Channels;
 
-namespace Insight.WS.Base.Common
+namespace Insight.WS.Base.Common.Entity
 {
     /// <summary>
     /// WebContentTypeMapper

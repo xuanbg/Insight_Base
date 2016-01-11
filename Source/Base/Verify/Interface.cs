@@ -1,6 +1,5 @@
 ﻿using System.ServiceModel;
 using System.ServiceModel.Web;
-using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
 
 namespace Insight.WS.Base.Verify

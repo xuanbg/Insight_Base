@@ -31,17 +31,20 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EntityFramework">
-      <HintPath>..\packages\EntityFramework.6.1.3\lib\net40\EntityFramework.dll</HintPath>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.2\lib\net40\EntityFramework.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="EntityFramework.SqlServer">
-      <HintPath>..\packages\EntityFramework.6.1.3\lib\net40\EntityFramework.SqlServer.dll</HintPath>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.2\lib\net40\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="GZipEncoder, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\GZipEncoder.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
@@ -61,14 +64,6 @@
     </Compile>
     <Compile Include="Entity\GuidParse.cs" />
     <Compile Include="Entity\JsonResult.cs" />
-    <Compile Include="Entity\ServiceInfo.cs" />
-    <Compile Include="Entity\TypeMapper.cs" />
-    <Compile Include="Entity\Session.cs" />
-    <Compile Include="Entity\VerifyRecord.cs" />
-    <Compile Include="Function\DataAccess.cs" />
-    <Compile Include="Function\General.cs" />
-    <Compile Include="Function\Services.cs" />
-    <Compile Include="Function\Util.cs" />
     <Compile Include="Entity\Model.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -84,8 +79,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Model.edmx</DependentUpon>
     </Compile>
-    <Compile Include="Function\Verify.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Entity\ServiceInfo.cs" />
     <Compile Include="Entity\SYS_Module.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
@@ -137,16 +131,27 @@
     <Compile Include="Entity\SYS_UserGroupMember.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
+    <Compile Include="Entity\TypeMapper.cs" />
+    <Compile Include="Entity\Session.cs" />
+    <Compile Include="Entity\VerifyRecord.cs" />
+    <Compile Include="Function\DataAccess.cs" />
+    <Compile Include="Function\General.cs" />
+    <Compile Include="Function\Services.cs" />
+    <Compile Include="Function\SqlHelper.cs" />
+    <Compile Include="Function\TypeFactory.cs" />
+    <Compile Include="Function\Util.cs" />
+    <Compile Include="Function\Verify.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <EntityDeploy Include="Entity\Model.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>Model.Designer.cs</LastGenOutput>
     </EntityDeploy>
+    <None Include="App.Config" />
     <None Include="Entity\Model.edmx.diagram">
       <DependentUpon>Model.edmx</DependentUpon>
     </None>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

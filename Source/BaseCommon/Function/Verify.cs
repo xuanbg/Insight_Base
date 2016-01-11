@@ -1,4 +1,5 @@
 ﻿using System;
+using Insight.WS.Base.Common.Entity;
 using static Insight.WS.Base.Common.Util;
 
 namespace Insight.WS.Base.Common

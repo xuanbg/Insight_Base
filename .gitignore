@@ -6,3 +6,4 @@ Debug
 *.suo
 /Images
 Insight Setup
+*.user

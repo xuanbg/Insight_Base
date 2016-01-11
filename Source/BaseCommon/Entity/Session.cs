@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Insight.WS.Base.Common
+namespace Insight.WS.Base.Common.Entity
 {
     /// <summary>
     /// 用户会话信息

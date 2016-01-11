@@ -7,6 +7,7 @@ using System.ServiceModel.Channels;
 using System.ServiceModel.Description;
 using System.Threading;
 using System.Windows.Forms;
+using Insight.WS.Base.Common.Entity;
 using Microsoft.Samples.GZipEncoder;
 
 namespace Insight.WS.Base.Common
@@ -45,8 +46,8 @@ namespace Insight.WS.Base.Common
         /// </summary>
         public Services()
         {
-            var names = new[] { "Verify" };
-            var attains = new[] { "SessionManage" };
+            var names = new[] { "Verify", "Organization" };
+            var attains = new[] { "SessionManage", "OrgManger" };
             for (var i = 0; i < names.Length; i++)
             {
                 var port = Convert.ToInt32(Port);
@@ -118,7 +119,7 @@ namespace Insight.WS.Base.Common
             var asm = Assembly.LoadFrom(path);
             try
             {
-                var address = new Uri(BaseAddress + info.Port);
+                var address = new Uri($"{BaseAddress}:{info.Port}");
                 var host = new ServiceHost(asm.GetType(info.Attain), address);
                 var endpoint = host.AddServiceEndpoint(asm.GetType(info.Interface), Binding, info.Name);
                 endpoint.Behaviors.Add(new WebHttpBehavior());

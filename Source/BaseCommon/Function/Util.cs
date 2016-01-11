@@ -11,6 +11,7 @@ using System.Text;
 using System.Web.Script.Serialization;
 using System.Xml;
 using System.Xml.Serialization;
+using Insight.WS.Base.Common.Entity;
 
 namespace Insight.WS.Base.Common
 {
@@ -266,10 +267,13 @@ namespace Insight.WS.Base.Common
         /// <returns></returns>
         private static bool CompareVersion(WebHeaderCollection headers)
         {
-            var accept = headers[HttpRequestHeader.Accept].Split(Convert.ToChar(";"));
+            var accept = headers[HttpRequestHeader.Accept];
+            if (accept == null) return false;
+
+            var val = accept.Split(Convert.ToChar(";"));
             if (accept.Length < 2) return false;
 
-            var ver = Convert.ToInt32(accept[1].Substring(9));
+            var ver = Convert.ToInt32(val[1].Substring(9));
             return ver >= Convert.ToInt32(CompatibleVersion) && ver <= Convert.ToInt32(UpdateVersion);
         }
 

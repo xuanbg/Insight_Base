@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Insight.WS.Base.Common
+namespace Insight.WS.Base.Common.Entity
 {
     public class GuidParse
     {

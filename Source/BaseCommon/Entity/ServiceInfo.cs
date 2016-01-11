@@ -1,4 +1,4 @@
-﻿namespace Insight.WS.Base.Common
+﻿namespace Insight.WS.Base.Common.Entity
 {
     /// <summary>
     /// 接口配置

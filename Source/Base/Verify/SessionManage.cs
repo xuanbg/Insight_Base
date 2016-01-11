@@ -30,14 +30,7 @@ namespace Insight.WS.Base.Verify
         /// <returns>JsonResult</returns>
         public JsonResult Authorization(string action)
         {
-            Session session;
-            var result = General.Verify(out session);
-            if (!result.Successful) return result;
-
-            Guid aid;
-            if (!Guid.TryParse(action, out aid)) return result.InvalidGuid();
-
-            return Authority(session, aid) ? result : result.Forbidden();
+            return General.Authorize(action);
         }
 
         #endregion
@@ -105,7 +98,7 @@ namespace Insight.WS.Base.Verify
         /// <returns>JsonResult</returns>
         public JsonResult GetSessions()
         {
-            var result = Authorization("331BF752-CDB7-44DE-9631-DF2605BB527E");
+            var result = General.Authorize("331BF752-CDB7-44DE-9631-DF2605BB527E");
             if (!result.Successful) return result;
 
             var list = Sessions.Where(s => s.UserType > 0 && s.OnlineStatus).ToList();
