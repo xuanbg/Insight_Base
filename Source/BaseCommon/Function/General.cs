@@ -62,5 +62,22 @@ namespace Insight.WS.Base.Common
             return DataAccess.Authority(session, aid) ? result : result.Forbidden();
         }
 
+        /// <summary>
+        /// 通过Session验证，并且鉴权
+        /// </summary>
+        /// <param name="session">Session</param>
+        /// <param name="action">需要鉴权的操作ID</param>
+        /// <returns>JsonResult</returns>
+        public static JsonResult Authorize(out Session session, string action)
+        {
+            var result = Verify(out session);
+            if (!result.Successful) return result;
+
+            Guid aid;
+            if (!Guid.TryParse(action, out aid)) return result.InvalidGuid();
+
+            return DataAccess.Authority(session, aid) ? result : result.Forbidden();
+        }
+
     }
 }
