@@ -79,7 +79,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Model.edmx</DependentUpon>
     </Compile>
-    <Compile Include="Entity\ServiceInfo.cs" />
     <Compile Include="Entity\SYS_Module.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>

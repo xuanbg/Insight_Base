@@ -4,10 +4,10 @@ using System.ServiceModel;
 using System.ServiceModel.Web;
 using Insight.WS.Base.Common.Entity;
 
-namespace Insight.WS.Base.Organization
+namespace Insight.WS.Base.Service
 {
     [ServiceContract]
-    interface Interface
+    interface Iorganization
     {
         /// <summary>
         /// 获取组织机构树

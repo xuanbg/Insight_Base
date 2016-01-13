@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System.IO;
 using System.ServiceModel;
 using System.ServiceProcess;
+using System.Windows.Forms;
 using Insight.WS.Base.Common;
 
 namespace Insight.WS.Base
@@ -10,7 +11,7 @@ namespace Insight.WS.Base
         /// <summary>
         /// 运行中的服务主机
         /// </summary>
-        private static readonly List<ServiceHost> Hosts = new List<ServiceHost>();
+        private static ServiceHost Host;
 
         #region 构造函数
 
@@ -32,8 +33,11 @@ namespace Insight.WS.Base
         /// <param name="args"></param>
         protected override void OnStart(string[] args)
         {
-            var httpService = new Services();
-            Hosts.AddRange(httpService.StartService());
+            string path = $"{Application.StartupPath}\\BaseService.dll";
+            if (!File.Exists(path)) return;
+
+            Host = Services.CreateHost(path);
+            Host.Open();
         }
 
         /// <summary>
@@ -41,11 +45,8 @@ namespace Insight.WS.Base
         /// </summary>
         protected override void OnStop()
         {
-            foreach (var host in Hosts)
-            {
-                host.Abort();
-                host.Close();
-            }
+            Host.Abort();
+            Host.Close();
         }
 
         #endregion

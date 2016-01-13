@@ -2,10 +2,10 @@
 using System.ServiceModel.Web;
 using Insight.WS.Base.Common.Entity;
 
-namespace Insight.WS.Base.Verify
+namespace Insight.WS.Base.Service
 {
     [ServiceContract]
-    interface Interface
+    interface Iverify
     {
 
         #region 验证

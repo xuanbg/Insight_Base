@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ServiceModel;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
 using static Insight.WS.Base.Common.Util;
 
-namespace Insight.WS.Base.Organization
+namespace Insight.WS.Base.Service
 {
 
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
-    public class OrgManger :Interface
+    public partial class BaseService : Iorganization
     {
         /// <summary>
         /// 获取组织机构树

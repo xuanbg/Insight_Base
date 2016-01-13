@@ -6,10 +6,10 @@ using Insight.WS.Base.Common.Entity;
 using static Insight.WS.Base.Common.DataAccess;
 using static Insight.WS.Base.Common.Util;
 
-namespace Insight.WS.Base.Verify
+namespace Insight.WS.Base.Service
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
-    public class SessionManage : Interface
+    public partial class BaseService : Iverify
     {
 
         #region 验证

@@ -4,8 +4,8 @@ using System.Runtime.InteropServices;
 // 有关程序集的一般信息由以下
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("Organization Service")]
-[assembly: AssemblyDescription("组织机构服务库")]
+[assembly: AssemblyTitle("BaseService")]
+[assembly: AssemblyDescription("基础服务库")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Insight Software Ltd.")]
 [assembly: AssemblyProduct("Insight Base Service")]
@@ -19,7 +19,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // 如果此项目向 COM 公开，则下列 GUID 用于类型库的 ID
-[assembly: Guid("e611d808-bc19-42c7-b08a-e64cd93adeeb")]
+[assembly: Guid("69f33c8d-dec5-47f5-b435-08217da98b82")]
 
 // 程序集的版本信息由下列四个值组成: 
 //
