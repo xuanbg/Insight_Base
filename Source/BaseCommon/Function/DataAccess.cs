@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
 using Insight.WS.Base.Common.Entity;
 using static Insight.WS.Base.Common.SqlHelper;
 
@@ -235,8 +234,8 @@ namespace Insight.WS.Base.Common
                 new SqlParameter("@ParentId", SqlDbType.UniqueIdentifier) {Value = obj.ParentId}
             };
 
-            cmds.Add(MakeCommand(DataAccess.ChangeIndex("SYS_Organization", 999, obj.Index, obj.ParentId, false)));
-            cmds.Add(MakeCommand(DataAccess.ChangeIndex("SYS_Organization", org.Index, 999, org.ParentId, false)));
+            cmds.Add(MakeCommand(ChangeIndex("SYS_Organization", 999, obj.Index, obj.ParentId, false)));
+            cmds.Add(MakeCommand(ChangeIndex("SYS_Organization", org.Index, 999, org.ParentId, false)));
             cmds.Add(MakeCommand(sql, parm));
             return SqlExecute(cmds);
         }

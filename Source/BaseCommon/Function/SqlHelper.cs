@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using Insight.WS.Base.Common.Entity;
 
 namespace Insight.WS.Base.Common
 {
@@ -12,7 +12,7 @@ namespace Insight.WS.Base.Common
         /// <summary>
         /// 系统连结字符串
         /// </summary>
-        private static readonly string ConStr = ConfigurationManager.ConnectionStrings[0].ConnectionString;
+        private static readonly string ConStr = new BaseEntities().Database.Connection.ConnectionString;
 
         /// <summary>
         /// 返回DataTable的带可变参数组查询方法
