@@ -7,23 +7,15 @@ using Insight.WS.Base.Common.Entity;
 namespace Insight.WS.Base.Service
 {
     [ServiceContract]
-    interface Iorganization
+    public interface Iorganizations
     {
-        /// <summary>
-        /// 获取组织机构树
-        /// </summary>
-        /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "orgs", ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        JsonResult GetOrgs();
-
         /// <summary>
         /// 根据对象实体数据新增一个组织机构节点
         /// </summary>
         /// <param name="org">组织节点对象</param>
         /// <param name="index">原序号</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "org", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         JsonResult AddOrg(SYS_Organization org, int index);
 
@@ -32,9 +24,9 @@ namespace Insight.WS.Base.Service
         /// </summary>
         /// <param name="id">节点ID</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "DELETE", UriTemplate = "org", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "DELETE", UriTemplate = "", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult DeleteOrg(string id);
+        JsonResult RemoveOrg(string id);
 
         /// <summary>
         /// 根据对象实体数据更新组织机构信息
@@ -42,7 +34,7 @@ namespace Insight.WS.Base.Service
         /// <param name="obj">组织节点对象</param>
         /// <param name="index">原序号</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "org", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         JsonResult UpdateOrg(SYS_Organization obj, int index);
 
@@ -51,16 +43,24 @@ namespace Insight.WS.Base.Service
         /// </summary>
         /// <param name="id">节点ID</param>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "org?id={id}", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "?id={id}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult GetOrg(string id);
+
+        /// <summary>
+        /// 获取组织机构树
+        /// </summary>
+        /// <returns>JsonResult</returns>
+        [WebGet(UriTemplate = "orgtree", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        JsonResult GetOrgTree();
 
         /// <summary>
         /// 根据对象实体数据新增一条组织机构节点合并记录
         /// </summary>
         /// <param name="org">组织节点合并对象</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "org/merger", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "merger", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         JsonResult AddOrgMerger(SYS_OrgMerger org);
 
@@ -69,9 +69,9 @@ namespace Insight.WS.Base.Service
         /// </summary>
         /// <param name="org">组织节点对象</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "org/parent", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "parent", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult UpdateOrgParentId(SYS_Organization org);
+        JsonResult SetOrgParent(SYS_Organization org);
 
         /// <summary>
         /// 根据参数组集合批量插入职位成员关系
@@ -79,7 +79,7 @@ namespace Insight.WS.Base.Service
         /// <param name="id">节点ID</param>
         /// <param name="uids">用户ID集合</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "org/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         JsonResult AddOrgMember(string id, List<Guid> uids);
 
@@ -88,15 +88,15 @@ namespace Insight.WS.Base.Service
         /// </summary>
         /// <param name="ids">职位成员关系ID集合</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "DELETE", UriTemplate = "org/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "DELETE", UriTemplate = "members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult DeleteOrgMember(List<Guid> ids);
+        JsonResult RemoveOrgMember(List<Guid> ids);
 
         /// <summary>
         /// 获取所有职位成员用户
         /// </summary>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "org/members", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "members", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult GetOrgMembers();
 
@@ -105,9 +105,9 @@ namespace Insight.WS.Base.Service
         /// </summary>
         /// <param name="id">节点ID</param>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "org/others?id={id}", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "others?id={id}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        JsonResult GetOrgMemberBeSides(string id);
+        JsonResult GetOtherOrgMember(string id);
 
     }
 }

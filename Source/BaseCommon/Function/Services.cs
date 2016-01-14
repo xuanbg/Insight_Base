@@ -26,7 +26,7 @@ namespace Insight.WS.Base.Common
         /// <summary>
         /// Endpoints名称列表
         /// </summary>
-        private static readonly string[] Endpoints = { "verify", "organization" };
+        private static readonly string[] Endpoints = { "verify", "organizations", "users" };
 
         #endregion
 
