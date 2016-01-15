@@ -134,7 +134,6 @@
     <Compile Include="Entity\Session.cs" />
     <Compile Include="Entity\VerifyRecord.cs" />
     <Compile Include="Function\DataAccess.cs" />
-    <Compile Include="Function\General.cs" />
     <Compile Include="Function\Services.cs" />
     <Compile Include="Function\SqlHelper.cs" />
     <Compile Include="Function\TypeFactory.cs" />

@@ -19,14 +19,11 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult AddUser(SYS_User user)
         {
-            Session session;
-            var result = General.Verify(out session);
-            if (!result.Successful) return result;
+            const string action = "60D5BE64-0102-4189-A999-96EDAD3DA1B5";
+            var verify = new Verify();
+            if (!verify.ParseUserIdAndCompare(user.ID.ToString(), action)) return verify.Result;
 
-            var aid = Guid.Parse("60D5BE64-0102-4189-A999-96EDAD3DA1B5");
-            if (session.UserId != user.ID && !DataAccess.Authority(session, aid)) return result.Forbidden();
-
-            return InsertData(user) ? result.Created() : result.DataBaseError();
+            return InsertData(user) ? verify.Result.Created() : verify.Result.DataBaseError();
         }
 
         /// <summary>
@@ -36,17 +33,11 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult RemoveUser(string id)
         {
-            Session session;
-            var result = General.Verify(out session);
-            if (!result.Successful) return result;
+            const string action = "BE2DE9AB-C109-418D-8626-236DEF8E8504";
+            var verify = new Verify();
+            if (!verify.ParseUserIdAndCompare(id, action)) return verify.Result;
 
-            Guid uid;
-            if (!Guid.TryParse(id, out uid)) return result.InvalidGuid();
-
-            var aid = Guid.Parse("BE2DE9AB-C109-418D-8626-236DEF8E8504");
-            if (session.UserId != uid && !DataAccess.Authority(session, aid)) return result.Forbidden();
-
-            return RemoveUser(uid) ? result.Created() : result.DataBaseError();
+            return DeleteUser(verify.Basis.UserId) ? verify.Result.Created() : verify.Result.DataBaseError();
         }
 
         /// <summary>
@@ -56,26 +47,23 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult UpdateUserInfo(SYS_User user)
         {
-            Session session;
-            var result = General.Verify(out session);
-            if (!result.Successful) return result;
-
-            var aid = Guid.Parse("3BC17B61-327D-4EAA-A0D7-7F825A6C71DB");
-            if (session.UserId != user.ID && !DataAccess.Authority(session, aid)) return result.Forbidden();
+            const string action = "3BC17B61-327D-4EAA-A0D7-7F825A6C71DB";
+            var verify = new Verify();
+            if (!verify.ParseUserIdAndCompare(user.ID.ToString(), action)) return verify.Result;
 
             var reset = Update(user);
-            if (!reset.HasValue) return result.NotFound();
+            if (!reset.HasValue) return verify.Result.NotFound();
 
-            if (!reset.Value) return result.DataBaseError();
+            if (!reset.Value) return verify.Result.DataBaseError();
 
-            session = Sessions.SingleOrDefault(s => s.UserId == user.ID);
-            if (session == null) return result;
+            var session = Sessions.SingleOrDefault(s => s.UserId == user.ID);
+            if (session == null) return verify.Result;
 
             session.LoginName = user.LoginName;
             session.UserName = user.Name;
             session.UserType = user.Type;
             session.OpenId = user.OpenId;
-            return result;
+            return verify.Result;
         }
 
         /// <summary>
@@ -85,14 +73,12 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult GetUser(string id)
         {
-            var result = General.Authorize("3BC17B61-327D-4EAA-A0D7-7F825A6C71DB");
-            if (!result.Successful) return result;
+            const string action = "3BC17B61-327D-4EAA-A0D7-7F825A6C71DB";
+            var verify = new Verify();
+            if (!verify.ParseUserIdAndCompare(id, action)) return verify.Result;
 
-            Guid uid;
-            if (!Guid.TryParse(id, out uid)) return result.InvalidGuid();
-
-            var user = GetUser(uid);
-            return user == null ? result.NotFound() : result.Success(Serialize(user));
+            var user = GetUser(verify.Guid);
+            return user == null ? verify.Result.NotFound() : verify.Result.Success(Serialize(user));
         }
 
         /// <summary>
@@ -101,11 +87,12 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult GetUsers()
         {
-            var result = General.Authorize("B5992AA3-4AD3-4795-A641-2ED37AC6425C");
-            if (!result.Successful) return result;
+            const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
+            var verify = new Verify();
+            if (!verify.Compare(action)) return verify.Result;
 
             var data = GetUserList();
-            return data.Rows.Count > 0 ? result.Success(Serialize(data)) : result.NoContent();
+            return data.Rows.Count > 0 ? verify.Result.Success(Serialize(data)) : verify.Result.NoContent();
         }
 
         /// <summary>
@@ -116,54 +103,42 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult UpdateSignature(string id, string pw)
         {
-            Session session;
-            var result = General.Verify(out session);
-            if (!result.Successful) return result;
+            const string action = "26481E60-0917-49B4-BBAA-2265E71E7B3F";
+            var verify = new Verify();
+            if (!verify.ParseUserIdAndCompare(id, action)) return verify.Result;
 
-            Guid uid;
-            if (!Guid.TryParse(id, out uid)) return result.InvalidGuid();
+            var reset = Update(verify.Guid, pw);
+            if (!reset.HasValue) return verify.Result.NotFound();
 
-            var aid = Guid.Parse("26481E60-0917-49B4-BBAA-2265E71E7B3F");
-            if (session.UserId != uid && !DataAccess.Authority(session, aid)) return result.Forbidden();
+            if (!reset.Value) return verify.Result.DataBaseError();
 
-            var reset = Update(uid, pw);
-            if (!reset.HasValue) return result.NotFound();
-
-            if (!reset.Value) return result.DataBaseError();
-
-            session = Sessions.SingleOrDefault(s => s.UserId == uid);
+            var session = Sessions.SingleOrDefault(s => s.UserId == verify.Guid);
             if (session != null) session.Signature = Hash(session.LoginName.ToUpper() + pw);
 
-            return result;
+            return verify.Result;
         }
 
         /// <summary>
         /// 根据用户ID设置用户状态
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">用户ID</param>
         /// <param name="validity">可用状态</param>
         /// <returns>JsonResult</returns>
         public JsonResult SetUserStatus(string id, bool validity)
         {
-            Session session;
-            var result = General.Verify(out session);
-            if (!result.Successful) return result;
+            var action = validity ? "369548E9-C8DB-439B-A604-4FDC07F3CCDD" : "0FA34D43-2C52-4968-BDDA-C9191D7FCE80";
+            var verify = new Verify();
+            if (!verify.ParseUserIdAndCompare(id, action)) return verify.Result;
 
-            Guid uid;
-            if (!Guid.TryParse(id, out uid)) return result.InvalidGuid();
+            var reset = Update(verify.Guid, validity);
+            if (!reset.HasValue) return verify.Result.NotFound();
 
-            var aid = Guid.Parse(validity ? "369548E9-C8DB-439B-A604-4FDC07F3CCDD" : "0FA34D43-2C52-4968-BDDA-C9191D7FCE80");
-            if (session.UserId != uid && !DataAccess.Authority(session, aid)) return result.Forbidden();
+            if (!reset.Value) return verify.Result.DataBaseError();
 
-            var reset = Update(uid, validity);
-            if (!reset.HasValue) return result.NotFound();
-
-            if (!reset.Value) return result.DataBaseError();
-
-            session = Sessions.SingleOrDefault(s => s.UserId == uid);
+            var session = Sessions.SingleOrDefault(s => s.UserId == verify.Guid);
             if (session != null) session.Validity = validity;
 
-            return result;
+            return verify.Result;
         }
 
         /// <summary>
@@ -172,18 +147,9 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult UserSignIn()
         {
-            var result = new JsonResult();
-            var session = GetAuthorization<Session>();
-            if (session == null) return result.InvalidAuth();
-
-            var verify = new Verify(session);
-            result = verify.Compare();
-            if (!result.Successful) return result;
-
-            verify.Basis.DeptId = session.DeptId;
-            verify.Basis.DeptName = session.DeptName;
-            verify.Basis.MachineId = session.MachineId;
-            return result.Success(Serialize(verify.Basis));
+            var verify = new Verify();
+            verify.SignIn();
+            return verify.Result;
         }
 
         /// <summary>
@@ -193,17 +159,16 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult UserSignOut(string account)
         {
-            Session session;
-            var result = General.Verify(out session);
-            if (!result.Successful) return result;
+            var action = "331BF752-CDB7-44DE-9631-DF2605BB527E";
+            var verify = new Verify();
+            if (verify.Basis.LoginName == account) action = null;
 
-            var aid = Guid.Parse("331BF752-CDB7-44DE-9631-DF2605BB527E");
-            if (session.LoginName != account && !DataAccess.Authority(session, aid)) return result.Forbidden();
+            if (!verify.Compare(action)) return verify.Result;
 
-            session = Sessions.SingleOrDefault(s => s.LoginName == account);
+            var session = Sessions.SingleOrDefault(s => s.LoginName == account);
             if (session != null) session.OnlineStatus = false;
 
-            return result;
+            return verify.Result;
         }
 
         #endregion
@@ -215,9 +180,14 @@ namespace Insight.WS.Base.Service
         /// </summary>
         /// <param name="group">用户组对象</param>
         /// <returns>JsonResult</returns>
-        public JsonResult AddGroup(SYS_UserGroup @group)
+        public JsonResult AddGroup(SYS_UserGroup group)
         {
-            throw new NotImplementedException();
+            const string action = "6E80210E-6F80-4FF7-8520-B602934D635C";
+            var verify = new Verify();
+            if (!verify.Compare(action)) return verify.Result;
+
+            var id = InsertData(verify.Basis.UserId, group);
+            return id == null ? verify.Result.DataBaseError() : verify.Result.Created();
         }
 
         /// <summary>
@@ -227,7 +197,11 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult RemoveGroup(string id)
         {
-            throw new NotImplementedException();
+            const string action = "E46B7A1C-A8B0-49B5-8494-BF1B09F43452";
+            var verify = new Verify();
+            if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
+
+            return DeleteGroup(verify.Guid) ? verify.Result : verify.Result.DataBaseError();
         }
 
         /// <summary>
@@ -235,9 +209,13 @@ namespace Insight.WS.Base.Service
         /// </summary>
         /// <param name="group">用户组对象</param>
         /// <returns>JsonResult</returns>
-        public JsonResult UpdateGroup(SYS_UserGroup @group)
+        public JsonResult UpdateGroup(SYS_UserGroup group)
         {
-            throw new NotImplementedException();
+            const string action = "6910FD14-5654-4CF0-B159-8FE1DF68619F";
+            var verify = new Verify();
+            if (!verify.Compare(action)) return verify.Result;
+
+            return Update(group) ? verify.Result : verify.Result.DataBaseError();
         }
 
         /// <summary>
@@ -247,7 +225,12 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult GetGroup(string id)
         {
-            throw new NotImplementedException();
+            const string action = "6910FD14-5654-4CF0-B159-8FE1DF68619F";
+            var verify = new Verify();
+            if (!verify.Compare(action)) return verify.Result;
+
+            var data = GetGroup(verify.Guid);
+            return data == null ? verify.Result.NoContent() : verify.Result.Success(Serialize(data));
         }
 
         /// <summary>
@@ -256,7 +239,12 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult GetGroups()
         {
-            throw new NotImplementedException();
+            const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
+            var verify = new Verify();
+            if (!verify.Compare(action)) return verify.Result;
+
+            var data = GetGroupList();
+            return data.Rows.Count > 0 ? verify.Result.Success(Serialize(data)) : verify.Result.NoContent();
         }
 
         /// <summary>
@@ -267,7 +255,11 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult AddGroupMember(string id, List<Guid> uids)
         {
-            throw new NotImplementedException();
+            const string action = "6C41724C-E118-4BCD-82AD-6B13D05C7894";
+            var verify = new Verify();
+            if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
+
+            return AddGroupMember(verify.Basis.UserId, verify.Guid, uids) ? verify.Result : verify.Result.DataBaseError();
         }
 
         /// <summary>
@@ -277,7 +269,11 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult RemoveMember(List<Guid> ids)
         {
-            throw new NotImplementedException();
+            const string action = "686C115A-CE2E-4E84-8F25-B63C15AC173C";
+            var verify = new Verify();
+            if (!verify.Compare(action)) return verify.Result;
+
+            return DeleteMember(ids) ? verify.Result : verify.Result.DataBaseError();
         }
 
         /// <summary>
@@ -286,7 +282,12 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult GetGroupMembers()
         {
-            throw new NotImplementedException();
+            const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
+            var verify = new Verify();
+            if (!verify.Compare(action)) return verify.Result;
+
+            var data = GetMemberList();
+            return data.Rows.Count > 0 ? verify.Result.Success(Serialize(data)) : verify.Result.NoContent();
         }
 
         /// <summary>
@@ -296,7 +297,12 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult GetOtherUser(string id)
         {
-            throw new NotImplementedException();
+            const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
+            var verify = new Verify();
+            if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
+
+            var data = GetOtherUser(verify.Guid);
+            return data.Rows.Count > 0 ? verify.Result.Success(Serialize(data)) : verify.Result.NoContent();
         }
 
         #endregion

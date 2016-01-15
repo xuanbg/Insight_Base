@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
@@ -40,7 +41,7 @@ namespace Insight.WS.Base.Service
         /// </summary>
         /// <param name="id">用户ID</param>
         /// <returns>bool 是否删除成功</returns>
-        private bool RemoveUser(Guid id)
+        private bool DeleteUser(Guid id)
         {
             var sql = $"Delete from SYS_User where ID = '{id}' and BuiltIn = 0";
             return SqlNonQuery(MakeCommand(sql)) > 0;
@@ -126,6 +127,131 @@ namespace Insight.WS.Base.Service
         private DataTable GetUserList()
         {
             const string sql = "select ID, BuiltIn as 内置, Name as 名称, LoginName as 登录名, Description as 描述, Case Validity when 1 then '正常' else '封禁' end 状态 From SYS_User where Type > 0 order by SN";
+            return SqlQuery(MakeCommand(sql));
+        }
+
+        /// <summary>
+        /// 根据对象实体数据新增一个用户组
+        /// </summary>
+        /// <param name="id">用户ID</param>
+        /// <param name="obj">用户组对象</param>
+        /// <returns>object 插入的用户组ID </returns>
+        private object InsertData(Guid id, SYS_UserGroup obj)
+        {
+            const string sql = "insert into SYS_UserGroup (Name, Description, CreatorUserId) select @Name, @Description, @CreatorUserId select ID From SYS_UserGroup where SN = SCOPE_IDENTITY()";
+            var parm = new[]
+            {
+                new SqlParameter("@Name", obj.Name),
+                new SqlParameter("@Description", obj.Description),
+                new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = id}
+            };
+            return SqlScalar(MakeCommand(sql, parm));
+        }
+
+        /// <summary>
+        /// 根据ID删除用户组
+        /// </summary>
+        /// <param name="id">用户组ID</param>
+        /// <returns>bool 是否删除成功</returns>
+        private bool DeleteGroup(Guid id)
+        {
+            var sql = $"Delete from SYS_UserGroup where ID = '{id}' and BuiltIn = 0";
+            return SqlNonQuery(MakeCommand(sql)) > 0;
+        }
+
+        /// <summary>
+        /// 根据对象实体数据更新用户组信息
+        /// </summary>
+        /// <param name="obj">用户组对象</param>
+        /// <returns>bool 是否更新成功</returns>
+        private bool Update(SYS_UserGroup obj)
+        {
+            const string sql = "update SYS_UserGroup set Name = @Name, Description = @Description where ID = @ID";
+            var parm = new[]
+            {
+                new SqlParameter("@ID", SqlDbType.UniqueIdentifier) {Value = obj.ID},
+                new SqlParameter("@Name", obj.Name),
+                new SqlParameter("@Description", obj.Description)
+            };
+            return SqlNonQuery(MakeCommand(sql, parm)) > 0;
+        }
+
+        /// <summary>
+        /// 根据ID获取用户组对象实体
+        /// </summary>
+        /// <param name="id">用户组ID</param>
+        /// <returns>SYS_UserGroup 用户组对象</returns>
+        private SYS_UserGroup GetGroup(Guid id)
+        {
+            using (var context = new BaseEntities())
+            {
+                return context.SYS_UserGroup.SingleOrDefault(e => e.ID == id);
+            }
+        }
+
+        /// <summary>
+        /// 获取全部用户组
+        /// </summary>
+        /// <returns>DataTable 全部用户组结果集</returns>
+        private DataTable GetGroupList()
+        {
+            const string sql = "select ID, BuiltIn as 内置, Name as 组名称, Description as 描述 From SYS_UserGroup where Visible = 1 order by SN";
+            return SqlQuery(MakeCommand(sql));
+        }
+
+        /// <summary>
+        /// 根据参数组集合批量插入用户组成员关系
+        /// </summary>
+        /// <param name="id">用户ID</param>
+        /// <param name="gid">用户组ID</param>
+        /// <param name="uids">用户ID集合</param>
+        /// <returns>bool 是否插入成功</returns>
+        private bool AddGroupMember(Guid id, Guid gid, IEnumerable<Guid> uids)
+        {
+            const string sql = "insert into SYS_UserGroupMember (GroupId, UserId, CreatorUserId) select @GroupId, @UserId, @CreatorUserId";
+            var cmds = uids.Select(uid => new[]
+            {
+                new SqlParameter("@GroupId", SqlDbType.UniqueIdentifier) {Value = gid},
+                new SqlParameter("@UserId", SqlDbType.UniqueIdentifier) {Value = uid},
+                new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = id}
+            }).Select(parm => MakeCommand(sql, parm)).ToList();
+            return SqlExecute(cmds);
+        }
+
+        /// <summary>
+        /// 根据ID集合删除用户组成员关系
+        /// </summary>
+        /// <param name="ids">户组成员关系ID集合</param>
+        /// <returns>bool 是否删除成功</returns>
+        private bool DeleteMember(IEnumerable<Guid> ids)
+        {
+            const string sql = "Delete from SYS_UserGroupMember where ID = @ID";
+            var cmds = ids.Select(id => new[]
+            {
+                new SqlParameter("@ID", SqlDbType.UniqueIdentifier) {Value = id}
+            }).Select(parm => MakeCommand(sql, parm)).ToList();
+            return SqlExecute(cmds);
+        }
+
+        /// <summary>
+        /// 获取全部用户组的所有成员信息
+        /// </summary>
+        /// <returns>DataTable 全部用户组成员信息结果集</returns>
+        private DataTable GetMemberList()
+        {
+            const string sql = "select M.ID, U.Name as 用户名, U.LoginName as 登录名, U.Description as 描述, M.GroupId, M.UserId from SYS_UserGroupMember M join SYS_User U on U.ID = M.UserId order by U.SN";
+            return SqlQuery(MakeCommand(sql));
+        }
+
+        /// <summary>
+        /// 根据ID获取组成员之外的全部用户
+        /// </summary>
+        /// <param name="id">用户组ID</param>
+        /// <returns>DataTable 组成员之外所有用户信息结果集</returns>
+        private DataTable GetOtherUser(Guid id)
+        {
+            var sql = "select U.ID, U.Name as 用户名, U.LoginName as 登录名, U.Description as 描述 from SYS_User U where U.Type > 0 ";
+            sql += $"and not exists (select UserId from SYS_UserGroupMember where UserId = U.ID and GroupId = '{id}') order by U.LoginName";
             return SqlQuery(MakeCommand(sql));
         }
 

@@ -19,7 +19,9 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult Verification()
         {
-            return General.Verify();
+            var verify = new Verify();
+            verify.Compare();
+            return verify.Result;
         }
 
         /// <summary>
@@ -29,7 +31,9 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult Authorization(string action)
         {
-            return General.Authorize(action);
+            var verify = new Verify();
+            verify.Compare(action);
+            return verify.Result;
         }
 
         #endregion
@@ -45,11 +49,11 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult NewCode(string mobile, int type, int time)
         {
-            var result = General.Verify(mobile + Secret);
-            if (!result.Successful) return result;
+            var verify = new Verify(mobile + Secret);
+            if (!verify.CompareUsageRule()) return verify.Result;
 
             var record = SmsCodes.OrderByDescending(r => r.CreateTime).FirstOrDefault(r => r.Mobile == mobile && r.Type == type);
-            if (record != null && (DateTime.Now - record.CreateTime).TotalSeconds < 60) return result.TimeTooShort();
+            if (record != null && (DateTime.Now - record.CreateTime).TotalSeconds < 60) return verify.Result.TimeTooShort();
 
             var code = Util.Random.Next(100000, 999999).ToString();
             record = new VerifyRecord
@@ -61,7 +65,7 @@ namespace Insight.WS.Base.Service
                 CreateTime = DateTime.Now
             };
             SmsCodes.Add(record);
-            return result.Success(code);
+            return verify.Result.Success(code);
         }
 
         /// <summary>
@@ -74,17 +78,17 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult VerifyCode(string mobile, string code, int type, bool remove)
         {
-            var result = General.Verify(mobile + Secret);
-            if (!result.Successful) return result;
+            var verify = new Verify(mobile + Secret);
+            if (!verify.CompareUsageRule()) return verify.Result;
 
             SmsCodes.RemoveAll(c => c.FailureTime < DateTime.Now);
             var record = SmsCodes.FirstOrDefault(c => c.Mobile == mobile && c.Code == code && c.Type == type);
-            if (record == null) return result.SMSCodeError();
+            if (record == null) return verify.Result.SMSCodeError();
 
-            if (!remove) return result;
+            if (!remove) return verify.Result;
 
             SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == type);
-            return result;
+            return verify.Result;
         }
 
         #endregion
@@ -97,11 +101,12 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult GetSessions()
         {
-            var result = General.Authorize("331BF752-CDB7-44DE-9631-DF2605BB527E");
-            if (!result.Successful) return result;
+            const string action = "331BF752-CDB7-44DE-9631-DF2605BB527E";
+            var verify = new Verify();
+            if (!verify.Compare(action)) return verify.Result;
 
             var list = Sessions.Where(s => s.UserType > 0 && s.OnlineStatus).ToList();
-            return result.Success(Serialize(list));
+            return list.Count > 0 ? verify.Result.Success(Serialize(list)) : verify.Result.NoContent();
         }
 
         #endregion

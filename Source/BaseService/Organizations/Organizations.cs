@@ -17,11 +17,12 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult AddOrg(SYS_Organization org, int index)
         {
-            Session session;
-            var result = General.Authorize(out session, "88AC97EF-52A3-4F7F-8121-4C311206535F");
-            if (!result.Successful) return result;
+            const string action = "88AC97EF-52A3-4F7F-8121-4C311206535F";
+            var verify = new Verify();
+            if (!verify.Compare(action)) return verify.Result;
 
-            return InsertData(session.UserId, org, index) ? result.Created() : result.DataBaseError();
+            var result = verify.Result;
+            return InsertData(verify.Basis.UserId, org, index) ? result.Created() : result.DataBaseError();
         }
 
         /// <summary>
@@ -31,13 +32,11 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult RemoveOrg(string id)
         {
-            var result = General.Authorize("71803766-97FE-4E6E-82DB-D5C90D2B7004");
-            if (!result.Successful) return result;
+            const string action = "71803766-97FE-4E6E-82DB-D5C90D2B7004";
+            var verify = new Verify();
+            if (!verify.Compare(action)) return verify.Result;
 
-            Guid gid;
-            if (!Guid.TryParse(id, out gid)) return result.InvalidGuid();
-
-            return DeleteOrg(gid) ? result : result.DataBaseError();
+            return DeleteOrg(verify.Guid) ? verify.Result : verify.Result.DataBaseError();
         }
 
         /// <summary>
@@ -48,10 +47,11 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult UpdateOrg(SYS_Organization obj, int index)
         {
-            var result = General.Authorize("542D5E28-8102-40C6-9C01-190D13DBF6C6");
-            if (!result.Successful) return result;
+            const string action = "542D5E28-8102-40C6-9C01-190D13DBF6C6";
+            var verify = new Verify();
+            if (!verify.Compare(action)) return verify.Result;
 
-            return Update(obj, index) ? result : result.DataBaseError();
+            return Update(obj) ? verify.Result : verify.Result.DataBaseError();
         }
 
         /// <summary>
@@ -61,14 +61,12 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult GetOrg(string id)
         {
-            var result = General.Authorize("928C7527-A2F7-49A3-A548-12B3834D8822");
-            if (!result.Successful) return result;
+            const string action = "928C7527-A2F7-49A3-A548-12B3834D8822";
+            var verify = new Verify();
+            if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
-            Guid gid;
-            if (!Guid.TryParse(id, out gid)) return result.InvalidGuid();
-
-            var org = GetOrg(gid);
-            return org == null ? result.NotFound() : result.Success(Serialize(org));
+            var org = GetOrg(verify.Guid);
+            return org == null ? verify.Result.NotFound() : verify.Result.Success(Serialize(org));
         }
 
         /// <summary>
@@ -77,11 +75,12 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult GetOrgTree()
         {
-            var result = General.Authorize("928C7527-A2F7-49A3-A548-12B3834D8822");
-            if (!result.Successful) return result;
+            const string action = "928C7527-A2F7-49A3-A548-12B3834D8822";
+            var verify = new Verify();
+            if (!verify.Compare(action)) return verify.Result;
 
             var data = GetOrgList();
-            return data.Rows.Count > 0 ? result.Success(Serialize(data)) : result.NoContent();
+            return data.Rows.Count > 0 ? verify.Result.Success(Serialize(data)) : verify.Result.NoContent();
         }
 
         /// <summary>
@@ -91,11 +90,11 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult AddOrgMerger(SYS_OrgMerger org)
         {
-            Session session;
-            var result = General.Authorize(out session, "DAE7F2C5-E379-4F74-8043-EB616D4A5F8B");
-            if (!result.Successful) return result;
+            const string action = "DAE7F2C5-E379-4F74-8043-EB616D4A5F8B";
+            var verify = new Verify();
+            if (!verify.Compare(action)) return verify.Result;
 
-            return InsertData(session.UserId, org) ? result : result.DataBaseError();
+            return InsertData(verify.Basis.UserId, org) ? verify.Result : verify.Result.DataBaseError();
         }
 
         /// <summary>
@@ -105,10 +104,11 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult SetOrgParent(SYS_Organization org)
         {
-            var result = General.Authorize("DB1A4EA2-1B3E-41AD-91FA-A3945AB7D901");
-            if (!result.Successful) return result;
+            const string action = "DB1A4EA2-1B3E-41AD-91FA-A3945AB7D901";
+            var verify = new Verify();
+            if (!verify.Compare(action)) return verify.Result;
 
-            return Update(org) ? result : result.DataBaseError();
+            return Update(org) ? verify.Result : verify.Result.DataBaseError();
         }
 
         /// <summary>
@@ -119,14 +119,11 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult AddOrgMember(string id, List<Guid> uids)
         {
-            Session session;
-            var result = General.Authorize(out session, "1F29DDEA-A4D7-4EF9-8136-0D4AFE88CB08");
-            if (!result.Successful) return result;
+            const string action = "1F29DDEA-A4D7-4EF9-8136-0D4AFE88CB08";
+            var verify = new Verify();
+            if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
-            Guid gid;
-            if (!Guid.TryParse(id, out gid)) return result.InvalidGuid();
-
-            return InsertData(session.UserId, gid, uids) ? result : result.DataBaseError();
+            return InsertData(verify.Basis.UserId, verify.Guid, uids) ? verify.Result : verify.Result.DataBaseError();
         }
 
         /// <summary>
@@ -136,10 +133,11 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult RemoveOrgMember(List<Guid> ids)
         {
-            var result = General.Authorize("70AC8EEB-F920-468D-8C8F-2DBA049ADAE9");
-            if (!result.Successful) return result;
+            const string action = "70AC8EEB-F920-468D-8C8F-2DBA049ADAE9";
+            var verify = new Verify();
+            if (!verify.Compare(action)) return verify.Result;
 
-            return DeleteOrgMember(ids) ? result : result.DataBaseError();
+            return DeleteOrgMember(ids) ? verify.Result : verify.Result.DataBaseError();
         }
 
         /// <summary>
@@ -148,11 +146,12 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         public JsonResult GetOrgMembers()
         {
-            var result = General.Authorize("928C7527-A2F7-49A3-A548-12B3834D8822");
-            if (!result.Successful) return result;
+            const string action = "928C7527-A2F7-49A3-A548-12B3834D8822";
+            var verify = new Verify();
+            if (!verify.Compare(action)) return verify.Result;
 
             var data = GetOrgMemberList();
-            return data.Rows.Count > 0 ? result.Success(Serialize(data)) : result.NoContent();
+            return data.Rows.Count > 0 ? verify.Result.Success(Serialize(data)) : verify.Result.NoContent();
         }
 
         /// <summary>
@@ -161,14 +160,12 @@ namespace Insight.WS.Base.Service
         /// <param name="id">节点ID</param>
         public JsonResult GetOtherOrgMember(string id)
         {
-            var result = General.Authorize("928C7527-A2F7-49A3-A548-12B3834D8822");
-            if (!result.Successful) return result;
+            const string action = "928C7527-A2F7-49A3-A548-12B3834D8822";
+            var verify = new Verify();
+            if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
-            Guid gid;
-            if (!Guid.TryParse(id, out gid)) return result.InvalidGuid();
-
-            var data = GetOrgMemberBeSides(gid);
-            return data.Rows.Count > 0 ? result : result.NoContent();
+            var data = GetOtherOrgMember(verify.Guid);
+            return data.Rows.Count > 0 ? verify.Result.Success(Serialize(data)) : verify.Result.NoContent();
         }
 
     }

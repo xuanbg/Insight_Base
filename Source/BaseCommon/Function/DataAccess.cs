@@ -47,7 +47,7 @@ namespace Insight.WS.Base.Common
         /// <summary>
         /// 根据操作ID返回鉴权结果
         /// </summary>
-        /// <param name="obj">用于会话</param>
+        /// <param name="obj">用户会话</param>
         /// <param name="id">操作ID</param>
         /// <returns>bool 是否授权</returns>
         public static bool Authority(Session obj, Guid id)

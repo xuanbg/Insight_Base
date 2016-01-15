@@ -156,7 +156,7 @@ namespace Insight.WS.Base.Service
         /// <param name="tid">职位ID</param>
         /// <param name="uids">用户ID集合</param>
         /// <returns>bool 是否成功</returns>
-        private bool InsertData(Guid uid, Guid tid, List<Guid> uids)
+        private bool InsertData(Guid uid, Guid tid, IEnumerable<Guid> uids)
         {
             const string sql = "insert into SYS_OrgMember ([OrgId], [UserId], [CreatorUserId]) select @OrgId, @UserId, @CreatorUserId";
             var cmds = uids.Select(id => new[]
@@ -173,7 +173,7 @@ namespace Insight.WS.Base.Service
         /// </summary>
         /// <param name="ids">职位成员关系ID集合</param>
         /// <returns>bool 是否删除成功</returns>
-        private bool DeleteOrgMember(List<Guid> ids)
+        private bool DeleteOrgMember(IEnumerable<Guid> ids)
         {
             const string sql = "Delete from SYS_OrgMember where ID = @ID";
             var cmds = ids.Select(id => new[]
@@ -198,7 +198,7 @@ namespace Insight.WS.Base.Service
         /// </summary>
         /// <param name="id">节点ID</param>
         /// <returns>DataTable 节点可添加成员信息结果集</returns>
-        private DataTable GetOrgMemberBeSides(Guid id)
+        private DataTable GetOtherOrgMember(Guid id)
         {
             var sql = "select U.ID, U.Name as 用户名, U.LoginName as 登录名, U.[Description] as 描述 from SYS_User U left join MDG_Contact C on C.MID = U.ID ";
             sql += $"where not exists (select UserId from SYS_OrgMember where UserId = U.ID and OrgId = '{id}') and C.MID is null ";
