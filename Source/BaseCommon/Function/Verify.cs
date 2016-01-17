@@ -133,8 +133,6 @@ namespace Insight.WS.Base.Common
         /// <returns>bool</returns>
         public bool Compare(string action = null)
         {
-            if (!Result.Successful) return false;
-
             if (!Basis.Validity)
             {
                 Session.LoginResult = LoginResult.Banned;
@@ -160,6 +158,7 @@ namespace Insight.WS.Base.Common
             Basis.OnlineStatus = true;
             Basis.FailureCount = 0;
             Basis.LoginResult = Basis.MachineId == Session.MachineId ? LoginResult.Success : LoginResult.Multiple;
+            Result.Success();
             if (action == null) return true;
 
             // 开始鉴权

@@ -63,7 +63,7 @@
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="Entity\GuidParse.cs" />
-    <Compile Include="Entity\JsonResult.cs" />
+    <Compile Include="Function\JsonResult.cs" />
     <Compile Include="Entity\Model.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
