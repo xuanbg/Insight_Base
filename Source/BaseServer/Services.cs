@@ -5,8 +5,9 @@ using System.ServiceModel.Channels;
 using System.ServiceModel.Description;
 using Insight.WS.Base.Common.Entity;
 using Microsoft.Samples.GZipEncoder;
+using Insight.WS.Base.Common;
 
-namespace Insight.WS.Base.Common
+namespace Insight.WS.Base
 {
     public class Services
     {
