@@ -39,6 +39,11 @@ namespace Insight.WS.Base.Common
         private readonly string VerifyString;
 
         /// <summary>
+        /// Session.ID是否一致
+        /// </summary>
+        private readonly bool Identical = true;
+
+        /// <summary>
         /// 构造方法，使用Session验证
         /// </summary>
         public Verify()
@@ -51,10 +56,10 @@ namespace Insight.WS.Base.Common
             }
 
             Basis = Session.ID < Sessions.Count ? Sessions[Session.ID] : GetSession(Session);
-            if (Basis.LoginName != Session.LoginName)
-            {
-                Basis = GetSession(Session);
-            }
+            if (Basis.LoginName == Session.LoginName) return;
+
+            Identical = false;
+            Basis = GetSession(Session);
         }
 
         /// <summary>
@@ -158,7 +163,11 @@ namespace Insight.WS.Base.Common
             Basis.OnlineStatus = true;
             Basis.FailureCount = 0;
             Basis.LoginResult = Basis.MachineId == Session.MachineId ? LoginResult.Success : LoginResult.Multiple;
-            Result.Success();
+
+            // 如Session.ID不一致，返回Session过期的信息
+            if (Identical) Result.Success();
+            else Result.Expired();
+
             if (action == null) return true;
 
             // 开始鉴权
