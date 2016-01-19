@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ServiceModel;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
 using static Insight.WS.Base.Common.Util;
 
 namespace Insight.WS.Base.Service
 {
-
     public partial class BaseService : Iorganizations
     {
         /// <summary>

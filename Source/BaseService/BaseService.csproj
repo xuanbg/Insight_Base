@@ -49,6 +49,9 @@
     <Compile Include="Organizations\DataAccess.cs" />
     <Compile Include="Organizations\Iorganizations.cs" />
     <Compile Include="Organizations\Organizations.cs" />
+    <Compile Include="Roles\DataAccess.cs" />
+    <Compile Include="Roles\Iroles.cs" />
+    <Compile Include="Roles\Roles.cs" />
     <Compile Include="Users\DataAccess.cs" />
     <Compile Include="Users\Iusers.cs" />
     <Compile Include="Users\Users.cs" />
@@ -63,9 +66,7 @@
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Roles\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
