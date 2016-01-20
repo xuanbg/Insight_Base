@@ -61,21 +61,21 @@ namespace Insight.WS.Base.Service
         /// 更新指定用户Session的签名
         /// </summary>
         /// <param name="id">用户ID</param>
-        /// <param name="pw">用户新密码</param>
+        /// <param name="password">用户新密码</param>
         /// <returns>JsonResult</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "signature", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult UpdateSignature(string id, string pw);
+        JsonResult UpdateSignature(string id, string password);
 
         /// <summary>
         /// 用户重置登录密码
         /// </summary>
         /// <param name="code">短信验证码</param>
-        /// <param name="pw">用户新密码</param>
+        /// <param name="password">用户新密码</param>
         /// <returns>JsonResult</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "resetpw", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult ResetSignature(string code, string pw);
+        JsonResult ResetSignature(string code, string password);
 
         /// <summary>
         /// 根据用户ID设置用户状态

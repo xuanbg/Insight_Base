@@ -53,7 +53,8 @@ namespace Insight.WS.Base.Common
         /// </summary>
         public Verify()
         {
-            Session = GetAuthorization<Session>();
+            var dict = GetAuthorization();
+            Session = GetAuthor<Session>(dict["Auth"]);
             if (Session == null)
             {
                 Result.InvalidAuth();
@@ -76,7 +77,8 @@ namespace Insight.WS.Base.Common
         public Verify(string rule)
         {
             Rule = Hash(rule);
-            VerifyString = GetAuthorization<string>();
+            var dict = GetAuthorization();
+            VerifyString = GetAuthor<string>(dict["Auth"]);
             if (VerifyString == null)
                 Result.InvalidAuth();
         }
