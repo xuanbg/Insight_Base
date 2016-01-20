@@ -2,7 +2,6 @@
 using System.ServiceModel;
 using System.ServiceProcess;
 using System.Windows.Forms;
-using Insight.WS.Base.Common;
 
 namespace Insight.WS.Base
 {

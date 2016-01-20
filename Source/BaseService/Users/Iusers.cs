@@ -68,6 +68,16 @@ namespace Insight.WS.Base.Service
         JsonResult UpdateSignature(string id, string pw);
 
         /// <summary>
+        /// 用户重置登录密码
+        /// </summary>
+        /// <param name="code">短信验证码</param>
+        /// <param name="pw">用户新密码</param>
+        /// <returns>JsonResult</returns>
+        [WebInvoke(Method = "PUT", UriTemplate = "resetpw", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [OperationContract]
+        JsonResult ResetSignature(string code, string pw);
+
+        /// <summary>
         /// 根据用户ID设置用户状态
         /// </summary>
         /// <param name="id">用户ID</param>

@@ -87,15 +87,14 @@ namespace Insight.WS.Base.Common
         /// 用户登录专用验证方法
         /// </summary>
         /// <returns>bool</returns>
-        public bool SignIn()
+        public void SignIn()
         {
-            if (!Compare()) return false;
+            if (!Compare()) return;
 
             Basis.DeptId = Session.DeptId;
             Basis.DeptName = Session.DeptName;
             Basis.MachineId = Session.MachineId;
             Result.Success(Serialize(Basis));
-            return true;
         }
 
         /// <summary>
