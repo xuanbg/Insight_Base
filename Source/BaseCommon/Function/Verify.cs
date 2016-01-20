@@ -44,6 +44,11 @@ namespace Insight.WS.Base.Common
         private readonly bool Identical = true;
 
         /// <summary>
+        /// 最大授权数
+        /// </summary>
+        private readonly int MaxAuth = Convert.ToInt32(GetAppSetting("MaxAuth"));
+
+        /// <summary>
         /// 构造方法，使用Session验证
         /// </summary>
         public Verify()
@@ -56,6 +61,8 @@ namespace Insight.WS.Base.Common
             }
 
             Basis = Session.ID < Sessions.Count ? Sessions[Session.ID] : GetSession(Session);
+            if (Basis == null) return;
+
             if (Basis.LoginName == Session.LoginName) return;
 
             Identical = false;
@@ -137,6 +144,20 @@ namespace Insight.WS.Base.Common
         /// <returns>bool</returns>
         public bool Compare(string action = null)
         {
+            if (Basis == null)
+            {
+                Session.LoginResult = LoginResult.NotExist;
+                Result.InvalidAuth(Serialize(Session));
+                return false;
+            }
+
+            if (Basis.ID > MaxAuth)
+            {
+                Session.LoginResult = LoginResult.Unauthorized;
+                Result.InvalidAuth(Serialize(Session));
+                return false;
+            }
+
             if (!Basis.Validity)
             {
                 Session.LoginResult = LoginResult.Banned;
@@ -155,17 +176,26 @@ namespace Insight.WS.Base.Common
             if (Basis.Signature != Session.Signature || (Basis.FailureCount >= 5 && Basis.MachineId != Session.MachineId))
             {
                 Basis.FailureCount++;
-                Result.InvalidAuth();
+                Session.LoginResult = LoginResult.Failure;
+                Result.InvalidAuth(Serialize(Session));
                 return false;
             }
 
             Basis.OnlineStatus = true;
             Basis.FailureCount = 0;
-            Basis.LoginResult = Basis.MachineId == Session.MachineId ? LoginResult.Success : LoginResult.Multiple;
-
+            if (Basis.MachineId == Session.MachineId)
+            {
+                Basis.LoginResult = LoginResult.Success;
+            }
+            else
+            {
+                Basis.LoginResult = LoginResult.Multiple;
+                Result.Multiple();
+            }
+            
             // 如Session.ID不一致，返回Session过期的信息
             if (Identical) Result.Success();
-            else Result.Expired();
+            else Result.Expired(Serialize(Basis));
 
             if (action == null) return true;
 
