@@ -119,6 +119,35 @@ namespace Insight.WS.Base.Service
         }
 
         /// <summary>
+        /// 用户重置登录密码
+        /// </summary>
+        /// <param name="code">短信验证码</param>
+        /// <param name="pw">用户新密码</param>
+        /// <returns>JsonResult</returns>
+        public JsonResult ResetSignature(string code, string pw)
+        {
+            var verify = new Verify();
+            var session = verify.Basis;
+            if (session == null) return verify.Result.NotFound();
+
+            // 验证短信验证码
+            var mobile = session.LoginName;
+            SmsCodes.RemoveAll(c => c.FailureTime < DateTime.Now);
+            var record = SmsCodes.FirstOrDefault(c => c.Mobile == mobile && c.Code == code && c.Type == 2);
+            if (record == null) return verify.Result.SMSCodeError();
+
+            SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == 2);
+
+            // 更新用户登录密码
+            var reset = Update(session.UserId, pw);
+            if (reset != null && !reset.Value) return verify.Result.DataBaseError();
+
+            session.Signature = Hash(session.LoginName.ToUpper() + pw);
+            verify.SignIn();
+            return verify.Result;
+        }
+
+        /// <summary>
         /// 根据用户ID设置用户状态
         /// </summary>
         /// <param name="id">用户ID</param>

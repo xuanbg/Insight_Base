@@ -36,7 +36,15 @@ namespace Insight.WS.Base
             string path = $"{Application.StartupPath}\\BaseService.dll";
             if (!File.Exists(path)) return;
 
-            Host = Services.CreateHost(path);
+            var serv = new Services
+            {
+                BaseAddress = Util.GetAppSetting("BaseAddress"),
+                Port = Util.GetAppSetting("Port"),
+                NameSpace = "Insight.WS.Base.Service",
+                ServiceType = "BaseService",
+                Endpoints = new [] { "verify", "users", "organizations", "roles" }
+            };
+            Host = serv.CreateHost(path);
             Host.Open();
         }
 

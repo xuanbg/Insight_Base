@@ -44,11 +44,17 @@ namespace Insight.WS.Base.Common
         private readonly bool Identical = true;
 
         /// <summary>
+        /// 最大授权数
+        /// </summary>
+        private readonly int MaxAuth = Convert.ToInt32(GetAppSetting("MaxAuth"));
+
+        /// <summary>
         /// 构造方法，使用Session验证
         /// </summary>
         public Verify()
         {
-            Session = GetAuthorization<Session>();
+            var dict = GetAuthorization();
+            Session = GetAuthor<Session>(dict["Auth"]);
             if (Session == null)
             {
                 Result.InvalidAuth();
@@ -56,6 +62,8 @@ namespace Insight.WS.Base.Common
             }
 
             Basis = Session.ID < Sessions.Count ? Sessions[Session.ID] : GetSession(Session);
+            if (Basis == null) return;
+
             if (Basis.LoginName == Session.LoginName) return;
 
             Identical = false;
@@ -69,7 +77,8 @@ namespace Insight.WS.Base.Common
         public Verify(string rule)
         {
             Rule = Hash(rule);
-            VerifyString = GetAuthorization<string>();
+            var dict = GetAuthorization();
+            VerifyString = GetAuthor<string>(dict["Auth"]);
             if (VerifyString == null)
                 Result.InvalidAuth();
         }
@@ -87,15 +96,14 @@ namespace Insight.WS.Base.Common
         /// 用户登录专用验证方法
         /// </summary>
         /// <returns>bool</returns>
-        public bool SignIn()
+        public void SignIn()
         {
-            if (!Compare()) return false;
+            if (!Compare()) return;
 
             Basis.DeptId = Session.DeptId;
             Basis.DeptName = Session.DeptName;
             Basis.MachineId = Session.MachineId;
             Result.Success(Serialize(Basis));
-            return true;
         }
 
         /// <summary>
@@ -138,6 +146,20 @@ namespace Insight.WS.Base.Common
         /// <returns>bool</returns>
         public bool Compare(string action = null)
         {
+            if (Basis == null)
+            {
+                Session.LoginResult = LoginResult.NotExist;
+                Result.InvalidAuth(Serialize(Session));
+                return false;
+            }
+
+            if (Basis.ID > MaxAuth)
+            {
+                Session.LoginResult = LoginResult.Unauthorized;
+                Result.InvalidAuth(Serialize(Session));
+                return false;
+            }
+
             if (!Basis.Validity)
             {
                 Session.LoginResult = LoginResult.Banned;
@@ -156,17 +178,26 @@ namespace Insight.WS.Base.Common
             if (Basis.Signature != Session.Signature || (Basis.FailureCount >= 5 && Basis.MachineId != Session.MachineId))
             {
                 Basis.FailureCount++;
-                Result.InvalidAuth();
+                Session.LoginResult = LoginResult.Failure;
+                Result.InvalidAuth(Serialize(Session));
                 return false;
             }
 
             Basis.OnlineStatus = true;
             Basis.FailureCount = 0;
-            Basis.LoginResult = Basis.MachineId == Session.MachineId ? LoginResult.Success : LoginResult.Multiple;
-
+            if (Basis.MachineId == Session.MachineId)
+            {
+                Basis.LoginResult = LoginResult.Success;
+            }
+            else
+            {
+                Basis.LoginResult = LoginResult.Multiple;
+                Result.Multiple();
+            }
+            
             // 如Session.ID不一致，返回Session过期的信息
             if (Identical) Result.Success();
-            else Result.Expired();
+            else Result.Expired(Serialize(Basis));
 
             if (action == null) return true;
 

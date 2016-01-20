@@ -131,12 +131,13 @@
         /// 返回身份验证失败（401）的错误信息
         /// </summary>
         /// <returns>JsonResult</returns>
-        public JsonResult InvalidAuth()
+        public JsonResult InvalidAuth(string data = null)
         {
             Successful = false;
             Code = "401";
             Name = "InvalidAuthenticationInfo";
             Message = "提供的身份验证信息不正确";
+            Data = data;
             return this;
         }
 
