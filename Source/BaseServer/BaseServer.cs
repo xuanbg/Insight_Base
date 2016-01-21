@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.ServiceModel;
 using System.ServiceProcess;
 using System.Windows.Forms;
@@ -36,13 +37,20 @@ namespace Insight.WS.Base
             string path = $"{Application.StartupPath}\\BaseService.dll";
             if (!File.Exists(path)) return;
 
+            var endpoints = new List<EndpointSet>
+            {
+                new EndpointSet { Name = "Iverify", Path = "verify"},
+                new EndpointSet { Name = "Iusers", Path = "users"},
+                new EndpointSet { Name = "Iorganizations", Path = "organizations", Compress = true },
+                new EndpointSet { Name = "Iroles", Path = "roles", Compress = true }
+            };
             var serv = new Services
             {
                 BaseAddress = Util.GetAppSetting("BaseAddress"),
                 Port = Util.GetAppSetting("Port"),
                 NameSpace = "Insight.WS.Base.Service",
                 ServiceType = "BaseService",
-                Endpoints = new [] { "verify", "users", "organizations", "roles" }
+                Endpoints = endpoints
             };
             Host = serv.CreateHost(path);
             Host.Open();
