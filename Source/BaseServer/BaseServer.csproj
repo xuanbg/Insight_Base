@@ -38,7 +38,6 @@
       <HintPath>..\packages\Service.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
