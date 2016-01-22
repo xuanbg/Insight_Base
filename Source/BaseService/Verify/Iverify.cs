@@ -14,7 +14,7 @@ namespace Insight.WS.Base.Service
         /// 会话合法性验证
         /// </summary>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "verify", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult Verification();
 
