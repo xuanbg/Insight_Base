@@ -22,6 +22,11 @@ namespace Insight.WS.Base.Common
 
             var headers = context.IncomingRequest.Headers;
             var response = context.OutgoingResponse;
+            response.Headers.Add("Access-Control-Allow-Credentials", "true");
+            response.Headers.Add("Access-Control-Allow-Headers", "Accept, Content-Type");
+            response.Headers.Add("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
+            response.Headers.Add("Access-Control-Allow-Origin", "*");
+
             if (!CompareVersion(headers))
             {
                 response.StatusCode = HttpStatusCode.NotAcceptable;
