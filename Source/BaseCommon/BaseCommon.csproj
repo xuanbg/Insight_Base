@@ -35,10 +35,8 @@
       <HintPath>..\packages\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Data" />
@@ -48,6 +46,7 @@
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="Entity\GuidParse.cs" />
+    <Compile Include="Function\General.cs" />
     <Compile Include="Function\JsonResult.cs" />
     <Compile Include="Entity\Model.Context.cs">
       <AutoGen>True</AutoGen>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Insight.WS.Base.Common.Entity;
+using static Insight.WS.Base.Common.General;
 using static Insight.WS.Base.Common.Util;
 
 namespace Insight.WS.Base.Common
