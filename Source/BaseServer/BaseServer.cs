@@ -4,7 +4,7 @@ using System.IO;
 using System.ServiceModel;
 using System.ServiceProcess;
 using System.Windows.Forms;
-using Insight.WS.Base.Common;
+using static Insight.WS.Base.Common.Util;
 
 namespace Insight.WS.Base
 {
@@ -23,7 +23,7 @@ namespace Insight.WS.Base
         public BaseServer()
         {
             InitializeComponent();
-            InitVersion();
+            InitSeting();
         }
 
         #endregion
@@ -41,15 +41,15 @@ namespace Insight.WS.Base
 
             var endpoints = new List<EndpointSet>
             {
-                new EndpointSet { Name = "Iverify", Path = "verify"},
-                new EndpointSet { Name = "Iusers", Path = "users"},
-                new EndpointSet { Name = "Iorganizations", Path = "organizations", Compress = true },
-                new EndpointSet { Name = "Iroles", Path = "roles", Compress = true }
+                new EndpointSet { Name = "IVerify", Path = "verify" },
+                new EndpointSet { Name = "IUsers", Path = "users" },
+                new EndpointSet { Name = "IOrganizations", Path = "organizations" },
+                new EndpointSet { Name = "IRoles", Path = "roles" }
             };
             var serv = new Services
             {
-                BaseAddress = Util.GetAppSetting("Address"),
-                Port = Util.GetAppSetting("Port"),
+                BaseAddress = GetAppSetting("Address"),
+                Port = GetAppSetting("Port"),
                 NameSpace = "Insight.WS.Base.Service",
                 ServiceType = "BaseService",
                 Endpoints = endpoints
@@ -70,13 +70,17 @@ namespace Insight.WS.Base
         #endregion
 
         /// <summary>
-        /// 读取版本信息
+        /// 初始化环境变量
         /// </summary>
-        public static void InitVersion()
+        public static void InitSeting()
         {
             var version = new Version(Application.ProductVersion);
             var build = $"{version.Major}{version.Minor}{version.Build.ToString("D4").Substring(0, 2)}";
-            Util.Version = Convert.ToInt32(build);
+            CurrentVersion = Convert.ToInt32(build);
+            CompatibleVersion = GetAppSetting("CompatibleVersion");
+            UpdateVersion = GetAppSetting("UpdateVersion");
+
+            LogServer = GetAppSetting("LogServer");
         }
 
     }

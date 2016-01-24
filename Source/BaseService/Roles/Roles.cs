@@ -6,7 +6,7 @@ using Insight.WS.Base.Common.Entity;
 
 namespace Insight.WS.Base.Service
 {
-    public partial class BaseService : Iroles
+    public partial class BaseService : IRoles
     {
         public JsonResult AddRole(SYS_Role role, DataTable action, DataTable data, DataTable custom)
         {

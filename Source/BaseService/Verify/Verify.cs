@@ -4,14 +4,31 @@ using System.ServiceModel;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
 using static Insight.WS.Base.Common.Util;
+using System.ServiceModel.Web;
 
 namespace Insight.WS.Base.Service
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
-    public partial class BaseService : Iverify
+    public partial class BaseService : IVerify
     {
 
         #region Verify
+
+        /// <summary>
+        /// 为跨域请求设置响应头信息
+        /// </summary>
+        public void ResponseOptions()
+        {
+            var context = WebOperationContext.Current;
+            if (context == null) return;
+
+            var headers = context.IncomingRequest.Headers;
+            var response = context.OutgoingResponse;
+            response.Headers.Add("Access-Control-Allow-Credentials", "true");
+            response.Headers.Add("Access-Control-Allow-Headers", "Accept, Content-Type, Authorization");
+            response.Headers.Add("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
+            response.Headers.Add("Access-Control-Allow-Origin", "*");
+        }
 
         /// <summary>
         /// 会话合法性验证

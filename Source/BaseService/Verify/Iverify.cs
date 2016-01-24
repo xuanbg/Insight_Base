@@ -5,10 +5,17 @@ using Insight.WS.Base.Common;
 namespace Insight.WS.Base.Service
 {
     [ServiceContract]
-    public interface Iverify
+    public interface IVerify
     {
 
         #region Verify
+
+        /// <summary>
+        /// 为跨域请求设置响应头信息
+        /// </summary>
+        [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [OperationContract]
+        void ResponseOptions();
 
         /// <summary>
         /// 会话合法性验证

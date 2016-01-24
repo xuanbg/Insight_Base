@@ -43,15 +43,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Organizations\DataAccess.cs" />
-    <Compile Include="Organizations\Iorganizations.cs" />
+    <Compile Include="Organizations\IOrganizations.cs" />
     <Compile Include="Organizations\Organizations.cs" />
     <Compile Include="Roles\DataAccess.cs" />
-    <Compile Include="Roles\Iroles.cs" />
+    <Compile Include="Roles\IRoles.cs" />
     <Compile Include="Roles\Roles.cs" />
     <Compile Include="Users\DataAccess.cs" />
-    <Compile Include="Users\Iusers.cs" />
+    <Compile Include="Users\IUsers.cs" />
     <Compile Include="Users\Users.cs" />
-    <Compile Include="Verify\Iverify.cs" />
+    <Compile Include="Verify\IVerify.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Verify\Verify.cs" />
   </ItemGroup>

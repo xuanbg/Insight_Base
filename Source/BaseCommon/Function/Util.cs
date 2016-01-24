@@ -23,6 +23,11 @@ namespace Insight.WS.Base.Common
         public const string Secret = "842A381C91CE43A98720825601C22A56";
 
         /// <summary>
+        /// 日志服务路径
+        /// </summary>
+        public static string LogServer;
+
+        /// <summary>
         /// 在线用户列表
         /// </summary>
         public static List<Session> Sessions = new List<Session>();
@@ -38,24 +43,19 @@ namespace Insight.WS.Base.Common
         public static readonly Random Random = new Random(Environment.TickCount);
 
         /// <summary>
-        /// 日志服务路径
-        /// </summary>
-        public static readonly string LogServer = GetAppSetting("LogServer");
-
-        /// <summary>
         /// 当前程序集版本
         /// </summary>
-        public static int Version;
+        public static int CurrentVersion;
 
         /// <summary>
         /// 接口最后兼容版本
         /// </summary>
-        public static readonly string CompatibleVersion = GetAppSetting("CompatibleVersion");
+        public static string CompatibleVersion;
 
         /// <summary>
         /// 接口最新版本
         /// </summary>
-        public static readonly string UpdateVersion = GetAppSetting("UpdateVersion");
+        public static string UpdateVersion;
 
         #endregion
 

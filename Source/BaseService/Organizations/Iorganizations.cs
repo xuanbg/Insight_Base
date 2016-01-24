@@ -8,8 +8,16 @@ using Insight.WS.Base.Common.Entity;
 namespace Insight.WS.Base.Service
 {
     [ServiceContract]
-    public interface Iorganizations
+    public interface IOrganizations
     {
+
+        /// <summary>
+        /// 为跨域请求设置响应头信息
+        /// </summary>
+        [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [OperationContract]
+        void ResponseOptions();
+
         /// <summary>
         /// 根据对象实体数据新增一个组织机构节点
         /// </summary>

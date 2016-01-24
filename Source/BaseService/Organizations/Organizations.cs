@@ -7,7 +7,7 @@ using static Insight.WS.Base.Common.Util;
 
 namespace Insight.WS.Base.Service
 {
-    public partial class BaseService : Iorganizations
+    public partial class BaseService : IOrganizations
     {
         /// <summary>
         /// 根据对象实体数据新增一个组织机构节点

@@ -7,7 +7,7 @@ using static Insight.WS.Base.Common.Util;
 
 namespace Insight.WS.Base.Service
 {
-    public partial class BaseService : Iusers
+    public partial class BaseService : IUsers
     {
 
         #region User

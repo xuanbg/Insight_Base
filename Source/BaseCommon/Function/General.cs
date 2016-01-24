@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Net;
 using System.ServiceModel.Web;
 using System.Text;
@@ -42,20 +41,12 @@ namespace Insight.WS.Base.Common
 
             var accept = headers[HttpRequestHeader.Accept];
             var val = accept.Split(Convert.ToChar(";"));
-            var dict = new Dictionary<string, string>
+            return new Dictionary<string, string>
             {
                 {"Auth", auth},
                 {"Version", val[1].Substring(9)},
                 {"Client", val[2].Substring(8)}
             };
-
-            var type = headers[HttpRequestHeader.ContentType];
-            if (type != "application/x-gzip") return dict;
-
-            response.Headers[HttpResponseHeader.ContentEncoding] = "gzip";
-            response.ContentType = "application/x-gzip";
-
-            return dict;
         }
 
         /// <summary>
@@ -86,15 +77,28 @@ namespace Insight.WS.Base.Common
         /// <param name="message">事件消息</param>
         public static void LogToLogServer(string code, string message)
         {
+            LogToLogServer(code, message, null, null, null);
+        }
+
+        /// <summary>
+        /// 将事件消息写到日志服务器
+        /// </summary>
+        /// <param name="code">事件代码</param>
+        /// <param name="message">事件消息</param>
+        public static void LogToLogServer(string code, string message, string source, string action, string userid)
+        {
+            var url = LogServer + "logs";
             var dict = new Dictionary<string, string>
             {
                 {"code", code},
                 {"message", message},
-                {"userid", null}
+                {"source", source },
+                {"action", action },
+                {"userid", userid }
             };
             var data = Serialize(dict);
             var author = Base64(Hash(code + Secret));
-            HttpRequest(LogServer, "POST", author, data);
+            HttpRequest(url, "POST", author, data);
         }
 
         /// <summary>
@@ -104,14 +108,13 @@ namespace Insight.WS.Base.Common
         /// <param name="method">请求的方法：GET,PUT,POST,DELETE</param>
         /// <param name="author">接口认证数据</param>
         /// <param name="data">接口参数</param>
-        /// <param name="compress">是否压缩传输，默认压缩</param>
         /// <returns>JsonResult</returns>
-        public static JsonResult HttpRequest(string url, string method, string author, string data = "", bool compress = true)
+        public static JsonResult HttpRequest(string url, string method, string author, string data = "")
         {
-            var request = GetWebRequest(url, method, author, compress);
+            var request = GetWebRequest(url, method, author);
             if (method == "GET") return GetResponse(request);
 
-            var buffer = compress ? Compress(Encoding.UTF8.GetBytes(data)) : Encoding.UTF8.GetBytes(data);
+            var buffer = Encoding.UTF8.GetBytes(data);
             request.ContentLength = buffer.Length;
             using (var stream = request.GetRequestStream())
             {
@@ -129,14 +132,13 @@ namespace Insight.WS.Base.Common
         /// <param name="url">请求的地址</param>
         /// <param name="method">请求的方法：GET,PUT,POST,DELETE</param>
         /// <param name="author">接口认证数据</param>
-        /// <param name="compress">是否压缩传输</param>
         /// <returns>HttpWebRequest</returns>
-        private static HttpWebRequest GetWebRequest(string url, string method, string author, bool compress)
+        private static HttpWebRequest GetWebRequest(string url, string method, string author)
         {
             var request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = method;
-            request.Accept = $"application/x-gzip/json; version={Util.Version}; client=5";
-            request.ContentType = compress ? "application/x-gzip" : "application/json";
+            request.Accept = $"application/json; version={CurrentVersion}; client=BaseServer";
+            request.ContentType = "application/json";
             request.Headers.Add(HttpRequestHeader.Authorization, author);
 
             return request;
@@ -155,12 +157,6 @@ namespace Insight.WS.Base.Common
                 var responseStream = response.GetResponseStream();
                 if (responseStream == null) return new JsonResult().BadRequest();
 
-                var encoding = response.Headers["Content-Encoding"];
-                if (encoding != null && encoding.ToLower().Contains("gzip"))
-                {
-                    responseStream = new GZipStream(responseStream, CompressionMode.Decompress);
-                }
-
                 using (var reader = new StreamReader(responseStream, Encoding.GetEncoding("utf-8")))
                 {
                     var result = reader.ReadToEnd();
@@ -170,7 +166,7 @@ namespace Insight.WS.Base.Common
             }
             catch (Exception ex)
             {
-                LogToLogServer("100101", ex.ToString());
+                LogToEvent(ex.ToString());
                 return new JsonResult().BadRequest();
             }
         }
