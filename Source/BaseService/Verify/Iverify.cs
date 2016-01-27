@@ -31,7 +31,7 @@ namespace Insight.WS.Base.Service
         /// <returns>JsonResult</returns>
         [WebGet(UriTemplate = "confirm?paykey={paykey}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        JsonResult Verification(string paykey);
+        JsonResult Confirmation(string paykey);
 
         /// <summary>
         /// 带鉴权的会话合法性验证

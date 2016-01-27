@@ -44,7 +44,7 @@ namespace Insight.WS.Base.Service
         /// 会话合法性验证并校验支付密码
         /// </summary>
         /// <returns>JsonResult</returns>
-        public JsonResult Verification(string paykey)
+        public JsonResult Confirmation(string paykey)
         {
             var verify = new Verify();
             verify.Confirm(paykey);
