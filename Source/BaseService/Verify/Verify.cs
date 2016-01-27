@@ -22,7 +22,6 @@ namespace Insight.WS.Base.Service
             var context = WebOperationContext.Current;
             if (context == null) return;
 
-            var headers = context.IncomingRequest.Headers;
             var response = context.OutgoingResponse;
             response.Headers.Add("Access-Control-Allow-Credentials", "true");
             response.Headers.Add("Access-Control-Allow-Headers", "Accept, Content-Type, Authorization");
@@ -38,6 +37,17 @@ namespace Insight.WS.Base.Service
         {
             var verify = new Verify();
             verify.Compare();
+            return verify.Result;
+        }
+
+        /// <summary>
+        /// 会话合法性验证并校验支付密码
+        /// </summary>
+        /// <returns>JsonResult</returns>
+        public JsonResult Verification(string paykey)
+        {
+            var verify = new Verify();
+            verify.Confirm(paykey);
             return verify.Result;
         }
 

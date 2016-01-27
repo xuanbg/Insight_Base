@@ -141,6 +141,21 @@ namespace Insight.WS.Base.Common
         }
 
         /// <summary>
+        /// 对Session和支付密码进行校验，返回验证结果
+        /// </summary>
+        /// <param name="key">支付密码（MD5值）</param>
+        /// <returns>bool</returns>
+        public bool Confirm(string key)
+        {
+            if (!Compare()) return false;
+
+            if (DataAccess.ConfirmPayKey(Basis.UserId, key)) return true;
+
+            Result.InvalidPayKey();
+            return false;
+        }
+
+        /// <summary>
         /// 对Session进行校验，返回验证结果
         /// </summary>
         /// <param name="action">操作码，默认为空</param>

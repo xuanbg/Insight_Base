@@ -58,5 +58,19 @@ namespace Insight.WS.Base.Common
             }
         }
 
+        /// <summary>
+        /// 校验支付密码
+        /// </summary>
+        /// <param name="id">用户ID</param>
+        /// <param name="key">支付密码</param>
+        /// <returns>bool 是否正确</returns>
+        public static bool ConfirmPayKey(Guid id, string key)
+        {
+            using (var context = new BaseEntities())
+            {
+                return context.SYS_User.Any(u => u.ID == id && u.PayPassword == key);
+            }
+        }
+
     }
 }
