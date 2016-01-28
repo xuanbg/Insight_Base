@@ -45,7 +45,7 @@ namespace Insight.WS.Base
         /// </summary>
         /// <param name="user">用户数据对象</param>
         /// <returns>JsonResult</returns>
-        public JsonResult UpdateUserInfo(SYS_User user)
+        public JsonResult UpdateUserInfo(string id, SYS_User user)
         {
             const string action = "3BC17B61-327D-4EAA-A0D7-7F825A6C71DB";
             var verify = new Verify();
@@ -124,7 +124,7 @@ namespace Insight.WS.Base
         /// <param name="code">短信验证码</param>
         /// <param name="pw">用户新密码</param>
         /// <returns>JsonResult</returns>
-        public JsonResult ResetSignature(string code, string pw)
+        public JsonResult ResetSignature(string account, string password, string code)
         {
             var verify = new Verify();
             var session = verify.Basis;
@@ -139,10 +139,10 @@ namespace Insight.WS.Base
             SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == 2);
 
             // 更新用户登录密码
-            var reset = Update(session.UserId, pw);
+            var reset = Update(session.UserId, password);
             if (reset != null && !reset.Value) return verify.Result.DataBaseError();
 
-            session.Signature = Hash(session.LoginName.ToUpper() + pw);
+            session.Signature = Hash(session.LoginName.ToUpper() + password);
             verify.SignIn();
             return verify.Result;
         }
@@ -174,7 +174,7 @@ namespace Insight.WS.Base
         /// 获取用户登录结果
         /// </summary>
         /// <returns>JsonResult</returns>
-        public JsonResult UserSignIn()
+        public JsonResult UserSignIn(string id)
         {
             var verify = new Verify();
             verify.SignIn();
