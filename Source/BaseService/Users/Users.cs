@@ -5,7 +5,7 @@ using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
 using static Insight.WS.Base.Common.Util;
 
-namespace Insight.WS.Base.Service
+namespace Insight.WS.Base
 {
     public partial class BaseService : IUsers
     {

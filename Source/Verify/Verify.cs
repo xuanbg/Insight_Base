@@ -6,10 +6,10 @@ using Insight.WS.Base.Common.Entity;
 using static Insight.WS.Base.Common.Util;
 using System.ServiceModel.Web;
 
-namespace Insight.WS.Base.Service
+namespace Insight.WS.Base
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
-    public partial class BaseService : IVerify
+    public class VerifyService : IVerify
     {
 
         #region Verify
@@ -44,7 +44,7 @@ namespace Insight.WS.Base.Service
         /// 会话合法性验证并校验支付密码
         /// </summary>
         /// <returns>JsonResult</returns>
-        public JsonResult Verification(string paykey)
+        public JsonResult Confirmation(string paykey)
         {
             var verify = new Verify();
             verify.Confirm(paykey);

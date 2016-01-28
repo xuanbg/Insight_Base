@@ -5,7 +5,7 @@ using System.ServiceModel.Web;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
 
-namespace Insight.WS.Base.Service
+namespace Insight.WS.Base
 {
     [ServiceContract]
     public interface IOrganizations

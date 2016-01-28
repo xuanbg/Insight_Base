@@ -4,7 +4,7 @@ using System.Data;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
 
-namespace Insight.WS.Base.Service
+namespace Insight.WS.Base
 {
     public partial class BaseService : IRoles
     {

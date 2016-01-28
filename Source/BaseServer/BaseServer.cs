@@ -13,7 +13,7 @@ namespace Insight.WS.Base
         /// <summary>
         /// 运行中的服务主机
         /// </summary>
-        private static ServiceHost Host;
+        private static List<ServiceHost> Hosts;
 
         #region 构造函数
 
@@ -36,26 +36,15 @@ namespace Insight.WS.Base
         /// <param name="args"></param>
         protected override void OnStart(string[] args)
         {
-            string path = $"{Application.StartupPath}\\BaseService.dll";
-            if (!File.Exists(path)) return;
-
-            var endpoints = new List<EndpointSet>
+            Hosts = new List<ServiceHost>
             {
-                new EndpointSet { Name = "IVerify", Path = "verify" },
-                new EndpointSet { Name = "IUsers", Path = "users" },
-                new EndpointSet { Name = "IOrganizations", Path = "organizations" },
-                new EndpointSet { Name = "IRoles", Path = "roles" }
+                BaseService(),
+                VerifyService()
             };
-            var serv = new Services
+            foreach (var host in Hosts)
             {
-                BaseAddress = GetAppSetting("Address"),
-                Port = GetAppSetting("Port"),
-                NameSpace = "Insight.WS.Base.Service",
-                ServiceType = "BaseService",
-                Endpoints = endpoints
-            };
-            Host = serv.CreateHost(path);
-            Host.Open();
+                host.Open();
+            }
         }
 
         /// <summary>
@@ -63,8 +52,11 @@ namespace Insight.WS.Base
         /// </summary>
         protected override void OnStop()
         {
-            Host.Abort();
-            Host.Close();
+            foreach (var host in Hosts)
+            {
+                host.Abort();
+                host.Close();
+            }
         }
 
         #endregion
@@ -72,7 +64,7 @@ namespace Insight.WS.Base
         /// <summary>
         /// 初始化环境变量
         /// </summary>
-        public static void InitSeting()
+        private static void InitSeting()
         {
             var version = new Version(Application.ProductVersion);
             var build = $"{version.Major}{version.Minor}{version.Build.ToString("D4").Substring(0, 2)}";
@@ -81,6 +73,56 @@ namespace Insight.WS.Base
             UpdateVersion = GetAppSetting("UpdateVersion");
 
             LogServer = GetAppSetting("LogServer");
+        }
+
+        /// <summary>
+        /// 初始化基础服务主机
+        /// </summary>
+        /// <returns></returns>
+        private static ServiceHost BaseService()
+        {
+            string path = $"{Application.StartupPath}\\BaseService.dll";
+            if (!File.Exists(path)) return null;
+
+            var endpoints = new List<EndpointSet>
+            {
+                new EndpointSet {Name = "IOrganizations", Path = "org"},
+                new EndpointSet {Name = "IUsers", Path = "user"},
+                new EndpointSet {Name = "IRoles", Path = "role"},
+            };
+            var serv = new Services
+            {
+                BaseAddress = GetAppSetting("Address"),
+                Port = GetAppSetting("BasePort"),
+                NameSpace = "Insight.WS.Base",
+                ServiceType = "BaseService",
+                Endpoints = endpoints
+            };
+            return serv.CreateHost(path);
+        }
+
+        /// <summary>
+        /// 初始化验证服务主机
+        /// </summary>
+        /// <returns></returns>
+        private static ServiceHost VerifyService()
+        {
+            string path = $"{Application.StartupPath}\\VerifyService.dll";
+            if (!File.Exists(path)) return null;
+
+            var endpoints = new List<EndpointSet>
+            {
+                new EndpointSet {Name = "IVerify"},
+            };
+            var serv = new Services
+            {
+                BaseAddress = GetAppSetting("Address"),
+                Port = GetAppSetting("VerifyPort"),
+                NameSpace = "Insight.WS.Base",
+                ServiceType = "VerifyService",
+                Endpoints = endpoints
+            };
+            return serv.CreateHost(path);
         }
 
     }
