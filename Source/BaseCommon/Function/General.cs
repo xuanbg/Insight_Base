@@ -75,9 +75,9 @@ namespace Insight.WS.Base.Common
         /// </summary>
         /// <param name="code">事件代码</param>
         /// <param name="message">事件消息</param>
-        public static void LogToLogServer(string code, string message)
+        public static void LogToLogServer(string code, string message = null)
         {
-            LogToLogServer(code, message, null, null, null);
+            LogToLogServer(code, message, null, null);
         }
 
         /// <summary>
@@ -85,7 +85,23 @@ namespace Insight.WS.Base.Common
         /// </summary>
         /// <param name="code">事件代码</param>
         /// <param name="message">事件消息</param>
-        public static void LogToLogServer(string code, string message, string source, string action, string userid)
+        /// <param name="source">事件来源</param>
+        /// <param name="action">操作名称</param>
+        public static void LogToLogServer(string code, string message, string source, string action)
+        {
+            LogToLogServer(code, message, source, action, null, null);
+        }
+
+        /// <summary>
+        /// 将事件消息写到日志服务器
+        /// </summary>
+        /// <param name="code">事件代码</param>
+        /// <param name="message">事件消息</param>
+        /// <param name="source">事件来源</param>
+        /// <param name="action">操作名称</param>
+        /// <param name="userid">源用户ID</param>
+        /// <param name="key">查询关键字段</param>
+        public static void LogToLogServer(string code, string message, string source, string action, string userid, string key)
         {
             var url = LogServer + "logs";
             var dict = new Dictionary<string, string>
@@ -94,7 +110,8 @@ namespace Insight.WS.Base.Common
                 {"message", message},
                 {"source", source },
                 {"action", action },
-                {"userid", userid }
+                {"userid", userid },
+                {"key", key }
             };
             var data = Serialize(dict);
             var author = Base64(Hash(code + Secret));

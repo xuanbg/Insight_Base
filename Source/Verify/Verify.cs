@@ -92,6 +92,7 @@ namespace Insight.WS.Base
                 CreateTime = DateTime.Now
             };
             SmsCodes.Add(record);
+            General.LogToLogServer("700501", $"已经为手机号【{mobile}】的用户生成了类型为【{type}】的短信验证码：【{code}】。此验证码将于{record.FailureTime}失效。", "验证服务", "生成短信验证码");
             return verify.Result.Success(code);
         }
 
