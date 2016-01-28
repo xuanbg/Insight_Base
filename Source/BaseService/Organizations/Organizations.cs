@@ -60,10 +60,11 @@ namespace Insight.WS.Base
         /// <summary>
         /// 根据对象实体数据更新组织机构信息
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="obj">组织节点对象</param>
         /// <param name="index">原序号</param>
         /// <returns>JsonResult</returns>
-        public JsonResult UpdateOrg(SYS_Organization obj, int index)
+        public JsonResult UpdateOrg(string id, SYS_Organization obj, int index)
         {
             const string action = "542D5E28-8102-40C6-9C01-190D13DBF6C6";
             var verify = new Verify();
@@ -118,9 +119,10 @@ namespace Insight.WS.Base
         /// <summary>
         /// 根据对象实体数据更新组织机构表ParentId字段
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="org">组织节点对象</param>
         /// <returns>JsonResult</returns>
-        public JsonResult SetOrgParent(SYS_Organization org)
+        public JsonResult SetOrgParent(string id, SYS_Organization org)
         {
             const string action = "DB1A4EA2-1B3E-41AD-91FA-A3945AB7D901";
             var verify = new Verify();

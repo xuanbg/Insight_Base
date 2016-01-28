@@ -43,6 +43,7 @@ namespace Insight.WS.Base
         /// <summary>
         /// 更新用户信息
         /// </summary>
+        /// <param name="id">用户ID</param>
         /// <param name="user">用户数据对象</param>
         /// <returns>JsonResult</returns>
         public JsonResult UpdateUserInfo(string id, SYS_User user)
@@ -121,8 +122,9 @@ namespace Insight.WS.Base
         /// <summary>
         /// 用户重置登录密码
         /// </summary>
+        /// <param name="account">用户账号</param>
+        /// <param name="password">用户新密码</param>
         /// <param name="code">短信验证码</param>
-        /// <param name="pw">用户新密码</param>
         /// <returns>JsonResult</returns>
         public JsonResult ResetSignature(string account, string password, string code)
         {

@@ -131,7 +131,7 @@ namespace Insight.WS.Base.Common
         {
             if (Guid.TryParse(id, out Guid))
             {
-                if (Basis.UserId == Guid) action = null;
+                if (Session.UserId == Guid) action = null;
 
                 return Compare(action);
             }
@@ -162,7 +162,7 @@ namespace Insight.WS.Base.Common
         /// <returns>bool</returns>
         public bool Compare(string action = null)
         {
-            if (Basis == null)
+            if (Basis == null || Basis.UserId != Session.UserId)
             {
                 Session.LoginResult = LoginResult.NotExist;
                 Result.InvalidAuth(Serialize(Session));
