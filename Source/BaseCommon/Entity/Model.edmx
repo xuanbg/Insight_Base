@@ -5,6 +5,64 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="BaseModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="SYS_Allot_Record">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="SN" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SchemeId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ModuleId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="OwnerId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="StartNumber" Type="varchar" MaxLength="8" />
+          <Property Name="EndNumber" Type="varchar" MaxLength="8" />
+          <Property Name="CreatorDeptId" Type="uniqueidentifier" />
+          <Property Name="CreatorUserId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="CreateTime" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="SYS_Code_Allot">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="SN" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SchemeId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ModuleId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="OwnerId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="AllotNumber" Type="varchar" MaxLength="8" Nullable="false" />
+          <Property Name="BusinessId" Type="uniqueidentifier" />
+          <Property Name="UpdateTime" Type="datetime" />
+          <Property Name="CreatorDeptId" Type="uniqueidentifier" />
+          <Property Name="CreatorUserId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="CreateTime" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="SYS_Code_Record">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="SN" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SchemeId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="RelationChar" Type="nvarchar" MaxLength="16" />
+          <Property Name="SerialNumber" Type="int" Nullable="false" />
+          <Property Name="BusinessId" Type="uniqueidentifier" />
+          <Property Name="CreateTime" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="SYS_Code_Scheme">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="SN" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="64" Nullable="false" />
+          <Property Name="CodeFormat" Type="nvarchar" MaxLength="64" Nullable="false" />
+          <Property Name="SerialFormat" Type="nvarchar" MaxLength="16" />
+          <Property Name="Description" Type="nvarchar(max)" />
+          <Property Name="Validity" Type="bit" Nullable="false" />
+          <Property Name="CreatorDeptId" Type="uniqueidentifier" />
+          <Property Name="CreatorUserId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="CreateTime" Type="datetime" Nullable="false" />
+        </EntityType>
         <EntityType Name="SYS_Module">
           <Key>
             <PropertyRef Name="ID" />
@@ -234,6 +292,172 @@
           <Property Name="CreatorUserId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="CreateTime" Type="datetime" Nullable="false" />
         </EntityType>
+        <Association Name="FK__SYS_Allot__Creat__3A6CA48E">
+          <End Role="SYS_Organization" Type="Self.SYS_Organization" Multiplicity="0..1" />
+          <End Role="SYS_Allot_Record" Type="Self.SYS_Allot_Record" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SYS_Organization">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="SYS_Allot_Record">
+              <PropertyRef Name="CreatorDeptId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__SYS_Allot__Creat__3B60C8C7">
+          <End Role="SYS_User" Type="Self.SYS_User" Multiplicity="1" />
+          <End Role="SYS_Allot_Record" Type="Self.SYS_Allot_Record" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SYS_User">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="SYS_Allot_Record">
+              <PropertyRef Name="CreatorUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__SYS_Allot__Modul__38845C1C">
+          <End Role="SYS_Module" Type="Self.SYS_Module" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="SYS_Allot_Record" Type="Self.SYS_Allot_Record" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SYS_Module">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="SYS_Allot_Record">
+              <PropertyRef Name="ModuleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__SYS_Allot__Owner__39788055">
+          <End Role="SYS_User" Type="Self.SYS_User" Multiplicity="1" />
+          <End Role="SYS_Allot_Record" Type="Self.SYS_Allot_Record" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SYS_User">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="SYS_Allot_Record">
+              <PropertyRef Name="OwnerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__SYS_Allot__Schem__379037E3">
+          <End Role="SYS_Code_Scheme" Type="Self.SYS_Code_Scheme" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="SYS_Allot_Record" Type="Self.SYS_Allot_Record" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SYS_Code_Scheme">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="SYS_Allot_Record">
+              <PropertyRef Name="SchemeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__SYS_Code___Creat__30E33A54">
+          <End Role="SYS_Organization" Type="Self.SYS_Organization" Multiplicity="0..1" />
+          <End Role="SYS_Code_Scheme" Type="Self.SYS_Code_Scheme" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SYS_Organization">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="SYS_Code_Scheme">
+              <PropertyRef Name="CreatorDeptId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__SYS_Code___Creat__31D75E8D">
+          <End Role="SYS_User" Type="Self.SYS_User" Multiplicity="1" />
+          <End Role="SYS_Code_Scheme" Type="Self.SYS_Code_Scheme" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SYS_User">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="SYS_Code_Scheme">
+              <PropertyRef Name="CreatorUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__SYS_Code___Creat__47C69FAC">
+          <End Role="SYS_Organization" Type="Self.SYS_Organization" Multiplicity="0..1" />
+          <End Role="SYS_Code_Allot" Type="Self.SYS_Code_Allot" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SYS_Organization">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="SYS_Code_Allot">
+              <PropertyRef Name="CreatorDeptId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__SYS_Code___Creat__48BAC3E5">
+          <End Role="SYS_User" Type="Self.SYS_User" Multiplicity="1" />
+          <End Role="SYS_Code_Allot" Type="Self.SYS_Code_Allot" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SYS_User">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="SYS_Code_Allot">
+              <PropertyRef Name="CreatorUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__SYS_Code___Modul__45DE573A">
+          <End Role="SYS_Module" Type="Self.SYS_Module" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="SYS_Code_Allot" Type="Self.SYS_Code_Allot" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SYS_Module">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="SYS_Code_Allot">
+              <PropertyRef Name="ModuleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__SYS_Code___Owner__46D27B73">
+          <End Role="SYS_User" Type="Self.SYS_User" Multiplicity="1" />
+          <End Role="SYS_Code_Allot" Type="Self.SYS_Code_Allot" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SYS_User">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="SYS_Code_Allot">
+              <PropertyRef Name="OwnerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__SYS_Code___Schem__40257DE4">
+          <End Role="SYS_Code_Scheme" Type="Self.SYS_Code_Scheme" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="SYS_Code_Record" Type="Self.SYS_Code_Record" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SYS_Code_Scheme">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="SYS_Code_Record">
+              <PropertyRef Name="SchemeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__SYS_Code___Schem__44EA3301">
+          <End Role="SYS_Code_Scheme" Type="Self.SYS_Code_Scheme" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="SYS_Code_Allot" Type="Self.SYS_Code_Allot" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SYS_Code_Scheme">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="SYS_Code_Allot">
+              <PropertyRef Name="SchemeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK__SYS_Modul__Modul__4CC05EF3">
           <End Role="SYS_ModuleGroup" Type="Self.SYS_ModuleGroup" Multiplicity="0..1" />
           <End Role="SYS_Module" Type="Self.SYS_Module" Multiplicity="*" />
@@ -728,7 +952,26 @@
             </CollectionType>
           </ReturnType>
         </Function>
+        <Function Name="Get_CodePreview" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" ReturnType="nvarchar">
+          <Parameter Name="SchemeId" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="DeptId" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="UserId" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="CodeFormat" Type="nvarchar" Mode="In" />
+          <Parameter Name="SerialFormat" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="GetCode" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="SchemeId" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="DeptId" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="UserId" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="BusinessId" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="ModuleId" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="Char" Type="nvarchar" Mode="In" />
+        </Function>
         <EntityContainer Name="BaseModelStoreContainer">
+          <EntitySet Name="SYS_Allot_Record" EntityType="Self.SYS_Allot_Record" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SYS_Code_Allot" EntityType="Self.SYS_Code_Allot" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SYS_Code_Record" EntityType="Self.SYS_Code_Record" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SYS_Code_Scheme" EntityType="Self.SYS_Code_Scheme" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SYS_Module" EntityType="Self.SYS_Module" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SYS_ModuleAction" EntityType="Self.SYS_ModuleAction" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SYS_ModuleGroup" EntityType="Self.SYS_ModuleGroup" Schema="dbo" store:Type="Tables" />
@@ -746,6 +989,58 @@
           <EntitySet Name="SYS_User" EntityType="Self.SYS_User" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SYS_UserGroup" EntityType="Self.SYS_UserGroup" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SYS_UserGroupMember" EntityType="Self.SYS_UserGroupMember" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK__SYS_Allot__Creat__3A6CA48E" Association="Self.FK__SYS_Allot__Creat__3A6CA48E">
+            <End Role="SYS_Organization" EntitySet="SYS_Organization" />
+            <End Role="SYS_Allot_Record" EntitySet="SYS_Allot_Record" />
+          </AssociationSet>
+          <AssociationSet Name="FK__SYS_Allot__Creat__3B60C8C7" Association="Self.FK__SYS_Allot__Creat__3B60C8C7">
+            <End Role="SYS_User" EntitySet="SYS_User" />
+            <End Role="SYS_Allot_Record" EntitySet="SYS_Allot_Record" />
+          </AssociationSet>
+          <AssociationSet Name="FK__SYS_Allot__Modul__38845C1C" Association="Self.FK__SYS_Allot__Modul__38845C1C">
+            <End Role="SYS_Module" EntitySet="SYS_Module" />
+            <End Role="SYS_Allot_Record" EntitySet="SYS_Allot_Record" />
+          </AssociationSet>
+          <AssociationSet Name="FK__SYS_Allot__Owner__39788055" Association="Self.FK__SYS_Allot__Owner__39788055">
+            <End Role="SYS_User" EntitySet="SYS_User" />
+            <End Role="SYS_Allot_Record" EntitySet="SYS_Allot_Record" />
+          </AssociationSet>
+          <AssociationSet Name="FK__SYS_Allot__Schem__379037E3" Association="Self.FK__SYS_Allot__Schem__379037E3">
+            <End Role="SYS_Code_Scheme" EntitySet="SYS_Code_Scheme" />
+            <End Role="SYS_Allot_Record" EntitySet="SYS_Allot_Record" />
+          </AssociationSet>
+          <AssociationSet Name="FK__SYS_Code___Creat__30E33A54" Association="Self.FK__SYS_Code___Creat__30E33A54">
+            <End Role="SYS_Organization" EntitySet="SYS_Organization" />
+            <End Role="SYS_Code_Scheme" EntitySet="SYS_Code_Scheme" />
+          </AssociationSet>
+          <AssociationSet Name="FK__SYS_Code___Creat__31D75E8D" Association="Self.FK__SYS_Code___Creat__31D75E8D">
+            <End Role="SYS_User" EntitySet="SYS_User" />
+            <End Role="SYS_Code_Scheme" EntitySet="SYS_Code_Scheme" />
+          </AssociationSet>
+          <AssociationSet Name="FK__SYS_Code___Creat__47C69FAC" Association="Self.FK__SYS_Code___Creat__47C69FAC">
+            <End Role="SYS_Organization" EntitySet="SYS_Organization" />
+            <End Role="SYS_Code_Allot" EntitySet="SYS_Code_Allot" />
+          </AssociationSet>
+          <AssociationSet Name="FK__SYS_Code___Creat__48BAC3E5" Association="Self.FK__SYS_Code___Creat__48BAC3E5">
+            <End Role="SYS_User" EntitySet="SYS_User" />
+            <End Role="SYS_Code_Allot" EntitySet="SYS_Code_Allot" />
+          </AssociationSet>
+          <AssociationSet Name="FK__SYS_Code___Modul__45DE573A" Association="Self.FK__SYS_Code___Modul__45DE573A">
+            <End Role="SYS_Module" EntitySet="SYS_Module" />
+            <End Role="SYS_Code_Allot" EntitySet="SYS_Code_Allot" />
+          </AssociationSet>
+          <AssociationSet Name="FK__SYS_Code___Owner__46D27B73" Association="Self.FK__SYS_Code___Owner__46D27B73">
+            <End Role="SYS_User" EntitySet="SYS_User" />
+            <End Role="SYS_Code_Allot" EntitySet="SYS_Code_Allot" />
+          </AssociationSet>
+          <AssociationSet Name="FK__SYS_Code___Schem__40257DE4" Association="Self.FK__SYS_Code___Schem__40257DE4">
+            <End Role="SYS_Code_Scheme" EntitySet="SYS_Code_Scheme" />
+            <End Role="SYS_Code_Record" EntitySet="SYS_Code_Record" />
+          </AssociationSet>
+          <AssociationSet Name="FK__SYS_Code___Schem__44EA3301" Association="Self.FK__SYS_Code___Schem__44EA3301">
+            <End Role="SYS_Code_Scheme" EntitySet="SYS_Code_Scheme" />
+            <End Role="SYS_Code_Allot" EntitySet="SYS_Code_Allot" />
+          </AssociationSet>
           <AssociationSet Name="FK__SYS_Modul__Modul__4CC05EF3" Association="Self.FK__SYS_Modul__Modul__4CC05EF3">
             <End Role="SYS_ModuleGroup" EntitySet="SYS_ModuleGroup" />
             <End Role="SYS_Module" EntitySet="SYS_Module" />
@@ -928,6 +1223,8 @@
           <NavigationProperty Name="SYS_ModuleParam" Relationship="Self.FK__SYS_Modul__Modul__5832119F" FromRole="SYS_Module" ToRole="SYS_ModuleParam" />
           <NavigationProperty Name="SYS_RolePerm_Data" Relationship="Self.FK__SYS_RoleP__Modul__05F8DC4F" FromRole="SYS_Module" ToRole="SYS_RolePerm_Data" />
           <NavigationProperty Name="SYS_RolePerm_DataAbs" Relationship="Self.FK__SYS_RoleP__Modul__0F824689" FromRole="SYS_Module" ToRole="SYS_RolePerm_DataAbs" />
+          <NavigationProperty Name="SYS_Allot_Record" Relationship="BaseModel.FK__SYS_Allot__Modul__38845C1C" FromRole="SYS_Module" ToRole="SYS_Allot_Record" />
+          <NavigationProperty Name="SYS_Code_Allot" Relationship="BaseModel.FK__SYS_Code___Modul__45DE573A" FromRole="SYS_Module" ToRole="SYS_Code_Allot" />
         </EntityType>
         <EntityType Name="SYS_ModuleAction">
           <Key>
@@ -1003,6 +1300,9 @@
           <NavigationProperty Name="SYS_OrgMerger1" Relationship="Self.FK__SYS_OrgMe__OrgId__4242D080" FromRole="SYS_Organization" ToRole="SYS_OrgMerger" />
           <NavigationProperty Name="SYS_Role_Title" Relationship="Self.FK__SYS_Role___OrgId__75C27486" FromRole="SYS_Organization" ToRole="SYS_Role_Title" />
           <NavigationProperty Name="SYS_RolePerm_DataAbs" Relationship="Self.FK__SYS_RoleP__OrgId__10766AC2" FromRole="SYS_Organization" ToRole="SYS_RolePerm_DataAbs" />
+          <NavigationProperty Name="SYS_Allot_Record" Relationship="BaseModel.FK__SYS_Allot__Creat__3A6CA48E" FromRole="SYS_Organization" ToRole="SYS_Allot_Record" />
+          <NavigationProperty Name="SYS_Code_Allot" Relationship="BaseModel.FK__SYS_Code___Creat__47C69FAC" FromRole="SYS_Organization" ToRole="SYS_Code_Allot" />
+          <NavigationProperty Name="SYS_Code_Scheme" Relationship="BaseModel.FK__SYS_Code___Creat__30E33A54" FromRole="SYS_Organization" ToRole="SYS_Code_Scheme" />
         </EntityType>
         <EntityType Name="SYS_OrgMember">
           <Key>
@@ -1174,6 +1474,11 @@
           <NavigationProperty Name="SYS_UserGroup" Relationship="Self.FK__SYS_UserG__Creat__25A691D2" FromRole="SYS_User" ToRole="SYS_UserGroup" />
           <NavigationProperty Name="SYS_UserGroupMember" Relationship="Self.FK__SYS_UserG__Creat__2D47B39A" FromRole="SYS_User" ToRole="SYS_UserGroupMember" />
           <NavigationProperty Name="SYS_UserGroupMember1" Relationship="Self.FK__SYS_UserG__UserI__2C538F61" FromRole="SYS_User" ToRole="SYS_UserGroupMember" />
+          <NavigationProperty Name="SYS_Allot_Record" Relationship="BaseModel.FK__SYS_Allot__Creat__3B60C8C7" FromRole="SYS_User" ToRole="SYS_Allot_Record" />
+          <NavigationProperty Name="SYS_Allot_Record1" Relationship="BaseModel.FK__SYS_Allot__Owner__39788055" FromRole="SYS_User" ToRole="SYS_Allot_Record" />
+          <NavigationProperty Name="SYS_Code_Allot" Relationship="BaseModel.FK__SYS_Code___Creat__48BAC3E5" FromRole="SYS_User" ToRole="SYS_Code_Allot" />
+          <NavigationProperty Name="SYS_Code_Allot1" Relationship="BaseModel.FK__SYS_Code___Owner__46D27B73" FromRole="SYS_User" ToRole="SYS_Code_Allot" />
+          <NavigationProperty Name="SYS_Code_Scheme" Relationship="BaseModel.FK__SYS_Code___Creat__31D75E8D" FromRole="SYS_User" ToRole="SYS_Code_Scheme" />
         </EntityType>
         <EntityType Name="SYS_UserGroup">
           <Key>
@@ -1858,7 +2163,311 @@
             <Parameter Name="DeptId" Mode="In" Type="Guid" />
             <Parameter Name="ActionId" Mode="In" Type="Guid" />
           </FunctionImport>
+          <EntitySet Name="SYS_Allot_Record" EntityType="BaseModel.SYS_Allot_Record" />
+          <EntitySet Name="SYS_Code_Allot" EntityType="BaseModel.SYS_Code_Allot" />
+          <EntitySet Name="SYS_Code_Record" EntityType="BaseModel.SYS_Code_Record" />
+          <EntitySet Name="SYS_Code_Scheme" EntityType="BaseModel.SYS_Code_Scheme" />
+          <AssociationSet Name="FK__SYS_Allot__Creat__3A6CA48E" Association="BaseModel.FK__SYS_Allot__Creat__3A6CA48E">
+            <End Role="SYS_Organization" EntitySet="SYS_Organization" />
+            <End Role="SYS_Allot_Record" EntitySet="SYS_Allot_Record" />
+          </AssociationSet>
+          <AssociationSet Name="FK__SYS_Allot__Creat__3B60C8C7" Association="BaseModel.FK__SYS_Allot__Creat__3B60C8C7">
+            <End Role="SYS_User" EntitySet="SYS_User" />
+            <End Role="SYS_Allot_Record" EntitySet="SYS_Allot_Record" />
+          </AssociationSet>
+          <AssociationSet Name="FK__SYS_Allot__Modul__38845C1C" Association="BaseModel.FK__SYS_Allot__Modul__38845C1C">
+            <End Role="SYS_Module" EntitySet="SYS_Module" />
+            <End Role="SYS_Allot_Record" EntitySet="SYS_Allot_Record" />
+          </AssociationSet>
+          <AssociationSet Name="FK__SYS_Allot__Owner__39788055" Association="BaseModel.FK__SYS_Allot__Owner__39788055">
+            <End Role="SYS_User" EntitySet="SYS_User" />
+            <End Role="SYS_Allot_Record" EntitySet="SYS_Allot_Record" />
+          </AssociationSet>
+          <AssociationSet Name="FK__SYS_Allot__Schem__379037E3" Association="BaseModel.FK__SYS_Allot__Schem__379037E3">
+            <End Role="SYS_Code_Scheme" EntitySet="SYS_Code_Scheme" />
+            <End Role="SYS_Allot_Record" EntitySet="SYS_Allot_Record" />
+          </AssociationSet>
+          <AssociationSet Name="FK__SYS_Code___Creat__47C69FAC" Association="BaseModel.FK__SYS_Code___Creat__47C69FAC">
+            <End Role="SYS_Organization" EntitySet="SYS_Organization" />
+            <End Role="SYS_Code_Allot" EntitySet="SYS_Code_Allot" />
+          </AssociationSet>
+          <AssociationSet Name="FK__SYS_Code___Creat__48BAC3E5" Association="BaseModel.FK__SYS_Code___Creat__48BAC3E5">
+            <End Role="SYS_User" EntitySet="SYS_User" />
+            <End Role="SYS_Code_Allot" EntitySet="SYS_Code_Allot" />
+          </AssociationSet>
+          <AssociationSet Name="FK__SYS_Code___Modul__45DE573A" Association="BaseModel.FK__SYS_Code___Modul__45DE573A">
+            <End Role="SYS_Module" EntitySet="SYS_Module" />
+            <End Role="SYS_Code_Allot" EntitySet="SYS_Code_Allot" />
+          </AssociationSet>
+          <AssociationSet Name="FK__SYS_Code___Owner__46D27B73" Association="BaseModel.FK__SYS_Code___Owner__46D27B73">
+            <End Role="SYS_User" EntitySet="SYS_User" />
+            <End Role="SYS_Code_Allot" EntitySet="SYS_Code_Allot" />
+          </AssociationSet>
+          <AssociationSet Name="FK__SYS_Code___Schem__44EA3301" Association="BaseModel.FK__SYS_Code___Schem__44EA3301">
+            <End Role="SYS_Code_Scheme" EntitySet="SYS_Code_Scheme" />
+            <End Role="SYS_Code_Allot" EntitySet="SYS_Code_Allot" />
+          </AssociationSet>
+          <AssociationSet Name="FK__SYS_Code___Schem__40257DE4" Association="BaseModel.FK__SYS_Code___Schem__40257DE4">
+            <End Role="SYS_Code_Scheme" EntitySet="SYS_Code_Scheme" />
+            <End Role="SYS_Code_Record" EntitySet="SYS_Code_Record" />
+          </AssociationSet>
+          <AssociationSet Name="FK__SYS_Code___Creat__30E33A54" Association="BaseModel.FK__SYS_Code___Creat__30E33A54">
+            <End Role="SYS_Organization" EntitySet="SYS_Organization" />
+            <End Role="SYS_Code_Scheme" EntitySet="SYS_Code_Scheme" />
+          </AssociationSet>
+          <AssociationSet Name="FK__SYS_Code___Creat__31D75E8D" Association="BaseModel.FK__SYS_Code___Creat__31D75E8D">
+            <End Role="SYS_User" EntitySet="SYS_User" />
+            <End Role="SYS_Code_Scheme" EntitySet="SYS_Code_Scheme" />
+          </AssociationSet>
+          <FunctionImport Name="GetCode" ReturnType="Collection(String)">
+            <Parameter Name="SchemeId" Mode="In" Type="Guid" />
+            <Parameter Name="DeptId" Mode="In" Type="Guid" />
+            <Parameter Name="UserId" Mode="In" Type="Guid" />
+            <Parameter Name="BusinessId" Mode="In" Type="Guid" />
+            <Parameter Name="ModuleId" Mode="In" Type="Guid" />
+            <Parameter Name="Char" Mode="In" Type="String" />
+          </FunctionImport>
         </EntityContainer>
+        <EntityType Name="SYS_Allot_Record">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="SN" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SchemeId" Type="Guid" Nullable="false" />
+          <Property Name="ModuleId" Type="Guid" Nullable="false" />
+          <Property Name="OwnerId" Type="Guid" Nullable="false" />
+          <Property Name="StartNumber" Type="String" MaxLength="8" FixedLength="false" Unicode="false" />
+          <Property Name="EndNumber" Type="String" MaxLength="8" FixedLength="false" Unicode="false" />
+          <Property Name="CreatorDeptId" Type="Guid" />
+          <Property Name="CreatorUserId" Type="Guid" Nullable="false" />
+          <Property Name="CreateTime" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="SYS_Organization" Relationship="BaseModel.FK__SYS_Allot__Creat__3A6CA48E" FromRole="SYS_Allot_Record" ToRole="SYS_Organization" />
+          <NavigationProperty Name="SYS_User" Relationship="BaseModel.FK__SYS_Allot__Creat__3B60C8C7" FromRole="SYS_Allot_Record" ToRole="SYS_User" />
+          <NavigationProperty Name="SYS_Module" Relationship="BaseModel.FK__SYS_Allot__Modul__38845C1C" FromRole="SYS_Allot_Record" ToRole="SYS_Module" />
+          <NavigationProperty Name="SYS_User1" Relationship="BaseModel.FK__SYS_Allot__Owner__39788055" FromRole="SYS_Allot_Record" ToRole="SYS_User" />
+          <NavigationProperty Name="SYS_Code_Scheme" Relationship="BaseModel.FK__SYS_Allot__Schem__379037E3" FromRole="SYS_Allot_Record" ToRole="SYS_Code_Scheme" />
+        </EntityType>
+        <EntityType Name="SYS_Code_Allot">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="SN" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SchemeId" Type="Guid" Nullable="false" />
+          <Property Name="ModuleId" Type="Guid" Nullable="false" />
+          <Property Name="OwnerId" Type="Guid" Nullable="false" />
+          <Property Name="AllotNumber" Type="String" Nullable="false" MaxLength="8" FixedLength="false" Unicode="false" />
+          <Property Name="BusinessId" Type="Guid" />
+          <Property Name="UpdateTime" Type="DateTime" Precision="3" />
+          <Property Name="CreatorDeptId" Type="Guid" />
+          <Property Name="CreatorUserId" Type="Guid" Nullable="false" />
+          <Property Name="CreateTime" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="SYS_Organization" Relationship="BaseModel.FK__SYS_Code___Creat__47C69FAC" FromRole="SYS_Code_Allot" ToRole="SYS_Organization" />
+          <NavigationProperty Name="SYS_User" Relationship="BaseModel.FK__SYS_Code___Creat__48BAC3E5" FromRole="SYS_Code_Allot" ToRole="SYS_User" />
+          <NavigationProperty Name="SYS_Module" Relationship="BaseModel.FK__SYS_Code___Modul__45DE573A" FromRole="SYS_Code_Allot" ToRole="SYS_Module" />
+          <NavigationProperty Name="SYS_User1" Relationship="BaseModel.FK__SYS_Code___Owner__46D27B73" FromRole="SYS_Code_Allot" ToRole="SYS_User" />
+          <NavigationProperty Name="SYS_Code_Scheme" Relationship="BaseModel.FK__SYS_Code___Schem__44EA3301" FromRole="SYS_Code_Allot" ToRole="SYS_Code_Scheme" />
+        </EntityType>
+        <EntityType Name="SYS_Code_Record">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="SN" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SchemeId" Type="Guid" Nullable="false" />
+          <Property Name="RelationChar" Type="String" MaxLength="16" FixedLength="false" Unicode="true" />
+          <Property Name="SerialNumber" Type="Int32" Nullable="false" />
+          <Property Name="BusinessId" Type="Guid" />
+          <Property Name="CreateTime" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="SYS_Code_Scheme" Relationship="BaseModel.FK__SYS_Code___Schem__40257DE4" FromRole="SYS_Code_Record" ToRole="SYS_Code_Scheme" />
+        </EntityType>
+        <EntityType Name="SYS_Code_Scheme">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="SN" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
+          <Property Name="CodeFormat" Type="String" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
+          <Property Name="SerialFormat" Type="String" MaxLength="16" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Validity" Type="Boolean" Nullable="false" />
+          <Property Name="CreatorDeptId" Type="Guid" />
+          <Property Name="CreatorUserId" Type="Guid" Nullable="false" />
+          <Property Name="CreateTime" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="SYS_Allot_Record" Relationship="BaseModel.FK__SYS_Allot__Schem__379037E3" FromRole="SYS_Code_Scheme" ToRole="SYS_Allot_Record" />
+          <NavigationProperty Name="SYS_Code_Allot" Relationship="BaseModel.FK__SYS_Code___Schem__44EA3301" FromRole="SYS_Code_Scheme" ToRole="SYS_Code_Allot" />
+          <NavigationProperty Name="SYS_Code_Record" Relationship="BaseModel.FK__SYS_Code___Schem__40257DE4" FromRole="SYS_Code_Scheme" ToRole="SYS_Code_Record" />
+          <NavigationProperty Name="SYS_Organization" Relationship="BaseModel.FK__SYS_Code___Creat__30E33A54" FromRole="SYS_Code_Scheme" ToRole="SYS_Organization" />
+          <NavigationProperty Name="SYS_User" Relationship="BaseModel.FK__SYS_Code___Creat__31D75E8D" FromRole="SYS_Code_Scheme" ToRole="SYS_User" />
+        </EntityType>
+        <Association Name="FK__SYS_Allot__Creat__3A6CA48E">
+          <End Type="BaseModel.SYS_Organization" Role="SYS_Organization" Multiplicity="0..1" />
+          <End Type="BaseModel.SYS_Allot_Record" Role="SYS_Allot_Record" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SYS_Organization">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="SYS_Allot_Record">
+              <PropertyRef Name="CreatorDeptId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__SYS_Allot__Creat__3B60C8C7">
+          <End Type="BaseModel.SYS_User" Role="SYS_User" Multiplicity="1" />
+          <End Type="BaseModel.SYS_Allot_Record" Role="SYS_Allot_Record" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SYS_User">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="SYS_Allot_Record">
+              <PropertyRef Name="CreatorUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__SYS_Allot__Modul__38845C1C">
+          <End Type="BaseModel.SYS_Module" Role="SYS_Module" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="BaseModel.SYS_Allot_Record" Role="SYS_Allot_Record" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SYS_Module">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="SYS_Allot_Record">
+              <PropertyRef Name="ModuleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__SYS_Allot__Owner__39788055">
+          <End Type="BaseModel.SYS_User" Role="SYS_User" Multiplicity="1" />
+          <End Type="BaseModel.SYS_Allot_Record" Role="SYS_Allot_Record" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SYS_User">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="SYS_Allot_Record">
+              <PropertyRef Name="OwnerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__SYS_Allot__Schem__379037E3">
+          <End Type="BaseModel.SYS_Code_Scheme" Role="SYS_Code_Scheme" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="BaseModel.SYS_Allot_Record" Role="SYS_Allot_Record" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SYS_Code_Scheme">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="SYS_Allot_Record">
+              <PropertyRef Name="SchemeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__SYS_Code___Creat__47C69FAC">
+          <End Type="BaseModel.SYS_Organization" Role="SYS_Organization" Multiplicity="0..1" />
+          <End Type="BaseModel.SYS_Code_Allot" Role="SYS_Code_Allot" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SYS_Organization">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="SYS_Code_Allot">
+              <PropertyRef Name="CreatorDeptId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__SYS_Code___Creat__48BAC3E5">
+          <End Type="BaseModel.SYS_User" Role="SYS_User" Multiplicity="1" />
+          <End Type="BaseModel.SYS_Code_Allot" Role="SYS_Code_Allot" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SYS_User">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="SYS_Code_Allot">
+              <PropertyRef Name="CreatorUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__SYS_Code___Modul__45DE573A">
+          <End Type="BaseModel.SYS_Module" Role="SYS_Module" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="BaseModel.SYS_Code_Allot" Role="SYS_Code_Allot" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SYS_Module">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="SYS_Code_Allot">
+              <PropertyRef Name="ModuleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__SYS_Code___Owner__46D27B73">
+          <End Type="BaseModel.SYS_User" Role="SYS_User" Multiplicity="1" />
+          <End Type="BaseModel.SYS_Code_Allot" Role="SYS_Code_Allot" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SYS_User">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="SYS_Code_Allot">
+              <PropertyRef Name="OwnerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__SYS_Code___Schem__44EA3301">
+          <End Type="BaseModel.SYS_Code_Scheme" Role="SYS_Code_Scheme" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="BaseModel.SYS_Code_Allot" Role="SYS_Code_Allot" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SYS_Code_Scheme">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="SYS_Code_Allot">
+              <PropertyRef Name="SchemeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__SYS_Code___Schem__40257DE4">
+          <End Type="BaseModel.SYS_Code_Scheme" Role="SYS_Code_Scheme" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="BaseModel.SYS_Code_Record" Role="SYS_Code_Record" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SYS_Code_Scheme">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="SYS_Code_Record">
+              <PropertyRef Name="SchemeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__SYS_Code___Creat__30E33A54">
+          <End Type="BaseModel.SYS_Organization" Role="SYS_Organization" Multiplicity="0..1" />
+          <End Type="BaseModel.SYS_Code_Scheme" Role="SYS_Code_Scheme" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SYS_Organization">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="SYS_Code_Scheme">
+              <PropertyRef Name="CreatorDeptId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__SYS_Code___Creat__31D75E8D">
+          <End Type="BaseModel.SYS_User" Role="SYS_User" Multiplicity="1" />
+          <End Type="BaseModel.SYS_Code_Scheme" Role="SYS_Code_Scheme" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SYS_User">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="SYS_Code_Scheme">
+              <PropertyRef Name="CreatorUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -2118,6 +2727,69 @@
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
+          <EntitySetMapping Name="SYS_Allot_Record">
+            <EntityTypeMapping TypeName="BaseModel.SYS_Allot_Record">
+              <MappingFragment StoreEntitySet="SYS_Allot_Record">
+                <ScalarProperty Name="CreateTime" ColumnName="CreateTime" />
+                <ScalarProperty Name="CreatorUserId" ColumnName="CreatorUserId" />
+                <ScalarProperty Name="CreatorDeptId" ColumnName="CreatorDeptId" />
+                <ScalarProperty Name="EndNumber" ColumnName="EndNumber" />
+                <ScalarProperty Name="StartNumber" ColumnName="StartNumber" />
+                <ScalarProperty Name="OwnerId" ColumnName="OwnerId" />
+                <ScalarProperty Name="ModuleId" ColumnName="ModuleId" />
+                <ScalarProperty Name="SchemeId" ColumnName="SchemeId" />
+                <ScalarProperty Name="SN" ColumnName="SN" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SYS_Code_Allot">
+            <EntityTypeMapping TypeName="BaseModel.SYS_Code_Allot">
+              <MappingFragment StoreEntitySet="SYS_Code_Allot">
+                <ScalarProperty Name="CreateTime" ColumnName="CreateTime" />
+                <ScalarProperty Name="CreatorUserId" ColumnName="CreatorUserId" />
+                <ScalarProperty Name="CreatorDeptId" ColumnName="CreatorDeptId" />
+                <ScalarProperty Name="UpdateTime" ColumnName="UpdateTime" />
+                <ScalarProperty Name="BusinessId" ColumnName="BusinessId" />
+                <ScalarProperty Name="AllotNumber" ColumnName="AllotNumber" />
+                <ScalarProperty Name="OwnerId" ColumnName="OwnerId" />
+                <ScalarProperty Name="ModuleId" ColumnName="ModuleId" />
+                <ScalarProperty Name="SchemeId" ColumnName="SchemeId" />
+                <ScalarProperty Name="SN" ColumnName="SN" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SYS_Code_Record">
+            <EntityTypeMapping TypeName="BaseModel.SYS_Code_Record">
+              <MappingFragment StoreEntitySet="SYS_Code_Record">
+                <ScalarProperty Name="CreateTime" ColumnName="CreateTime" />
+                <ScalarProperty Name="BusinessId" ColumnName="BusinessId" />
+                <ScalarProperty Name="SerialNumber" ColumnName="SerialNumber" />
+                <ScalarProperty Name="RelationChar" ColumnName="RelationChar" />
+                <ScalarProperty Name="SchemeId" ColumnName="SchemeId" />
+                <ScalarProperty Name="SN" ColumnName="SN" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SYS_Code_Scheme">
+            <EntityTypeMapping TypeName="BaseModel.SYS_Code_Scheme">
+              <MappingFragment StoreEntitySet="SYS_Code_Scheme">
+                <ScalarProperty Name="CreateTime" ColumnName="CreateTime" />
+                <ScalarProperty Name="CreatorUserId" ColumnName="CreatorUserId" />
+                <ScalarProperty Name="CreatorDeptId" ColumnName="CreatorDeptId" />
+                <ScalarProperty Name="Validity" ColumnName="Validity" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="SerialFormat" ColumnName="SerialFormat" />
+                <ScalarProperty Name="CodeFormat" ColumnName="CodeFormat" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="SN" ColumnName="SN" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="GetCode" FunctionName="BaseModel.Store.GetCode" />
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

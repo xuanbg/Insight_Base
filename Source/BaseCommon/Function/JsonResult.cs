@@ -323,6 +323,19 @@
             return this;
         }
 
+        /// <summary>
+        /// 返回服务不可用（503）的错误信息
+        /// </summary>
+        /// <returns>JsonResult</returns>
+        public JsonResult ServiceUnavailable()
+        {
+            Successful = false;
+            Code = "503";
+            Name = "ServiceUnavailable";
+            Message = "当前服务不可用";
+            return this;
+        }
+
         #endregion
 
     }

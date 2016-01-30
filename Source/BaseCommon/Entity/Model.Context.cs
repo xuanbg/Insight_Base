@@ -44,6 +44,10 @@ namespace Insight.WS.Base.Common.Entity
         public virtual DbSet<SYS_User> SYS_User { get; set; }
         public virtual DbSet<SYS_UserGroup> SYS_UserGroup { get; set; }
         public virtual DbSet<SYS_UserGroupMember> SYS_UserGroupMember { get; set; }
+        public virtual DbSet<SYS_Allot_Record> SYS_Allot_Record { get; set; }
+        public virtual DbSet<SYS_Code_Allot> SYS_Code_Allot { get; set; }
+        public virtual DbSet<SYS_Code_Record> SYS_Code_Record { get; set; }
+        public virtual DbSet<SYS_Code_Scheme> SYS_Code_Scheme { get; set; }
     
         [DbFunction("BaseEntities", "Authority")]
         public virtual IQueryable<Authority> Authority(Nullable<System.Guid> userId, Nullable<System.Guid> deptId, Nullable<System.Guid> actionId)
@@ -61,6 +65,35 @@ namespace Insight.WS.Base.Common.Entity
                 new ObjectParameter("ActionId", typeof(System.Guid));
     
             return ((IObjectContextAdapter)this).ObjectContext.CreateQuery<Authority>("[BaseEntities].[Authority](@UserId, @DeptId, @ActionId)", userIdParameter, deptIdParameter, actionIdParameter);
+        }
+    
+        public virtual ObjectResult<string> GetCode(Nullable<System.Guid> schemeId, Nullable<System.Guid> deptId, Nullable<System.Guid> userId, Nullable<System.Guid> businessId, Nullable<System.Guid> moduleId, string @char)
+        {
+            var schemeIdParameter = schemeId.HasValue ?
+                new ObjectParameter("SchemeId", schemeId) :
+                new ObjectParameter("SchemeId", typeof(System.Guid));
+    
+            var deptIdParameter = deptId.HasValue ?
+                new ObjectParameter("DeptId", deptId) :
+                new ObjectParameter("DeptId", typeof(System.Guid));
+    
+            var userIdParameter = userId.HasValue ?
+                new ObjectParameter("UserId", userId) :
+                new ObjectParameter("UserId", typeof(System.Guid));
+    
+            var businessIdParameter = businessId.HasValue ?
+                new ObjectParameter("BusinessId", businessId) :
+                new ObjectParameter("BusinessId", typeof(System.Guid));
+    
+            var moduleIdParameter = moduleId.HasValue ?
+                new ObjectParameter("ModuleId", moduleId) :
+                new ObjectParameter("ModuleId", typeof(System.Guid));
+    
+            var charParameter = @char != null ?
+                new ObjectParameter("Char", @char) :
+                new ObjectParameter("Char", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<string>("GetCode", schemeIdParameter, deptIdParameter, userIdParameter, businessIdParameter, moduleIdParameter, charParameter);
         }
     }
 }

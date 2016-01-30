@@ -59,6 +59,23 @@
         <AssociationConnector Association="BaseModel.FK__SYS_UserG__Creat__2D47B39A" ManuallyRouted="false" />
         <AssociationConnector Association="BaseModel.FK__SYS_UserG__UserI__2C538F61" ManuallyRouted="false" />
         <AssociationConnector Association="BaseModel.FK__SYS_UserG__Group__2B5F6B28" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="BaseModel.SYS_Allot_Record" Width="1.5" PointX="13.5" PointY="25" />
+        <EntityTypeShape EntityType="BaseModel.SYS_Code_Allot" Width="1.5" PointX="16.5" PointY="22.875" />
+        <EntityTypeShape EntityType="BaseModel.SYS_Code_Record" Width="1.5" PointX="13.5" PointY="16.375" />
+        <EntityTypeShape EntityType="BaseModel.SYS_Code_Scheme" Width="1.5" PointX="11.25" PointY="15.75" />
+        <AssociationConnector Association="BaseModel.FK__SYS_Allot__Creat__3A6CA48E" />
+        <AssociationConnector Association="BaseModel.FK__SYS_Allot__Creat__3B60C8C7" />
+        <AssociationConnector Association="BaseModel.FK__SYS_Allot__Modul__38845C1C" />
+        <AssociationConnector Association="BaseModel.FK__SYS_Allot__Owner__39788055" />
+        <AssociationConnector Association="BaseModel.FK__SYS_Allot__Schem__379037E3" />
+        <AssociationConnector Association="BaseModel.FK__SYS_Code___Creat__47C69FAC" />
+        <AssociationConnector Association="BaseModel.FK__SYS_Code___Creat__48BAC3E5" />
+        <AssociationConnector Association="BaseModel.FK__SYS_Code___Modul__45DE573A" />
+        <AssociationConnector Association="BaseModel.FK__SYS_Code___Owner__46D27B73" />
+        <AssociationConnector Association="BaseModel.FK__SYS_Code___Schem__44EA3301" />
+        <AssociationConnector Association="BaseModel.FK__SYS_Code___Schem__40257DE4" />
+        <AssociationConnector Association="BaseModel.FK__SYS_Code___Creat__30E33A54" />
+        <AssociationConnector Association="BaseModel.FK__SYS_Code___Creat__31D75E8D" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

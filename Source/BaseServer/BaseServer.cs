@@ -89,6 +89,7 @@ namespace Insight.WS.Base
                 new EndpointSet {Name = "IOrganizations", Path = "orgs"},
                 new EndpointSet {Name = "IUsers", Path = "users"},
                 new EndpointSet {Name = "IRoles", Path = "roles"},
+                new EndpointSet {Name = "ICodes", Path = "codes"}
             };
             var serv = new Services
             {
