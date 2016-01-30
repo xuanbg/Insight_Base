@@ -12,17 +12,17 @@ namespace Insight.WS.Base
             throw new NotImplementedException();
         }
 
-        public JsonResult DeleteScheme(Guid id)
+        public JsonResult DeleteScheme(string id)
         {
             throw new NotImplementedException();
         }
 
-        public JsonResult UpdateScheme(SYS_Code_Scheme obj)
+        public JsonResult UpdateScheme(string id, SYS_Code_Scheme scheme)
         {
             throw new NotImplementedException();
         }
 
-        public JsonResult EnableScheme(Guid id)
+        public JsonResult EnableScheme(string id)
         {
             throw new NotImplementedException();
         }
@@ -57,7 +57,7 @@ namespace Insight.WS.Base
         /// </summary>
         /// <param name="name">编码方案名称</param>
         /// <param name="id">业务记录ID</param>
-        /// <param name="mark">标记符</param>
+        /// <param name="mark">标识符</param>
         /// <returns>JsonResult</returns>
         public JsonResult GetCode(string name, string id, string mark)
         {

@@ -1,5 +1,4 @@
-﻿using System;
-using System.ServiceModel;
+﻿using System.ServiceModel;
 using System.ServiceModel.Web;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
@@ -19,7 +18,7 @@ namespace Insight.WS.Base
         /// <summary>
         /// 新增编码方案
         /// </summary>
-        /// <param name="obj">编码方案对象实体</param>
+        /// <param name="obj">SYS_Code_Scheme</param>
         /// <returns>JsonResult</returns>
         [WebInvoke(Method = "POST", UriTemplate = "", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
@@ -32,16 +31,17 @@ namespace Insight.WS.Base
         /// <returns>JsonResult</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult DeleteScheme(Guid id);
+        JsonResult DeleteScheme(string id);
 
         /// <summary>
         /// 更新编码方案
         /// </summary>
-        /// <param name="obj"></param>
+        /// <param name="id">编码方案ID</param>
+        /// <param name="scheme">SYS_Code_Scheme</param>
         /// <returns>JsonResult</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult UpdateScheme(SYS_Code_Scheme obj);
+        JsonResult UpdateScheme(string id, SYS_Code_Scheme scheme);
 
         /// <summary>
         /// 根据ID更新编码方案状态
@@ -50,7 +50,7 @@ namespace Insight.WS.Base
         /// <returns>JsonResult</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "{id}/validity", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult EnableScheme(Guid id);
+        JsonResult EnableScheme(string id);
 
         /// <summary>
         /// 根据ID获取编码方案对象实体
@@ -101,7 +101,7 @@ namespace Insight.WS.Base
         /// </summary>
         /// <param name="name">编码方案名称</param>
         /// <param name="id">业务记录ID</param>
-        /// <param name="mark">标记符</param>
+        /// <param name="mark">标识符</param>
         /// <returns>JsonResult</returns>
         [WebGet(UriTemplate = "{name}/newcode?id={id}&mark={mark}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
