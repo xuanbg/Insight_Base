@@ -47,7 +47,7 @@ namespace Insight.WS.Base.Common
         /// <summary>
         /// 最大授权数
         /// </summary>
-        private readonly int MaxAuth = Convert.ToInt32(GetAppSetting("MaxAuth"));
+        private const int MaxAuth = 999999999;
 
         /// <summary>
         /// 构造方法，使用Session验证
@@ -99,7 +99,7 @@ namespace Insight.WS.Base.Common
         /// <returns>bool</returns>
         public void SignIn()
         {
-            if (!Compare()) return;
+            if (!Compare(null, false)) return;
 
             Basis.DeptId = Session.DeptId;
             Basis.DeptName = Session.DeptName;
@@ -159,10 +159,11 @@ namespace Insight.WS.Base.Common
         /// 对Session进行校验，返回验证结果
         /// </summary>
         /// <param name="action">操作码，默认为空</param>
+        /// <param name="verify">是否验证模式</param>
         /// <returns>bool</returns>
-        public bool Compare(string action = null)
+        public bool Compare(string action = null, bool verify = true)
         {
-            if (Basis == null || Basis.UserId != Session.UserId)
+            if (Basis == null || (verify && Basis.UserId != Session.UserId))
             {
                 Session.LoginResult = LoginResult.NotExist;
                 Result.InvalidAuth(Serialize(Session));
