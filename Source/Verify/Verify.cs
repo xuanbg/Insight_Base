@@ -104,7 +104,7 @@ namespace Insight.WS.Base
         /// <param name="type">验证码类型</param>
         /// <param name="remove">是否验证成功后删除记录</param>
         /// <returns>JsonResult</returns>
-        public JsonResult VerifyCode(string mobile, string code, int type, bool remove)
+        public JsonResult VerifyCode(string mobile, string code, int type, bool remove = true)
         {
             var verify = new Verify(mobile + Secret);
             if (!verify.CompareUsageRule()) return verify.Result;
