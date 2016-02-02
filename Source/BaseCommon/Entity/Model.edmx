@@ -2219,14 +2219,6 @@
             <End Role="SYS_User" EntitySet="SYS_User" />
             <End Role="SYS_Code_Scheme" EntitySet="SYS_Code_Scheme" />
           </AssociationSet>
-          <FunctionImport Name="GetCode" ReturnType="Collection(String)">
-            <Parameter Name="SchemeId" Mode="In" Type="Guid" />
-            <Parameter Name="DeptId" Mode="In" Type="Guid" />
-            <Parameter Name="UserId" Mode="In" Type="Guid" />
-            <Parameter Name="BusinessId" Mode="In" Type="Guid" />
-            <Parameter Name="ModuleId" Mode="In" Type="Guid" />
-            <Parameter Name="Char" Mode="In" Type="String" />
-          </FunctionImport>
         </EntityContainer>
         <EntityType Name="SYS_Allot_Record">
           <Key>
@@ -2789,7 +2781,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <FunctionImportMapping FunctionImportName="GetCode" FunctionName="BaseModel.Store.GetCode" />
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

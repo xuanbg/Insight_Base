@@ -77,7 +77,7 @@ namespace Insight.WS.Base
                     return verify.Result.ServiceUnavailable();
                 }
 
-                var code = context.GetCode(scheme.ID, null, session.UserId, oid, null, mark);
+                var code = GetCode(scheme.ID, null, session.UserId, oid, null, mark);
                 return code == null ? verify.Result.DataBaseError() : verify.Result.Success(code.ToString());
             }
         }

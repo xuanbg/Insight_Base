@@ -158,7 +158,7 @@ if (@Count = 0)
       and AllotNumber = @Serial
   end
 
-select @Code
+select @Code as Code
 
 END
 

@@ -66,34 +66,5 @@ namespace Insight.WS.Base.Common.Entity
     
             return ((IObjectContextAdapter)this).ObjectContext.CreateQuery<Authority>("[BaseEntities].[Authority](@UserId, @DeptId, @ActionId)", userIdParameter, deptIdParameter, actionIdParameter);
         }
-    
-        public virtual ObjectResult<string> GetCode(Nullable<System.Guid> schemeId, Nullable<System.Guid> deptId, Nullable<System.Guid> userId, Nullable<System.Guid> businessId, Nullable<System.Guid> moduleId, string @char)
-        {
-            var schemeIdParameter = schemeId.HasValue ?
-                new ObjectParameter("SchemeId", schemeId) :
-                new ObjectParameter("SchemeId", typeof(System.Guid));
-    
-            var deptIdParameter = deptId.HasValue ?
-                new ObjectParameter("DeptId", deptId) :
-                new ObjectParameter("DeptId", typeof(System.Guid));
-    
-            var userIdParameter = userId.HasValue ?
-                new ObjectParameter("UserId", userId) :
-                new ObjectParameter("UserId", typeof(System.Guid));
-    
-            var businessIdParameter = businessId.HasValue ?
-                new ObjectParameter("BusinessId", businessId) :
-                new ObjectParameter("BusinessId", typeof(System.Guid));
-    
-            var moduleIdParameter = moduleId.HasValue ?
-                new ObjectParameter("ModuleId", moduleId) :
-                new ObjectParameter("ModuleId", typeof(System.Guid));
-    
-            var charParameter = @char != null ?
-                new ObjectParameter("Char", @char) :
-                new ObjectParameter("Char", typeof(string));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<string>("GetCode", schemeIdParameter, deptIdParameter, userIdParameter, businessIdParameter, moduleIdParameter, charParameter);
-        }
     }
 }
