@@ -46,9 +46,6 @@
     <Compile Include="Entity\Authority.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
-    <Compile Include="Entity\CodeResult.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
     <Compile Include="Entity\GuidParse.cs" />
     <Compile Include="Entity\SYS_Allot_Record.cs">
       <DependentUpon>Model.tt</DependentUpon>
