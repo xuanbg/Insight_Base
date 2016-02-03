@@ -77,11 +77,12 @@ namespace Insight.WS.Base.Common
         /// <param name="rule">验证规则</param>
         public Verify(string rule)
         {
-            Rule = Hash(rule);
             var dict = GetAuthorization();
             VerifyString = GetAuthor<string>(dict["Auth"]);
-            if (VerifyString == null)
-                Result.InvalidAuth();
+            Rule = Hash(rule);
+            if (VerifyString == null) Result.InvalidAuth();
+
+            Result.Success();
         }
 
         /// <summary>
@@ -105,6 +106,16 @@ namespace Insight.WS.Base.Common
             Basis.DeptName = Session.DeptName;
             Basis.MachineId = Session.MachineId;
             Result.Success(Serialize(Basis));
+        }
+
+        /// <summary>
+        /// 用户注册专用验证方法
+        /// </summary>
+        /// <param name="action">操作码，默认为空</param>
+        /// <returns>bool</returns>
+        public bool SignUp(string action = null)
+        {
+            return Basis == null || Compare(action);
         }
 
         /// <summary>

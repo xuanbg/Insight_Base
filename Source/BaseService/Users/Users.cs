@@ -15,13 +15,20 @@ namespace Insight.WS.Base
         /// <summary>
         /// 根据对象实体数据新增一个用户
         /// </summary>
+        /// <param name="account">登录账号</param>
         /// <param name="user">用户对象</param>
         /// <returns>JsonResult</returns>
-        public JsonResult AddUser(SYS_User user)
+        public JsonResult AddUser(string account, SYS_User user)
         {
             const string action = "60D5BE64-0102-4189-A999-96EDAD3DA1B5";
             var verify = new Verify();
-            if (!verify.ParseUserIdAndCompare(user.ID.ToString(), action)) return verify.Result;
+            if (!verify.SignUp(action)) return verify.Result;
+
+            if (verify.Basis != null) return InsertData(user) ? verify.Result.Created() : verify.Result.DataBaseError();
+
+            var session = verify.Session;
+            var sign = Hash(session.LoginName + user.LoginName + user.Password);
+            if (sign != session.Signature) return verify.Result.InvalidAuth();
 
             return InsertData(user) ? verify.Result.Created() : verify.Result.DataBaseError();
         }
@@ -176,7 +183,7 @@ namespace Insight.WS.Base
         /// 获取用户登录结果
         /// </summary>
         /// <returns>JsonResult</returns>
-        public JsonResult UserSignIn(string id)
+        public JsonResult UserSignIn(string account)
         {
             var verify = new Verify();
             verify.SignIn();

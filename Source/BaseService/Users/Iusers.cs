@@ -23,11 +23,12 @@ namespace Insight.WS.Base
         /// <summary>
         /// 根据对象实体数据新增一个用户
         /// </summary>
+        /// <param name="account">登录账号</param>
         /// <param name="user">用户对象</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "{account}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult AddUser(SYS_User user);
+        JsonResult AddUser(string account, SYS_User user);
 
         /// <summary>
         /// 根据ID删除用户
