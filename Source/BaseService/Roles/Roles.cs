@@ -4,9 +4,9 @@ using System.Data;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
 
-namespace Insight.WS.Base.Service
+namespace Insight.WS.Base
 {
-    public partial class BaseService : Iroles
+    public partial class BaseService : IRoles
     {
         public JsonResult AddRole(SYS_Role role, DataTable action, DataTable data, DataTable custom)
         {
@@ -18,7 +18,7 @@ namespace Insight.WS.Base.Service
             throw new NotImplementedException();
         }
 
-        public JsonResult EditRole(SYS_Role obj, List<object> adl, List<object> ddl, List<object> cdl, DataTable adt, DataTable ddt, DataTable cdt)
+        public JsonResult EditRole(string id, SYS_Role obj, List<object> adl, List<object> ddl, List<object> cdl, DataTable adt, DataTable ddt, DataTable cdt)
         {
             throw new NotImplementedException();
         }
@@ -38,7 +38,7 @@ namespace Insight.WS.Base.Service
             throw new NotImplementedException();
         }
 
-        public JsonResult DeleteRoleMember(int type, string id)
+        public JsonResult DeleteRoleMember(string id, int type)
         {
             throw new NotImplementedException();
         }

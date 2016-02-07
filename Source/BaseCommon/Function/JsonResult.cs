@@ -285,6 +285,19 @@
         }
 
         /// <summary>
+        /// 返回错误的支付密码（418）的错误信息
+        /// </summary>
+        /// <returns>JsonResult</returns>
+        public JsonResult InvalidPayKey()
+        {
+            Successful = false;
+            Code = "418";
+            Name = "InvalidPayKey";
+            Message = "错误的支付密码";
+            return this;
+        }
+
+        /// <summary>
         /// 返回数据库操作失败（501）的错误信息
         /// </summary>
         /// <returns>JsonResult</returns>
@@ -307,6 +320,19 @@
             Code = "502";
             Name = "DataAlreadyExists";
             Message = "数据已存在";
+            return this;
+        }
+
+        /// <summary>
+        /// 返回服务不可用（503）的错误信息
+        /// </summary>
+        /// <returns>JsonResult</returns>
+        public JsonResult ServiceUnavailable()
+        {
+            Successful = false;
+            Code = "503";
+            Name = "ServiceUnavailable";
+            Message = "当前服务不可用";
             return this;
         }
 

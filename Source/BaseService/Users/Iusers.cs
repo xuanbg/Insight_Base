@@ -5,47 +5,56 @@ using System.ServiceModel.Web;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
 
-namespace Insight.WS.Base.Service
+namespace Insight.WS.Base
 {
     [ServiceContract]
-    public interface Iusers
+    public interface IUsers
     {
 
         #region User
 
         /// <summary>
+        /// 为跨域请求设置响应头信息
+        /// </summary>
+        [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [OperationContract]
+        void ResponseOptions();
+
+        /// <summary>
         /// 根据对象实体数据新增一个用户
         /// </summary>
+        /// <param name="account">登录账号</param>
         /// <param name="user">用户对象</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "{account}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult AddUser(SYS_User user);
+        JsonResult AddUser(string account, SYS_User user);
 
         /// <summary>
         /// 根据ID删除用户
         /// </summary>
         /// <param name="id">用户ID</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "DELETE", UriTemplate = "", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "DELETE", UriTemplate = "{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         JsonResult RemoveUser(string id);
 
         /// <summary>
         /// 根据用户ID更新用户信息
         /// </summary>
+        /// <param name="id">用户ID</param>
         /// <param name="user">用户数据对象</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult UpdateUserInfo(SYS_User user);
+        JsonResult UpdateUserInfo(string id, SYS_User user);
 
         /// <summary>
         /// 根据ID获取用户对象实体
         /// </summary>
         /// <param name="id">用户ID</param>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "?id={id}", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "{id}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult GetUser(string id);
 
@@ -53,7 +62,7 @@ namespace Insight.WS.Base.Service
         /// 获取全部用户
         /// </summary>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "alluser", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult GetUsers();
 
@@ -63,19 +72,20 @@ namespace Insight.WS.Base.Service
         /// <param name="id">用户ID</param>
         /// <param name="password">用户新密码</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "signature", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "{id}/signature", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         JsonResult UpdateSignature(string id, string password);
 
         /// <summary>
         /// 用户重置登录密码
         /// </summary>
-        /// <param name="code">短信验证码</param>
+        /// <param name="account">用户账号</param>
         /// <param name="password">用户新密码</param>
+        /// <param name="code">短信验证码</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "resetpw", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "{account}/resetpw", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult ResetSignature(string code, string password);
+        JsonResult ResetSignature(string account, string password, string code);
 
         /// <summary>
         /// 根据用户ID设置用户状态
@@ -83,7 +93,7 @@ namespace Insight.WS.Base.Service
         /// <param name="id">用户ID</param>
         /// <param name="validity">可用状态</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "validity", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "{id}/validity", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         JsonResult SetUserStatus(string id, bool validity);
 
@@ -91,16 +101,16 @@ namespace Insight.WS.Base.Service
         /// 用户登录
         /// </summary>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "signin", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "{account}/signin", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult UserSignIn();
+        JsonResult UserSignIn(string account);
 
         /// <summary>
         /// 设置指定用户的登录状态为离线
         /// </summary>
         /// <param name="account">用户账号</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "signout", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "{account}/signout", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         JsonResult UserSignOut(string account);
 
@@ -122,7 +132,7 @@ namespace Insight.WS.Base.Service
         /// </summary>
         /// <param name="id">用户组ID</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "DELETE", UriTemplate = "groups", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "DELETE", UriTemplate = "groups/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         JsonResult RemoveGroup(string id);
 
@@ -140,7 +150,7 @@ namespace Insight.WS.Base.Service
         /// </summary>
         /// <param name="id">用户组ID</param>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "groups?id={id}", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "groups/{id}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult GetGroup(string id);
 
@@ -148,7 +158,7 @@ namespace Insight.WS.Base.Service
         /// 获取全部用户组
         /// </summary>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "allgroup", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "groups", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult GetGroups();
 
@@ -158,7 +168,7 @@ namespace Insight.WS.Base.Service
         /// <param name="id">用户组ID</param>
         /// <param name="uids">用户ID集合</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "groups/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "groups/{id}/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         JsonResult AddGroupMember(string id, List<Guid> uids);
 
@@ -184,7 +194,7 @@ namespace Insight.WS.Base.Service
         /// </summary>
         /// <param name="id">用户组ID</param>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "groups/othermember?id={id}", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "groups/{id}/othermember", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult GetOtherUser(string id);
 

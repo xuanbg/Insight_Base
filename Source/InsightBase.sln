@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseService", "BaseService\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseServer", "BaseServer\BaseServer.csproj", "{3419DA7E-3706-4E91-9821-E66CDE1836CE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VerifyService", "Verify\VerifyService.csproj", "{B18DFF40-4EB9-4777-B63E-756F36D5C5E2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{3419DA7E-3706-4E91-9821-E66CDE1836CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3419DA7E-3706-4E91-9821-E66CDE1836CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3419DA7E-3706-4E91-9821-E66CDE1836CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B18DFF40-4EB9-4777-B63E-756F36D5C5E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B18DFF40-4EB9-4777-B63E-756F36D5C5E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B18DFF40-4EB9-4777-B63E-756F36D5C5E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B18DFF40-4EB9-4777-B63E-756F36D5C5E2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

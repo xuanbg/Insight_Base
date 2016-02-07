@@ -1,21 +1,20 @@
 ﻿USE Insight_Base
 GO
 
-IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'Get_Code') AND OBJECTPROPERTY(id, N'ISPROCEDURE') = 1)
-DROP PROCEDURE Get_Code
+IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'GetCode') AND OBJECTPROPERTY(id, N'ISPROCEDURE') = 1)
+DROP PROCEDURE GetCode
 GO
 
 
 /*****标量值函数：获取编码字符串*****/
 
-CREATE PROCEDURE Get_Code (
+CREATE PROCEDURE GetCode (
 @SchemeId              UNIQUEIDENTIFIER,           --编码方案ID
 @DeptId                UNIQUEIDENTIFIER,           --部门ID
 @UserId                UNIQUEIDENTIFIER,           --用户ID
 @BusinessId            UNIQUEIDENTIFIER,           --业务记录ID
 @ModuleId              UNIQUEIDENTIFIER,           --业务模块ID
-@Char                  NVARCHAR(8),                --自定义字符串
-@Code                  VARCHAR(32) OUTPUT
+@Char                  NVARCHAR(8)                 --自定义字符串
 )
 AS
 BEGIN
@@ -28,7 +27,8 @@ DECLARE @SerialFormat  NVARCHAR(16),
         @Serial        VARCHAR(8),
         @Number        INT,
         @Dig           INT,
-        @Count         INT
+        @Count         INT,
+		@Code          VARCHAR(64)
 
 select @Code = CodeFormat, @SerialFormat = isnull(SerialFormat, '') from SYS_Code_Scheme where ID = @SchemeId
 set @Datetime = getdate()
@@ -53,13 +53,7 @@ if (charindex ('dd', @Code) > 0)
 if (charindex ('@', @Code) > 0)
   set @Code = replace(@Code, '@', isnull(@Char, ''))
 
-/*****格式化用户/部门/编码机构字段*****/
-
-if (charindex ('$0', @Code) > 0)
-  begin
-  select @UserCode = isnull(Code, '') from MasterData where ID = @UserId
-  set @Code = replace(@Code, '$0', @UserCode)
-  end
+/*****格式化部门/编码机构字段*****/
 
 if (charindex ('$1', @Code) > 0)
   begin
@@ -164,7 +158,7 @@ if (@Count = 0)
       and AllotNumber = @Serial
   end
 
-select @Code
+select @Code as Code
 
 END
 

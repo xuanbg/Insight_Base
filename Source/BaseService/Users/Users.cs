@@ -5,9 +5,9 @@ using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
 using static Insight.WS.Base.Common.Util;
 
-namespace Insight.WS.Base.Service
+namespace Insight.WS.Base
 {
-    public partial class BaseService : Iusers
+    public partial class BaseService : IUsers
     {
 
         #region User
@@ -15,13 +15,20 @@ namespace Insight.WS.Base.Service
         /// <summary>
         /// 根据对象实体数据新增一个用户
         /// </summary>
+        /// <param name="account">登录账号</param>
         /// <param name="user">用户对象</param>
         /// <returns>JsonResult</returns>
-        public JsonResult AddUser(SYS_User user)
+        public JsonResult AddUser(string account, SYS_User user)
         {
             const string action = "60D5BE64-0102-4189-A999-96EDAD3DA1B5";
             var verify = new Verify();
-            if (!verify.ParseUserIdAndCompare(user.ID.ToString(), action)) return verify.Result;
+            if (!verify.SignUp(action)) return verify.Result;
+
+            if (verify.Basis != null) return InsertData(user) ? verify.Result.Created() : verify.Result.DataBaseError();
+
+            var session = verify.Session;
+            var sign = Hash(session.LoginName + user.LoginName + user.Password);
+            if (sign != session.Signature) return verify.Result.InvalidAuth();
 
             return InsertData(user) ? verify.Result.Created() : verify.Result.DataBaseError();
         }
@@ -43,9 +50,10 @@ namespace Insight.WS.Base.Service
         /// <summary>
         /// 更新用户信息
         /// </summary>
+        /// <param name="id">用户ID</param>
         /// <param name="user">用户数据对象</param>
         /// <returns>JsonResult</returns>
-        public JsonResult UpdateUserInfo(SYS_User user)
+        public JsonResult UpdateUserInfo(string id, SYS_User user)
         {
             const string action = "3BC17B61-327D-4EAA-A0D7-7F825A6C71DB";
             var verify = new Verify();
@@ -121,10 +129,11 @@ namespace Insight.WS.Base.Service
         /// <summary>
         /// 用户重置登录密码
         /// </summary>
+        /// <param name="account">用户账号</param>
+        /// <param name="password">用户新密码</param>
         /// <param name="code">短信验证码</param>
-        /// <param name="pw">用户新密码</param>
         /// <returns>JsonResult</returns>
-        public JsonResult ResetSignature(string code, string pw)
+        public JsonResult ResetSignature(string account, string password, string code)
         {
             var verify = new Verify();
             var session = verify.Basis;
@@ -139,10 +148,10 @@ namespace Insight.WS.Base.Service
             SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == 2);
 
             // 更新用户登录密码
-            var reset = Update(session.UserId, pw);
+            var reset = Update(session.UserId, password);
             if (reset != null && !reset.Value) return verify.Result.DataBaseError();
 
-            session.Signature = Hash(session.LoginName.ToUpper() + pw);
+            session.Signature = Hash(session.LoginName.ToUpper() + password);
             verify.SignIn();
             return verify.Result;
         }
@@ -174,7 +183,7 @@ namespace Insight.WS.Base.Service
         /// 获取用户登录结果
         /// </summary>
         /// <returns>JsonResult</returns>
-        public JsonResult UserSignIn()
+        public JsonResult UserSignIn(string account)
         {
             var verify = new Verify();
             verify.SignIn();

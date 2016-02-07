@@ -47,7 +47,7 @@ namespace Insight.WS.Base.Common
         /// <summary>
         /// 最大授权数
         /// </summary>
-        private readonly int MaxAuth = Convert.ToInt32(GetAppSetting("MaxAuth"));
+        private const int MaxAuth = 999999999;
 
         /// <summary>
         /// 构造方法，使用Session验证
@@ -77,11 +77,12 @@ namespace Insight.WS.Base.Common
         /// <param name="rule">验证规则</param>
         public Verify(string rule)
         {
-            Rule = Hash(rule);
             var dict = GetAuthorization();
             VerifyString = GetAuthor<string>(dict["Auth"]);
-            if (VerifyString == null)
-                Result.InvalidAuth();
+            Rule = Hash(rule);
+            if (VerifyString == null) Result.InvalidAuth();
+
+            Result.Success();
         }
 
         /// <summary>
@@ -99,12 +100,22 @@ namespace Insight.WS.Base.Common
         /// <returns>bool</returns>
         public void SignIn()
         {
-            if (!Compare()) return;
+            if (!Compare(null, false)) return;
 
             Basis.DeptId = Session.DeptId;
             Basis.DeptName = Session.DeptName;
             Basis.MachineId = Session.MachineId;
             Result.Success(Serialize(Basis));
+        }
+
+        /// <summary>
+        /// 用户注册专用验证方法
+        /// </summary>
+        /// <param name="action">操作码，默认为空</param>
+        /// <returns>bool</returns>
+        public bool SignUp(string action = null)
+        {
+            return Basis == null || Compare(action);
         }
 
         /// <summary>
@@ -131,7 +142,7 @@ namespace Insight.WS.Base.Common
         {
             if (Guid.TryParse(id, out Guid))
             {
-                if (Basis.UserId == Guid) action = null;
+                if (Session.UserId == Guid) action = null;
 
                 return Compare(action);
             }
@@ -141,13 +152,29 @@ namespace Insight.WS.Base.Common
         }
 
         /// <summary>
+        /// 对Session和支付密码进行校验，返回验证结果
+        /// </summary>
+        /// <param name="key">支付密码（MD5值）</param>
+        /// <returns>bool</returns>
+        public bool Confirm(string key)
+        {
+            if (!Compare()) return false;
+
+            if (DataAccess.ConfirmPayKey(Basis.UserId, key)) return true;
+
+            Result.InvalidPayKey();
+            return false;
+        }
+
+        /// <summary>
         /// 对Session进行校验，返回验证结果
         /// </summary>
         /// <param name="action">操作码，默认为空</param>
+        /// <param name="verify">是否验证模式</param>
         /// <returns>bool</returns>
-        public bool Compare(string action = null)
+        public bool Compare(string action = null, bool verify = true)
         {
-            if (Basis == null)
+            if (Basis == null || (verify && Basis.UserId != Session.UserId))
             {
                 Session.LoginResult = LoginResult.NotExist;
                 Result.InvalidAuth(Serialize(Session));

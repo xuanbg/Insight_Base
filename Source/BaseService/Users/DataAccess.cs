@@ -6,7 +6,7 @@ using System.Linq;
 using Insight.WS.Base.Common.Entity;
 using static Insight.WS.Base.Common.SqlHelper;
 
-namespace Insight.WS.Base.Service
+namespace Insight.WS.Base
 {
     public partial class BaseService
     {

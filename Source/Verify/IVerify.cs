@@ -2,13 +2,20 @@
 using System.ServiceModel.Web;
 using Insight.WS.Base.Common;
 
-namespace Insight.WS.Base.Service
+namespace Insight.WS.Base
 {
     [ServiceContract]
-    public interface Iverify
+    public interface IVerify
     {
 
         #region Verify
+
+        /// <summary>
+        /// 为跨域请求设置响应头信息
+        /// </summary>
+        [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [OperationContract]
+        void ResponseOptions();
 
         /// <summary>
         /// 会话合法性验证
@@ -17,6 +24,14 @@ namespace Insight.WS.Base.Service
         [WebGet(UriTemplate = "verify", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult Verification();
+
+        /// <summary>
+        /// 会话合法性验证并校验支付密码
+        /// </summary>
+        /// <returns>JsonResult</returns>
+        [WebGet(UriTemplate = "confirm?paykey={paykey}", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        JsonResult Confirmation(string paykey);
 
         /// <summary>
         /// 带鉴权的会话合法性验证

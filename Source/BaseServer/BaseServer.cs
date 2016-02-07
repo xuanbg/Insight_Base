@@ -4,7 +4,7 @@ using System.IO;
 using System.ServiceModel;
 using System.ServiceProcess;
 using System.Windows.Forms;
-using Insight.WS.Base.Common;
+using static Insight.WS.Base.Common.Util;
 
 namespace Insight.WS.Base
 {
@@ -13,7 +13,7 @@ namespace Insight.WS.Base
         /// <summary>
         /// 运行中的服务主机
         /// </summary>
-        private static ServiceHost Host;
+        private static List<ServiceHost> Hosts;
 
         #region 构造函数
 
@@ -23,7 +23,7 @@ namespace Insight.WS.Base
         public BaseServer()
         {
             InitializeComponent();
-            InitVersion();
+            InitSeting();
         }
 
         #endregion
@@ -36,26 +36,15 @@ namespace Insight.WS.Base
         /// <param name="args"></param>
         protected override void OnStart(string[] args)
         {
-            string path = $"{Application.StartupPath}\\BaseService.dll";
-            if (!File.Exists(path)) return;
-
-            var endpoints = new List<EndpointSet>
+            Hosts = new List<ServiceHost>
             {
-                new EndpointSet { Name = "Iverify", Path = "verify"},
-                new EndpointSet { Name = "Iusers", Path = "users"},
-                new EndpointSet { Name = "Iorganizations", Path = "organizations", Compress = true },
-                new EndpointSet { Name = "Iroles", Path = "roles", Compress = true }
+                BaseService(),
+                VerifyService()
             };
-            var serv = new Services
+            foreach (var host in Hosts)
             {
-                BaseAddress = Util.GetAppSetting("Address"),
-                Port = Util.GetAppSetting("Port"),
-                NameSpace = "Insight.WS.Base.Service",
-                ServiceType = "BaseService",
-                Endpoints = endpoints
-            };
-            Host = serv.CreateHost(path);
-            Host.Open();
+                host.Open();
+            }
         }
 
         /// <summary>
@@ -63,20 +52,78 @@ namespace Insight.WS.Base
         /// </summary>
         protected override void OnStop()
         {
-            Host.Abort();
-            Host.Close();
+            foreach (var host in Hosts)
+            {
+                host.Abort();
+                host.Close();
+            }
         }
 
         #endregion
 
         /// <summary>
-        /// 读取版本信息
+        /// 初始化环境变量
         /// </summary>
-        public static void InitVersion()
+        private static void InitSeting()
         {
             var version = new Version(Application.ProductVersion);
             var build = $"{version.Major}{version.Minor}{version.Build.ToString("D4").Substring(0, 2)}";
-            Util.Version = Convert.ToInt32(build);
+            CurrentVersion = Convert.ToInt32(build);
+            CompatibleVersion = GetAppSetting("CompatibleVersion");
+            UpdateVersion = GetAppSetting("UpdateVersion");
+
+            LogServer = GetAppSetting("LogServer");
+        }
+
+        /// <summary>
+        /// 初始化基础服务主机
+        /// </summary>
+        /// <returns></returns>
+        private static ServiceHost BaseService()
+        {
+            string path = $"{Application.StartupPath}\\BaseService.dll";
+            if (!File.Exists(path)) return null;
+
+            var endpoints = new List<EndpointSet>
+            {
+                new EndpointSet {Name = "IOrganizations", Path = "orgs"},
+                new EndpointSet {Name = "IUsers", Path = "users"},
+                new EndpointSet {Name = "IRoles", Path = "roles"},
+                new EndpointSet {Name = "ICodes", Path = "codes"}
+            };
+            var serv = new Services
+            {
+                BaseAddress = GetAppSetting("Address"),
+                Port = GetAppSetting("BasePort"),
+                NameSpace = "Insight.WS.Base",
+                ServiceType = "BaseService",
+                Endpoints = endpoints
+            };
+            return serv.CreateHost(path);
+        }
+
+        /// <summary>
+        /// 初始化验证服务主机
+        /// </summary>
+        /// <returns></returns>
+        private static ServiceHost VerifyService()
+        {
+            string path = $"{Application.StartupPath}\\VerifyService.dll";
+            if (!File.Exists(path)) return null;
+
+            var endpoints = new List<EndpointSet>
+            {
+                new EndpointSet {Name = "IVerify"},
+            };
+            var serv = new Services
+            {
+                BaseAddress = GetAppSetting("Address"),
+                Port = GetAppSetting("VerifyPort"),
+                NameSpace = "Insight.WS.Base",
+                ServiceType = "VerifyService",
+                Endpoints = endpoints
+            };
+            return serv.CreateHost(path);
         }
 
     }

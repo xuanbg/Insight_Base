@@ -37,6 +37,7 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Data" />
@@ -46,6 +47,18 @@
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="Entity\GuidParse.cs" />
+    <Compile Include="Entity\SYS_Allot_Record.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SYS_Code_Allot.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SYS_Code_Record.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SYS_Code_Scheme.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
     <Compile Include="Function\General.cs" />
     <Compile Include="Function\JsonResult.cs" />
     <Compile Include="Entity\Model.Context.cs">
@@ -128,6 +141,7 @@
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>Model.Designer.cs</LastGenOutput>
     </EntityDeploy>
+    <None Include="App.Config" />
     <None Include="Entity\Model.edmx.diagram">
       <DependentUpon>Model.edmx</DependentUpon>
     </None>

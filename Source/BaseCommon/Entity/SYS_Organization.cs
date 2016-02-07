@@ -24,6 +24,9 @@ namespace Insight.WS.Base.Common.Entity
             this.SYS_OrgMerger1 = new HashSet<SYS_OrgMerger>();
             this.SYS_Role_Title = new HashSet<SYS_Role_Title>();
             this.SYS_RolePerm_DataAbs = new HashSet<SYS_RolePerm_DataAbs>();
+            this.SYS_Allot_Record = new HashSet<SYS_Allot_Record>();
+            this.SYS_Code_Allot = new HashSet<SYS_Code_Allot>();
+            this.SYS_Code_Scheme = new HashSet<SYS_Code_Scheme>();
         }
     
         public System.Guid ID { get; set; }
@@ -56,5 +59,11 @@ namespace Insight.WS.Base.Common.Entity
         public virtual ICollection<SYS_Role_Title> SYS_Role_Title { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SYS_RolePerm_DataAbs> SYS_RolePerm_DataAbs { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<SYS_Allot_Record> SYS_Allot_Record { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<SYS_Code_Allot> SYS_Code_Allot { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<SYS_Code_Scheme> SYS_Code_Scheme { get; set; }
     }
 }

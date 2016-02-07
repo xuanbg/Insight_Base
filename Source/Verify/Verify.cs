@@ -4,14 +4,30 @@ using System.ServiceModel;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
 using static Insight.WS.Base.Common.Util;
+using System.ServiceModel.Web;
 
-namespace Insight.WS.Base.Service
+namespace Insight.WS.Base
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
-    public partial class BaseService : Iverify
+    public class VerifyService : IVerify
     {
 
         #region Verify
+
+        /// <summary>
+        /// 为跨域请求设置响应头信息
+        /// </summary>
+        public void ResponseOptions()
+        {
+            var context = WebOperationContext.Current;
+            if (context == null) return;
+
+            var response = context.OutgoingResponse;
+            response.Headers.Add("Access-Control-Allow-Credentials", "true");
+            response.Headers.Add("Access-Control-Allow-Headers", "Accept, Content-Type, Authorization");
+            response.Headers.Add("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
+            response.Headers.Add("Access-Control-Allow-Origin", "*");
+        }
 
         /// <summary>
         /// 会话合法性验证
@@ -21,6 +37,17 @@ namespace Insight.WS.Base.Service
         {
             var verify = new Verify();
             verify.Compare();
+            return verify.Result;
+        }
+
+        /// <summary>
+        /// 会话合法性验证并校验支付密码
+        /// </summary>
+        /// <returns>JsonResult</returns>
+        public JsonResult Confirmation(string paykey)
+        {
+            var verify = new Verify();
+            verify.Confirm(paykey);
             return verify.Result;
         }
 
@@ -65,6 +92,7 @@ namespace Insight.WS.Base.Service
                 CreateTime = DateTime.Now
             };
             SmsCodes.Add(record);
+            General.LogToLogServer("700501", $"已经为手机号【{mobile}】的用户生成了类型为【{type}】的短信验证码：【{code}】。此验证码将于{record.FailureTime}失效。", "验证服务", "生成短信验证码");
             return verify.Result.Success(code);
         }
 
@@ -76,7 +104,7 @@ namespace Insight.WS.Base.Service
         /// <param name="type">验证码类型</param>
         /// <param name="remove">是否验证成功后删除记录</param>
         /// <returns>JsonResult</returns>
-        public JsonResult VerifyCode(string mobile, string code, int type, bool remove)
+        public JsonResult VerifyCode(string mobile, string code, int type, bool remove = true)
         {
             var verify = new Verify(mobile + Secret);
             if (!verify.CompareUsageRule()) return verify.Result;
