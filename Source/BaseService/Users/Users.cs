@@ -139,6 +139,9 @@ namespace Insight.WS.Base
             var session = verify.Basis;
             if (session == null) return verify.Result.NotFound();
 
+            var sign = Hash(session.LoginName.ToUpper() + code + password);
+            if (verify.Session.Signature != sign) return verify.Result.InvalidAuth();
+
             // 验证短信验证码
             var mobile = session.LoginName;
             SmsCodes.RemoveAll(c => c.FailureTime < DateTime.Now);
@@ -152,6 +155,7 @@ namespace Insight.WS.Base
             if (reset != null && !reset.Value) return verify.Result.DataBaseError();
 
             session.Signature = Hash(session.LoginName.ToUpper() + password);
+            verify.Session.Signature = Hash(session.LoginName.ToUpper() + password);
             verify.SignIn();
             return verify.Result;
         }
