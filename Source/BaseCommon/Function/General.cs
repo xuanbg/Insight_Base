@@ -26,7 +26,8 @@ namespace Insight.WS.Base.Common
             response.Headers.Add("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
             response.Headers.Add("Access-Control-Allow-Origin", "*");
 
-            if (!CompareVersion(headers))
+            var accept = CompareVersion(headers);
+            if (accept == null)
             {
                 response.StatusCode = HttpStatusCode.NotAcceptable;
                 return null;
@@ -39,13 +40,11 @@ namespace Insight.WS.Base.Common
                 return null;
             }
 
-            var accept = headers[HttpRequestHeader.Accept];
-            var val = accept.Split(Convert.ToChar(";"));
             return new Dictionary<string, string>
             {
                 {"Auth", auth},
-                {"Version", val[1].Substring(9)},
-                {"Client", val[2].Substring(8)}
+                {"Version", accept[1].Substring(9)},
+                {"Client", accept[2].Substring(8)}
             };
         }
 
@@ -193,16 +192,17 @@ namespace Insight.WS.Base.Common
         /// </summary>
         /// <param name="headers"></param>
         /// <returns></returns>
-        private static bool CompareVersion(WebHeaderCollection headers)
+        private static string[] CompareVersion(WebHeaderCollection headers)
         {
             var accept = headers[HttpRequestHeader.Accept];
-            if (accept == null) return false;
+            if (accept == null) return null;
 
-            var val = accept.Split(Convert.ToChar(";"));
-            if (accept.Length < 3) return false;
+            var array = accept.Split(Convert.ToChar(";"));
+            if (array.Length < 3) return null;
 
-            var ver = Convert.ToInt32(val[1].Substring(9));
-            return ver >= Convert.ToInt32(CompatibleVersion) && ver <= Convert.ToInt32(UpdateVersion);
+            var ver = Convert.ToInt32(array[1].Substring(9));
+            var comp = ver >= Convert.ToInt32(CompatibleVersion) && ver <= Convert.ToInt32(UpdateVersion);
+            return comp ? array : null;
         }
 
         #endregion
