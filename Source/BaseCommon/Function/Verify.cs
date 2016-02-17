@@ -8,11 +8,15 @@ namespace Insight.WS.Base.Common
 {
     public class Verify
     {
+        /// <summary>
+        /// Guid转换结果
+        /// </summary>
+        public Guid Guid;
 
         /// <summary>
         /// 用于验证的基准对象
         /// </summary>
-        public readonly Session Basis;
+        public Session Basis;
 
         /// <summary>
         /// 用于验证的目标对象
@@ -22,12 +26,12 @@ namespace Insight.WS.Base.Common
         /// <summary>
         /// JsonResult类型的验证结果
         /// </summary>
-        public JsonResult Result = new JsonResult();
+        public JsonResult Result = new JsonResult().InvalidAuth();
 
         /// <summary>
-        /// Guid转换结果
+        /// Session.ID是否一致
         /// </summary>
-        public Guid Guid;
+        private readonly bool Identical = true;
 
         /// <summary>
         /// 用于验证的基础规则
@@ -40,11 +44,6 @@ namespace Insight.WS.Base.Common
         private readonly string VerifyString;
 
         /// <summary>
-        /// Session.ID是否一致
-        /// </summary>
-        private readonly bool Identical = true;
-
-        /// <summary>
         /// 最大授权数
         /// </summary>
         private const int MaxAuth = 999999999;
@@ -54,21 +53,23 @@ namespace Insight.WS.Base.Common
         /// </summary>
         public Verify()
         {
+            // 从请求头获取验证数据
             var dict = GetAuthorization();
             Session = GetAuthor<Session>(dict["Auth"]);
-            if (Session == null)
-            {
-                Result.InvalidAuth();
-                return;
-            }
 
-            Basis = Session.ID < Sessions.Count ? Sessions[Session.ID] : GetSession(Session);
-            if (Basis == null) return;
+            // 验证数据不存在
+            if (Session == null) return;
 
+            // 下标超出缓存个数，初始化该用户的缓存数据
+            if (Session.ID >= Sessions.Count && !InitSession()) return;
+
+            // 下标一致，数据一致
             if (Basis.LoginName == Session.LoginName) return;
 
+            // 下标不一致，初始化该用户的缓存数据
+            if (!InitSession()) return;
+
             Identical = false;
-            Basis = GetSession(Session);
         }
 
         /// <summary>
@@ -247,20 +248,19 @@ namespace Insight.WS.Base.Common
         /// <summary>
         /// 根据用户账号获取用户Session
         /// </summary>
-        /// <param name="obj">用户会话</param>
         /// <returns>Session</returns>
-        private Session GetSession(Session obj)
+        private bool InitSession()
         {
-            // 先在缓存中根据用户账号查找，找到即返回结果
-            var session = Sessions.SingleOrDefault(s => string.Equals(s.LoginName, obj.LoginName, StringComparison.CurrentCultureIgnoreCase));
-            if (session != null) return session;
+            // 先在缓存中根据用户账号查找，找到结果存贮与Basis，且返回true
+            Basis = Sessions.SingleOrDefault(s => string.Equals(s.LoginName, Session.LoginName, StringComparison.CurrentCultureIgnoreCase));
+            if (Basis != null) return true;
 
-            // 未在缓存中找到结果时，再在数据库中根据用户账号查找用户；
-            // 找到后根据用户信息初始化Session数据、加入缓存并返回结果，否则返回null。
-            var user = DataAccess.GetUser(obj.LoginName);
-            if (user == null) return null;
+            // 在数据库中根据用户账号查找用户；
+            // 找到后根据用户信息初始化Basis数据、加入缓存并返回true，否则返回false。
+            var user = DataAccess.GetUser(Session.LoginName);
+            if (user == null) return false;
 
-            session = new Session
+            Basis = new Session
             {
                 ID = Sessions.Count,
                 UserId = user.ID,
@@ -270,10 +270,10 @@ namespace Insight.WS.Base.Common
                 Signature = Hash(user.LoginName.ToUpper() + user.Password),
                 UserType = user.Type,
                 Validity = user.Validity,
-                MachineId = obj.MachineId
+                MachineId = Session.MachineId
             };
-            Sessions.Add(session);
-            return session;
+            Sessions.Add(Basis);
+            return true;
         }
 
     }
