@@ -60,16 +60,20 @@ namespace Insight.WS.Base.Common
             // 验证数据不存在
             if (Session == null) return;
 
-            // 下标超出缓存个数，初始化该用户的缓存数据
-            if (Session.ID >= Sessions.Count && !InitSession()) return;
+            // 下标不可访问，初始化该用户的缓存数据
+            if (Session.ID >= Sessions.Count)
+            {
+                GetBasis();
+                return;
+            }
 
-            // 下标一致，数据一致
+            // 下标可访问，根据下标获得Basis；如数据一致，直接返回
+            Basis = Sessions[Session.ID];
             if (Basis.LoginName == Session.LoginName) return;
 
-            // 下标不一致，初始化该用户的缓存数据
-            if (!InitSession()) return;
-
+            // 下标可访问但数据不一致，初始化该用户的缓存数据
             Identical = false;
+            GetBasis();
         }
 
         /// <summary>
@@ -246,19 +250,19 @@ namespace Insight.WS.Base.Common
         }
 
         /// <summary>
-        /// 根据用户账号获取用户Session
+        /// 根据用户账号初始化Basis
+        /// 如Basis不存在于缓存，则将Basis加入缓存
         /// </summary>
-        /// <returns>Session</returns>
-        private bool InitSession()
+        private void GetBasis()
         {
-            // 先在缓存中根据用户账号查找，找到结果存贮与Basis，且返回true
+            // 在缓存中根据用户账号查找，找到结果存贮于Basis，并立即返回
             Basis = Sessions.SingleOrDefault(s => string.Equals(s.LoginName, Session.LoginName, StringComparison.CurrentCultureIgnoreCase));
-            if (Basis != null) return true;
+            if (Basis != null) return;
 
             // 在数据库中根据用户账号查找用户；
-            // 找到后根据用户信息初始化Basis数据、加入缓存并返回true，否则返回false。
+            // 找到后根据用户信息初始化Basis数据、加入缓存并返回。
             var user = DataAccess.GetUser(Session.LoginName);
-            if (user == null) return false;
+            if (user == null) return;
 
             Basis = new Session
             {
@@ -273,7 +277,6 @@ namespace Insight.WS.Base.Common
                 MachineId = Session.MachineId
             };
             Sessions.Add(Basis);
-            return true;
         }
 
     }
