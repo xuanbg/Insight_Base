@@ -123,7 +123,7 @@ namespace Insight.WS.Base
             var session = Sessions.SingleOrDefault(s => s.UserId == verify.Guid);
             if (session != null) session.Signature = Hash(session.LoginName.ToUpper() + pw);
 
-            return verify.Result;
+            return verify.Result.Success(Serialize(session));
         }
 
         /// <summary>
