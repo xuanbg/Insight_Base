@@ -256,7 +256,7 @@ namespace Insight.WS.Base.Common
         private void GetBasis()
         {
             // 在缓存中根据用户账号查找，找到结果存贮于Basis，并立即返回
-            Basis = Sessions.SingleOrDefault(s => string.Equals(s.LoginName, Session.LoginName, StringComparison.CurrentCultureIgnoreCase));
+            Basis = Sessions.SingleOrDefault(s => s.LoginName.ToUpper() == Session.LoginName.ToUpper());
             if (Basis != null) return;
 
             // 在数据库中根据用户账号查找用户；
