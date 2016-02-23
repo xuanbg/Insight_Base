@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
+using Insight.WS.Base.Users;
 using static Insight.WS.Base.Common.Util;
 
 namespace Insight.WS.Base
@@ -120,6 +121,10 @@ namespace Insight.WS.Base
 
             if (!reset.Value) return verify.Result.DataBaseError();
 
+            // 调用信分宝接口修改信分宝用户密码
+            var xresult = XFBInterface.ChangXFBPassword(verify.Basis.LoginName, pw, verify.Basis.Signature);
+            if (xresult?.resultCode != "0") return verify.Result.XfbInterfaceFail(xresult?.resultMessage);
+
             var session = Sessions.SingleOrDefault(s => s.UserId == verify.Guid);
             if (session != null) session.Signature = Hash(session.LoginName.ToUpper() + pw);
 
@@ -153,6 +158,10 @@ namespace Insight.WS.Base
             // 更新用户登录密码
             var reset = Update(session.UserId, password);
             if (reset != null && !reset.Value) return verify.Result.DataBaseError();
+
+            // 调用信分宝接口修改信分宝用户密码
+            var xresult = XFBInterface.ChangXFBPassword(session.LoginName, password, session.Signature);
+            if (xresult?.resultCode != "0") return verify.Result.XfbInterfaceFail(xresult?.resultMessage);
 
             session.Signature = Hash(session.LoginName.ToUpper() + password);
             verify.Session.Signature = Hash(session.LoginName.ToUpper() + password);
