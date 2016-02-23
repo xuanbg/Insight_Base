@@ -107,10 +107,11 @@ namespace Insight.WS.Base.Common
         {
             if (!Compare(null, false)) return;
 
+            Basis.OpenId = Session.OpenId;
             Basis.DeptId = Session.DeptId;
             Basis.DeptName = Session.DeptName;
             Basis.MachineId = Session.MachineId;
-            Result.Success(Serialize(Basis));
+            Result.Success(Basis);
         }
 
         /// <summary>
@@ -179,7 +180,7 @@ namespace Insight.WS.Base.Common
         /// <returns>bool</returns>
         public bool Compare(string action = null, bool verify = true)
         {
-            if (Basis == null || (verify && Basis.UserId != Session.UserId))
+            if (Basis == null || !ExtraCheck(verify))
             {
                 Session.LoginResult = LoginResult.NotExist;
                 Result.InvalidAuth(Serialize(Session));
@@ -279,5 +280,13 @@ namespace Insight.WS.Base.Common
             Sessions.Add(Basis);
         }
 
+        /// <summary>
+        /// 附加检查（用户ID和微信OpenID）
+        /// </summary>
+        /// <returns>bool 是否一致</returns>
+        private bool ExtraCheck(bool verify)
+        {
+            return !verify || Basis.UserId == Session.UserId && (!CheckOpenID || Basis.OpenId == Session.OpenId);
+        }
     }
 }

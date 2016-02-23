@@ -45,7 +45,7 @@ namespace Insight.WS.Base
             var verify = new Verify();
             if (!verify.ParseUserIdAndCompare(id, action)) return verify.Result;
 
-            return DeleteUser(verify.Basis.UserId) ? verify.Result.Created() : verify.Result.DataBaseError();
+            return DeleteUser(verify.Basis.UserId) ? verify.Result : verify.Result.DataBaseError();
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace Insight.WS.Base
             session.UserName = user.Name;
             session.UserType = user.Type;
             session.OpenId = user.OpenId;
-            return verify.Result;
+            return verify.Result.Success(session);
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace Insight.WS.Base
             if (!verify.ParseUserIdAndCompare(id, action)) return verify.Result;
 
             var user = GetUser(verify.Guid);
-            return user == null ? verify.Result.NotFound() : verify.Result.Success(Serialize(user));
+            return user == null ? verify.Result.NotFound() : verify.Result.Success(user);
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Insight.WS.Base
             if (!verify.Compare(action)) return verify.Result;
 
             var data = GetUserList();
-            return data.Rows.Count > 0 ? verify.Result.Success(Serialize(data)) : verify.Result.NoContent();
+            return data.Rows.Count > 0 ? verify.Result.Success(data) : verify.Result.NoContent();
         }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace Insight.WS.Base
             var session = Sessions.SingleOrDefault(s => s.UserId == verify.Guid);
             if (session != null) session.Signature = Hash(session.LoginName.ToUpper() + pw);
 
-            return verify.Result.Success(Serialize(session));
+            return verify.Result.Success(session);
         }
 
         /// <summary>
@@ -189,7 +189,7 @@ namespace Insight.WS.Base
             var session = Sessions.SingleOrDefault(s => s.UserId == verify.Guid);
             if (session != null) session.Validity = validity;
 
-            return verify.Result;
+            return verify.Result.Success(session);
         }
 
         /// <summary>
@@ -219,7 +219,7 @@ namespace Insight.WS.Base
             var session = Sessions.SingleOrDefault(s => s.LoginName == account);
             if (session != null) session.OnlineStatus = false;
 
-            return verify.Result;
+            return verify.Result.Success(session);
         }
 
         #endregion
@@ -281,7 +281,7 @@ namespace Insight.WS.Base
             if (!verify.Compare(action)) return verify.Result;
 
             var data = GetGroup(verify.Guid);
-            return data == null ? verify.Result.NoContent() : verify.Result.Success(Serialize(data));
+            return data == null ? verify.Result.NoContent() : verify.Result.Success(data);
         }
 
         /// <summary>
@@ -295,7 +295,7 @@ namespace Insight.WS.Base
             if (!verify.Compare(action)) return verify.Result;
 
             var data = GetGroupList();
-            return data.Rows.Count > 0 ? verify.Result.Success(Serialize(data)) : verify.Result.NoContent();
+            return data.Rows.Count > 0 ? verify.Result.Success(data) : verify.Result.NoContent();
         }
 
         /// <summary>
@@ -338,7 +338,7 @@ namespace Insight.WS.Base
             if (!verify.Compare(action)) return verify.Result;
 
             var data = GetMemberList();
-            return data.Rows.Count > 0 ? verify.Result.Success(Serialize(data)) : verify.Result.NoContent();
+            return data.Rows.Count > 0 ? verify.Result.Success(data) : verify.Result.NoContent();
         }
 
         /// <summary>
@@ -353,7 +353,7 @@ namespace Insight.WS.Base
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
             var data = GetOtherUser(verify.Guid);
-            return data.Rows.Count > 0 ? verify.Result.Success(Serialize(data)) : verify.Result.NoContent();
+            return data.Rows.Count > 0 ? verify.Result.Success(data) : verify.Result.NoContent();
         }
 
         #endregion
