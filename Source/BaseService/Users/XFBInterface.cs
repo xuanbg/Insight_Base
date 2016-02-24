@@ -107,7 +107,7 @@ namespace Insight.WS.Base.Users
                 {"password", password},
                 {"authentication", $"timestamp={tick};secretKey={secretkey}"},
                 {"sysType", "IOS"},
-                {"sysVersion", Util.GetAppSetting("Version")},
+                {"sysVersion", "V1.2.0"},
                 {"uuid", "A6872607-3614-4361-8B10-319D66114309"},
                 {"OSversion", "8.4.1"},
                 {"phoneModel", "iPhone 6 (A1549/A1586)"},
