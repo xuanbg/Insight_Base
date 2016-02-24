@@ -32,10 +32,10 @@ namespace Insight.WS.Base.Users
         /// <returns>JsonGeneral</returns>
         public static JsonGeneral ChangXFBPassword(string loginname, string password, string old)
         {
-            var userid = DoLogin(loginname, password)?.userId;
+            var userid = DoLogin(loginname, old)?.userId;
             var url = Util.GetAppSetting("Interface") + "customer/changeInfo.do";
             var data = $"loginName={loginname}&newPassWord={password}&oldPassword={old}";
-            return HttpRequest<JsonGeneral>(url, "POST", data, userid, password);
+            return HttpRequest<JsonGeneral>(url, "POST", data, userid, old);
         }
 
         /// <summary>
