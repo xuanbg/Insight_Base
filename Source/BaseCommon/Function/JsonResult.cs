@@ -88,6 +88,21 @@
         }
 
         /// <summary>
+        /// 返回资源创建成功（201）的成功信息
+        /// </summary>
+        /// <param name="data">承载的数据（可选）</param>
+        /// <returns>JsonResult</returns>
+        public JsonResult Created(object data)
+        {
+            Successful = true;
+            Code = "201";
+            Name = "Created";
+            Message = "资源创建成功";
+            Data = Util.Serialize(data);
+            return this;
+        }
+
+        /// <summary>
         /// 返回用户多地登录（202）的错误信息
         /// </summary>
         /// <returns>JsonResult</returns>
