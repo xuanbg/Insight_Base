@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.ServiceModel;
+using System.ServiceModel.Web;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
 using static Insight.WS.Base.Common.Util;
-using System.ServiceModel.Web;
 
 namespace Insight.WS.Base
 {
@@ -35,7 +35,7 @@ namespace Insight.WS.Base
         /// <returns>JsonResult</returns>
         public JsonResult Verification()
         {
-            var verify = new Verify();
+            var verify = new SessionVerify();
             verify.Compare();
             return verify.Result;
         }
@@ -46,7 +46,7 @@ namespace Insight.WS.Base
         /// <returns>JsonResult</returns>
         public JsonResult Confirmation(string paykey)
         {
-            var verify = new Verify();
+            var verify = new SessionVerify();
             verify.Confirm(paykey);
             return verify.Result;
         }
@@ -58,7 +58,7 @@ namespace Insight.WS.Base
         /// <returns>JsonResult</returns>
         public JsonResult Authorization(string action)
         {
-            var verify = new Verify();
+            var verify = new SessionVerify();
             verify.Compare(action);
             return verify.Result;
         }
@@ -76,11 +76,11 @@ namespace Insight.WS.Base
         /// <returns>JsonResult</returns>
         public JsonResult NewCode(string mobile, int type, int time)
         {
-            var verify = new Verify(mobile + Secret);
-            if (!verify.CompareUsageRule()) return verify.Result;
+            var verify = General.Verify(mobile + Secret);
+            if (!verify.Successful) return verify;
 
             var record = SmsCodes.OrderByDescending(r => r.CreateTime).FirstOrDefault(r => r.Mobile == mobile && r.Type == type);
-            if (record != null && (DateTime.Now - record.CreateTime).TotalSeconds < 60) return verify.Result.TimeTooShort();
+            if (record != null && (DateTime.Now - record.CreateTime).TotalSeconds < 60) return verify.TimeTooShort();
 
             var code = Util.Random.Next(100000, 999999).ToString();
             record = new VerifyRecord
@@ -93,7 +93,7 @@ namespace Insight.WS.Base
             };
             SmsCodes.Add(record);
             General.LogToLogServer("700501", $"已经为手机号【{mobile}】的用户生成了类型为【{type}】的短信验证码：【{code}】。此验证码将于{record.FailureTime}失效。", "验证服务", "生成短信验证码");
-            return verify.Result.Success(code);
+            return verify.Success(code);
         }
 
         /// <summary>
@@ -106,17 +106,17 @@ namespace Insight.WS.Base
         /// <returns>JsonResult</returns>
         public JsonResult VerifyCode(string mobile, string code, int type, bool remove = true)
         {
-            var verify = new Verify(mobile + Secret);
-            if (!verify.CompareUsageRule()) return verify.Result;
+            var verify = General.Verify(mobile + Secret);
+            if (!verify.Successful) return verify;
 
             SmsCodes.RemoveAll(c => c.FailureTime < DateTime.Now);
             var record = SmsCodes.FirstOrDefault(c => c.Mobile == mobile && c.Code == code && c.Type == type);
-            if (record == null) return verify.Result.SMSCodeError();
+            if (record == null) return verify.SMSCodeError();
 
-            if (!remove) return verify.Result;
+            if (!remove) return verify;
 
             SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == type);
-            return verify.Result;
+            return verify;
         }
 
         #endregion
@@ -130,7 +130,7 @@ namespace Insight.WS.Base
         public JsonResult GetSessions()
         {
             const string action = "331BF752-CDB7-44DE-9631-DF2605BB527E";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
             var list = Sessions.Where(s => s.UserType > 0 && s.OnlineStatus).ToList();

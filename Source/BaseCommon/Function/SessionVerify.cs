@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Linq;
 using Insight.WS.Base.Common.Entity;
 using static Insight.WS.Base.Common.General;
 using static Insight.WS.Base.Common.Util;
+using static Insight.WS.Base.Common.SessionManage;
 
 namespace Insight.WS.Base.Common
 {
-    public class Verify
+    public class SessionVerify
     {
         /// <summary>
         /// Guid转换结果
@@ -31,17 +31,7 @@ namespace Insight.WS.Base.Common
         /// <summary>
         /// Session.ID是否一致
         /// </summary>
-        private readonly bool Identical = true;
-
-        /// <summary>
-        /// 用于验证的基础规则
-        /// </summary>
-        private readonly string Rule;
-
-        /// <summary>
-        /// 用于验证的字符串
-        /// </summary>
-        private readonly string VerifyString;
+        private readonly bool Identical;
 
         /// <summary>
         /// 最大授权数
@@ -51,7 +41,7 @@ namespace Insight.WS.Base.Common
         /// <summary>
         /// 构造方法，使用Session验证
         /// </summary>
-        public Verify()
+        public SessionVerify()
         {
             // 从请求头获取验证数据
             var dict = GetAuthorization();
@@ -60,43 +50,8 @@ namespace Insight.WS.Base.Common
             // 验证数据不存在
             if (Session == null) return;
 
-            // 下标不可访问，初始化该用户的缓存数据
-            if (Session.ID >= Sessions.Count)
-            {
-                GetBasis();
-                return;
-            }
-
-            // 下标可访问，根据下标获得Basis；如数据一致，直接返回
-            Basis = Sessions[Session.ID];
-            if (Basis.LoginName == Session.LoginName) return;
-
-            // 下标可访问但数据不一致，初始化该用户的缓存数据
-            Identical = false;
-            GetBasis();
-        }
-
-        /// <summary>
-        /// 构造方法，使用简单规则验证
-        /// </summary>
-        /// <param name="rule">验证规则</param>
-        public Verify(string rule)
-        {
-            var dict = GetAuthorization();
-            VerifyString = GetAuthor<string>(dict["Auth"]);
-            Rule = Hash(rule);
-            if (VerifyString == null) Result.InvalidAuth();
-
-            Result.Success();
-        }
-
-        /// <summary>
-        /// 对Rule进行校验，返回验证结果
-        /// </summary>
-        /// <returns>bool</returns>
-        public bool CompareUsageRule()
-        {
-            return Result.Successful && Rule == VerifyString;
+            Basis = GetSession(Session);
+            Identical = Basis?.ID == Session.ID;
         }
 
         /// <summary>
@@ -107,10 +62,11 @@ namespace Insight.WS.Base.Common
         {
             if (!Compare(null, false)) return;
 
+            Basis.OpenId = Session.OpenId;
             Basis.DeptId = Session.DeptId;
             Basis.DeptName = Session.DeptName;
             Basis.MachineId = Session.MachineId;
-            Result.Success(Serialize(Basis));
+            Result.Success(Basis);
         }
 
         /// <summary>
@@ -121,39 +77,6 @@ namespace Insight.WS.Base.Common
         public bool SignUp(string action = null)
         {
             return Basis == null || Compare(action);
-        }
-
-        /// <summary>
-        /// 转换一个Guid，并对Session进行校验
-        /// </summary>
-        /// <param name="id">要转换的Guid字符串</param>
-        /// <param name="action">操作码，默认为空</param>
-        /// <returns>bool</returns>
-        public bool ParseIdAndCompare(string id, string action = null)
-        {
-            if (Guid.TryParse(id, out Guid)) return Compare(action);
-
-            Result.InvalidGuid();
-            return false;
-        }
-
-        /// <summary>
-        /// 转换一个用户ID，并对Session进行校验
-        /// </summary>
-        /// <param name="id">要转换的UserId</param>
-        /// <param name="action">操作码，默认为空</param>
-        /// <returns>bool</returns>
-        public bool ParseUserIdAndCompare(string id, string action = null)
-        {
-            if (Guid.TryParse(id, out Guid))
-            {
-                if (Session.UserId == Guid) action = null;
-
-                return Compare(action);
-            }
-
-            Result.InvalidGuid();
-            return false;
         }
 
         /// <summary>
@@ -172,6 +95,54 @@ namespace Insight.WS.Base.Common
         }
 
         /// <summary>
+        /// 转换一个Guid，并对Session进行校验
+        /// </summary>
+        /// <param name="id">要转换的Guid字符串</param>
+        /// <param name="action">操作码，默认为空</param>
+        /// <returns>bool</returns>
+        public bool ParseIdAndCompare(string id, string action = null)
+        {
+            if (Guid.TryParse(id, out Guid)) return Compare(action);
+
+            Result.InvalidGuid();
+            return false;
+        }
+
+        /// <summary>
+        /// 对Session进行校验（如account一致，忽略鉴权），返回验证结果
+        /// </summary>
+        /// <param name="action">操作码</param>
+        /// <param name="account">登录账号</param>
+        /// <returns>bool</returns>
+        public bool CompareAs(string action, string account)
+        {
+            // 如指定的登录账号是操作人的登录账号，则不进行鉴权
+            if (Session.LoginName == account) action = null;
+
+            return Compare(action);
+        }
+
+        /// <summary>
+        /// 转换一个用户ID，并对Session进行校验（如id一致，忽略鉴权），返回验证结果，
+        /// </summary>
+        /// <param name="action">操作码</param>
+        /// <param name="id">用户ID</param>
+        /// <returns>bool</returns>
+        public bool Compare(string action, string id)
+        {
+            if (Guid.TryParse(id, out Guid))
+            {
+                // 如指定的用户ID是操作人ID，则不进行鉴权
+                if (Session.UserId == Guid) action = null;
+
+                return Compare(action);
+            }
+
+            Result.InvalidGuid();
+            return false;
+        }
+
+        /// <summary>
         /// 对Session进行校验，返回验证结果
         /// </summary>
         /// <param name="action">操作码，默认为空</param>
@@ -179,7 +150,7 @@ namespace Insight.WS.Base.Common
         /// <returns>bool</returns>
         public bool Compare(string action = null, bool verify = true)
         {
-            if (Basis == null || (verify && Basis.UserId != Session.UserId))
+            if (Basis == null || !ExtraCheck(verify))
             {
                 Session.LoginResult = LoginResult.NotExist;
                 Result.InvalidAuth(Serialize(Session));
@@ -250,34 +221,12 @@ namespace Insight.WS.Base.Common
         }
 
         /// <summary>
-        /// 根据用户账号初始化Basis
-        /// 如Basis不存在于缓存，则将Basis加入缓存
+        /// 附加检查（用户ID和微信OpenID）
         /// </summary>
-        private void GetBasis()
+        /// <returns>bool 是否一致</returns>
+        private bool ExtraCheck(bool verify)
         {
-            // 在缓存中根据用户账号查找，找到结果存贮于Basis，并立即返回
-            Basis = Sessions.SingleOrDefault(s => s.LoginName.ToUpper() == Session.LoginName.ToUpper());
-            if (Basis != null) return;
-
-            // 在数据库中根据用户账号查找用户；
-            // 找到后根据用户信息初始化Basis数据、加入缓存并返回。
-            var user = DataAccess.GetUser(Session.LoginName);
-            if (user == null) return;
-
-            Basis = new Session
-            {
-                ID = Sessions.Count,
-                UserId = user.ID,
-                UserName = user.Name,
-                OpenId = user.OpenId,
-                LoginName = user.LoginName,
-                Signature = Hash(user.LoginName.ToUpper() + user.Password),
-                UserType = user.Type,
-                Validity = user.Validity,
-                MachineId = Session.MachineId
-            };
-            Sessions.Add(Basis);
+            return !verify || Basis.UserId == Session.UserId && (!CheckOpenID || Basis.OpenId == Session.OpenId);
         }
-
     }
 }

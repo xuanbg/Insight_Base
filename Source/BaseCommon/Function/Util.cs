@@ -57,6 +57,11 @@ namespace Insight.WS.Base.Common
         /// </summary>
         public static string UpdateVersion;
 
+        /// <summary>
+        /// 是否验证微信OpenID
+        /// </summary>
+        public static bool CheckOpenID;
+
         #endregion
 
         #region 静态公共方法
@@ -114,10 +119,9 @@ namespace Insight.WS.Base.Common
         /// <summary>
         /// 将一个对象序列化为Json字符串
         /// </summary>
-        /// <typeparam name="T">对象类型</typeparam>
         /// <param name="obj">对象</param>
         /// <returns>string Json字符串</returns>
-        public static string Serialize<T>(T obj)
+        public static string Serialize(object obj)
         {
             return new JavaScriptSerializer().Serialize(obj);
         }

@@ -58,6 +58,21 @@
         }
 
         /// <summary>
+        /// 返回接口调用成功（200）的成功信息
+        /// </summary>
+        /// <param name="data">承载的数据（可选）</param>
+        /// <returns>JsonResult</returns>
+        public JsonResult Success(object data)
+        {
+            Successful = true;
+            Code = "200";
+            Name = "OK";
+            Message = "接口调用成功";
+            Data = Util.Serialize(data);
+            return this;
+        }
+
+        /// <summary>
         /// 返回资源创建成功（201）的成功信息
         /// </summary>
         /// <param name="data">承载的数据（可选）</param>

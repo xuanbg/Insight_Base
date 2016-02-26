@@ -36,7 +36,7 @@ namespace Insight.WS.Base
         public JsonResult AddOrg(SYS_Organization org, int index)
         {
             const string action = "88AC97EF-52A3-4F7F-8121-4C311206535F";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
             var result = verify.Result;
@@ -51,7 +51,7 @@ namespace Insight.WS.Base
         public JsonResult RemoveOrg(string id)
         {
             const string action = "71803766-97FE-4E6E-82DB-D5C90D2B7004";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
             return DeleteOrg(verify.Guid) ? verify.Result : verify.Result.DataBaseError();
@@ -67,7 +67,7 @@ namespace Insight.WS.Base
         public JsonResult UpdateOrg(string id, SYS_Organization obj, int index)
         {
             const string action = "542D5E28-8102-40C6-9C01-190D13DBF6C6";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
             return Update(obj) ? verify.Result : verify.Result.DataBaseError();
@@ -81,7 +81,7 @@ namespace Insight.WS.Base
         public JsonResult GetOrg(string id)
         {
             const string action = "928C7527-A2F7-49A3-A548-12B3834D8822";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
             var org = GetOrg(verify.Guid);
@@ -95,7 +95,7 @@ namespace Insight.WS.Base
         public JsonResult GetOrgTree()
         {
             const string action = "928C7527-A2F7-49A3-A548-12B3834D8822";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
             var data = GetOrgList();
@@ -110,7 +110,7 @@ namespace Insight.WS.Base
         public JsonResult AddOrgMerger(SYS_OrgMerger org)
         {
             const string action = "DAE7F2C5-E379-4F74-8043-EB616D4A5F8B";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
             return InsertData(verify.Basis.UserId, org) ? verify.Result : verify.Result.DataBaseError();
@@ -125,7 +125,7 @@ namespace Insight.WS.Base
         public JsonResult SetOrgParent(string id, SYS_Organization org)
         {
             const string action = "DB1A4EA2-1B3E-41AD-91FA-A3945AB7D901";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
             return Update(org) ? verify.Result : verify.Result.DataBaseError();
@@ -140,7 +140,7 @@ namespace Insight.WS.Base
         public JsonResult AddOrgMember(string id, List<Guid> uids)
         {
             const string action = "1F29DDEA-A4D7-4EF9-8136-0D4AFE88CB08";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
             return InsertData(verify.Basis.UserId, verify.Guid, uids) ? verify.Result : verify.Result.DataBaseError();
@@ -154,7 +154,7 @@ namespace Insight.WS.Base
         public JsonResult RemoveOrgMember(List<Guid> ids)
         {
             const string action = "70AC8EEB-F920-468D-8C8F-2DBA049ADAE9";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
             return DeleteOrgMember(ids) ? verify.Result : verify.Result.DataBaseError();
@@ -167,7 +167,7 @@ namespace Insight.WS.Base
         public JsonResult GetOrgMembers()
         {
             const string action = "928C7527-A2F7-49A3-A548-12B3834D8822";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
             var data = GetOrgMemberList();
@@ -181,7 +181,7 @@ namespace Insight.WS.Base
         public JsonResult GetOtherOrgMember(string id)
         {
             const string action = "928C7527-A2F7-49A3-A548-12B3834D8822";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
             var data = GetOtherOrgMember(verify.Guid);

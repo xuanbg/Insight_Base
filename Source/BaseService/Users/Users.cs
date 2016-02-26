@@ -21,7 +21,7 @@ namespace Insight.WS.Base
         public JsonResult AddUser(string account, SYS_User user)
         {
             const string action = "60D5BE64-0102-4189-A999-96EDAD3DA1B5";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.SignUp(action)) return verify.Result;
 
             if (verify.Basis != null) return InsertData(user) ? verify.Result.Created() : verify.Result.DataBaseError();
@@ -41,8 +41,8 @@ namespace Insight.WS.Base
         public JsonResult RemoveUser(string id)
         {
             const string action = "BE2DE9AB-C109-418D-8626-236DEF8E8504";
-            var verify = new Verify();
-            if (!verify.ParseUserIdAndCompare(id, action)) return verify.Result;
+            var verify = new SessionVerify();
+            if (!verify.Compare(action, id)) return verify.Result;
 
             return DeleteUser(verify.Basis.UserId) ? verify.Result.Created() : verify.Result.DataBaseError();
         }
@@ -56,8 +56,8 @@ namespace Insight.WS.Base
         public JsonResult UpdateUserInfo(string id, SYS_User user)
         {
             const string action = "3BC17B61-327D-4EAA-A0D7-7F825A6C71DB";
-            var verify = new Verify();
-            if (!verify.ParseUserIdAndCompare(user.ID.ToString(), action)) return verify.Result;
+            var verify = new SessionVerify();
+            if (!verify.Compare(action, id)) return verify.Result;
 
             var reset = Update(user);
             if (!reset.HasValue) return verify.Result.NotFound();
@@ -82,8 +82,8 @@ namespace Insight.WS.Base
         public JsonResult GetUser(string id)
         {
             const string action = "3BC17B61-327D-4EAA-A0D7-7F825A6C71DB";
-            var verify = new Verify();
-            if (!verify.ParseUserIdAndCompare(id, action)) return verify.Result;
+            var verify = new SessionVerify();
+            if (!verify.Compare(action, id)) return verify.Result;
 
             var user = GetUser(verify.Guid);
             return user == null ? verify.Result.NotFound() : verify.Result.Success(Serialize(user));
@@ -96,7 +96,7 @@ namespace Insight.WS.Base
         public JsonResult GetUsers()
         {
             const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
             var data = GetUserList();
@@ -112,8 +112,8 @@ namespace Insight.WS.Base
         public JsonResult UpdateSignature(string id, string pw)
         {
             const string action = "26481E60-0917-49B4-BBAA-2265E71E7B3F";
-            var verify = new Verify();
-            if (!verify.ParseUserIdAndCompare(id, action)) return verify.Result;
+            var verify = new SessionVerify();
+            if (!verify.Compare(action, id)) return verify.Result;
 
             var reset = Update(verify.Guid, pw);
             if (!reset.HasValue) return verify.Result.NotFound();
@@ -135,7 +135,7 @@ namespace Insight.WS.Base
         /// <returns>JsonResult</returns>
         public JsonResult ResetSignature(string account, string password, string code)
         {
-            var verify = new Verify();
+            var verify = new SessionVerify();
             var session = verify.Basis;
             if (session == null) return verify.Result.NotFound();
 
@@ -169,8 +169,8 @@ namespace Insight.WS.Base
         public JsonResult SetUserStatus(string id, bool validity)
         {
             var action = validity ? "369548E9-C8DB-439B-A604-4FDC07F3CCDD" : "0FA34D43-2C52-4968-BDDA-C9191D7FCE80";
-            var verify = new Verify();
-            if (!verify.ParseUserIdAndCompare(id, action)) return verify.Result;
+            var verify = new SessionVerify();
+            if (!verify.Compare(action, id)) return verify.Result;
 
             var reset = Update(verify.Guid, validity);
             if (!reset.HasValue) return verify.Result.NotFound();
@@ -189,7 +189,7 @@ namespace Insight.WS.Base
         /// <returns>JsonResult</returns>
         public JsonResult UserSignIn(string account)
         {
-            var verify = new Verify();
+            var verify = new SessionVerify();
             verify.SignIn();
             return verify.Result;
         }
@@ -202,7 +202,7 @@ namespace Insight.WS.Base
         public JsonResult UserSignOut(string account)
         {
             var action = "331BF752-CDB7-44DE-9631-DF2605BB527E";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (verify.Basis.LoginName == account) action = null;
 
             if (!verify.Compare(action)) return verify.Result;
@@ -225,7 +225,7 @@ namespace Insight.WS.Base
         public JsonResult AddGroup(SYS_UserGroup group)
         {
             const string action = "6E80210E-6F80-4FF7-8520-B602934D635C";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
             var id = InsertData(verify.Basis.UserId, group);
@@ -240,7 +240,7 @@ namespace Insight.WS.Base
         public JsonResult RemoveGroup(string id)
         {
             const string action = "E46B7A1C-A8B0-49B5-8494-BF1B09F43452";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
             return DeleteGroup(verify.Guid) ? verify.Result : verify.Result.DataBaseError();
@@ -254,7 +254,7 @@ namespace Insight.WS.Base
         public JsonResult UpdateGroup(SYS_UserGroup group)
         {
             const string action = "6910FD14-5654-4CF0-B159-8FE1DF68619F";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
             return Update(group) ? verify.Result : verify.Result.DataBaseError();
@@ -268,7 +268,7 @@ namespace Insight.WS.Base
         public JsonResult GetGroup(string id)
         {
             const string action = "6910FD14-5654-4CF0-B159-8FE1DF68619F";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
             var data = GetGroup(verify.Guid);
@@ -282,7 +282,7 @@ namespace Insight.WS.Base
         public JsonResult GetGroups()
         {
             const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
             var data = GetGroupList();
@@ -298,7 +298,7 @@ namespace Insight.WS.Base
         public JsonResult AddGroupMember(string id, List<Guid> uids)
         {
             const string action = "6C41724C-E118-4BCD-82AD-6B13D05C7894";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
             return AddGroupMember(verify.Basis.UserId, verify.Guid, uids) ? verify.Result : verify.Result.DataBaseError();
@@ -312,7 +312,7 @@ namespace Insight.WS.Base
         public JsonResult RemoveMember(List<Guid> ids)
         {
             const string action = "686C115A-CE2E-4E84-8F25-B63C15AC173C";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
             return DeleteMember(ids) ? verify.Result : verify.Result.DataBaseError();
@@ -325,7 +325,7 @@ namespace Insight.WS.Base
         public JsonResult GetGroupMembers()
         {
             const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
             var data = GetMemberList();
@@ -340,7 +340,7 @@ namespace Insight.WS.Base
         public JsonResult GetOtherUser(string id)
         {
             const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
             var data = GetOtherUser(verify.Guid);

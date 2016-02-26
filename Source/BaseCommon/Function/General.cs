@@ -11,6 +11,18 @@ namespace Insight.WS.Base.Common
     public class General
     {
         /// <summary>
+        /// 构造方法，使用简单规则验证
+        /// </summary>
+        /// <param name="rule">验证规则</param>
+        public static JsonResult Verify(string rule)
+        {
+            var dict = GetAuthorization();
+            var basis = GetAuthor<string>(dict["Auth"]);
+            var result = new JsonResult();
+            return basis == null || basis != Hash(rule) ? result.InvalidAuth() : result.Success();
+        }
+
+        /// <summary>
         /// 获取Http请求头部承载的验证信息
         /// </summary>
         /// <returns>string Http请求头部承载的验证字符串</returns>
