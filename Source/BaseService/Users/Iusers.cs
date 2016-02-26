@@ -69,18 +69,18 @@ namespace Insight.WS.Base
         /// <summary>
         /// 更新指定用户Session的签名
         /// </summary>
-        /// <param name="id">用户ID</param>
-        /// <param name="password">用户新密码</param>
+        /// <param name="account">登录账号</param>
+        /// <param name="password">新密码</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "{id}/signature", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "{account}/signature", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult UpdateSignature(string id, string password);
+        JsonResult UpdateSignature(string account, string password);
 
         /// <summary>
         /// 用户重置登录密码
         /// </summary>
-        /// <param name="account">用户账号</param>
-        /// <param name="password">用户新密码</param>
+        /// <param name="account">登录账号</param>
+        /// <param name="password">新密码</param>
         /// <param name="code">短信验证码</param>
         /// <returns>JsonResult</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "{account}/resetpw", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
@@ -90,12 +90,12 @@ namespace Insight.WS.Base
         /// <summary>
         /// 根据用户ID设置用户状态
         /// </summary>
-        /// <param name="id">用户ID</param>
+        /// <param name="account">用户ID</param>
         /// <param name="validity">可用状态</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "{id}/validity", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "{account}/validity", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult SetUserStatus(string id, bool validity);
+        JsonResult SetUserStatus(string account, bool validity);
 
         /// <summary>
         /// 用户登录
