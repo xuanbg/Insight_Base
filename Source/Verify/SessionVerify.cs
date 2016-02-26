@@ -32,7 +32,7 @@ namespace Insight.WS.Base.Verify
         /// <summary>
         /// Session.ID是否一致
         /// </summary>
-        private readonly bool Identical = true;
+        private readonly bool Identical;
 
         /// <summary>
         /// 用于验证的基础规则
@@ -62,7 +62,7 @@ namespace Insight.WS.Base.Verify
             if (Session == null) return;
 
             Basis = GetSession(Session);
-            Identical = Basis.ID == Session.ID;
+            Identical = Basis?.ID == Session.ID;
         }
 
         /// <summary>
