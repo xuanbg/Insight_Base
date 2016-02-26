@@ -143,7 +143,7 @@ namespace Insight.WS.Base.Verify
         }
 
         /// <summary>
-        /// 转换一个用户ID，并对Session进行校验
+        /// 对Session进行校验（如account一致，忽略鉴权），返回验证结果
         /// </summary>
         /// <param name="action">操作码</param>
         /// <param name="account">登录账号</param>
@@ -157,7 +157,7 @@ namespace Insight.WS.Base.Verify
         }
 
         /// <summary>
-        /// 转换一个用户ID，并对Session进行校验
+        /// 转换一个用户ID，并对Session进行校验（如id一致，忽略鉴权），返回验证结果，
         /// </summary>
         /// <param name="action">操作码</param>
         /// <param name="id">用户ID</param>

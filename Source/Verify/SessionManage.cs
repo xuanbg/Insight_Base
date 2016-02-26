@@ -89,7 +89,7 @@ namespace Insight.WS.Base.Verify
         }
 
         /// <summary>
-        /// 根据传入的Session获取缓存中的Session
+        /// 根据SessionID获取缓存中的Session并返回
         /// </summary>
         /// <param name="session">Session</param>
         /// <returns>Session</returns>
@@ -100,7 +100,7 @@ namespace Insight.WS.Base.Verify
         }
 
         /// <summary>
-        /// 根据登录账号获取Session
+        /// 根据登录账号在缓存中查找Session并返回
         /// </summary>
         /// <param name="loginname">登录账号</param>
         /// <returns>Session</returns>
@@ -110,13 +110,13 @@ namespace Insight.WS.Base.Verify
 
             if (list.Count < 2) return list.Count == 0 ? AddSession(loginname) : list[0];
 
-            General.LogToLogServer("000000", $"用户【{loginname}】数据重复，已清除重复数据", "验证服务", "获取验证数据");
             Sessions.RemoveAll(s => s.LoginName == loginname);
+            General.LogToLogServer("000000", $"用户【{loginname}】数据重复，已清除重复数据", "验证服务", "获取验证数据");
             return AddSession(loginname);
         }
 
         /// <summary>
-        /// 将传入的Session加入缓存
+        /// 根据登录账号从数据库读取用户信息构造Session加入缓存并返回
         /// </summary>
         /// <param name="loginname">登录账号</param>
         private static Session AddSession(string loginname)
