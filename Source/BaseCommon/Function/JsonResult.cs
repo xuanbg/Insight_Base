@@ -88,6 +88,21 @@
         }
 
         /// <summary>
+        /// 返回资源创建成功（201）的成功信息
+        /// </summary>
+        /// <param name="data">承载的数据（可选）</param>
+        /// <returns>JsonResult</returns>
+        public JsonResult Created(object data)
+        {
+            Successful = true;
+            Code = "201";
+            Name = "Created";
+            Message = "资源创建成功";
+            Data = Util.Serialize(data);
+            return this;
+        }
+
+        /// <summary>
         /// 返回用户多地登录（202）的错误信息
         /// </summary>
         /// <returns>JsonResult</returns>
@@ -296,6 +311,20 @@
             Code = "412";
             Name = "TimeIntervalTooShort";
             Message = "请求发送验证码时间间隔过短，请稍后再试";
+            return this;
+        }
+
+        /// <summary>
+        /// 返回调用信分宝接口失败（416）的错误信息
+        /// </summary>
+        /// <param name="message">额外的错误信息</param>
+        /// <returns>JsonResult</returns>
+        public JsonResult XfbInterfaceFail(string message)
+        {
+            Successful = false;
+            Code = "416";
+            Name = "XfbInterfaceFail";
+            Message = $"调用信分宝接口失败！Return message:{message}";
             return this;
         }
 

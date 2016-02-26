@@ -61,6 +61,7 @@ namespace Insight.WS.Base
             CurrentVersion = Convert.ToInt32(build);
             CompatibleVersion = GetAppSetting("CompatibleVersion");
             UpdateVersion = GetAppSetting("UpdateVersion");
+            CheckOpenID = bool.Parse(GetAppSetting("CheckOpenID"));
 
             LogServer = GetAppSetting("LogServer");
         }

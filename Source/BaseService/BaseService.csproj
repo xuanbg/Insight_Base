@@ -56,12 +56,17 @@
     <Compile Include="Users\IUsers.cs" />
     <Compile Include="Users\Users.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Users\XFBInterface.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BaseCommon\BaseCommon.csproj">
       <Project>{c4f26dd1-de5a-4773-a789-7823e96ea166}</Project>
       <Name>BaseCommon</Name>
       <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Verify\VerifyService.csproj">
+      <Project>{b18dff40-4eb9-4777-b63e-756f36d5c5e2}</Project>
+      <Name>VerifyService</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
