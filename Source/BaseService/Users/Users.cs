@@ -44,7 +44,7 @@ namespace Insight.WS.Base
             var verify = new SessionVerify();
             if (!verify.Compare(action, id)) return verify.Result;
 
-            return DeleteUser(verify.Basis.UserId) ? verify.Result.Created() : verify.Result.DataBaseError();
+            return DeleteUser(verify.Basis.UserId) ? verify.Result : verify.Result.DataBaseError();
         }
 
         /// <summary>
@@ -64,14 +64,8 @@ namespace Insight.WS.Base
 
             if (!reset.Value) return verify.Result.DataBaseError();
 
-            var session = Sessions.SingleOrDefault(s => s.UserId == user.ID);
-            if (session == null) return verify.Result;
-
-            session.LoginName = user.LoginName;
-            session.UserName = user.Name;
-            session.UserType = user.Type;
-            session.OpenId = user.OpenId;
-            return verify.Result;
+            var session = SessionManage.UpdateSession(user);
+            return session == null ? verify.Result.NotFound() : verify.Result.Success(session);
         }
 
         /// <summary>
@@ -86,7 +80,7 @@ namespace Insight.WS.Base
             if (!verify.Compare(action, id)) return verify.Result;
 
             var user = GetUser(verify.Guid);
-            return user == null ? verify.Result.NotFound() : verify.Result.Success(Serialize(user));
+            return user == null ? verify.Result.NotFound() : verify.Result.Success(user);
         }
 
         /// <summary>
@@ -100,37 +94,35 @@ namespace Insight.WS.Base
             if (!verify.Compare(action)) return verify.Result;
 
             var data = GetUserList();
-            return data.Rows.Count > 0 ? verify.Result.Success(Serialize(data)) : verify.Result.NoContent();
+            return data.Rows.Count > 0 ? verify.Result.Success(data) : verify.Result.NoContent();
         }
 
         /// <summary>
         /// 更新指定用户Session的签名
         /// </summary>
-        /// <param name="id">用户ID</param>
-        /// <param name="pw">用户新密码</param>
+        /// <param name="account">登录账号</param>
+        /// <param name="password">新密码</param>
         /// <returns>JsonResult</returns>
-        public JsonResult UpdateSignature(string id, string pw)
+        public JsonResult UpdateSignature(string account, string password)
         {
             const string action = "26481E60-0917-49B4-BBAA-2265E71E7B3F";
             var verify = new SessionVerify();
-            if (!verify.Compare(action, id)) return verify.Result;
+            if (!verify.CompareAs(action, account)) return verify.Result;
 
-            var reset = Update(verify.Guid, pw);
+            var reset = Update(account, password);
             if (!reset.HasValue) return verify.Result.NotFound();
 
             if (!reset.Value) return verify.Result.DataBaseError();
 
-            var session = Sessions.SingleOrDefault(s => s.UserId == verify.Guid);
-            if (session != null) session.Signature = Hash(session.LoginName.ToUpper() + pw);
-
-            return verify.Result.Success(Serialize(session));
+            var session = SessionManage.UpdateSignature(account, password);
+            return verify.Result.Success(session);
         }
 
         /// <summary>
         /// 用户重置登录密码
         /// </summary>
-        /// <param name="account">用户账号</param>
-        /// <param name="password">用户新密码</param>
+        /// <param name="account">登录账号</param>
+        /// <param name="password">新密码</param>
         /// <param name="code">短信验证码</param>
         /// <returns>JsonResult</returns>
         public JsonResult ResetSignature(string account, string password, string code)
@@ -151,36 +143,31 @@ namespace Insight.WS.Base
             SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == 2);
 
             // 更新用户登录密码
-            var reset = Update(session.UserId, password);
-            if (reset != null && !reset.Value) return verify.Result.DataBaseError();
+            var reset = Update(account, password);
+            if (reset == null || !reset.Value) return verify.Result.DataBaseError();
 
-            session.Signature = Hash(session.LoginName.ToUpper() + password);
-            verify.Session.Signature = Hash(session.LoginName.ToUpper() + password);
-            verify.SignIn();
-            return verify.Result;
+            return verify.Result.Success(SessionManage.UpdateSignature(account, password));
         }
 
         /// <summary>
-        /// 根据用户ID设置用户状态
+        /// 为指定的登录账号设置用户状态
         /// </summary>
-        /// <param name="id">用户ID</param>
+        /// <param name="account">登录账号</param>
         /// <param name="validity">可用状态</param>
         /// <returns>JsonResult</returns>
-        public JsonResult SetUserStatus(string id, bool validity)
+        public JsonResult SetUserStatus(string account, bool validity)
         {
             var action = validity ? "369548E9-C8DB-439B-A604-4FDC07F3CCDD" : "0FA34D43-2C52-4968-BDDA-C9191D7FCE80";
             var verify = new SessionVerify();
-            if (!verify.Compare(action, id)) return verify.Result;
+            if (!verify.CompareAs(action, account)) return verify.Result;
 
             var reset = Update(verify.Guid, validity);
             if (!reset.HasValue) return verify.Result.NotFound();
 
             if (!reset.Value) return verify.Result.DataBaseError();
 
-            var session = Sessions.SingleOrDefault(s => s.UserId == verify.Guid);
-            if (session != null) session.Validity = validity;
-
-            return verify.Result;
+            var session = SessionManage.SetValidity(account, validity);
+            return verify.Result.Success(session);
         }
 
         /// <summary>
@@ -207,10 +194,8 @@ namespace Insight.WS.Base
 
             if (!verify.Compare(action)) return verify.Result;
 
-            var session = Sessions.SingleOrDefault(s => s.LoginName == account);
-            if (session != null) session.OnlineStatus = false;
-
-            return verify.Result;
+            SessionManage.Offline(account);
+            return verify.Result.Success();
         }
 
         #endregion
@@ -272,7 +257,7 @@ namespace Insight.WS.Base
             if (!verify.Compare(action)) return verify.Result;
 
             var data = GetGroup(verify.Guid);
-            return data == null ? verify.Result.NoContent() : verify.Result.Success(Serialize(data));
+            return data == null ? verify.Result.NoContent() : verify.Result.Success(data);
         }
 
         /// <summary>
@@ -286,7 +271,7 @@ namespace Insight.WS.Base
             if (!verify.Compare(action)) return verify.Result;
 
             var data = GetGroupList();
-            return data.Rows.Count > 0 ? verify.Result.Success(Serialize(data)) : verify.Result.NoContent();
+            return data.Rows.Count > 0 ? verify.Result.Success(data) : verify.Result.NoContent();
         }
 
         /// <summary>
@@ -329,7 +314,7 @@ namespace Insight.WS.Base
             if (!verify.Compare(action)) return verify.Result;
 
             var data = GetMemberList();
-            return data.Rows.Count > 0 ? verify.Result.Success(Serialize(data)) : verify.Result.NoContent();
+            return data.Rows.Count > 0 ? verify.Result.Success(data) : verify.Result.NoContent();
         }
 
         /// <summary>
@@ -344,7 +329,7 @@ namespace Insight.WS.Base
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
             var data = GetOtherUser(verify.Guid);
-            return data.Rows.Count > 0 ? verify.Result.Success(Serialize(data)) : verify.Result.NoContent();
+            return data.Rows.Count > 0 ? verify.Result.Success(data) : verify.Result.NoContent();
         }
 
         #endregion
