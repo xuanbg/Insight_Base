@@ -111,10 +111,6 @@ namespace Insight.WS.Base
             var verify = new SessionVerify();
             if (!verify.CompareAs(action, account)) return verify.Result;
 
-            // 调用信分宝接口修改信分宝用户密码
-            var xresult = XFBInterface.ChangXFBPassword(account, password, verify.Basis.Signature);
-            if (xresult?.resultCode != "0") return verify.Result.XfbInterfaceFail(xresult?.resultMessage);
-
             var reset = Update(account, password);
             if (!reset.HasValue) return verify.Result.NotFound();
 
@@ -147,10 +143,6 @@ namespace Insight.WS.Base
             if (record == null) return verify.Result.SMSCodeError();
 
             SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == 2);
-
-            // 调用信分宝接口修改信分宝用户密码
-            var xresult = XFBInterface.ChangXFBPassword(account, password, session.Signature);
-            if (xresult?.resultCode != "0") return verify.Result.XfbInterfaceFail(xresult?.resultMessage);
 
             // 更新用户登录密码
             var reset = Update(account, password);
