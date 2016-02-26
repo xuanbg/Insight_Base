@@ -2,7 +2,6 @@
 using System.Linq;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
-using Insight.WS.Base.Verify;
 
 namespace Insight.WS.Base
 {

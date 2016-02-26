@@ -109,26 +109,12 @@ namespace Insight.WS.Base.Common
         }
 
         /// <summary>
-        /// 对Session进行校验（如account一致，忽略鉴权），返回验证结果
-        /// </summary>
-        /// <param name="action">操作码</param>
-        /// <param name="account">登录账号</param>
-        /// <returns>bool</returns>
-        public bool CompareAs(string action, string account)
-        {
-            // 如指定的登录账号是操作人的登录账号，则不进行鉴权
-            if (Session.LoginName == account) action = null;
-
-            return Compare(action);
-        }
-
-        /// <summary>
         /// 转换一个用户ID，并对Session进行校验（如id一致，忽略鉴权），返回验证结果，
         /// </summary>
         /// <param name="action">操作码</param>
         /// <param name="id">用户ID</param>
         /// <returns>bool</returns>
-        public bool Compare(string action, string id)
+        public bool CompareAsID(string action, string id)
         {
             if (Guid.TryParse(id, out Guid))
             {
@@ -140,6 +126,20 @@ namespace Insight.WS.Base.Common
 
             Result.InvalidGuid();
             return false;
+        }
+
+        /// <summary>
+        /// 对Session进行校验（如account一致，忽略鉴权），返回验证结果
+        /// </summary>
+        /// <param name="action">操作码</param>
+        /// <param name="account">登录账号</param>
+        /// <returns>bool</returns>
+        public bool Compare(string action, string account)
+        {
+            // 如指定的登录账号是操作人的登录账号，则不进行鉴权
+            if (Session.LoginName == account) action = null;
+
+            return Compare(action);
         }
 
         /// <summary>

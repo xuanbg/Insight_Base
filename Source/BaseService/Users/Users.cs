@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
-using Insight.WS.Base.Users;
-using Insight.WS.Base.Verify;
 using static Insight.WS.Base.Common.Util;
 
 namespace Insight.WS.Base
@@ -44,7 +42,7 @@ namespace Insight.WS.Base
         {
             const string action = "BE2DE9AB-C109-418D-8626-236DEF8E8504";
             var verify = new SessionVerify();
-            if (!verify.Compare(action, id)) return verify.Result;
+            if (!verify.CompareAsID(action, id)) return verify.Result;
 
             return DeleteUser(verify.Basis.UserId) ? verify.Result : verify.Result.DataBaseError();
         }
@@ -59,7 +57,7 @@ namespace Insight.WS.Base
         {
             const string action = "3BC17B61-327D-4EAA-A0D7-7F825A6C71DB";
             var verify = new SessionVerify();
-            if (!verify.Compare(action, id)) return verify.Result;
+            if (!verify.CompareAsID(action, id)) return verify.Result;
 
             var reset = Update(user);
             if (!reset.HasValue) return verify.Result.NotFound();
@@ -79,7 +77,7 @@ namespace Insight.WS.Base
         {
             const string action = "3BC17B61-327D-4EAA-A0D7-7F825A6C71DB";
             var verify = new SessionVerify();
-            if (!verify.Compare(action, id)) return verify.Result;
+            if (!verify.CompareAsID(action, id)) return verify.Result;
 
             var user = GetUser(verify.Guid);
             return user == null ? verify.Result.NotFound() : verify.Result.Success(user);
@@ -109,7 +107,7 @@ namespace Insight.WS.Base
         {
             const string action = "26481E60-0917-49B4-BBAA-2265E71E7B3F";
             var verify = new SessionVerify();
-            if (!verify.CompareAs(action, account)) return verify.Result;
+            if (!verify.Compare(action, account)) return verify.Result;
 
             var reset = Update(account, password);
             if (!reset.HasValue) return verify.Result.NotFound();
@@ -161,7 +159,7 @@ namespace Insight.WS.Base
         {
             var action = validity ? "369548E9-C8DB-439B-A604-4FDC07F3CCDD" : "0FA34D43-2C52-4968-BDDA-C9191D7FCE80";
             var verify = new SessionVerify();
-            if (!verify.CompareAs(action, account)) return verify.Result;
+            if (!verify.Compare(action, account)) return verify.Result;
 
             var reset = Update(verify.Guid, validity);
             if (!reset.HasValue) return verify.Result.NotFound();
