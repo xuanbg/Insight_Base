@@ -4,6 +4,7 @@ using System.Linq;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
 using Insight.WS.Base.Users;
+using Insight.WS.Base.Verify;
 using static Insight.WS.Base.Common.Util;
 
 namespace Insight.WS.Base
@@ -22,7 +23,7 @@ namespace Insight.WS.Base
         public JsonResult AddUser(string account, SYS_User user)
         {
             const string action = "60D5BE64-0102-4189-A999-96EDAD3DA1B5";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.SignUp(action)) return verify.Result;
 
             if (verify.Basis != null) return InsertData(user) ? verify.Result.Created() : verify.Result.DataBaseError();
@@ -42,8 +43,8 @@ namespace Insight.WS.Base
         public JsonResult RemoveUser(string id)
         {
             const string action = "BE2DE9AB-C109-418D-8626-236DEF8E8504";
-            var verify = new Verify();
-            if (!verify.ParseUserIdAndCompare(id, action)) return verify.Result;
+            var verify = new SessionVerify();
+            if (!verify.Compare(action, id)) return verify.Result;
 
             return DeleteUser(verify.Basis.UserId) ? verify.Result : verify.Result.DataBaseError();
         }
@@ -57,22 +58,16 @@ namespace Insight.WS.Base
         public JsonResult UpdateUserInfo(string id, SYS_User user)
         {
             const string action = "3BC17B61-327D-4EAA-A0D7-7F825A6C71DB";
-            var verify = new Verify();
-            if (!verify.ParseUserIdAndCompare(user.ID.ToString(), action)) return verify.Result;
+            var verify = new SessionVerify();
+            if (!verify.Compare(action, id)) return verify.Result;
 
             var reset = Update(user);
             if (!reset.HasValue) return verify.Result.NotFound();
 
             if (!reset.Value) return verify.Result.DataBaseError();
 
-            var session = Sessions.SingleOrDefault(s => s.UserId == user.ID);
-            if (session == null) return verify.Result;
-
-            session.LoginName = user.LoginName;
-            session.UserName = user.Name;
-            session.UserType = user.Type;
-            session.OpenId = user.OpenId;
-            return verify.Result.Success(session);
+            var session = SessionManage.UpdateSession(user);
+            return session == null ? verify.Result.NotFound() : verify.Result.Success(session);
         }
 
         /// <summary>
@@ -83,8 +78,8 @@ namespace Insight.WS.Base
         public JsonResult GetUser(string id)
         {
             const string action = "3BC17B61-327D-4EAA-A0D7-7F825A6C71DB";
-            var verify = new Verify();
-            if (!verify.ParseUserIdAndCompare(id, action)) return verify.Result;
+            var verify = new SessionVerify();
+            if (!verify.Compare(action, id)) return verify.Result;
 
             var user = GetUser(verify.Guid);
             return user == null ? verify.Result.NotFound() : verify.Result.Success(user);
@@ -97,7 +92,7 @@ namespace Insight.WS.Base
         public JsonResult GetUsers()
         {
             const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
             var data = GetUserList();
@@ -107,40 +102,38 @@ namespace Insight.WS.Base
         /// <summary>
         /// 更新指定用户Session的签名
         /// </summary>
-        /// <param name="id">用户ID</param>
-        /// <param name="pw">用户新密码</param>
+        /// <param name="account">登录账号</param>
+        /// <param name="password">新密码</param>
         /// <returns>JsonResult</returns>
-        public JsonResult UpdateSignature(string id, string pw)
+        public JsonResult UpdateSignature(string account, string password)
         {
             const string action = "26481E60-0917-49B4-BBAA-2265E71E7B3F";
-            var verify = new Verify();
-            if (!verify.ParseUserIdAndCompare(id, action)) return verify.Result;
+            var verify = new SessionVerify();
+            if (!verify.CompareAs(action, account)) return verify.Result;
 
-            var reset = Update(verify.Guid, pw);
+            // 调用信分宝接口修改信分宝用户密码
+            var xresult = XFBInterface.ChangXFBPassword(account, password, verify.Basis.Signature);
+            if (xresult?.resultCode != "0") return verify.Result.XfbInterfaceFail(xresult?.resultMessage);
+
+            var reset = Update(account, password);
             if (!reset.HasValue) return verify.Result.NotFound();
 
             if (!reset.Value) return verify.Result.DataBaseError();
 
-            // 调用信分宝接口修改信分宝用户密码
-            var xresult = XFBInterface.ChangXFBPassword(verify.Basis.LoginName, pw, verify.Basis.Signature);
-            if (xresult?.resultCode != "0") return verify.Result.XfbInterfaceFail(xresult?.resultMessage);
-
-            var session = Sessions.SingleOrDefault(s => s.UserId == verify.Guid);
-            if (session != null) session.Signature = Hash(session.LoginName.ToUpper() + pw);
-
+            var session = SessionManage.UpdateSignature(account, password);
             return verify.Result.Success(session);
         }
 
         /// <summary>
         /// 用户重置登录密码
         /// </summary>
-        /// <param name="account">用户账号</param>
-        /// <param name="password">用户新密码</param>
+        /// <param name="account">登录账号</param>
+        /// <param name="password">新密码</param>
         /// <param name="code">短信验证码</param>
         /// <returns>JsonResult</returns>
         public JsonResult ResetSignature(string account, string password, string code)
         {
-            var verify = new Verify();
+            var verify = new SessionVerify();
             var session = verify.Basis;
             if (session == null) return verify.Result.NotFound();
 
@@ -155,40 +148,35 @@ namespace Insight.WS.Base
 
             SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == 2);
 
-            // 更新用户登录密码
-            var reset = Update(session.UserId, password);
-            if (reset != null && !reset.Value) return verify.Result.DataBaseError();
-
             // 调用信分宝接口修改信分宝用户密码
-            var xresult = XFBInterface.ChangXFBPassword(session.LoginName, password, session.Signature);
+            var xresult = XFBInterface.ChangXFBPassword(account, password, session.Signature);
             if (xresult?.resultCode != "0") return verify.Result.XfbInterfaceFail(xresult?.resultMessage);
 
-            session.Signature = Hash(session.LoginName.ToUpper() + password);
-            verify.Session.Signature = Hash(session.LoginName.ToUpper() + password);
-            verify.SignIn();
-            return verify.Result;
+            // 更新用户登录密码
+            var reset = Update(account, password);
+            if (reset == null || !reset.Value) return verify.Result.DataBaseError();
+
+            return verify.Result.Success(SessionManage.UpdateSignature(account, password));
         }
 
         /// <summary>
-        /// 根据用户ID设置用户状态
+        /// 为指定的登录账号设置用户状态
         /// </summary>
-        /// <param name="id">用户ID</param>
+        /// <param name="account">登录账号</param>
         /// <param name="validity">可用状态</param>
         /// <returns>JsonResult</returns>
-        public JsonResult SetUserStatus(string id, bool validity)
+        public JsonResult SetUserStatus(string account, bool validity)
         {
             var action = validity ? "369548E9-C8DB-439B-A604-4FDC07F3CCDD" : "0FA34D43-2C52-4968-BDDA-C9191D7FCE80";
-            var verify = new Verify();
-            if (!verify.ParseUserIdAndCompare(id, action)) return verify.Result;
+            var verify = new SessionVerify();
+            if (!verify.CompareAs(action, account)) return verify.Result;
 
             var reset = Update(verify.Guid, validity);
             if (!reset.HasValue) return verify.Result.NotFound();
 
             if (!reset.Value) return verify.Result.DataBaseError();
 
-            var session = Sessions.SingleOrDefault(s => s.UserId == verify.Guid);
-            if (session != null) session.Validity = validity;
-
+            var session = SessionManage.SetValidity(account, validity);
             return verify.Result.Success(session);
         }
 
@@ -198,7 +186,7 @@ namespace Insight.WS.Base
         /// <returns>JsonResult</returns>
         public JsonResult UserSignIn(string account)
         {
-            var verify = new Verify();
+            var verify = new SessionVerify();
             verify.SignIn();
             return verify.Result;
         }
@@ -211,15 +199,13 @@ namespace Insight.WS.Base
         public JsonResult UserSignOut(string account)
         {
             var action = "331BF752-CDB7-44DE-9631-DF2605BB527E";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (verify.Basis.LoginName == account) action = null;
 
             if (!verify.Compare(action)) return verify.Result;
 
-            var session = Sessions.SingleOrDefault(s => s.LoginName == account);
-            if (session != null) session.OnlineStatus = false;
-
-            return verify.Result.Success(session);
+            SessionManage.Offline(account);
+            return verify.Result.Success();
         }
 
         #endregion
@@ -234,7 +220,7 @@ namespace Insight.WS.Base
         public JsonResult AddGroup(SYS_UserGroup group)
         {
             const string action = "6E80210E-6F80-4FF7-8520-B602934D635C";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
             var id = InsertData(verify.Basis.UserId, group);
@@ -249,7 +235,7 @@ namespace Insight.WS.Base
         public JsonResult RemoveGroup(string id)
         {
             const string action = "E46B7A1C-A8B0-49B5-8494-BF1B09F43452";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
             return DeleteGroup(verify.Guid) ? verify.Result : verify.Result.DataBaseError();
@@ -263,7 +249,7 @@ namespace Insight.WS.Base
         public JsonResult UpdateGroup(SYS_UserGroup group)
         {
             const string action = "6910FD14-5654-4CF0-B159-8FE1DF68619F";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
             return Update(group) ? verify.Result : verify.Result.DataBaseError();
@@ -277,7 +263,7 @@ namespace Insight.WS.Base
         public JsonResult GetGroup(string id)
         {
             const string action = "6910FD14-5654-4CF0-B159-8FE1DF68619F";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
             var data = GetGroup(verify.Guid);
@@ -291,7 +277,7 @@ namespace Insight.WS.Base
         public JsonResult GetGroups()
         {
             const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
             var data = GetGroupList();
@@ -307,7 +293,7 @@ namespace Insight.WS.Base
         public JsonResult AddGroupMember(string id, List<Guid> uids)
         {
             const string action = "6C41724C-E118-4BCD-82AD-6B13D05C7894";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
             return AddGroupMember(verify.Basis.UserId, verify.Guid, uids) ? verify.Result : verify.Result.DataBaseError();
@@ -321,7 +307,7 @@ namespace Insight.WS.Base
         public JsonResult RemoveMember(List<Guid> ids)
         {
             const string action = "686C115A-CE2E-4E84-8F25-B63C15AC173C";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
             return DeleteMember(ids) ? verify.Result : verify.Result.DataBaseError();
@@ -334,7 +320,7 @@ namespace Insight.WS.Base
         public JsonResult GetGroupMembers()
         {
             const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
             var data = GetMemberList();
@@ -349,7 +335,7 @@ namespace Insight.WS.Base
         public JsonResult GetOtherUser(string id)
         {
             const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
             var data = GetOtherUser(verify.Guid);

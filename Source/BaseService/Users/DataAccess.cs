@@ -50,14 +50,14 @@ namespace Insight.WS.Base
         /// <summary>
         /// 更新用户登录密码
         /// </summary>
-        /// <param name="id">用户ID</param>
+        /// <param name="account">登录账号</param>
         /// <param name="pw">登录密码</param>
         /// <returns>bool 是否成功</returns>
-        private bool? Update(Guid id, string pw)
+        private bool? Update(string account, string pw)
         {
             using (var context = new BaseEntities())
             {
-                var user = context.SYS_User.SingleOrDefault(u => u.ID == id);
+                var user = context.SYS_User.SingleOrDefault(u => u.LoginName == account);
                 if (user == null) return null;
 
                 if (user.Password == pw) return true;

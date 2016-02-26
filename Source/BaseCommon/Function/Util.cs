@@ -28,11 +28,6 @@ namespace Insight.WS.Base.Common
         public static string LogServer;
 
         /// <summary>
-        /// 在线用户列表
-        /// </summary>
-        public static List<Session> Sessions = new List<Session>();
-
-        /// <summary>
         /// 短信验证码的缓存列表
         /// </summary>
         public static readonly List<VerifyRecord> SmsCodes = new List<VerifyRecord>();

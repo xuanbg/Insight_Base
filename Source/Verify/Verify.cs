@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.ServiceModel;
+using System.ServiceModel.Web;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
+using Insight.WS.Base.Verify;
 using static Insight.WS.Base.Common.Util;
-using System.ServiceModel.Web;
 
 namespace Insight.WS.Base
 {
@@ -35,7 +36,7 @@ namespace Insight.WS.Base
         /// <returns>JsonResult</returns>
         public JsonResult Verification()
         {
-            var verify = new Verify();
+            var verify = new SessionVerify();
             verify.Compare();
             return verify.Result;
         }
@@ -46,7 +47,7 @@ namespace Insight.WS.Base
         /// <returns>JsonResult</returns>
         public JsonResult Confirmation(string paykey)
         {
-            var verify = new Verify();
+            var verify = new SessionVerify();
             verify.Confirm(paykey);
             return verify.Result;
         }
@@ -58,7 +59,7 @@ namespace Insight.WS.Base
         /// <returns>JsonResult</returns>
         public JsonResult Authorization(string action)
         {
-            var verify = new Verify();
+            var verify = new SessionVerify();
             verify.Compare(action);
             return verify.Result;
         }
@@ -76,7 +77,7 @@ namespace Insight.WS.Base
         /// <returns>JsonResult</returns>
         public JsonResult NewCode(string mobile, int type, int time)
         {
-            var verify = new Verify(mobile + Secret);
+            var verify = new SessionVerify(mobile + Secret);
             if (!verify.CompareUsageRule()) return verify.Result;
 
             var record = SmsCodes.OrderByDescending(r => r.CreateTime).FirstOrDefault(r => r.Mobile == mobile && r.Type == type);
@@ -106,7 +107,7 @@ namespace Insight.WS.Base
         /// <returns>JsonResult</returns>
         public JsonResult VerifyCode(string mobile, string code, int type, bool remove = true)
         {
-            var verify = new Verify(mobile + Secret);
+            var verify = new SessionVerify(mobile + Secret);
             if (!verify.CompareUsageRule()) return verify.Result;
 
             SmsCodes.RemoveAll(c => c.FailureTime < DateTime.Now);
@@ -130,10 +131,10 @@ namespace Insight.WS.Base
         public JsonResult GetSessions()
         {
             const string action = "331BF752-CDB7-44DE-9631-DF2605BB527E";
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
-            var list = Sessions.Where(s => s.UserType > 0 && s.OnlineStatus).ToList();
+            var list = SessionManage.GetSessions(1);
             return list.Count > 0 ? verify.Result.Success(Serialize(list)) : verify.Result.NoContent();
         }
 

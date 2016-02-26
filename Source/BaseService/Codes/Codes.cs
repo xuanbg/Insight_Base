@@ -2,6 +2,7 @@
 using System.Linq;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
+using Insight.WS.Base.Verify;
 
 namespace Insight.WS.Base
 {
@@ -61,7 +62,7 @@ namespace Insight.WS.Base
         /// <returns>JsonResult</returns>
         public JsonResult GetCode(string name, string id, string mark)
         {
-            var verify = new Verify();
+            var verify = new SessionVerify();
             if (!verify.Compare()) return verify.Result;
 
             Guid oid;

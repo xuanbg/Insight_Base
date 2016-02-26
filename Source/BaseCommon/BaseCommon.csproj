@@ -133,7 +133,6 @@
     <Compile Include="Function\SqlHelper.cs" />
     <Compile Include="Function\TypeFactory.cs" />
     <Compile Include="Function\Util.cs" />
-    <Compile Include="Function\Verify.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
