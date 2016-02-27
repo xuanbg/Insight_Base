@@ -77,24 +77,5 @@ namespace Insight.WS.Base.Common.Entity
         /// </summary>
         public bool OnlineStatus { get; set; }
 
-        /// <summary>
-        /// 用户登录结果
-        /// </summary>
-        public LoginResult LoginResult { get; set; }
-
-    }
-
-    /// <summary>
-    /// 用户登录结果
-    /// </summary>
-    public enum LoginResult
-    {
-        Success,
-        Multiple,
-        Online,
-        Failure,
-        Banned,
-        NotExist,
-        Unauthorized
     }
 }

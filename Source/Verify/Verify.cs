@@ -126,15 +126,16 @@ namespace Insight.WS.Base
         /// <summary>
         /// 获取当前在线状态的全部内部用户的Session
         /// </summary>
+        /// <param name="type">用户类型</param>
         /// <returns>JsonResult</returns>
-        public JsonResult GetSessions()
+        public JsonResult GetSessions(string type)
         {
             const string action = "331BF752-CDB7-44DE-9631-DF2605BB527E";
             var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
-            var list = Sessions.Where(s => s.UserType > 0 && s.OnlineStatus).ToList();
-            return list.Count > 0 ? verify.Result.Success(Serialize(list)) : verify.Result.NoContent();
+            var list = SessionManage.GetSessions(Convert.ToInt32(type));
+            return list.Count > 0 ? verify.Result.Success(list) : verify.Result.NoContent();
         }
 
         #endregion

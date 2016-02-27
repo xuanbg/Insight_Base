@@ -63,7 +63,6 @@ namespace Insight.WS.Base.Common
             Basis.DeptId = Session.DeptId;
             Basis.DeptName = Session.DeptName;
             Basis.MachineId = Session.MachineId;
-            Result.Success(Basis);
         }
 
         /// <summary>
@@ -147,23 +146,13 @@ namespace Insight.WS.Base.Common
         /// <returns>bool</returns>
         public bool Compare(string action = null, bool verify = true)
         {
-            if (Basis == null || !ExtraCheck(verify))
-            {
-                Session.LoginResult = LoginResult.NotExist;
-                Result.InvalidAuth(Util.Serialize(Session));
-                return false;
-            }
+            Result.InvalidAuth();
+            if (Basis == null || !ExtraCheck(verify)) return false;
 
-            if (Basis.ID > MaxAuth)
-            {
-                Session.LoginResult = LoginResult.Unauthorized;
-                Result.InvalidAuth(Util.Serialize(Session));
-                return false;
-            }
+            if (Basis.ID > MaxAuth) return false;
 
             if (!Basis.Validity)
             {
-                Session.LoginResult = LoginResult.Banned;
                 Result.Disabled();
                 return false;
             }
@@ -179,26 +168,16 @@ namespace Insight.WS.Base.Common
             if (Basis.Signature != Session.Signature || (Basis.FailureCount >= 5 && Basis.MachineId != Session.MachineId))
             {
                 Basis.FailureCount++;
-                Session.LoginResult = LoginResult.Failure;
-                Result.InvalidAuth(Util.Serialize(Session));
                 return false;
             }
 
             Basis.OnlineStatus = true;
             Basis.FailureCount = 0;
-            if (Basis.MachineId == Session.MachineId)
-            {
-                Basis.LoginResult = LoginResult.Success;
-            }
-            else
-            {
-                Basis.LoginResult = LoginResult.Multiple;
-                Result.Multiple();
-            }
-            
+            if (Basis.MachineId != Session.MachineId) Result.Multiple();
+
             // 如Session.ID不一致，返回Session过期的信息
             if (Identical) Result.Success();
-            else Result.Expired(Util.Serialize(Basis));
+            else Result.Expired(Util.CreateKey(Basis));
 
             if (action == null) return true;
 
@@ -218,12 +197,19 @@ namespace Insight.WS.Base.Common
         }
 
         /// <summary>
-        /// 附加检查（用户ID和微信OpenID）
+        /// 扩展验证
         /// </summary>
-        /// <returns>bool 是否一致</returns>
+        /// <param name="verify">是否进行扩展验证</param>
+        /// <returns>bool 验证是否通过</returns>
         private bool ExtraCheck(bool verify)
         {
-            return !verify || Basis.UserId == Session.UserId && (!Util.CheckOpenID || Basis.OpenId == Session.OpenId);
+            if (!verify) return true;
+
+            if (Util.CheckMachineId && Basis.MachineId != Session.MachineId) return false;
+
+            if (Util.CheckOpenID && Basis.OpenId != Session.OpenId) return false;
+
+            return Basis.UserId == Session.UserId;
         }
     }
 }

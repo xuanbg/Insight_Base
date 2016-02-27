@@ -28,11 +28,6 @@ namespace Insight.WS.Base.Common
         public static string LogServer;
 
         /// <summary>
-        /// 在线用户列表
-        /// </summary>
-        public static List<Session> Sessions = new List<Session>();
-
-        /// <summary>
         /// 短信验证码的缓存列表
         /// </summary>
         public static readonly List<VerifyRecord> SmsCodes = new List<VerifyRecord>();
@@ -62,6 +57,11 @@ namespace Insight.WS.Base.Common
         /// </summary>
         public static bool CheckOpenID;
 
+        /// <summary>
+        /// 是否验证微信OpenID
+        /// </summary>
+        public static bool CheckMachineId;
+
         #endregion
 
         #region 静态公共方法
@@ -77,12 +77,30 @@ namespace Insight.WS.Base.Common
         }
 
         /// <summary>
+        /// 生成用于验证的Key
+        /// </summary>
+        /// <param name="session">Session</param>
+        /// <returns>string 用于验证的Key</returns>
+        public static string CreateKey(Session session)
+        {
+            var obj = new
+            {
+                session.ID,
+                session.LoginName,
+                session.Signature,
+                session.UserId,
+                session.OpenId,
+                session.MachineId
+            };
+            return Base64(obj);
+        }
+
+        /// <summary>
         /// 将对象转换为Base64编码的字符串
         /// </summary>
-        /// <typeparam name="T">输入类型</typeparam>
         /// <param name="obj">用于转换的数据对象</param>
         /// <returns>string Base64编码的字符串</returns>
-        public static string Base64<T>(T obj)
+        public static string Base64(object obj)
         {
             var json = Serialize(obj);
             var buff = Encoding.UTF8.GetBytes(json);

@@ -40,7 +40,6 @@ namespace Insight.WS.Base.Common
             var session = GetSession(user.LoginName);
             if (session == null) return null;
 
-            session.LoginName = user.LoginName;
             session.UserName = user.Name;
             session.UserType = user.Type;
             session.OpenId = user.OpenId;
@@ -79,12 +78,10 @@ namespace Insight.WS.Base.Common
         /// <param name="account">登录账号</param>
         /// <param name="validity">bool 是否有效</param>
         /// <returns>Session</returns>
-        public static Session SetValidity(string account, bool validity)
+        public static void SetValidity(string account, bool validity)
         {
             var session = GetSession(account);
             if (session != null) session.Validity = validity;
-
-            return session;
         }
 
         /// <summary>
@@ -109,9 +106,14 @@ namespace Insight.WS.Base.Common
 
             if (list.Count < 2) return list.Count == 0 ? AddSession(loginname) : list[0];
 
-            Sessions.RemoveAll(s => s.LoginName == loginname);
-            General.LogToLogServer("000000", $"用户【{loginname}】数据重复，已清除重复数据", "验证服务", "获取验证数据");
-            return AddSession(loginname);
+            var msg = "";
+            for (var i = 1; i < list.Count; i++)
+            {
+                msg += $"/r/n Session {i}:{Util.Serialize(list[i])}";
+                list[i].LoginName = null;
+            }
+            General.LogToLogServer("000000", $"用户【{loginname}】数据重复，已清除重复数据。/n/r Session 0:{Util.Serialize(list[0])}{msg}", "验证服务", "获取验证数据");
+            return list[0];
         }
 
         /// <summary>

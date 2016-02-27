@@ -24,13 +24,19 @@ namespace Insight.WS.Base
             var verify = new SessionVerify();
             if (!verify.SignUp(action)) return verify.Result;
 
+            // 管理员添加用户
             if (verify.Basis != null) return InsertData(user) ? verify.Result.Created() : verify.Result.DataBaseError();
 
+            // 用户注册，验证用户签名
             var session = verify.Session;
             var sign = Hash(session.LoginName + user.LoginName + user.Password);
             if (sign != session.Signature) return verify.Result.InvalidAuth();
 
-            return InsertData(user) ? verify.Result.Created() : verify.Result.DataBaseError();
+            if (!InsertData(user)) return verify.Result.DataBaseError();
+
+            // 返回用于验证的Key
+            session = SessionManage.GetSession(session);
+            return verify.Result.Created(CreateKey(session));
         }
 
         /// <summary>
@@ -65,7 +71,7 @@ namespace Insight.WS.Base
             if (!reset.Value) return verify.Result.DataBaseError();
 
             var session = SessionManage.UpdateSession(user);
-            return session == null ? verify.Result.NotFound() : verify.Result.Success(session);
+            return session == null ? verify.Result.NotFound() : verify.Result.Success(CreateKey(session));
         }
 
         /// <summary>
@@ -115,7 +121,7 @@ namespace Insight.WS.Base
             if (!reset.Value) return verify.Result.DataBaseError();
 
             var session = SessionManage.UpdateSignature(account, password);
-            return verify.Result.Success(session);
+            return verify.Result.Success(CreateKey(session));
         }
 
         /// <summary>
@@ -146,7 +152,8 @@ namespace Insight.WS.Base
             var reset = Update(account, password);
             if (reset == null || !reset.Value) return verify.Result.DataBaseError();
 
-            return verify.Result.Success(SessionManage.UpdateSignature(account, password));
+            session = SessionManage.UpdateSignature(account, password);
+            return verify.Result.Success(CreateKey(session));
         }
 
         /// <summary>
@@ -166,8 +173,8 @@ namespace Insight.WS.Base
 
             if (!reset.Value) return verify.Result.DataBaseError();
 
-            var session = SessionManage.SetValidity(account, validity);
-            return verify.Result.Success(session);
+            SessionManage.SetValidity(account, validity);
+            return verify.Result.Success();
         }
 
         /// <summary>
@@ -178,7 +185,8 @@ namespace Insight.WS.Base
         {
             var verify = new SessionVerify();
             verify.SignIn();
-            return verify.Result;
+            var key = CreateKey(verify.Basis);
+            return verify.Result.Success(key);
         }
 
         /// <summary>

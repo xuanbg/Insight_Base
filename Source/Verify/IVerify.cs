@@ -76,10 +76,11 @@ namespace Insight.WS.Base
         /// <summary>
         /// 获取当前在线状态的全部内部用户的Session
         /// </summary>
+        /// <param name="type">用户类型</param>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "sessions", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "sessions?type={type}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        JsonResult GetSessions();
+        JsonResult GetSessions(string type);
 
         #endregion
 
