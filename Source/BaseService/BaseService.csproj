@@ -58,6 +58,7 @@
     <Compile Include="Users\IUsers.cs" />
     <Compile Include="Users\Users.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Users\XFBInterface.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BaseCommon\BaseCommon.csproj">
