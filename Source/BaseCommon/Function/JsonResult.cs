@@ -315,20 +315,6 @@
         }
 
         /// <summary>
-        /// 返回调用信分宝接口失败（416）的错误信息
-        /// </summary>
-        /// <param name="message">额外的错误信息</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult XfbInterfaceFail(string message)
-        {
-            Successful = false;
-            Code = "416";
-            Name = "XfbInterfaceFail";
-            Message = $"调用信分宝接口失败！Return message:{message}";
-            return this;
-        }
-
-        /// <summary>
         /// 返回错误的支付密码（418）的错误信息
         /// </summary>
         /// <returns>JsonResult</returns>

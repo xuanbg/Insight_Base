@@ -1,8 +1,5 @@
 ﻿using System;
 using Insight.WS.Base.Common.Entity;
-using static Insight.WS.Base.Common.General;
-using static Insight.WS.Base.Common.Util;
-using static Insight.WS.Base.Common.SessionManage;
 
 namespace Insight.WS.Base.Common
 {
@@ -44,13 +41,13 @@ namespace Insight.WS.Base.Common
         public SessionVerify()
         {
             // 从请求头获取验证数据
-            var dict = GetAuthorization();
-            Session = GetAuthor<Session>(dict["Auth"]);
+            var dict = General.GetAuthorization();
+            Session = General.GetAuthor<Session>(dict["Auth"]);
 
             // 验证数据不存在
             if (Session == null) return;
 
-            Basis = GetSession(Session);
+            Basis = SessionManage.GetSession(Session);
             Identical = Basis?.ID == Session.ID;
         }
 
@@ -153,14 +150,14 @@ namespace Insight.WS.Base.Common
             if (Basis == null || !ExtraCheck(verify))
             {
                 Session.LoginResult = LoginResult.NotExist;
-                Result.InvalidAuth(Serialize(Session));
+                Result.InvalidAuth(Util.Serialize(Session));
                 return false;
             }
 
             if (Basis.ID > MaxAuth)
             {
                 Session.LoginResult = LoginResult.Unauthorized;
-                Result.InvalidAuth(Serialize(Session));
+                Result.InvalidAuth(Util.Serialize(Session));
                 return false;
             }
 
@@ -183,7 +180,7 @@ namespace Insight.WS.Base.Common
             {
                 Basis.FailureCount++;
                 Session.LoginResult = LoginResult.Failure;
-                Result.InvalidAuth(Serialize(Session));
+                Result.InvalidAuth(Util.Serialize(Session));
                 return false;
             }
 
@@ -201,7 +198,7 @@ namespace Insight.WS.Base.Common
             
             // 如Session.ID不一致，返回Session过期的信息
             if (Identical) Result.Success();
-            else Result.Expired(Serialize(Basis));
+            else Result.Expired(Util.Serialize(Basis));
 
             if (action == null) return true;
 
@@ -226,7 +223,7 @@ namespace Insight.WS.Base.Common
         /// <returns>bool 是否一致</returns>
         private bool ExtraCheck(bool verify)
         {
-            return !verify || Basis.UserId == Session.UserId && (!CheckOpenID || Basis.OpenId == Session.OpenId);
+            return !verify || Basis.UserId == Session.UserId && (!Util.CheckOpenID || Basis.OpenId == Session.OpenId);
         }
     }
 }
