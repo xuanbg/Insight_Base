@@ -31,35 +31,31 @@ namespace Insight.WS.Base.Common
         }
 
         /// <summary>
+        /// 根据登录账号更新Signature
+        /// </summary>
+        /// <param name="session">Session</param>
+        /// <returns>Session</returns>
+        public static Session UpdateSignature(Session session)
+        {
+            var basis = GetSession(session);
+            if (session.Signature == basis.Signature) return basis;
+
+            basis.Signature = session.Signature;
+            return basis;
+        }
+
+        /// <summary>
         /// 根据传入的用户数据更新Session
         /// </summary>
         /// <param name="user">SYS_User</param>
         /// <returns>Session</returns>
-        public static Session UpdateSession(SYS_User user)
+        public static void UpdateSession(SYS_User user)
         {
             var session = GetSession(user.LoginName);
-            if (session == null) return null;
+            if (session == null) return;
 
             session.UserName = user.Name;
             session.UserType = user.Type;
-            session.OpenId = user.OpenId;
-            return session;
-        }
-
-        /// <summary>
-        /// 根据登录账号更新Signature
-        /// </summary>
-        /// <param name="account">登录账号</param>
-        /// <param name="password">登录密码</param>
-        /// <returns>Session</returns>
-        public static Session UpdateSignature(string account, string password)
-        {
-            var session = GetSession(account);
-            var sign = Util.Hash(account.ToUpper() + password);
-            if (session == null || session.Signature == sign) return session;
-
-            session.Signature = sign;
-            return session;
         }
 
         /// <summary>
@@ -91,20 +87,20 @@ namespace Insight.WS.Base.Common
         /// <returns>Session</returns>
         public static Session GetSession(Session session)
         {
-            var fast = session.ID < Sessions.Count && string.Equals(session.LoginName, Sessions[session.ID].LoginName, StringComparison.CurrentCultureIgnoreCase);
-            return fast ? Sessions[session.ID] : GetSession(session.LoginName);
+            var fast = session.ID < Sessions.Count && session.SessionId == Sessions[session.ID].SessionId;
+            return fast ? Sessions[session.ID] : FindSession(session);
         }
 
         /// <summary>
         /// 根据登录账号在缓存中查找Session并返回
         /// </summary>
-        /// <param name="loginname">登录账号</param>
+        /// <param name="account">登录账号</param>
         /// <returns>Session</returns>
-        private static Session GetSession(string loginname)
+        public static Session GetSession(string account)
         {
-            var list = Sessions.Where(s => string.Equals(s.LoginName, loginname, StringComparison.CurrentCultureIgnoreCase)).ToList();
+            var list = Sessions.Where(s => string.Equals(s.LoginName, account, StringComparison.CurrentCultureIgnoreCase)).ToList();
 
-            if (list.Count < 2) return list.Count == 0 ? AddSession(loginname) : list[0];
+            if (list.Count < 2) return list.Count == 0 ? null : list[0];
 
             var msg = "";
             for (var i = 1; i < list.Count; i++)
@@ -112,30 +108,47 @@ namespace Insight.WS.Base.Common
                 msg += $"/r/n Session {i}:{Util.Serialize(list[i])}";
                 list[i].LoginName = null;
             }
-            General.LogToLogServer("000000", $"用户【{loginname}】数据重复，已清除重复数据。/n/r Session 0:{Util.Serialize(list[0])}{msg}", "验证服务", "获取验证数据");
+            General.LogToLogServer("000000", $"用户【{account}】数据重复，已清除重复数据。/n/r Session 0:{Util.Serialize(list[0])}{msg}", "验证服务", "获取验证数据");
             return list[0];
         }
 
         /// <summary>
-        /// 根据登录账号从数据库读取用户信息构造Session加入缓存并返回
+        /// 根据登录账号在缓存中查找Session并返回
         /// </summary>
-        /// <param name="loginname">登录账号</param>
-        private static Session AddSession(string loginname)
+        /// <param name="session">Session</param>
+        /// <returns>Session</returns>
+        private static Session FindSession(Session session)
         {
-            var user = DataAccess.GetUser(loginname);
+            var list = Sessions.Where(s => string.Equals(s.LoginName, session.LoginName, StringComparison.CurrentCultureIgnoreCase)).ToList();
+
+            if (list.Count < 2) return list.Count == 0 ? AddSession(session) : list[0];
+
+            var msg = "";
+            for (var i = 1; i < list.Count; i++)
+            {
+                msg += $"/r/n Session {i}:{Util.Serialize(list[i])}";
+                list[i].LoginName = null;
+            }
+            General.LogToLogServer("000000", $"用户【{session.LoginName}】数据重复，已清除重复数据。/n/r Session 0:{Util.Serialize(list[0])}{msg}", "验证服务", "获取验证数据");
+            return list[0];
+        }
+
+        /// <summary>
+        /// 根据登录账号从数据库读取用户信息更新Session加入缓存并返回
+        /// </summary>
+        /// <param name="session">Session</param>
+        private static Session AddSession(Session session)
+        {
+            var user = DataAccess.GetUser(session.LoginName);
             if (user == null) return null;
 
-            var session = new Session
-            {
-                ID = Sessions.Count,
-                UserId = user.ID,
-                UserName = user.Name,
-                OpenId = user.OpenId,
-                LoginName = user.LoginName,
-                Signature = Util.Hash(user.LoginName.ToUpper() + user.Password),
-                UserType = user.Type,
-                Validity = user.Validity,
-            };
+            session.ID = Sessions.Count;
+            session.SessionId = Guid.NewGuid();
+            session.UserId = user.ID;
+            session.UserName = user.Name;
+            session.UserType = user.Type;
+            session.Validity = user.Validity;
+            session.Expired = DateTime.Now.AddHours(Util.Expired);
             Sessions.Add(session);
             return session;
         }

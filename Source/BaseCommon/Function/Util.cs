@@ -58,9 +58,12 @@ namespace Insight.WS.Base.Common
         public static bool CheckOpenID;
 
         /// <summary>
-        /// 是否验证微信OpenID
+        /// 是否验证用户设备ID
         /// </summary>
         public static bool CheckMachineId;
+
+
+        public static int Expired;
 
         #endregion
 
@@ -86,10 +89,10 @@ namespace Insight.WS.Base.Common
             var obj = new
             {
                 session.ID,
+                session.SessionId,
+                session.OpenId,
                 session.LoginName,
                 session.Signature,
-                session.UserId,
-                session.OpenId,
                 session.MachineId
             };
             return Base64(obj);

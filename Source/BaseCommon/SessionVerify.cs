@@ -13,7 +13,7 @@ namespace Insight.WS.Base.Common
         /// <summary>
         /// 用于验证的基准对象
         /// </summary>
-        public Session Basis;
+        public readonly Session Basis;
 
         /// <summary>
         /// 用于验证的目标对象
@@ -23,12 +23,7 @@ namespace Insight.WS.Base.Common
         /// <summary>
         /// JsonResult类型的验证结果
         /// </summary>
-        public JsonResult Result = new JsonResult().InvalidAuth();
-
-        /// <summary>
-        /// Session.ID是否一致
-        /// </summary>
-        private readonly bool Identical;
+        public JsonResult Result;
 
         /// <summary>
         /// 最大授权数
@@ -48,31 +43,11 @@ namespace Insight.WS.Base.Common
             if (Session == null) return;
 
             Basis = SessionManage.GetSession(Session);
-            Identical = Basis?.ID == Session.ID;
-        }
+            if (Basis.Expired > DateTime.Now) return;
 
-        /// <summary>
-        /// 用户登录专用验证方法
-        /// </summary>
-        /// <returns>bool</returns>
-        public void SignIn()
-        {
-            if (!Compare(null, false)) return;
-
-            Basis.OpenId = Session.OpenId;
-            Basis.DeptId = Session.DeptId;
-            Basis.DeptName = Session.DeptName;
-            Basis.MachineId = Session.MachineId;
-        }
-
-        /// <summary>
-        /// 用户注册专用验证方法
-        /// </summary>
-        /// <param name="action">操作码，默认为空</param>
-        /// <returns>bool</returns>
-        public bool SignUp(string action = null)
-        {
-            return Basis == null || Compare(action);
+            // SessionID已过期，更新SessionID和过期时间
+            Basis.SessionId = Guid.NewGuid();
+            Basis.Expired = DateTime.Now.AddHours(Util.Expired);
         }
 
         /// <summary>
@@ -142,14 +117,12 @@ namespace Insight.WS.Base.Common
         /// 对Session进行校验，返回验证结果
         /// </summary>
         /// <param name="action">操作码，默认为空</param>
-        /// <param name="verify">是否验证模式</param>
-        /// <returns>bool</returns>
-        public bool Compare(string action = null, bool verify = true)
+        /// <param name="check">是否检查信息过期</param>
+        /// <returns>bool 是否通过验证</returns>
+        public bool Compare(string action = null, bool check = true)
         {
-            Result.InvalidAuth();
-            if (Basis == null || !ExtraCheck(verify)) return false;
-
-            if (Basis.ID > MaxAuth) return false;
+            Result = new JsonResult().InvalidAuth();
+            if (Basis == null || Basis.ID > MaxAuth) return false;
 
             if (!Basis.Validity)
             {
@@ -171,17 +144,23 @@ namespace Insight.WS.Base.Common
                 return false;
             }
 
+            // 检查验证信息是否过期
+            if (check && !ExpiredCheck())
+            {
+                Result.Expired();
+                return false;
+            }
+
             Basis.OnlineStatus = true;
             Basis.FailureCount = 0;
+            Result.Success();
+
+            // 如配置为不验证设备ID，设备ID不一致时返回多点登录信息
             if (Basis.MachineId != Session.MachineId) Result.Multiple();
 
-            // 如Session.ID不一致，返回Session过期的信息
-            if (Identical) Result.Success();
-            else Result.Expired(Util.CreateKey(Basis));
-
+            // 如action为空，立即返回；否则进行鉴权
             if (action == null) return true;
 
-            // 开始鉴权
             Guid aid;
             if (!Guid.TryParse(action, out aid))
             {
@@ -197,19 +176,16 @@ namespace Insight.WS.Base.Common
         }
 
         /// <summary>
-        /// 扩展验证
+        /// 检查验证信息是否过期
         /// </summary>
-        /// <param name="verify">是否进行扩展验证</param>
-        /// <returns>bool 验证是否通过</returns>
-        private bool ExtraCheck(bool verify)
+        /// <returns>bool 信息是否过期</returns>
+        private bool ExpiredCheck()
         {
-            if (!verify) return true;
-
             if (Util.CheckMachineId && Basis.MachineId != Session.MachineId) return false;
 
             if (Util.CheckOpenID && Basis.OpenId != Session.OpenId) return false;
 
-            return Basis.UserId == Session.UserId;
+            return Basis.SessionId == Session.SessionId;
         }
     }
 }

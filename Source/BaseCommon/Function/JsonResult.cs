@@ -132,15 +132,13 @@
         /// <summary>
         /// 返回接口调用成功，但Session过期（300）的成功信息
         /// </summary>
-        /// <param name="data">承载的数据（可选）</param>
         /// <returns>JsonResult</returns>
-        public JsonResult Expired(string data = null)
+        public JsonResult Expired()
         {
-            Successful = true;
+            Successful = false;
             Code = "300";
             Name = "SessionExpired";
-            Message = "Session过期，请更新Session";
-            Data = data;
+            Message = "登录信息过期，请重新登录";
             return this;
         }
 

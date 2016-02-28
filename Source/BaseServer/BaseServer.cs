@@ -65,6 +65,7 @@ namespace Insight.WS.Base
             LogServer = GetAppSetting("LogServer");
             CheckOpenID = bool.Parse(GetAppSetting("CheckOpenID"));
             CheckMachineId = bool.Parse(GetAppSetting("CheckMachineId"));
+            Expired = Convert.ToInt32(GetAppSetting("Expired"));
         }
 
         /// <summary>

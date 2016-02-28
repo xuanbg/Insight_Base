@@ -23,21 +23,25 @@ namespace Insight.WS.Base
         {
             const string action = "60D5BE64-0102-4189-A999-96EDAD3DA1B5";
             var verify = new SessionVerify();
-            if (!verify.SignUp(action)) return verify.Result;
-
-            // 管理员添加用户
-            if (verify.Basis != null) return InsertData(user) ? verify.Result.Created() : verify.Result.DataBaseError();
 
             // 用户注册，验证用户签名
-            var session = verify.Session;
-            var sign = Hash(session.LoginName + user.LoginName + user.Password);
-            if (sign != session.Signature) return verify.Result.InvalidAuth();
+            if (verify.Basis == null)
+            {
+                var session = verify.Session;
+                var sign = Hash(session.LoginName + user.LoginName + user.Password);
+                if (sign != session.Signature) return verify.Result.InvalidAuth();
 
-            if (!InsertData(user)) return verify.Result.DataBaseError();
+                if (!InsertData(user)) return verify.Result.DataBaseError();
 
-            // 返回用于验证的Key
-            session = SessionManage.GetSession(session);
-            return verify.Result.Created(CreateKey(session));
+                // 返回用于验证的Key
+                session = SessionManage.GetSession(session);
+                return verify.Result.Created(CreateKey(session));
+            }
+
+            // 管理员添加用户，验证管理员身份及鉴权
+            if (!verify.Compare(action)) return verify.Result;
+
+            return InsertData(user) ? verify.Result.Created() : verify.Result.DataBaseError();
         }
 
         /// <summary>
@@ -71,8 +75,8 @@ namespace Insight.WS.Base
 
             if (!reset.Value) return verify.Result.DataBaseError();
 
-            var session = SessionManage.UpdateSession(user);
-            return session == null ? verify.Result.NotFound() : verify.Result.Success(CreateKey(session));
+            SessionManage.UpdateSession(user);
+            return verify.Result.Success();
         }
 
         /// <summary>
@@ -114,18 +118,23 @@ namespace Insight.WS.Base
         {
             const string action = "26481E60-0917-49B4-BBAA-2265E71E7B3F";
             var verify = new SessionVerify();
+            var us = verify.Basis;
             if (!verify.Compare(action, account)) return verify.Result;
 
             // 调用信分宝接口修改信分宝用户密码
-            var xresult = XFBInterface.ChangXFBPassword(account, password, verify.Basis.Signature);
-            if (xresult?.resultCode != "0") return verify.Result.XfbInterfaceFail(xresult?.resultMessage);
+            if (verify.Session.LoginName != account)
+            {
+                us = SessionManage.GetSession(account);
+                var xresult = XFBInterface.ChangXFBPassword(account, password, us.Signature);
+                if (xresult?.resultCode != "0") return verify.Result.XfbInterfaceFail(xresult?.resultMessage);
+            }
 
             var reset = Update(account, password);
             if (!reset.HasValue) return verify.Result.NotFound();
 
             if (!reset.Value) return verify.Result.DataBaseError();
 
-            var session = SessionManage.UpdateSignature(account, password);
+            var session = SessionManage.UpdateSignature(us);
             return verify.Result.Success(CreateKey(session));
         }
 
@@ -161,7 +170,7 @@ namespace Insight.WS.Base
             var reset = Update(account, password);
             if (reset == null || !reset.Value) return verify.Result.DataBaseError();
 
-            session = SessionManage.UpdateSignature(account, password);
+            session = SessionManage.UpdateSignature(session);
             return verify.Result.Success(CreateKey(session));
         }
 
@@ -193,7 +202,16 @@ namespace Insight.WS.Base
         public JsonResult UserSignIn(string account)
         {
             var verify = new SessionVerify();
-            verify.SignIn();
+            if (!verify.Compare(null, false)) return verify.Result;
+
+            // 更新缓存信息
+            verify.Basis.OpenId = verify.Session.OpenId;
+            verify.Basis.MachineId = verify.Session.MachineId;
+            verify.Basis.DeptId = verify.Session.DeptId;
+            verify.Basis.DeptName = verify.Session.DeptName;
+            verify.Basis.Expired = DateTime.Now.AddHours(Expired);
+
+            // 返回用于验证的Key
             var key = CreateKey(verify.Basis);
             return verify.Result.Success(key);
         }
