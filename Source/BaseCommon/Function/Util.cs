@@ -93,7 +93,10 @@ namespace Insight.WS.Base.Common
                 session.OpenId,
                 session.LoginName,
                 session.Signature,
-                session.MachineId
+                session.MachineId,
+                session.UserId,
+                session.UserName,
+                session.UserType
             };
             return Base64(obj);
         }

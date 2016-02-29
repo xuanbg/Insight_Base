@@ -118,14 +118,14 @@ namespace Insight.WS.Base
         {
             const string action = "26481E60-0917-49B4-BBAA-2265E71E7B3F";
             var verify = new SessionVerify();
-            var us = verify.Basis;
+            var session = verify.Basis;
+            if (!string.Equals(session.LoginName, account, StringComparison.CurrentCultureIgnoreCase)) session = SessionManage.GetSession(account);
             if (!verify.Compare(action, account)) return verify.Result;
 
             // 调用信分宝接口修改信分宝用户密码
-            if (verify.Session.LoginName != account)
+            if (session != null && session.UserType <= 0)
             {
-                us = SessionManage.GetSession(account);
-                var xresult = XFBInterface.ChangXFBPassword(account, password, us.Signature);
+                var xresult = XFBInterface.ChangXFBPassword(account, password, session.Signature);
                 if (xresult?.resultCode != "0") return verify.Result.XfbInterfaceFail(xresult?.resultMessage);
             }
 
@@ -134,7 +134,9 @@ namespace Insight.WS.Base
 
             if (!reset.Value) return verify.Result.DataBaseError();
 
-            var session = SessionManage.UpdateSignature(us);
+            if (session == null) return verify.Result;
+
+            session.Signature = Hash(session.LoginName.ToUpper() + password);
             return verify.Result.Success(CreateKey(session));
         }
 
