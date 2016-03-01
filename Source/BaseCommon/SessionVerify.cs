@@ -38,12 +38,12 @@ namespace Insight.WS.Base.Common
             // 从请求头获取验证数据
             var dict = General.GetAuthorization();
             Session = General.GetAuthor<Session>(dict["Auth"]);
-
+            Result = new JsonResult();
             // 验证数据不存在
             if (Session == null) return;
 
             Basis = SessionManage.GetSession(Session);
-            if (Basis.Expired > DateTime.Now) return;
+            if (Basis == null || Basis.Expired > DateTime.Now) return;
 
             // SessionID已过期，更新SessionID和过期时间
             Basis.SessionId = Guid.NewGuid();
@@ -121,7 +121,7 @@ namespace Insight.WS.Base.Common
         /// <returns>bool 是否通过验证</returns>
         public bool Compare(string action = null, bool check = true)
         {
-            Result = new JsonResult().InvalidAuth();
+            Result.InvalidAuth();
             if (Basis == null || Basis.ID > MaxAuth) return false;
 
             if (!Basis.Validity)
