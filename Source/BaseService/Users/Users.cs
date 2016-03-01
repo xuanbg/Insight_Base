@@ -121,6 +121,7 @@ namespace Insight.WS.Base
             var verify = new SessionVerify();
             var session = verify.Basis;
             if (!string.Equals(session.LoginName, account, StringComparison.CurrentCultureIgnoreCase)) session = SessionManage.GetSession(account);
+
             if (!verify.Compare(action, account)) return verify.Result;
 
             // 调用信分宝接口修改信分宝用户密码
@@ -173,7 +174,7 @@ namespace Insight.WS.Base
             var reset = Update(account, password);
             if (reset == null || !reset.Value) return verify.Result.DataBaseError();
 
-            session = SessionManage.UpdateSignature(session);
+            session.Signature = Hash(account.ToUpper() + password);
             return verify.Result.Success(CreateKey(session));
         }
 

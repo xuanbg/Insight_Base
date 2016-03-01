@@ -39,6 +39,7 @@ namespace Insight.WS.Base.Common
             var dict = General.GetAuthorization();
             Session = General.GetAuthor<Session>(dict["Auth"]);
             Result = new JsonResult();
+
             // 验证数据不存在
             if (Session == null) return;
 

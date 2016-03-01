@@ -31,20 +31,6 @@ namespace Insight.WS.Base.Common
         }
 
         /// <summary>
-        /// 根据登录账号更新Signature
-        /// </summary>
-        /// <param name="session">Session</param>
-        /// <returns>Session</returns>
-        public static Session UpdateSignature(Session session)
-        {
-            var basis = GetSession(session);
-            if (session.Signature == basis.Signature) return basis;
-
-            basis.Signature = session.Signature;
-            return basis;
-        }
-
-        /// <summary>
         /// 根据传入的用户数据更新Session
         /// </summary>
         /// <param name="user">SYS_User</param>
