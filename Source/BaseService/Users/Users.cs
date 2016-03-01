@@ -34,6 +34,7 @@ namespace Insight.WS.Base
                 if (!InsertData(user)) return verify.Result.DataBaseError();
 
                 // 返回用于验证的Key
+                session.Signature = Hash(account.ToUpper() + user.Password);
                 session = SessionManage.GetSession(session);
                 return verify.Result.Created(CreateKey(session));
             }
