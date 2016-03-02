@@ -57,7 +57,9 @@ namespace Insight.WS.Base.Common
         public static void Offline(string account)
         {
             var session = GetSession(account);
-            if (session != null) session.OnlineStatus = false;
+            if (session == null) return;
+
+            session.OnlineStatus = false;
         }
 
         /// <summary>
@@ -69,21 +71,9 @@ namespace Insight.WS.Base.Common
         public static void SetValidity(string account, bool validity)
         {
             var session = GetSession(account);
-            if (session != null) session.Validity = validity;
-        }
+            if (session == null) return;
 
-        /// <summary>
-        /// 根据SessionID获取缓存中的Session并返回
-        /// </summary>
-        /// <param name="session">Session</param>
-        /// <returns>Session</returns>
-        public static Session GetSession(Session session)
-        {
-            Mutex.WaitOne();
-            var fast = session.ID < Sessions.Count && session.SessionId == Sessions[session.ID].SessionId;
-            var obj = fast ? Sessions[session.ID] : FindSession(session);
-            Mutex.ReleaseMutex();
-            return obj;
+            session.Validity = validity;
         }
 
         /// <summary>
@@ -93,18 +83,18 @@ namespace Insight.WS.Base.Common
         /// <returns>Session</returns>
         public static Session GetSession(string account)
         {
-            var list = Sessions.Where(s => string.Equals(s.LoginName, account, StringComparison.CurrentCultureIgnoreCase)).ToList();
+            return Sessions.SingleOrDefault(s => Util.StringCompare(s.LoginName, account));
+        }
 
-            if (list.Count < 2) return list.Count == 0 ? null : list[0];
-
-            var msg = "";
-            for (var i = 1; i < list.Count; i++)
-            {
-                msg += $"/r/n Session {i}:{Util.Serialize(list[i])}";
-                list[i].LoginName = null;
-            }
-            General.LogToLogServer("000000", $"用户【{account}】数据重复，已清除重复数据。/n/r Session 0:{Util.Serialize(list[0])}{msg}", "验证服务", "获取验证数据");
-            return list[0];
+        /// <summary>
+        /// 根据SessionID获取缓存中的Session并返回
+        /// </summary>
+        /// <param name="session">Session</param>
+        /// <returns>Session</returns>
+        public static Session GetSession(Session session)
+        {
+            var fast = session.ID < Sessions.Count && session.SessionId == Sessions[session.ID].SessionId;
+            return fast ? Sessions[session.ID] : FindSession(session);
         }
 
         /// <summary>
@@ -114,18 +104,10 @@ namespace Insight.WS.Base.Common
         /// <returns>Session</returns>
         private static Session FindSession(Session session)
         {
-            var list = Sessions.Where(s => string.Equals(s.LoginName, session.LoginName, StringComparison.CurrentCultureIgnoreCase)).ToList();
-
-            if (list.Count < 2) return list.Count == 0 ? AddSession(session) : list[0];
-
-            var msg = "";
-            for (var i = 1; i < list.Count; i++)
-            {
-                msg += $"/r/n Session {i}:{Util.Serialize(list[i])}";
-                list[i].LoginName = null;
-            }
-            General.LogToLogServer("000000", $"用户【{session.LoginName}】数据重复，已清除重复数据。/n/r Session 0:{Util.Serialize(list[0])}{msg}", "验证服务", "获取验证数据");
-            return list[0];
+            Mutex.WaitOne();
+            var obj = Sessions.SingleOrDefault(s => Util.StringCompare(s.LoginName, session.LoginName)) ?? AddSession(session);
+            Mutex.ReleaseMutex();
+            return obj;
         }
 
         /// <summary>

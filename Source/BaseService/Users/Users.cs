@@ -77,7 +77,7 @@ namespace Insight.WS.Base
             if (!reset.Value) return verify.Result.DataBaseError();
 
             SessionManage.UpdateSession(user);
-            return verify.Result.Success();
+            return verify.Result;
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace Insight.WS.Base
             const string action = "26481E60-0917-49B4-BBAA-2265E71E7B3F";
             var verify = new SessionVerify();
             var session = verify.Basis;
-            if (!string.Equals(session.LoginName, account, StringComparison.CurrentCultureIgnoreCase)) session = SessionManage.GetSession(account);
+            if (!StringCompare(session.LoginName, account)) session = SessionManage.GetSession(account);
 
             if (!verify.Compare(action, account)) return verify.Result;
 
@@ -196,7 +196,7 @@ namespace Insight.WS.Base
             if (!reset.Value) return verify.Result.DataBaseError();
 
             SessionManage.SetValidity(account, validity);
-            return verify.Result.Success();
+            return verify.Result;
         }
 
         /// <summary>
@@ -234,7 +234,7 @@ namespace Insight.WS.Base
             if (!verify.Compare(action)) return verify.Result;
 
             SessionManage.Offline(account);
-            return verify.Result.Success();
+            return verify.Result;
         }
 
         #endregion

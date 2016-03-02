@@ -109,7 +109,7 @@ namespace Insight.WS.Base.Common
         public bool Compare(string action, string account)
         {
             // 如指定的登录账号是操作人的登录账号，则不进行鉴权
-            if (Session.LoginName == account) action = null;
+            if (Util.StringCompare(Session.LoginName, account)) action = null;
 
             return Compare(action);
         }

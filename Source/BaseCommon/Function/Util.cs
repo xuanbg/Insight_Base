@@ -80,6 +80,17 @@ namespace Insight.WS.Base.Common
         }
 
         /// <summary>
+        /// 忽略大小写情况下比较两个字符串
+        /// </summary>
+        /// <param name="s1">字符串1</param>
+        /// <param name="s2">字符串2</param>
+        /// <returns>bool 是否相同</returns>
+        public static bool StringCompare(string s1, string s2)
+        {
+            return string.Equals(s1, s2, StringComparison.CurrentCultureIgnoreCase);
+        }
+
+        /// <summary>
         /// 生成用于验证的Key
         /// </summary>
         /// <param name="session">Session</param>
