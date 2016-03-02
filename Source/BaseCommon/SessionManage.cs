@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Insight.WS.Base.Common.Entity;
 
 namespace Insight.WS.Base.Common
@@ -11,6 +12,11 @@ namespace Insight.WS.Base.Common
         /// Session缓存
         /// </summary>
         private static readonly List<Session> Sessions;
+
+        /// <summary>
+        /// 进程同步基元
+        /// </summary>
+        public static readonly Mutex Mutex = new Mutex();
 
         /// <summary>
         /// 构造方法，初始化Sessions
@@ -73,8 +79,11 @@ namespace Insight.WS.Base.Common
         /// <returns>Session</returns>
         public static Session GetSession(Session session)
         {
+            Mutex.WaitOne();
             var fast = session.ID < Sessions.Count && session.SessionId == Sessions[session.ID].SessionId;
-            return fast ? Sessions[session.ID] : FindSession(session);
+            var obj = fast ? Sessions[session.ID] : FindSession(session);
+            Mutex.ReleaseMutex();
+            return obj;
         }
 
         /// <summary>
