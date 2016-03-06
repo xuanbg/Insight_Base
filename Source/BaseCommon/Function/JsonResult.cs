@@ -164,7 +164,7 @@
             Successful = false;
             Code = "401";
             Name = "InvalidAuthenticationInfo";
-            Message = "提供的身份验证信息不正确";
+            Message = "登录账号或密码错误";
             return this;
         }
 
@@ -247,15 +247,15 @@
         }
 
         /// <summary>
-        /// 返回用户已登录（408）的错误信息
+        /// 返回账号已锁定（408）的错误信息
         /// </summary>
         /// <returns>JsonResult</returns>
-        public JsonResult AccountSignin()
+        public JsonResult AccountIsBlocked()
         {
             Successful = false;
             Code = "408";
-            Name = "AccountAlreadySignin";
-            Message = "用户已登录";
+            Name = "AccountIsBlocked";
+            Message = "账号已锁定";
             return this;
         }
 

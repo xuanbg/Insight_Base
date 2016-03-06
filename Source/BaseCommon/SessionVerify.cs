@@ -138,6 +138,7 @@ namespace Insight.WS.Base.Common
             if (Basis.Signature != Session.Signature || (Basis.FailureCount >= 5 && Basis.MachineId != Session.MachineId))
             {
                 Basis.FailureCount++;
+                Result.AccountIsBlocked();
                 return false;
             }
 
