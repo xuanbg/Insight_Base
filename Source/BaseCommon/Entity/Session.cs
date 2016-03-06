@@ -13,16 +13,6 @@ namespace Insight.WS.Base.Common.Entity
         public int ID { get; set; }
 
         /// <summary>
-        /// 登录用户ID
-        /// </summary>
-        public Guid UserId { get; set; }
-
-        /// <summary>
-        /// 登录用户名
-        /// </summary>
-        public string UserName { get; set; }
-
-        /// <summary>
         /// 用户OpenId
         /// </summary>
         public string OpenId { get; set; }
@@ -36,6 +26,21 @@ namespace Insight.WS.Base.Common.Entity
         /// 用户签名，用户名（大写）+ 密码MD5值的结果的MD5值
         /// </summary>
         public string Signature { get; set; }
+
+        /// <summary>
+        /// 用户机器码
+        /// </summary>
+        public string MachineId { get; set; }
+
+        /// <summary>
+        /// 登录用户ID
+        /// </summary>
+        public Guid UserId { get; set; }
+
+        /// <summary>
+        /// 登录用户名
+        /// </summary>
+        public string UserName { get; set; }
 
         /// <summary>
         /// 登录部门ID
@@ -58,11 +63,6 @@ namespace Insight.WS.Base.Common.Entity
         public bool Validity { get; set; }
 
         /// <summary>
-        /// 用户机器码
-        /// </summary>
-        public string MachineId { get; set; }
-
-        /// <summary>
         /// 连续失败次数
         /// </summary>
         public int FailureCount { get; set; }
@@ -78,23 +78,9 @@ namespace Insight.WS.Base.Common.Entity
         public bool OnlineStatus { get; set; }
 
         /// <summary>
-        /// 用户登录结果
+        /// 过期时间
         /// </summary>
-        public LoginResult LoginResult { get; set; }
+        public DateTime Expired { get; set; }
 
-    }
-
-    /// <summary>
-    /// 用户登录结果
-    /// </summary>
-    public enum LoginResult
-    {
-        Success,
-        Multiple,
-        Online,
-        Failure,
-        Banned,
-        NotExist,
-        Unauthorized
     }
 }

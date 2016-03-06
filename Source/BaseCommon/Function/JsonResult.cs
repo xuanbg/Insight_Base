@@ -130,17 +130,15 @@
         }
 
         /// <summary>
-        /// 返回接口调用成功，但Session过期（300）的成功信息
+        /// 返回接口调用成功，但Session过期（300）的错误信息
         /// </summary>
-        /// <param name="data">承载的数据（可选）</param>
         /// <returns>JsonResult</returns>
-        public JsonResult Expired(string data = null)
+        public JsonResult Expired()
         {
-            Successful = true;
+            Successful = false;
             Code = "300";
             Name = "SessionExpired";
-            Message = "Session过期，请更新Session";
-            Data = data;
+            Message = "登录信息过期，请重新登录";
             return this;
         }
 
@@ -161,13 +159,12 @@
         /// 返回身份验证失败（401）的错误信息
         /// </summary>
         /// <returns>JsonResult</returns>
-        public JsonResult InvalidAuth(string data = null)
+        public JsonResult InvalidAuth()
         {
             Successful = false;
             Code = "401";
             Name = "InvalidAuthenticationInfo";
             Message = "提供的身份验证信息不正确";
-            Data = data;
             return this;
         }
 
@@ -311,20 +308,6 @@
             Code = "412";
             Name = "TimeIntervalTooShort";
             Message = "请求发送验证码时间间隔过短，请稍后再试";
-            return this;
-        }
-
-        /// <summary>
-        /// 返回调用信分宝接口失败（416）的错误信息
-        /// </summary>
-        /// <param name="message">额外的错误信息</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult XfbInterfaceFail(string message)
-        {
-            Successful = false;
-            Code = "416";
-            Name = "XfbInterfaceFail";
-            Message = $"调用信分宝接口失败！Return message:{message}";
             return this;
         }
 

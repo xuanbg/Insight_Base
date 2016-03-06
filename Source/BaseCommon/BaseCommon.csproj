@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Insight.WS.Base.Common</RootNamespace>
     <AssemblyName>BaseCommon</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,6 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework">
@@ -46,7 +48,7 @@
     <Compile Include="Entity\Authority.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
-    <Compile Include="Entity\GuidParse.cs" />
+    <Compile Include="Function\GuidParse.cs" />
     <Compile Include="Entity\SYS_Allot_Record.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
@@ -129,9 +131,9 @@
     </Compile>
     <Compile Include="Entity\Session.cs" />
     <Compile Include="Entity\VerifyRecord.cs" />
-    <Compile Include="Function\DataAccess.cs" />
-    <Compile Include="Function\SessionManage.cs" />
-    <Compile Include="Function\SessionVerify.cs" />
+    <Compile Include="DataAccess.cs" />
+    <Compile Include="SessionManage.cs" />
+    <Compile Include="SessionVerify.cs" />
     <Compile Include="Function\SqlHelper.cs" />
     <Compile Include="Function\Util.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -141,7 +143,6 @@
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>Model.Designer.cs</LastGenOutput>
     </EntityDeploy>
-    <None Include="App.Config" />
     <None Include="Entity\Model.edmx.diagram">
       <DependentUpon>Model.edmx</DependentUpon>
     </None>
