@@ -100,7 +100,6 @@ namespace Insight.WS.Base.Common
             var obj = new
             {
                 session.ID,
-                session.SessionId,
                 session.OpenId,
                 session.LoginName,
                 session.Signature,

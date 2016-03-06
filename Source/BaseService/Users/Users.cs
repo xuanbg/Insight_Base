@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
-using Insight.WS.Base.Users;
 using static Insight.WS.Base.Common.Util;
 
 namespace Insight.WS.Base
@@ -124,13 +123,6 @@ namespace Insight.WS.Base
 
             if (!verify.Compare(action, account)) return verify.Result;
 
-            // 调用信分宝接口修改信分宝用户密码
-            if (session != null && session.UserType <= 0)
-            {
-                var xresult = XFBInterface.ChangXFBPassword(account, password, session.Signature);
-                if (xresult?.resultCode != "0") return verify.Result.XfbInterfaceFail(xresult?.resultMessage);
-            }
-
             var reset = Update(account, password);
             if (!reset.HasValue) return verify.Result.NotFound();
 
@@ -165,10 +157,6 @@ namespace Insight.WS.Base
             if (record == null) return verify.Result.SMSCodeError();
 
             SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == 2);
-
-            // 调用信分宝接口修改信分宝用户密码
-            var xresult = XFBInterface.ChangXFBPassword(account, password, session.Signature);
-            if (xresult?.resultCode != "0") return verify.Result.XfbInterfaceFail(xresult?.resultMessage);
 
             // 更新用户登录密码
             var reset = Update(account, password);
@@ -206,7 +194,7 @@ namespace Insight.WS.Base
         public JsonResult UserSignIn(string account)
         {
             var verify = new SessionVerify();
-            if (!verify.Compare(null, false)) return verify.Result;
+            if (!verify.Compare(null, true)) return verify.Result;
 
             // 更新缓存信息
             verify.Basis.OpenId = verify.Session.OpenId;

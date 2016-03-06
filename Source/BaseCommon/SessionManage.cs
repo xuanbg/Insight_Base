@@ -93,7 +93,7 @@ namespace Insight.WS.Base.Common
         /// <returns>Session</returns>
         public static Session GetSession(Session session)
         {
-            var fast = session.ID < Sessions.Count && session.SessionId == Sessions[session.ID].SessionId;
+            var fast = session.ID < Sessions.Count && Util.StringCompare(session.LoginName, Sessions[session.ID].LoginName);
             return fast ? Sessions[session.ID] : FindSession(session);
         }
 
@@ -120,7 +120,6 @@ namespace Insight.WS.Base.Common
             if (user == null) return null;
 
             session.ID = Sessions.Count;
-            session.SessionId = Guid.NewGuid();
             session.UserId = user.ID;
             session.UserName = user.Name;
             session.UserType = user.Type;

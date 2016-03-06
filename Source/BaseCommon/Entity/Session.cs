@@ -13,11 +13,6 @@ namespace Insight.WS.Base.Common.Entity
         public int ID { get; set; }
 
         /// <summary>
-        /// SessionID
-        /// </summary>
-        public Guid SessionId { get; set; }
-
-        /// <summary>
         /// 用户OpenId
         /// </summary>
         public string OpenId { get; set; }
