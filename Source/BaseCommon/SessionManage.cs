@@ -16,7 +16,7 @@ namespace Insight.WS.Base.Common
         /// <summary>
         /// 进程同步基元
         /// </summary>
-        public static readonly Mutex Mutex = new Mutex();
+        private static readonly Mutex Mutex = new Mutex();
 
         /// <summary>
         /// 构造方法，初始化Sessions
@@ -105,7 +105,7 @@ namespace Insight.WS.Base.Common
         private static Session FindSession(Session session)
         {
             Mutex.WaitOne();
-            var obj = Sessions.SingleOrDefault(s => Util.StringCompare(s.LoginName, session.LoginName)) ?? AddSession(session);
+            var obj = Sessions.SingleOrDefault(s => Util.StringCompare(s.LoginName, session.LoginName)) ?? AddSession(session.LoginName);
             Mutex.ReleaseMutex();
             return obj;
         }
@@ -113,18 +113,24 @@ namespace Insight.WS.Base.Common
         /// <summary>
         /// 根据登录账号从数据库读取用户信息更新Session加入缓存并返回
         /// </summary>
-        /// <param name="session">Session</param>
-        private static Session AddSession(Session session)
+        /// <param name="account">登录账号</param>
+        private static Session AddSession(string account)
         {
-            var user = DataAccess.GetUser(session.LoginName);
+            var user = DataAccess.GetUser(account);
             if (user == null) return null;
 
-            session.ID = Sessions.Count;
-            session.UserId = user.ID;
-            session.UserName = user.Name;
-            session.UserType = user.Type;
-            session.Validity = user.Validity;
-            session.Expired = DateTime.Now.AddHours(Util.Expired);
+            var session = new Session
+            {
+                ID = Sessions.Count,
+                OpenId = user.OpenId,
+                LoginName = user.LoginName,
+                Signature = Util.Hash(user.LoginName.ToUpper() + user.Password),
+                UserId = user.ID,
+                UserName = user.Name,
+                UserType = user.Type,
+                Validity = user.Validity,
+                Expired = DateTime.Now.AddHours(Util.Expired)
+            };
             Sessions.Add(session);
             return session;
         }
