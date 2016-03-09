@@ -145,7 +145,9 @@ namespace Insight.WS.Base.Common
             // 检查验证信息是否过期
             if (!login && ExpiredCheck())
             {
-                Result.Expired();
+                var check = Util.CheckMachineId || Util.CheckOpenID;
+                var key = check ? null : Util.CreateKey(Basis);
+                Result.Expired(key);
                 return false;
             }
 
@@ -179,16 +181,16 @@ namespace Insight.WS.Base.Common
         /// <returns>bool 信息是否过期</returns>
         private bool ExpiredCheck()
         {
+            // Session.ID失效（服务重启）或超过设定时间过期（长期未操作）
+            if (Basis.ID != Session.ID || Basis.Expired < DateTime.Now) return true;
+
             // 设备码不同造成过期（用户在另一台设备登录）
             if (Util.CheckMachineId && Basis.MachineId != Session.MachineId) return true;
 
             // OpenID不同造成过期（用户使用另一个微信账号登录）
             if (Util.CheckOpenID && Basis.OpenId != Session.OpenId) return true;
 
-            // 超过设定时间过期（长期未操作）
-            if (Basis.Expired < DateTime.Now) return true;
-
-            // 如过期前3天有通过验证，过期时间自动延期
+            // 在过期前3天通过验证，过期时间自动延期
             var time = Basis.Expired.AddDays(-3);
             if (time < DateTime.Now) Basis.Expired = DateTime.Now.AddHours(Util.Expired);
 
