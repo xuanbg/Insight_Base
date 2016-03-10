@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ServiceModel;
-using System.ServiceModel.Web;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
 using static Insight.WS.Base.Common.Util;
@@ -9,24 +8,8 @@ using static Insight.WS.Base.Common.Util;
 namespace Insight.WS.Base
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
-    public partial class BaseService : IOrganizations
+    public partial class Organizations : IOrganizations
     {
-
-        /// <summary>
-        /// 为跨域请求设置响应头信息
-        /// </summary>
-        public void ResponseOptions()
-        {
-            var context = WebOperationContext.Current;
-            if (context == null) return;
-
-            var response = context.OutgoingResponse;
-            response.Headers.Add("Access-Control-Allow-Credentials", "true");
-            response.Headers.Add("Access-Control-Allow-Headers", "Accept, Content-Type, Authorization");
-            response.Headers.Add("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
-            response.Headers.Add("Access-Control-Allow-Origin", "*");
-        }
-
         /// <summary>
         /// 根据对象实体数据新增一个组织机构节点
         /// </summary>
@@ -186,6 +169,20 @@ namespace Insight.WS.Base
 
             var data = GetOtherOrgMember(verify.Guid);
             return data.Rows.Count > 0 ? verify.Result.Success(Serialize(data)) : verify.Result.NoContent();
+        }
+
+        /// <summary>
+        /// 根据用户登录名获取可登录部门列表
+        /// </summary>
+        /// <param name="account">用户登录名</param>
+        /// <returns>JsonResult</returns>
+        public JsonResult GetLoginDepts(string account)
+        {
+            var verify = General.Verify(account.ToUpper() + Secret);
+            if (!verify.Successful) return verify;
+
+            var data = GetDeptList(account);
+            return data.Rows.Count > 0 ? verify.Success(Serialize(data)) : verify.NoContent();
         }
 
     }

@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{69F33C8D-DEC5-47F5-B435-08217DA98B82}</ProjectGuid>
+    <ProjectGuid>{6E102873-07F4-41F7-AC8D-2C3F1F2BB09F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Insight.WS.Base</RootNamespace>
-    <AssemblyName>BaseService</AssemblyName>
+    <RootNamespace>Insight.WS.Base.Codes</RootNamespace>
+    <AssemblyName>Codes</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -17,60 +17,45 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\Debug\</OutputPath>
+    <OutputPath>..\..\..\Debug\Services\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\Release\</OutputPath>
+    <OutputPath>..\..\..\Release\Services\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EntityFramework">
-      <HintPath>..\packages\EntityFramework.dll</HintPath>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\EntityFramework.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Web" />
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Codes\Codes.cs" />
-    <Compile Include="Codes\DataAccess.cs" />
-    <Compile Include="Codes\ICodes.cs" />
-    <Compile Include="Organizations\DataAccess.cs" />
-    <Compile Include="Organizations\IOrganizations.cs" />
-    <Compile Include="Organizations\Organizations.cs" />
-    <Compile Include="Roles\DataAccess.cs" />
-    <Compile Include="Roles\IRoles.cs" />
-    <Compile Include="Roles\Roles.cs" />
-    <Compile Include="Users\DataAccess.cs" />
-    <Compile Include="Users\IUsers.cs" />
-    <Compile Include="Users\Users.cs" />
+    <Compile Include="Codes.cs" />
+    <Compile Include="DataAccess.cs" />
+    <Compile Include="ICodes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BaseCommon\BaseCommon.csproj">
-      <Project>{c4f26dd1-de5a-4773-a789-7823e96ea166}</Project>
+    <ProjectReference Include="..\..\BaseCommon\BaseCommon.csproj">
+      <Project>{C4F26DD1-DE5A-4773-A789-7823E96EA166}</Project>
       <Name>BaseCommon</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\Verify\VerifyService.csproj">
-      <Project>{b18dff40-4eb9-4777-b63e-756f36d5c5e2}</Project>
-      <Name>VerifyService</Name>
-    </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

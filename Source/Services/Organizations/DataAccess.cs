@@ -9,7 +9,7 @@ using static Insight.WS.Base.Common.SqlHelper;
 
 namespace Insight.WS.Base
 {
-    public partial class BaseService
+    public partial class Organizations
     {
 
         /// <summary>
@@ -203,6 +203,17 @@ namespace Insight.WS.Base
             var sql = "select U.ID, U.Name as 用户名, U.LoginName as 登录名, U.[Description] as 描述 from SYS_User U left join MDG_Contact C on C.MID = U.ID ";
             sql += $"where not exists (select UserId from SYS_OrgMember where UserId = U.ID and OrgId = '{id}') and C.MID is null ";
             sql += "order by LoginName";
+            return SqlQuery(MakeCommand(sql));
+        }
+
+        /// <summary>
+        /// 根据用户登录名获取可登录部门列表
+        /// </summary>
+        /// <param name="loginName">用户登录名</param>
+        /// <returns>DataTable 可登录部门列表</returns>
+        private DataTable GetDeptList(string loginName)
+        {
+            var sql = $"select * from dbo.Get_LoginDept('{loginName}')";
             return SqlQuery(MakeCommand(sql));
         }
 

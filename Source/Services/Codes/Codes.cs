@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Linq;
+using System.ServiceModel;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
 
 namespace Insight.WS.Base
 {
-    public partial class BaseService : ICodes
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
+    public partial class Codes : ICodes
     {
         public JsonResult AddScheme(SYS_Code_Scheme obj)
         {

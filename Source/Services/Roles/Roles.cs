@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.ServiceModel;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
 
 namespace Insight.WS.Base
 {
-    public partial class BaseService : IRoles
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
+    public partial class Roles : IRoles
     {
         public JsonResult AddRole(SYS_Role role, DataTable action, DataTable data, DataTable custom)
         {
@@ -92,5 +94,6 @@ namespace Insight.WS.Base
         {
             throw new NotImplementedException();
         }
+
     }
 }

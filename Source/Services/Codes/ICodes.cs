@@ -9,13 +9,6 @@ namespace Insight.WS.Base
     public interface ICodes
     {
         /// <summary>
-        /// 为跨域请求设置响应头信息
-        /// </summary>
-        [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
-        [OperationContract]
-        void ResponseOptions();
-
-        /// <summary>
         /// 新增编码方案
         /// </summary>
         /// <param name="obj">SYS_Code_Scheme</param>

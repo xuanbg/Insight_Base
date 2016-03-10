@@ -48,6 +48,9 @@
     <Compile Include="Entity\Authority.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
+    <Compile Include="Entity\SYS_Interface.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
     <Compile Include="Function\GuidParse.cs" />
     <Compile Include="Entity\SYS_Allot_Record.cs">
       <DependentUpon>Model.tt</DependentUpon>
@@ -143,6 +146,7 @@
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>Model.Designer.cs</LastGenOutput>
     </EntityDeploy>
+    <None Include="App.Config" />
     <None Include="Entity\Model.edmx.diagram">
       <DependentUpon>Model.edmx</DependentUpon>
     </None>

@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ServiceProcess;
 using System.Windows.Forms;
+using Insight.WS.Base.Common;
 using Insight.WS.Service;
 using static Insight.WS.Base.Common.Util;
 
@@ -35,9 +35,22 @@ namespace Insight.WS.Base
         /// <param name="args"></param>
         protected override void OnStart(string[] args)
         {
+            var list = DataAccess.GetServiceList();
             Services = new Services();
-            Services.CreateHost(BaseService());
-            Services.CreateHost(VerifyService());
+            foreach (var info in list)
+            {
+                var service = new ServiceInfo
+                {
+                    BaseAddress = GetAppSetting("Address"),
+                    Port = info.Port ?? GetAppSetting("Port"),
+                    Path = info.Path,
+                    NameSpace = info.NameSpace,
+                    Interface = info.Interface,
+                    ComplyType = info.Service,
+                    ServiceFile = info.ServiceFile
+                };
+                Services.CreateHost(service);
+            }
             Services.StartService();
         }
 
@@ -66,51 +79,6 @@ namespace Insight.WS.Base
             CheckOpenID = bool.Parse(GetAppSetting("CheckOpenID"));
             CheckMachineId = bool.Parse(GetAppSetting("CheckMachineId"));
             Expired = Convert.ToInt32(GetAppSetting("Expired"));
-        }
-
-        /// <summary>
-        /// 初始化基础服务主机
-        /// </summary>
-        /// <returns></returns>
-        private static ServiceInfo BaseService()
-        {
-            var endpoints = new List<EndpointSet>
-            {
-                new EndpointSet {Interface = "IOrganizations", Path = "orgs"},
-                new EndpointSet {Interface = "IUsers", Path = "users"},
-                new EndpointSet {Interface = "IRoles", Path = "roles"},
-                new EndpointSet {Interface = "ICodes", Path = "codes"}
-            };
-            return new ServiceInfo
-            {
-                BaseAddress = GetAppSetting("Address"),
-                Port = GetAppSetting("BasePort"),
-                ServiceFile = "BaseService.dll",
-                NameSpace = "Insight.WS.Base",
-                ComplyType = "BaseService",
-                Endpoints = endpoints
-            };
-        }
-
-        /// <summary>
-        /// 初始化验证服务主机
-        /// </summary>
-        /// <returns></returns>
-        private static ServiceInfo VerifyService()
-        {
-            var endpoints = new List<EndpointSet>
-            {
-                new EndpointSet {Interface = "IVerify"},
-            };
-            return new ServiceInfo
-            {
-                BaseAddress = GetAppSetting("Address"),
-                Port = GetAppSetting("VerifyPort"),
-                ServiceFile = "VerifyService.dll",
-                NameSpace = "Insight.WS.Base",
-                ComplyType = "VerifyService",
-                Endpoints = endpoints
-            };
         }
 
     }

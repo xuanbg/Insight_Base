@@ -14,13 +14,6 @@ namespace Insight.WS.Base
         #region User
 
         /// <summary>
-        /// 为跨域请求设置响应头信息
-        /// </summary>
-        [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
-        [OperationContract]
-        void ResponseOptions();
-
-        /// <summary>
         /// 根据对象实体数据新增一个用户
         /// </summary>
         /// <param name="account">登录账号</param>
