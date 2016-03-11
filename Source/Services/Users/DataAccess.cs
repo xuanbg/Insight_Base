@@ -8,7 +8,7 @@ using static Insight.WS.Base.Common.SqlHelper;
 
 namespace Insight.WS.Base
 {
-    public partial class BaseService
+    public partial class Users
     {
 
         /// <summary>

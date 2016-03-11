@@ -10,14 +10,6 @@ namespace Insight.WS.Base
     [ServiceContract]
     public interface IOrganizations
     {
-
-        /// <summary>
-        /// 为跨域请求设置响应头信息
-        /// </summary>
-        [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
-        [OperationContract]
-        void ResponseOptions();
-
         /// <summary>
         /// 根据对象实体数据新增一个组织机构节点
         /// </summary>
@@ -120,5 +112,13 @@ namespace Insight.WS.Base
         [OperationContract]
         JsonResult GetOtherOrgMember(string id);
 
+        /// <summary>
+        /// 根据用户登录名获取可登录部门列表
+        /// </summary>
+        /// <param name="account">用户登录名</param>
+        /// <returns>JsonResult</returns>
+        [WebGet(UriTemplate = "login?account={account}", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        JsonResult GetLoginDepts(string account);
     }
 }

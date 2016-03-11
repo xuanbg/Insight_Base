@@ -63,6 +63,19 @@
           <Property Name="CreatorUserId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="CreateTime" Type="datetime" Nullable="false" />
         </EntityType>
+        <EntityType Name="SYS_Interface">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="SN" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Port" Type="varchar" MaxLength="8" />
+          <Property Name="Path" Type="varchar" MaxLength="16" />
+          <Property Name="NameSpace" Type="varchar" MaxLength="128" Nullable="false" />
+          <Property Name="Interface" Type="varchar" MaxLength="64" Nullable="false" />
+          <Property Name="Service" Type="varchar" MaxLength="64" Nullable="false" />
+          <Property Name="ServiceFile" Type="nvarchar(max)" Nullable="false" />
+        </EntityType>
         <EntityType Name="SYS_Module">
           <Key>
             <PropertyRef Name="ID" />
@@ -972,6 +985,7 @@
           <EntitySet Name="SYS_Code_Allot" EntityType="Self.SYS_Code_Allot" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SYS_Code_Record" EntityType="Self.SYS_Code_Record" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SYS_Code_Scheme" EntityType="Self.SYS_Code_Scheme" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SYS_Interface" EntityType="Self.SYS_Interface" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SYS_Module" EntityType="Self.SYS_Module" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SYS_ModuleAction" EntityType="Self.SYS_ModuleAction" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SYS_ModuleGroup" EntityType="Self.SYS_ModuleGroup" Schema="dbo" store:Type="Tables" />
@@ -2219,6 +2233,7 @@
             <End Role="SYS_User" EntitySet="SYS_User" />
             <End Role="SYS_Code_Scheme" EntitySet="SYS_Code_Scheme" />
           </AssociationSet>
+          <EntitySet Name="SYS_Interface" EntityType="BaseModel.SYS_Interface" />
         </EntityContainer>
         <EntityType Name="SYS_Allot_Record">
           <Key>
@@ -2460,6 +2475,19 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="SYS_Interface">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="SN" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Port" Type="String" MaxLength="8" FixedLength="false" Unicode="false" />
+          <Property Name="Path" Type="String" MaxLength="16" FixedLength="false" Unicode="false" />
+          <Property Name="NameSpace" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="Interface" Type="String" Nullable="false" MaxLength="64" FixedLength="false" Unicode="false" />
+          <Property Name="Service" Type="String" Nullable="false" MaxLength="64" FixedLength="false" Unicode="false" />
+          <Property Name="ServiceFile" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -2776,6 +2804,20 @@
                 <ScalarProperty Name="SerialFormat" ColumnName="SerialFormat" />
                 <ScalarProperty Name="CodeFormat" ColumnName="CodeFormat" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="SN" ColumnName="SN" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SYS_Interface">
+            <EntityTypeMapping TypeName="BaseModel.SYS_Interface">
+              <MappingFragment StoreEntitySet="SYS_Interface">
+                <ScalarProperty Name="ServiceFile" ColumnName="ServiceFile" />
+                <ScalarProperty Name="Service" ColumnName="Service" />
+                <ScalarProperty Name="Interface" ColumnName="Interface" />
+                <ScalarProperty Name="NameSpace" ColumnName="NameSpace" />
+                <ScalarProperty Name="Path" ColumnName="Path" />
+                <ScalarProperty Name="Port" ColumnName="Port" />
                 <ScalarProperty Name="SN" ColumnName="SN" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>

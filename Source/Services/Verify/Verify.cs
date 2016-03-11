@@ -9,7 +9,7 @@ using static Insight.WS.Base.Common.Util;
 namespace Insight.WS.Base
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
-    public class VerifyService : IVerify
+    public class Verify : IVerify
     {
 
         #region Verify

@@ -76,6 +76,7 @@
         <AssociationConnector Association="BaseModel.FK__SYS_Code___Schem__40257DE4" />
         <AssociationConnector Association="BaseModel.FK__SYS_Code___Creat__30E33A54" />
         <AssociationConnector Association="BaseModel.FK__SYS_Code___Creat__31D75E8D" />
+        <EntityTypeShape EntityType="BaseModel.SYS_Interface" Width="1.5" PointX="0.75" PointY="0.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

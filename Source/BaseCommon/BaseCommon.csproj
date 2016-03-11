@@ -36,6 +36,9 @@
     <Reference Include="EntityFramework">
       <HintPath>..\packages\EntityFramework.dll</HintPath>
     </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\..\..\insight_ws3\Source\packages\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -46,6 +49,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entity\Authority.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SYS_Interface.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="Function\GuidParse.cs" />

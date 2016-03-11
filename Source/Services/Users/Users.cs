@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel;
+using System.ServiceModel.Web;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
 using static Insight.WS.Base.Common.Util;
 
 namespace Insight.WS.Base
 {
-    public partial class BaseService : IUsers
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
+    public partial class Users : IUsers
     {
 
         #region User
