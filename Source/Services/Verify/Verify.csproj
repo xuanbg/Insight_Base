@@ -44,9 +44,9 @@
     <Compile Include="Verify.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\BaseCommon\BaseCommon.csproj">
+    <ProjectReference Include="..\..\Common\Common.csproj">
       <Project>{c4f26dd1-de5a-4773-a789-7823e96ea166}</Project>
-      <Name>BaseCommon</Name>
+      <Name>Common</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>

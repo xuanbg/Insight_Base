@@ -7,12 +7,13 @@ using Insight.WS.Base.Common.Entity;
 namespace Insight.WS.Base
 {
     [ServiceContract]
-    interface IModule
+    interface IModules
     {
         /// <summary>
         /// 获取用户获得授权的所有模块的组信息
         /// </summary>
         /// <returns>JsonResult</returns>
+        [WebGet(UriTemplate = "groups/allow", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult GetModuleGroup();
 
@@ -20,6 +21,7 @@ namespace Insight.WS.Base
         /// 获取用户获得授权的所有模块信息
         /// </summary>
         /// <returns>JsonResult</returns>
+        [WebGet(UriTemplate = "allow", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult GetUserModule();
 
@@ -28,6 +30,7 @@ namespace Insight.WS.Base
         /// </summary>
         /// <param name="id">模块ID</param>
         /// <returns>JsonResult</returns>
+        [WebGet(UriTemplate = "{id}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult GetModuleInfo(string id);
 
@@ -36,6 +39,7 @@ namespace Insight.WS.Base
         /// </summary>
         /// <param name="id">模块ID</param>
         /// <returns>JsonResult</returns>
+        [WebGet(UriTemplate = "{id}/actions", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult GetAction(string id);
 
@@ -43,34 +47,38 @@ namespace Insight.WS.Base
         /// 获取模块有效选项参数
         /// </summary>
         /// <param name="id"></param>
-        /// <returns>SYS_ModuleParam List 参数集合</returns>
+        /// <returns>JsonResult</returns>
+        [WebGet(UriTemplate = "{id}/params", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        List<SYS_ModuleParam> GetModuleParam(string id);
+        JsonResult GetModuleParam(string id);
 
         /// <summary>
         /// 获取模块个人选项参数
         /// </summary>
         /// <param name="id">模块ID</param>
-        /// <returns>SYS_ModuleParam List 参数集合</returns>
+        /// <returns>JsonResult</returns>
+        [WebGet(UriTemplate = "{id}/params/user", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        List<SYS_ModuleParam> GetModuleUserParam(string id);
+        JsonResult GetModuleUserParam(string id);
 
         /// <summary>
         /// 获取模块部门选项参数
         /// </summary>
         /// <param name="id">模块ID</param>
-        /// <returns>SYS_ModuleParam List 参数集合</returns>
+        /// <returns>JsonResult</returns>
+        [WebGet(UriTemplate = "{id}/params/dept", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        List<SYS_ModuleParam> GetModuleDeptParam(string id);
+        JsonResult GetModuleDeptParam(string id);
 
         /// <summary>
         /// 保存模块选项参数
         /// </summary>
         /// <param name="apl">新增参数集合</param>
         /// <param name="upl">更新参数集合</param>
-        /// <returns></returns>
+        /// <returns>JsonResult</returns>
+        [WebInvoke(Method = "POST", UriTemplate = "params", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        bool SaveModuleParam(List<SYS_ModuleParam> apl, List<SYS_ModuleParam> upl);
+        JsonResult SaveModuleParam(List<SYS_ModuleParam> apl, List<SYS_ModuleParam> upl);
 
     }
 }

@@ -77,9 +77,9 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BaseCommon\BaseCommon.csproj">
+    <ProjectReference Include="..\Common\Common.csproj">
       <Project>{c4f26dd1-de5a-4773-a789-7823e96ea166}</Project>
-      <Name>BaseCommon</Name>
+      <Name>Common</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
