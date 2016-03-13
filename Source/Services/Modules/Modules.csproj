@@ -37,20 +37,27 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\..\packages\EntityFramework.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Web" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IModule.cs" />
+    <Compile Include="DataAccess.cs" />
+    <Compile Include="IModules.cs" />
     <Compile Include="Modules.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\BaseCommon\BaseCommon.csproj">
+    <ProjectReference Include="..\..\Common\Common.csproj">
       <Project>{C4F26DD1-DE5A-4773-A789-7823E96EA166}</Project>
-      <Name>BaseCommon</Name>
+      <Name>Common</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>

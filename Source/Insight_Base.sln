@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseCommon", "BaseCommon\BaseCommon.csproj", "{C4F26DD1-DE5A-4773-A789-7823E96EA166}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{C4F26DD1-DE5A-4773-A789-7823E96EA166}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseServer", "BaseServer\BaseServer.csproj", "{3419DA7E-3706-4E91-9821-E66CDE1836CE}"
 EndProject
@@ -20,6 +20,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Verify", "Services\Verify\Verify.csproj", "{B18DFF40-4EB9-4777-B63E-756F36D5C5E2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules", "Services\Modules\Modules.csproj", "{06751A2C-C718-4F53-A9F8-61401BA119D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{2C3E8BD1-E382-4EDC-9545-FC528C524428}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +61,10 @@ Global
 		{06751A2C-C718-4F53-A9F8-61401BA119D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06751A2C-C718-4F53-A9F8-61401BA119D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{06751A2C-C718-4F53-A9F8-61401BA119D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C3E8BD1-E382-4EDC-9545-FC528C524428}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C3E8BD1-E382-4EDC-9545-FC528C524428}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C3E8BD1-E382-4EDC-9545-FC528C524428}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C3E8BD1-E382-4EDC-9545-FC528C524428}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

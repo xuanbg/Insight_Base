@@ -67,5 +67,47 @@ namespace Insight.WS.Base.Common.Entity
     
             return ((IObjectContextAdapter)this).ObjectContext.CreateQuery<Authority>("[BaseEntities].[Authority](@UserId, @DeptId, @ActionId)", userIdParameter, deptIdParameter, actionIdParameter);
         }
+    
+        [DbFunction("BaseEntities", "Get_LoginDept")]
+        public virtual IQueryable<LoginDept> Get_LoginDept(string loginName)
+        {
+            var loginNameParameter = loginName != null ?
+                new ObjectParameter("LoginName", loginName) :
+                new ObjectParameter("LoginName", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.CreateQuery<LoginDept>("[BaseEntities].[Get_LoginDept](@LoginName)", loginNameParameter);
+        }
+    
+        [DbFunction("BaseEntities", "Get_PermAction")]
+        public virtual IQueryable<Nullable<System.Guid>> Get_PermAction(Nullable<System.Guid> moduleId, Nullable<System.Guid> userId, Nullable<System.Guid> orgId)
+        {
+            var moduleIdParameter = moduleId.HasValue ?
+                new ObjectParameter("ModuleId", moduleId) :
+                new ObjectParameter("ModuleId", typeof(System.Guid));
+    
+            var userIdParameter = userId.HasValue ?
+                new ObjectParameter("UserId", userId) :
+                new ObjectParameter("UserId", typeof(System.Guid));
+    
+            var orgIdParameter = orgId.HasValue ?
+                new ObjectParameter("OrgId", orgId) :
+                new ObjectParameter("OrgId", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.CreateQuery<Nullable<System.Guid>>("[BaseEntities].[Get_PermAction](@ModuleId, @UserId, @OrgId)", moduleIdParameter, userIdParameter, orgIdParameter);
+        }
+    
+        [DbFunction("BaseEntities", "Get_PermModule")]
+        public virtual IQueryable<Nullable<System.Guid>> Get_PermModule(Nullable<System.Guid> userId, Nullable<System.Guid> orgId)
+        {
+            var userIdParameter = userId.HasValue ?
+                new ObjectParameter("UserId", userId) :
+                new ObjectParameter("UserId", typeof(System.Guid));
+    
+            var orgIdParameter = orgId.HasValue ?
+                new ObjectParameter("OrgId", orgId) :
+                new ObjectParameter("OrgId", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.CreateQuery<Nullable<System.Guid>>("[BaseEntities].[Get_PermModule](@UserId, @OrgId)", userIdParameter, orgIdParameter);
+        }
     }
 }
