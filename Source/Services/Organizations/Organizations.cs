@@ -182,7 +182,7 @@ namespace Insight.WS.Base
             if (!verify.Successful) return verify;
 
             var data = GetDeptList(account);
-            return data.Rows.Count > 0 ? verify.Success(Serialize(data)) : verify.NoContent();
+            return data.Count > 0 ? verify.Success(Serialize(data)) : verify.NoContent();
         }
 
     }

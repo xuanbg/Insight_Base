@@ -211,10 +211,12 @@ namespace Insight.WS.Base
         /// </summary>
         /// <param name="loginName">用户登录名</param>
         /// <returns>DataTable 可登录部门列表</returns>
-        private DataTable GetDeptList(string loginName)
+        private List<LoginDept> GetDeptList(string loginName)
         {
-            var sql = $"select * from dbo.Get_LoginDept('{loginName}')";
-            return SqlQuery(MakeCommand(sql));
+            using (var context = new BaseEntities())
+            {
+                return context.Get_LoginDept(loginName).ToList();
+            }
         }
 
     }

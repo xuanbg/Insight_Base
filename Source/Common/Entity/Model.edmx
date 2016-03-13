@@ -972,6 +972,40 @@
           <Parameter Name="CodeFormat" Type="nvarchar" Mode="In" />
           <Parameter Name="SerialFormat" Type="nvarchar" Mode="In" />
         </Function>
+        <Function Name="Get_LoginDept" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="LoginName" Type="varchar" Mode="In" />
+          <ReturnType>
+            <CollectionType>
+              <RowType>
+                <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+                <Property Name="FullName" Type="nvarchar" MaxLength="32" />
+              </RowType>
+            </CollectionType>
+          </ReturnType>
+        </Function>
+        <Function Name="Get_PermAction" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="ModuleId" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="UserId" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="OrgId" Type="uniqueidentifier" Mode="In" />
+          <ReturnType>
+            <CollectionType>
+              <RowType>
+                <Property Name="ActionId" Type="uniqueidentifier" Nullable="false" />
+              </RowType>
+            </CollectionType>
+          </ReturnType>
+        </Function>
+        <Function Name="Get_PermModule" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="UserId" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="OrgId" Type="uniqueidentifier" Mode="In" />
+          <ReturnType>
+            <CollectionType>
+              <RowType>
+                <Property Name="ModuleId" Type="uniqueidentifier" />
+              </RowType>
+            </CollectionType>
+          </ReturnType>
+        </Function>
         <Function Name="GetCode" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="SchemeId" Type="uniqueidentifier" Mode="In" />
           <Parameter Name="DeptId" Type="uniqueidentifier" Mode="In" />
@@ -2234,6 +2268,18 @@
             <End Role="SYS_Code_Scheme" EntitySet="SYS_Code_Scheme" />
           </AssociationSet>
           <EntitySet Name="SYS_Interface" EntityType="BaseModel.SYS_Interface" />
+          <FunctionImport Name="Get_LoginDept" IsComposable="true" ReturnType="Collection(BaseModel.LoginDept)">
+          <Parameter Name="LoginName" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="Get_PermAction" IsComposable="true" ReturnType="Collection(Guid)">
+            <Parameter Name="ModuleId" Mode="In" Type="Guid" />
+            <Parameter Name="UserId" Mode="In" Type="Guid" />
+            <Parameter Name="OrgId" Mode="In" Type="Guid" />
+          </FunctionImport>
+          <FunctionImport Name="Get_PermModule" IsComposable="true" ReturnType="Collection(Guid)">
+            <Parameter Name="UserId" Mode="In" Type="Guid" />
+            <Parameter Name="OrgId" Mode="In" Type="Guid" />
+          </FunctionImport>
         </EntityContainer>
         <EntityType Name="SYS_Allot_Record">
           <Key>
@@ -2488,6 +2534,10 @@
           <Property Name="Service" Type="String" Nullable="false" MaxLength="64" FixedLength="false" Unicode="false" />
           <Property Name="ServiceFile" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
         </EntityType>
+        <ComplexType Name="LoginDept">
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="String" Name="FullName" Nullable="true" MaxLength="32" />
+        </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -2823,6 +2873,16 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="Get_LoginDept" FunctionName="BaseModel.Store.Get_LoginDept">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="BaseModel.LoginDept">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="FullName" ColumnName="FullName" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="Get_PermAction" FunctionName="BaseModel.Store.Get_PermAction" />
+          <FunctionImportMapping FunctionImportName="Get_PermModule" FunctionName="BaseModel.Store.Get_PermModule" />
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

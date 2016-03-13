@@ -20,7 +20,7 @@ GO
 
 insert SYS_Interface (Port, Path, NameSpace, Interface, Service, ServiceFile)
 select NULL, NULL, 'Insight.WS.Base', 'IVerify', 'Verify', 'Services\Verify.dll' union all
-select NULL, 'modules', 'Insight.WS.Base', 'IModule', 'Modules', 'Services\Modules.dll' union all
+select NULL, 'modules', 'Insight.WS.Base', 'IModules', 'Modules', 'Services\Modules.dll' union all
 select NULL, 'orgs', 'Insight.WS.Base', 'IOrganizations', 'Organizations', 'Services\Organizations.dll' union all
 select NULL, 'users', 'Insight.WS.Base', 'IUsers', 'Users', 'Services\Users.dll' union all
 select NULL, 'roles', 'Insight.WS.Base', 'IRoles', 'Roles', 'Services\Roles.dll' union all
