@@ -107,7 +107,7 @@ namespace Insight.WS.Base
             if (!verify.Compare(action)) return verify.Result;
 
             var data = GetUserList();
-            return data.Rows.Count > 0 ? verify.Result.Success(data) : verify.Result.NoContent();
+            return data.Any() ? verify.Result.Success(data) : verify.Result.NoContent();
         }
 
         /// <summary>
@@ -243,7 +243,7 @@ namespace Insight.WS.Base
             if (!verify.Compare(action)) return verify.Result;
 
             var id = InsertData(verify.Basis.UserId, group);
-            return id == null ? verify.Result.DataBaseError() : verify.Result.Created();
+            return id == null ? verify.Result.DataBaseError() : verify.Result.Created(id.ToString());
         }
 
         /// <summary>
@@ -263,9 +263,10 @@ namespace Insight.WS.Base
         /// <summary>
         /// 根据对象实体数据更新用户组信息
         /// </summary>
+        /// <param name="id">用户组ID</param>
         /// <param name="group">用户组对象</param>
         /// <returns>JsonResult</returns>
-        public JsonResult UpdateGroup(SYS_UserGroup group)
+        public JsonResult UpdateGroup(string id, SYS_UserGroup @group)
         {
             const string action = "6910FD14-5654-4CF0-B159-8FE1DF68619F";
             var verify = new SessionVerify();
@@ -300,7 +301,7 @@ namespace Insight.WS.Base
             if (!verify.Compare(action)) return verify.Result;
 
             var data = GetGroupList();
-            return data.Rows.Count > 0 ? verify.Result.Success(data) : verify.Result.NoContent();
+            return data.Any() ? verify.Result.Success(data) : verify.Result.NoContent();
         }
 
         /// <summary>
@@ -343,7 +344,7 @@ namespace Insight.WS.Base
             if (!verify.Compare(action)) return verify.Result;
 
             var data = GetMemberList();
-            return data.Rows.Count > 0 ? verify.Result.Success(data) : verify.Result.NoContent();
+            return data.Any() ? verify.Result.Success(data) : verify.Result.NoContent();
         }
 
         /// <summary>

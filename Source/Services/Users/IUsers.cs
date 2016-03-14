@@ -55,7 +55,7 @@ namespace Insight.WS.Base
         /// 获取全部用户
         /// </summary>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "all", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult GetUsers();
 
@@ -132,11 +132,12 @@ namespace Insight.WS.Base
         /// <summary>
         /// 根据对象实体数据更新用户组信息
         /// </summary>
+        /// <param name="id">用户组ID</param>
         /// <param name="group">用户组对象</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "groups", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "groups/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult UpdateGroup(SYS_UserGroup group);
+        JsonResult UpdateGroup(string id, SYS_UserGroup group);
 
         /// <summary>
         /// 根据ID获取用户组对象实体

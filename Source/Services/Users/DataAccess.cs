@@ -124,10 +124,13 @@ namespace Insight.WS.Base
         /// 获取全部用户
         /// </summary>
         /// <returns>DataTable 全部用户结果集</returns>
-        private DataTable GetUserList()
+        private IEnumerable<object> GetUserList()
         {
-            const string sql = "select ID, BuiltIn as 内置, Name as 名称, LoginName as 登录名, Description as 描述, Case Validity when 1 then '正常' else '封禁' end 状态 From SYS_User where Type > 0 order by SN";
-            return SqlQuery(MakeCommand(sql));
+            using (var context = new BaseEntities())
+            {
+                var list = context.SYS_User.Where(u => u.Type > 0).OrderBy(u => u.SN).ToList();
+                return list.Select(u => new {u.ID, u.BuiltIn, u.Name, u.LoginName, u.Description, u.Validity});
+            }
         }
 
         /// <summary>
@@ -193,10 +196,13 @@ namespace Insight.WS.Base
         /// 获取全部用户组
         /// </summary>
         /// <returns>DataTable 全部用户组结果集</returns>
-        private DataTable GetGroupList()
+        private IEnumerable<object> GetGroupList()
         {
-            const string sql = "select ID, BuiltIn as 内置, Name as 组名称, Description as 描述 From SYS_UserGroup where Visible = 1 order by SN";
-            return SqlQuery(MakeCommand(sql));
+            using (var context = new BaseEntities())
+            {
+                var list = context.SYS_UserGroup.Where(g => g.Visible).OrderBy(g => g.SN).ToList();
+                return list.Select(g => new {g.ID, g.BuiltIn, g.Name, g.Description});
+            }
         }
 
         /// <summary>
@@ -237,10 +243,17 @@ namespace Insight.WS.Base
         /// 获取全部用户组的所有成员信息
         /// </summary>
         /// <returns>DataTable 全部用户组成员信息结果集</returns>
-        private DataTable GetMemberList()
+        private IEnumerable<object> GetMemberList()
         {
-            const string sql = "select M.ID, U.Name as 用户名, U.LoginName as 登录名, U.Description as 描述, M.GroupId, M.UserId from SYS_UserGroupMember M join SYS_User U on U.ID = M.UserId order by U.SN";
-            return SqlQuery(MakeCommand(sql));
+            using (var context = new BaseEntities())
+            {
+                var list = from u in context.SYS_User.OrderBy(u => u.SN)
+                           join m in context.SYS_UserGroupMember on u.ID equals m.UserId
+                           join g in context.SYS_UserGroup on m.GroupId equals g.ID
+                           where u.Validity && g.Visible
+                           select new {m.ID, m.GroupId, m.UserId, u.Name, u.LoginName, u.Description};
+                return list.ToList();
+            }
         }
 
         /// <summary>
