@@ -25,6 +25,12 @@ namespace Insight.WS.Base
             const string action = "60D5BE64-0102-4189-A999-96EDAD3DA1B5";
             var verify = new SessionVerify();
 
+            using (var context = new BaseEntities())
+            {
+                var data = context.SYS_User.FirstOrDefault(u => u.LoginName == user.LoginName);
+                if (data != null) return verify.Result.AccountExists();
+            }  
+            
             // 用户注册，验证用户签名
             if (verify.Basis == null)
             {
@@ -32,7 +38,7 @@ namespace Insight.WS.Base
                 var sign = Hash(session.LoginName + user.LoginName + user.Password);
                 if (sign != session.Signature) return verify.Result.InvalidAuth();
 
-                if (!InsertData(user)) return verify.Result.DataBaseError();
+                if (InsertData(user) == null) return verify.Result.DataBaseError();
 
                 // 返回用于验证的Key
                 session.Signature = Hash(account.ToUpper() + user.Password);
@@ -43,7 +49,12 @@ namespace Insight.WS.Base
             // 管理员添加用户，验证管理员身份及鉴权
             if (!verify.Compare(action)) return verify.Result;
 
-            return InsertData(user) ? verify.Result.Created() : verify.Result.DataBaseError();
+            user.ID = Guid.NewGuid();
+            user.Password = Hash("123456");
+            user.Type = 1;
+            user.CreatorUserId = verify.Basis.UserId;
+            var id = InsertData(user);
+            return id == null ? verify.Result.DataBaseError() : verify.Result.Created(id.ToString());
         }
 
         /// <summary>
@@ -57,7 +68,7 @@ namespace Insight.WS.Base
             var verify = new SessionVerify();
             if (!verify.CompareAsID(action, id)) return verify.Result;
 
-            return DeleteUser(verify.Basis.UserId) ? verify.Result : verify.Result.DataBaseError();
+            return DeleteUser(verify.Guid) ? verify.Result : verify.Result.DataBaseError();
         }
 
         /// <summary>
@@ -108,6 +119,21 @@ namespace Insight.WS.Base
 
             var data = GetUserList();
             return data.Any() ? verify.Result.Success(data) : verify.Result.NoContent();
+        }
+
+        /// <summary>
+        /// 获取全部在线用户
+        /// </summary>
+        /// <param name="type">用户类型</param>
+        /// <returns>JsonResult</returns>
+        public JsonResult GetOnlineUsers(string type)
+        {
+            const string action = "331BF752-CDB7-44DE-9631-DF2605BB527E";
+            var verify = new SessionVerify();
+            if (!verify.Compare(action)) return verify.Result;
+
+            var list = SessionManage.GetSessions(Convert.ToInt32(type));
+            return list.Any() ? verify.Result.Success(list) : verify.Result.NoContent();
         }
 
         /// <summary>
@@ -180,7 +206,7 @@ namespace Insight.WS.Base
             var verify = new SessionVerify();
             if (!verify.Compare(action, account)) return verify.Result;
 
-            var reset = Update(verify.Guid, validity);
+            var reset = Update(account, validity);
             if (!reset.HasValue) return verify.Result.NotFound();
 
             if (!reset.Value) return verify.Result.DataBaseError();
@@ -284,10 +310,10 @@ namespace Insight.WS.Base
         {
             const string action = "6910FD14-5654-4CF0-B159-8FE1DF68619F";
             var verify = new SessionVerify();
-            if (!verify.Compare(action)) return verify.Result;
+            if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
             var data = GetGroup(verify.Guid);
-            return data == null ? verify.Result.NoContent() : verify.Result.Success(data);
+            return data == null ? verify.Result.NotFound() : verify.Result.Success(data);
         }
 
         /// <summary>
@@ -359,7 +385,7 @@ namespace Insight.WS.Base
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
             var data = GetOtherUser(verify.Guid);
-            return data.Rows.Count > 0 ? verify.Result.Success(data) : verify.Result.NoContent();
+            return data.Any() ? verify.Result.Success(data) : verify.Result.NoContent();
         }
 
         #endregion

@@ -60,6 +60,15 @@ namespace Insight.WS.Base
         JsonResult GetUsers();
 
         /// <summary>
+        /// 获取全部在线用户
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns>JsonResult</returns>
+        [WebGet(UriTemplate = "online?type={type}", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        JsonResult GetOnlineUsers(string type);
+
+        /// <summary>
         /// 更新指定用户Session的签名
         /// </summary>
         /// <param name="account">登录账号</param>
@@ -83,7 +92,7 @@ namespace Insight.WS.Base
         /// <summary>
         /// 根据用户ID设置用户状态
         /// </summary>
-        /// <param name="account">用户ID</param>
+        /// <param name="account">登录账号</param>
         /// <param name="validity">可用状态</param>
         /// <returns>JsonResult</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "{account}/validity", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]

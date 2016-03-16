@@ -16,10 +16,11 @@ namespace Insight.WS.Base
         /// </summary>
         /// <param name="obj">用户对象</param>
         /// <returns>SqlCommand</returns>
-        private bool InsertData(SYS_User obj)
+        private object InsertData(SYS_User obj)
         {
             var sql = "insert SYS_User (ID, Name, LoginName, Password, PayPassword, OpenId, Description, Type, CreatorUserId) ";
-            sql += "select @ID, @Name, @LoginName, @Password, @PayPassword, @OpenId, @Description, @Type, @CreatorUserId";
+            sql += "select @ID, @Name, @LoginName, @Password, @PayPassword, @OpenId, @Description, @Type, @CreatorUserId;";
+            sql += "select ID From SYS_User where SN = SCOPE_IDENTITY()";
             var parm = new[]
             {
                 new SqlParameter("@ID", SqlDbType.UniqueIdentifier) {Value = obj.ID},
@@ -33,7 +34,7 @@ namespace Insight.WS.Base
                 new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = obj.CreatorUserId},
                 new SqlParameter("@Read", SqlDbType.Int) {Value = 0}
             };
-            return SqlNonQuery(MakeCommand(sql, parm)) > 0;
+            return SqlScalar(MakeCommand(sql, parm));
         }
 
         /// <summary>
@@ -79,10 +80,11 @@ namespace Insight.WS.Base
                 var user = context.SYS_User.SingleOrDefault(u => u.ID == obj.ID);
                 if (user == null) return null;
 
+                user.OpenId = obj.OpenId;
                 user.LoginName = obj.LoginName;
                 user.Name = obj.Name;
+                user.Description = obj.Description;
                 user.Type = obj.Type;
-                user.OpenId = obj.OpenId;
                 return context.SaveChanges() > 0;
             }
         }
@@ -90,14 +92,14 @@ namespace Insight.WS.Base
         /// <summary>
         /// 更新用户状态
         /// </summary>
-        /// <param name="id">用户ID</param>
+        /// <param name="account">用户ID</param>
         /// <param name="validity">是否有效</param>
         /// <returns>bool 是否成功</returns>
-        private bool? Update(Guid id, bool validity)
+        private bool? Update(string account, bool validity)
         {
             using (var context = new BaseEntities())
             {
-                var user = context.SYS_User.SingleOrDefault(u => u.ID == id);
+                var user = context.SYS_User.SingleOrDefault(u => u.LoginName == account);
                 if (user == null) return null;
 
                 if (user.Validity == validity) return true;
@@ -129,7 +131,7 @@ namespace Insight.WS.Base
             using (var context = new BaseEntities())
             {
                 var list = context.SYS_User.Where(u => u.Type > 0).OrderBy(u => u.SN).ToList();
-                return list.Select(u => new {u.ID, u.BuiltIn, u.Name, u.LoginName, u.Description, u.Validity});
+                return list.Select(u => new {u.ID, u.BuiltIn, u.Name, u.LoginName, u.Description, u.Type, u.Validity});
             }
         }
 
@@ -261,11 +263,16 @@ namespace Insight.WS.Base
         /// </summary>
         /// <param name="id">用户组ID</param>
         /// <returns>DataTable 组成员之外所有用户信息结果集</returns>
-        private DataTable GetOtherUser(Guid id)
+        private IEnumerable<object> GetOtherUser(Guid id)
         {
-            var sql = "select U.ID, U.Name as 用户名, U.LoginName as 登录名, U.Description as 描述 from SYS_User U where U.Type > 0 ";
-            sql += $"and not exists (select UserId from SYS_UserGroupMember where UserId = U.ID and GroupId = '{id}') order by U.LoginName";
-            return SqlQuery(MakeCommand(sql));
+            using (var context = new BaseEntities())
+            {
+                var members = from m in context.SYS_UserGroupMember where m.GroupId == id select m.UserId;
+                var list = from u in context.SYS_User
+                           where u.Validity && u.Type > 0 && !members.Any(m => m == u.ID)
+                           select new { u.ID, u.Name, u.LoginName };
+                return list.OrderBy(u => u.LoginName).ToList();
+            }
         }
 
     }
