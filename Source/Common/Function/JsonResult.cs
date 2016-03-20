@@ -125,7 +125,7 @@
             Code = "204";
             Name = "NoContent";
             Message = "无可用内容";
-            Data = "";
+            Data = Util.Serialize(new string[0]);
             return this;
         }
 

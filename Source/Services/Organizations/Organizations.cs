@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.ServiceModel;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
@@ -23,7 +24,9 @@ namespace Insight.WS.Base
             if (!verify.Compare(action)) return verify.Result;
 
             var result = verify.Result;
-            return InsertData(verify.Basis.UserId, org, index) ? result.Created() : result.DataBaseError();
+            org.CreatorUserId = verify.Basis.UserId;
+            var id = InsertData(org, index);
+            return id == null ? result.DataBaseError() : result.Created(id.ToString());
         }
 
         /// <summary>
@@ -35,7 +38,7 @@ namespace Insight.WS.Base
         {
             const string action = "71803766-97FE-4E6E-82DB-D5C90D2B7004";
             var verify = new SessionVerify();
-            if (!verify.Compare(action)) return verify.Result;
+            if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
             return DeleteOrg(verify.Guid) ? verify.Result : verify.Result.DataBaseError();
         }
@@ -44,16 +47,16 @@ namespace Insight.WS.Base
         /// 根据对象实体数据更新组织机构信息
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="obj">组织节点对象</param>
+        /// <param name="org">组织节点对象</param>
         /// <param name="index">原序号</param>
         /// <returns>JsonResult</returns>
-        public JsonResult UpdateOrg(string id, SYS_Organization obj, int index)
+        public JsonResult UpdateOrg(string id, SYS_Organization org, int index)
         {
             const string action = "542D5E28-8102-40C6-9C01-190D13DBF6C6";
             var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
-            return Update(obj) ? verify.Result : verify.Result.DataBaseError();
+            return Update(org, index) ? verify.Result : verify.Result.DataBaseError();
         }
 
         /// <summary>
@@ -82,7 +85,7 @@ namespace Insight.WS.Base
             if (!verify.Compare(action)) return verify.Result;
 
             var data = GetOrgList();
-            return data.Rows.Count > 0 ? verify.Result.Success(Serialize(data)) : verify.Result.NoContent();
+            return data.Any() ? verify.Result.Success(data) : verify.Result.NoContent();
         }
 
         /// <summary>
@@ -96,7 +99,8 @@ namespace Insight.WS.Base
             var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
-            return InsertData(verify.Basis.UserId, org) ? verify.Result : verify.Result.DataBaseError();
+            org.CreatorUserId = verify.Basis.UserId;
+            return InsertData(org) ? verify.Result : verify.Result.DataBaseError();
         }
 
         /// <summary>
@@ -118,15 +122,15 @@ namespace Insight.WS.Base
         /// 根据参数组集合批量插入职位成员关系
         /// </summary>
         /// <param name="id">节点ID</param>
-        /// <param name="uids">用户ID集合</param>
+        /// <param name="ids">用户ID集合</param>
         /// <returns>JsonResult</returns>
-        public JsonResult AddOrgMember(string id, List<Guid> uids)
+        public JsonResult AddOrgMember(string id, List<Guid> ids)
         {
             const string action = "1F29DDEA-A4D7-4EF9-8136-0D4AFE88CB08";
             var verify = new SessionVerify();
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
-            return InsertData(verify.Basis.UserId, verify.Guid, uids) ? verify.Result : verify.Result.DataBaseError();
+            return InsertData(verify.Basis.UserId, verify.Guid, ids) ? verify.Result : verify.Result.DataBaseError();
         }
 
         /// <summary>
@@ -154,7 +158,7 @@ namespace Insight.WS.Base
             if (!verify.Compare(action)) return verify.Result;
 
             var data = GetOrgMemberList();
-            return data.Rows.Count > 0 ? verify.Result.Success(Serialize(data)) : verify.Result.NoContent();
+            return data.Any() ? verify.Result.Success(data) : verify.Result.NoContent();
         }
 
         /// <summary>
@@ -168,7 +172,7 @@ namespace Insight.WS.Base
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
             var data = GetOtherOrgMember(verify.Guid);
-            return data.Rows.Count > 0 ? verify.Result.Success(Serialize(data)) : verify.Result.NoContent();
+            return data.Any() ? verify.Result.Success(data) : verify.Result.NoContent();
         }
 
         /// <summary>

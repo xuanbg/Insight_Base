@@ -17,7 +17,7 @@ RETURNS TABLE AS
 RETURN
 
 --正常职位成员用户
-select D.ID, D.FullName
+select D.ID, D.FullName as Name
 from Sys_User U
 join Sys_OrgMember M on M.UserId = U.ID
 join Sys_Organization P on P.ID = M.OrgId
@@ -26,7 +26,7 @@ join Sys_Organization D on D.ID = P.ParentId
 where U.LoginName = @loginName
 
 union --合并职位成员用户
-select D.ID, D.FullName
+select D.ID, D.FullName as Name
 from Sys_User U
 join Sys_OrgMember M on M.UserId = U.ID
 join Sys_OrgMerger OM on OM.MergerOrgId = M.OrgId

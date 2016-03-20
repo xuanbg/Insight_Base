@@ -90,7 +90,7 @@ namespace Insight.WS.Base
             throw new NotImplementedException();
         }
 
-        public JsonResult SaveModuleParam(List<SYS_ModuleParam> apl, List<SYS_ModuleParam> upl)
+        public JsonResult SaveModuleParam(string id, List<SYS_ModuleParam> apl, List<SYS_ModuleParam> upl)
         {
             throw new NotImplementedException();
         }

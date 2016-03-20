@@ -13,10 +13,10 @@ AS
 
 --正常职位下用户成员
 select PM.ID,
-       U.Name as 用户名,
-       U.LoginName as 登录名,
-       case when U.Validity = 1 then '正常' else '封禁' end as 状态,
-       PM.OrgId as TitleId
+       PM.OrgId as TitleId,
+       U.Name,
+       U.LoginName,
+       U.Validity
 from Sys_User U
 join Sys_OrgMember PM on PM.UserId = U.ID
 join Sys_Organization O on O.ID = PM.OrgId
@@ -24,10 +24,10 @@ join Sys_Organization O on O.ID = PM.OrgId
 
 union --被合并职位下用户成员
 select PM.ID,
-       U.Name as 用户名,
-       U.LoginName as 登录名,
-       case when U.Validity = 1 then '正常' else '封禁' end as 状态,
-       OM.OrgId as TitleId
+       OM.OrgId as TitleId,
+       U.Name,
+       U.LoginName,
+       U.Validity
 from Sys_User U
 join Sys_OrgMember PM on PM.UserId = U.ID
 join Sys_OrgMerger OM on OM.MergerOrgId = PM.OrgId
