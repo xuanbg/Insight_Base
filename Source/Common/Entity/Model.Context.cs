@@ -49,6 +49,8 @@ namespace Insight.WS.Base.Common.Entity
         public virtual DbSet<SYS_Code_Record> SYS_Code_Record { get; set; }
         public virtual DbSet<SYS_Code_Scheme> SYS_Code_Scheme { get; set; }
         public virtual DbSet<SYS_Interface> SYS_Interface { get; set; }
+        public virtual DbSet<OrgInfo> OrgInfo { get; set; }
+        public virtual DbSet<TitleMember> TitleMember { get; set; }
     
         [DbFunction("BaseEntities", "Authority")]
         public virtual IQueryable<Authority> Authority(Nullable<System.Guid> userId, Nullable<System.Guid> deptId, Nullable<System.Guid> actionId)

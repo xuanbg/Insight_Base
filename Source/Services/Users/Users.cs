@@ -17,10 +17,9 @@ namespace Insight.WS.Base
         /// <summary>
         /// 根据对象实体数据新增一个用户
         /// </summary>
-        /// <param name="account">登录账号</param>
         /// <param name="user">用户对象</param>
         /// <returns>JsonResult</returns>
-        public JsonResult AddUser(string account, SYS_User user)
+        public JsonResult AddUser(SYS_User user)
         {
             const string action = "60D5BE64-0102-4189-A999-96EDAD3DA1B5";
             var verify = new SessionVerify();
@@ -41,9 +40,8 @@ namespace Insight.WS.Base
                 if (InsertData(user) == null) return verify.Result.DataBaseError();
 
                 // 返回用于验证的Key
-                session.Signature = Hash(account.ToUpper() + user.Password);
-                session = SessionManage.GetSession(session);
-                return verify.Result.Created(CreateKey(session));
+                var us = SessionManage.GetSession(session);
+                return verify.Result.Created(CreateKey(us));
             }
 
             // 管理员添加用户，验证管理员身份及鉴权

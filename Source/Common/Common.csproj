@@ -46,6 +46,7 @@
     <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entity\Authority.cs">
@@ -54,7 +55,13 @@
     <Compile Include="Entity\LoginDept.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
+    <Compile Include="Entity\OrgInfo.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
     <Compile Include="Entity\SYS_Interface.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\TitleMember.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="Function\GuidParse.cs" />

@@ -33,12 +33,22 @@ namespace Insight.WS.Base
         /// 根据对象实体数据更新组织机构信息
         /// </summary>
         /// <param name="id">节点ID</param>
-        /// <param name="obj">组织节点对象</param>
+        /// <param name="org">组织节点对象</param>
         /// <param name="index">原序号</param>
         /// <returns>JsonResult</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "orgs/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult UpdateOrg(string id, SYS_Organization obj, int index);
+        JsonResult UpdateOrg(string id, SYS_Organization org, int index);
+
+        /// <summary>
+        /// 根据对象实体数据更新组织机构表ParentId字段
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="org">组织节点对象</param>
+        /// <returns>JsonResult</returns>
+        [WebInvoke(Method = "PUT", UriTemplate = "orgs/{id}/parent", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [OperationContract]
+        JsonResult SetOrgParent(string id, SYS_Organization org);
 
         /// <summary>
         /// 根据ID获取机构对象实体
@@ -67,24 +77,14 @@ namespace Insight.WS.Base
         JsonResult AddOrgMerger(SYS_OrgMerger org);
 
         /// <summary>
-        /// 根据对象实体数据更新组织机构表ParentId字段
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="org">组织节点对象</param>
-        /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "orgs/{id}/parent", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
-        [OperationContract]
-        JsonResult SetOrgParent(string id, SYS_Organization org);
-
-        /// <summary>
         /// 根据参数组集合批量插入职位成员关系
         /// </summary>
         /// <param name="id">节点ID</param>
-        /// <param name="uids">用户ID集合</param>
+        /// <param name="ids">用户ID集合</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "orgs/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "orgs/{id}/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult AddOrgMember(string id, List<Guid> uids);
+        JsonResult AddOrgMember(string id, List<Guid> ids);
 
         /// <summary>
         /// 根据ID集合删除职位成员关系

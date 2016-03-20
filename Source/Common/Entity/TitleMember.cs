@@ -10,10 +10,14 @@
 namespace Insight.WS.Base.Common.Entity
 {
     using System;
+    using System.Collections.Generic;
     
-    public partial class LoginDept
+    public partial class TitleMember
     {
         public System.Guid ID { get; set; }
+        public System.Guid TitleId { get; set; }
         public string Name { get; set; }
+        public string LoginName { get; set; }
+        public bool Validity { get; set; }
     }
 }

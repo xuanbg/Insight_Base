@@ -305,6 +305,42 @@
           <Property Name="CreatorUserId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="CreateTime" Type="datetime" Nullable="false" />
         </EntityType>
+        <!--生成过程中发现错误:
+警告 6002: 表/视图“Insight_Base.dbo.OrgInfo”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="OrgInfo">
+          <Key>
+            <PropertyRef Name="ID" />
+            
+            
+            
+            
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="SN" Type="bigint" Nullable="false" />
+          <Property Name="ParentId" Type="uniqueidentifier" />
+          <Property Name="NodeType" Type="int" Nullable="false" />
+          <Property Name="Index" Type="int" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="32" Nullable="false" />
+          <Property Name="FullName" Type="nvarchar" MaxLength="32" />
+          <Property Name="Alias" Type="nvarchar" MaxLength="16" />
+          <Property Name="Code" Type="varchar" MaxLength="32" />
+        </EntityType>
+        <!--生成过程中发现错误:
+警告 6002: 表/视图“Insight_Base.dbo.TitleMember”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="TitleMember">
+          <Key>
+            <PropertyRef Name="ID" />
+            
+            
+            
+            
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="TitleId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="16" Nullable="false" />
+          <Property Name="LoginName" Type="nvarchar" MaxLength="32" Nullable="false" />
+          <Property Name="Validity" Type="bit" Nullable="false" />
+        </EntityType>
         <Association Name="FK__SYS_Allot__Creat__3A6CA48E">
           <End Role="SYS_Organization" Type="Self.SYS_Organization" Multiplicity="0..1" />
           <End Role="SYS_Allot_Record" Type="Self.SYS_Allot_Record" Multiplicity="*" />
@@ -1037,6 +1073,28 @@
           <EntitySet Name="SYS_User" EntityType="Self.SYS_User" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SYS_UserGroup" EntityType="Self.SYS_UserGroup" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SYS_UserGroupMember" EntityType="Self.SYS_UserGroupMember" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="OrgInfo" EntityType="Self.OrgInfo" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [OrgInfo].[ID] AS [ID], 
+    [OrgInfo].[SN] AS [SN], 
+    [OrgInfo].[ParentId] AS [ParentId], 
+    [OrgInfo].[NodeType] AS [NodeType], 
+    [OrgInfo].[Index] AS [Index], 
+    [OrgInfo].[Name] AS [Name], 
+    [OrgInfo].[FullName] AS [FullName], 
+    [OrgInfo].[Alias] AS [Alias], 
+    [OrgInfo].[Code] AS [Code]
+    FROM [dbo].[OrgInfo] AS [OrgInfo]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="TitleMember" EntityType="Self.TitleMember" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [TitleMember].[ID] AS [ID], 
+    [TitleMember].[TitleId] AS [TitleId], 
+    [TitleMember].[Name] AS [Name], 
+    [TitleMember].[LoginName] AS [LoginName], 
+    [TitleMember].[Validity] AS [Validity]
+    FROM [dbo].[TitleMember] AS [TitleMember]</DefiningQuery>
+          </EntitySet>
           <AssociationSet Name="FK__SYS_Allot__Creat__3A6CA48E" Association="Self.FK__SYS_Allot__Creat__3A6CA48E">
             <End Role="SYS_Organization" EntitySet="SYS_Organization" />
             <End Role="SYS_Allot_Record" EntitySet="SYS_Allot_Record" />
@@ -2280,6 +2338,8 @@
             <Parameter Name="UserId" Mode="In" Type="Guid" />
             <Parameter Name="OrgId" Mode="In" Type="Guid" />
           </FunctionImport>
+          <EntitySet Name="OrgInfo" EntityType="BaseModel.OrgInfo" />
+          <EntitySet Name="TitleMember" EntityType="BaseModel.TitleMember" />
         </EntityContainer>
         <EntityType Name="SYS_Allot_Record">
           <Key>
@@ -2536,8 +2596,32 @@
         </EntityType>
         <ComplexType Name="LoginDept">
           <Property Type="Guid" Name="ID" Nullable="false" />
-          <Property Type="String" Name="FullName" Nullable="true" MaxLength="32" />
+          <Property Type="String" Name="Name" Nullable="true" MaxLength="32" />
         </ComplexType>
+        <EntityType Name="OrgInfo">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="SN" Type="Int64" Nullable="false" />
+          <Property Name="ParentId" Type="Guid" />
+          <Property Name="NodeType" Type="Int32" Nullable="false" />
+          <Property Name="Index" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="32" FixedLength="false" Unicode="true" />
+          <Property Name="FullName" Type="String" MaxLength="32" FixedLength="false" Unicode="true" />
+          <Property Name="Alias" Type="String" MaxLength="16" FixedLength="false" Unicode="true" />
+          <Property Name="Code" Type="String" MaxLength="32" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="TitleMember">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="TitleId" Type="Guid" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="16" FixedLength="false" Unicode="true" />
+          <Property Name="LoginName" Type="String" Nullable="false" MaxLength="32" FixedLength="false" Unicode="true" />
+          <Property Name="Validity" Type="Boolean" Nullable="false" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -2877,12 +2961,38 @@
             <ResultMapping>
               <ComplexTypeMapping TypeName="BaseModel.LoginDept">
                 <ScalarProperty Name="ID" ColumnName="ID" />
-                <ScalarProperty Name="FullName" ColumnName="FullName" />
+                <ScalarProperty Name="Name" ColumnName="FullName" />
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
           <FunctionImportMapping FunctionImportName="Get_PermAction" FunctionName="BaseModel.Store.Get_PermAction" />
           <FunctionImportMapping FunctionImportName="Get_PermModule" FunctionName="BaseModel.Store.Get_PermModule" />
+          <EntitySetMapping Name="OrgInfo">
+            <EntityTypeMapping TypeName="BaseModel.OrgInfo">
+              <MappingFragment StoreEntitySet="OrgInfo">
+                <ScalarProperty Name="Code" ColumnName="Code" />
+                <ScalarProperty Name="Alias" ColumnName="Alias" />
+                <ScalarProperty Name="FullName" ColumnName="FullName" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Index" ColumnName="Index" />
+                <ScalarProperty Name="NodeType" ColumnName="NodeType" />
+                <ScalarProperty Name="ParentId" ColumnName="ParentId" />
+                <ScalarProperty Name="SN" ColumnName="SN" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TitleMember">
+            <EntityTypeMapping TypeName="BaseModel.TitleMember">
+              <MappingFragment StoreEntitySet="TitleMember">
+                <ScalarProperty Name="Validity" ColumnName="Validity" />
+                <ScalarProperty Name="LoginName" ColumnName="LoginName" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="TitleId" ColumnName="TitleId" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
