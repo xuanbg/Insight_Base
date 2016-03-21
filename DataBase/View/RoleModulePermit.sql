@@ -12,12 +12,12 @@ CREATE VIEW RoleModulePermit
 AS
 
 with PermModule as (
-select M.ID as ModuleId,
-       M.ModuleGroupId as ParentID,
-       R.ID as RoleId,
+select R.ID as RoleId,
        M.[Index] + 100 as [Index],
-       case when max(isnull(P.Action, -1)) = -1 then 1 else 4 end as Action,
-       M.ApplicationName as Ä£¿é
+       M.ID as ModuleId,
+       M.ModuleGroupId as ParentId,
+       case when max(isnull(P.Action, -1)) = -1 then 1 else 4 end as Type,
+       M.ApplicationName as Module
 from Sys_Role R
 join Sys_Module M on M.ID = M.ID
 join SYS_ModuleAction A on A.ModuleId = M.ID
@@ -27,12 +27,12 @@ where M.ModuleGroupId is not null
 group by M.ID, M.ModuleGroupId, R.ID, M.[Index], M.ApplicationName),
 List as (
 select distinct
-       G.ID as ModuleId,
-       null as ParentID,
        R.ID as RoleId,
        G.[Index],
-       0 as Action,
-       G.Name as Ä£¿é
+       G.ID as ModuleId,
+       null as ParentId,
+       0 as Type,
+       G.Name as Module
 from Sys_Role R
 join Sys_ModuleGroup G on G.ID = G.ID
 join PermModule P on P.ParentID = G.ID

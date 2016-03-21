@@ -51,6 +51,11 @@ namespace Insight.WS.Base.Common.Entity
         public virtual DbSet<SYS_Interface> SYS_Interface { get; set; }
         public virtual DbSet<OrgInfo> OrgInfo { get; set; }
         public virtual DbSet<TitleMember> TitleMember { get; set; }
+        public virtual DbSet<RoleActionPermit> RoleActionPermit { get; set; }
+        public virtual DbSet<RoleMember> RoleMember { get; set; }
+        public virtual DbSet<RoleModulePermit> RoleModulePermit { get; set; }
+        public virtual DbSet<RoleUser> RoleUser { get; set; }
+        public virtual DbSet<RoleDataPermit> RoleDataPermit { get; set; }
     
         [DbFunction("BaseEntities", "Authority")]
         public virtual IQueryable<Authority> Authority(Nullable<System.Guid> userId, Nullable<System.Guid> deptId, Nullable<System.Guid> actionId)

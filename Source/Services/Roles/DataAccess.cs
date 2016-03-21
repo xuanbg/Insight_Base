@@ -11,6 +11,37 @@ namespace Insight.WS.Base
     public partial class Roles
     {
 
+        /// <summary>
+        /// 获取所有角色
+        /// </summary>
+        /// <returns>角色信息结果集</returns>
+        private IEnumerable<object> GetRoles()
+        {
+            using (var context = new BaseEntities())
+            {
+                var members = context.RoleMember;
+                var users = context.RoleUser;
+                var modules = context.RoleModulePermit;
+                var actions = context.RoleActionPermit;
+                var datas = context.RoleDataPermit;
+                var roles = from r in context.SYS_Role.OrderBy(r => r.SN)
+                            where r.Validity
+                            select new
+                            {
+                                r.ID,
+                                r.BuiltIn,
+                                r.Name,
+                                r.Description,
+                                Members = members.Where(m => m.RoleId == r.ID).ToList(),
+                                Users = users.Where(u => u.RoleId == r.ID).ToList(),
+                                Modules = modules.Where(m => m.RoleId == r.ID).ToList(),
+                                Actions = actions.Where(a => a.RoleId == r.ID).ToList(),
+                                Datas = datas.Where(d => d.RoleId == r.ID).ToList()
+                            };
+                return roles.ToList();
+            }
+        }
+
         #region 获取数据
 
         /// <summary>

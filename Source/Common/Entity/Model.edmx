@@ -326,6 +326,92 @@
           <Property Name="Code" Type="varchar" MaxLength="32" />
         </EntityType>
         <!--生成过程中发现错误:
+警告 6002: 表/视图“Insight_Base.dbo.RoleActionPermit”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="RoleActionPermit">
+          <Key>
+            
+            
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Index" Type="int" />
+          <Property Name="ActionId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ParentId" Type="uniqueidentifier" />
+          <Property Name="Type" Type="int" />
+          <Property Name="Action" Type="nvarchar" MaxLength="64" />
+        </EntityType>
+        <!--生成过程中发现错误:
+警告 6002: 表/视图“Insight_Base.dbo.RoleDataPermit”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="RoleDataPermit">
+          <Key>
+            
+            
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Index" Type="int" />
+          <Property Name="DataId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ParentId" Type="uniqueidentifier" />
+          <Property Name="Type" Type="int" />
+          <Property Name="Model" Type="nvarchar" MaxLength="64" />
+          <Property Name="Permit" Type="varchar" MaxLength="4" />
+        </EntityType>
+        <!--生成过程中发现错误:
+警告 6002: 表/视图“Insight_Base.dbo.RoleMember”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="RoleMember">
+          <Key>
+            
+            
+            
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Index" Type="bigint" Nullable="false" />
+          <Property Name="MemberId" Type="uniqueidentifier" />
+          <Property Name="ParentId" Type="uniqueidentifier" />
+          <Property Name="NodeType" Type="int" Nullable="false" />
+          <Property Name="Member" Type="nvarchar" MaxLength="64" />
+        </EntityType>
+        <!--生成过程中发现错误:
+警告 6002: 表/视图“Insight_Base.dbo.RoleModulePermit”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="RoleModulePermit">
+          <Key>
+            
+            
+            
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Index" Type="int" />
+          <Property Name="ModuleId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ParentId" Type="uniqueidentifier" />
+          <Property Name="Type" Type="int" Nullable="false" />
+          <Property Name="Module" Type="nvarchar" MaxLength="64" />
+        </EntityType>
+        <!--生成过程中发现错误:
+警告 6002: 表/视图“Insight_Base.dbo.RoleUser”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="RoleUser">
+          <Key>
+            
+            
+            
+            
+            
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="UserId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="16" Nullable="false" />
+          <Property Name="LoginName" Type="nvarchar" MaxLength="32" Nullable="false" />
+          <Property Name="Description" Type="nvarchar(max)" />
+          <Property Name="Validity" Type="bit" Nullable="false" />
+        </EntityType>
+        <!--生成过程中发现错误:
 警告 6002: 表/视图“Insight_Base.dbo.TitleMember”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
         <EntityType Name="TitleMember">
           <Key>
@@ -1085,6 +1171,62 @@
     [OrgInfo].[Alias] AS [Alias], 
     [OrgInfo].[Code] AS [Code]
     FROM [dbo].[OrgInfo] AS [OrgInfo]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="RoleActionPermit" EntityType="Self.RoleActionPermit" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [RoleActionPermit].[ID] AS [ID], 
+    [RoleActionPermit].[RoleId] AS [RoleId], 
+    [RoleActionPermit].[Index] AS [Index], 
+    [RoleActionPermit].[ActionId] AS [ActionId], 
+    [RoleActionPermit].[ParentId] AS [ParentId], 
+    [RoleActionPermit].[Type] AS [Type], 
+    [RoleActionPermit].[Action] AS [Action]
+    FROM [dbo].[RoleActionPermit] AS [RoleActionPermit]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="RoleDataPermit" EntityType="Self.RoleDataPermit" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [RoleDataPermit].[ID] AS [ID], 
+    [RoleDataPermit].[RoleId] AS [RoleId], 
+    [RoleDataPermit].[Index] AS [Index], 
+    [RoleDataPermit].[DataId] AS [DataId], 
+    [RoleDataPermit].[ParentId] AS [ParentId], 
+    [RoleDataPermit].[Type] AS [Type], 
+    [RoleDataPermit].[Model] AS [Model], 
+    [RoleDataPermit].[Permit] AS [Permit]
+    FROM [dbo].[RoleDataPermit] AS [RoleDataPermit]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="RoleMember" EntityType="Self.RoleMember" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [RoleMember].[ID] AS [ID], 
+    [RoleMember].[RoleId] AS [RoleId], 
+    [RoleMember].[Index] AS [Index], 
+    [RoleMember].[MemberId] AS [MemberId], 
+    [RoleMember].[ParentId] AS [ParentId], 
+    [RoleMember].[NodeType] AS [NodeType], 
+    [RoleMember].[Member] AS [Member]
+    FROM [dbo].[RoleMember] AS [RoleMember]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="RoleModulePermit" EntityType="Self.RoleModulePermit" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [RoleModulePermit].[ID] AS [ID], 
+    [RoleModulePermit].[RoleId] AS [RoleId], 
+    [RoleModulePermit].[Index] AS [Index], 
+    [RoleModulePermit].[ModuleId] AS [ModuleId], 
+    [RoleModulePermit].[ParentId] AS [ParentId], 
+    [RoleModulePermit].[Type] AS [Type], 
+    [RoleModulePermit].[Module] AS [Module]
+    FROM [dbo].[RoleModulePermit] AS [RoleModulePermit]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="RoleUser" EntityType="Self.RoleUser" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [RoleUser].[ID] AS [ID], 
+    [RoleUser].[RoleId] AS [RoleId], 
+    [RoleUser].[UserId] AS [UserId], 
+    [RoleUser].[Name] AS [Name], 
+    [RoleUser].[LoginName] AS [LoginName], 
+    [RoleUser].[Description] AS [Description], 
+    [RoleUser].[Validity] AS [Validity]
+    FROM [dbo].[RoleUser] AS [RoleUser]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="TitleMember" EntityType="Self.TitleMember" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
@@ -2340,6 +2482,11 @@
           </FunctionImport>
           <EntitySet Name="OrgInfo" EntityType="BaseModel.OrgInfo" />
           <EntitySet Name="TitleMember" EntityType="BaseModel.TitleMember" />
+          <EntitySet Name="RoleActionPermit" EntityType="BaseModel.RoleActionPermit" />
+          <EntitySet Name="RoleMember" EntityType="BaseModel.RoleMember" />
+          <EntitySet Name="RoleModulePermit" EntityType="BaseModel.RoleModulePermit" />
+          <EntitySet Name="RoleUser" EntityType="BaseModel.RoleUser" />
+          <EntitySet Name="RoleDataPermit" EntityType="BaseModel.RoleDataPermit" />
         </EntityContainer>
         <EntityType Name="SYS_Allot_Record">
           <Key>
@@ -2621,6 +2768,67 @@
           <Property Name="Name" Type="String" Nullable="false" MaxLength="16" FixedLength="false" Unicode="true" />
           <Property Name="LoginName" Type="String" Nullable="false" MaxLength="32" FixedLength="false" Unicode="true" />
           <Property Name="Validity" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="RoleActionPermit">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="RoleId" Type="Guid" Nullable="false" />
+          <Property Name="Index" Type="Int32" />
+          <Property Name="ActionId" Type="Guid" Nullable="false" />
+          <Property Name="ParentId" Type="Guid" />
+          <Property Name="Type" Type="Int32" />
+          <Property Name="Action" Type="String" MaxLength="64" Unicode="true" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="RoleMember">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="RoleId" Type="Guid" Nullable="false" />
+          <Property Name="Index" Type="Int64" Nullable="false" />
+          <Property Name="MemberId" Type="Guid" />
+          <Property Name="ParentId" Type="Guid" />
+          <Property Name="NodeType" Type="Int32" Nullable="false" />
+          <Property Name="Member" Type="String" MaxLength="64" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="RoleModulePermit">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="RoleId" Type="Guid" Nullable="false" />
+          <Property Name="Index" Type="Int32" />
+          <Property Name="ModuleId" Type="Guid" Nullable="false" />
+          <Property Name="ParentId" Type="Guid" />
+          <Property Name="Type" Type="Int32" Nullable="false" />
+          <Property Name="Module" Type="String" MaxLength="64" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="RoleUser">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="RoleId" Type="Guid" Nullable="false" />
+          <Property Name="UserId" Type="Guid" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="16" FixedLength="false" Unicode="true" />
+          <Property Name="LoginName" Type="String" Nullable="false" MaxLength="32" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Validity" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="RoleDataPermit">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="RoleId" Type="Guid" Nullable="false" />
+          <Property Name="Index" Type="Int32" />
+          <Property Name="DataId" Type="Guid" Nullable="false" />
+          <Property Name="ParentId" Type="Guid" />
+          <Property Name="Type" Type="Int32" />
+          <Property Name="Model" Type="String" MaxLength="64" FixedLength="false" Unicode="true" />
+          <Property Name="Permit" Type="String" MaxLength="4" FixedLength="false" Unicode="false" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -2989,6 +3197,72 @@
                 <ScalarProperty Name="LoginName" ColumnName="LoginName" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="TitleId" ColumnName="TitleId" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RoleActionPermit">
+            <EntityTypeMapping TypeName="BaseModel.RoleActionPermit">
+              <MappingFragment StoreEntitySet="RoleActionPermit">
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="ParentId" ColumnName="ParentId" />
+                <ScalarProperty Name="Action" ColumnName="Action" />
+                <ScalarProperty Name="Index" ColumnName="Index" />
+                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+                <ScalarProperty Name="ActionId" ColumnName="ActionId" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RoleMember">
+            <EntityTypeMapping TypeName="BaseModel.RoleMember">
+              <MappingFragment StoreEntitySet="RoleMember">
+                <ScalarProperty Name="Member" ColumnName="Member" />
+                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+                <ScalarProperty Name="Index" ColumnName="Index" />
+                <ScalarProperty Name="NodeType" ColumnName="NodeType" />
+                <ScalarProperty Name="ParentId" ColumnName="ParentId" />
+                <ScalarProperty Name="MemberId" ColumnName="MemberId" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RoleModulePermit">
+            <EntityTypeMapping TypeName="BaseModel.RoleModulePermit">
+              <MappingFragment StoreEntitySet="RoleModulePermit">
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="ParentId" ColumnName="ParentId" />
+                <ScalarProperty Name="Module" ColumnName="Module" />
+                <ScalarProperty Name="Index" ColumnName="Index" />
+                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+                <ScalarProperty Name="ModuleId" ColumnName="ModuleId" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RoleUser">
+            <EntityTypeMapping TypeName="BaseModel.RoleUser">
+              <MappingFragment StoreEntitySet="RoleUser">
+                <ScalarProperty Name="Validity" ColumnName="Validity" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="LoginName" ColumnName="LoginName" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RoleDataPermit">
+            <EntityTypeMapping TypeName="BaseModel.RoleDataPermit">
+              <MappingFragment StoreEntitySet="RoleDataPermit">
+                <ScalarProperty Name="Model" ColumnName="Model" />
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="Permit" ColumnName="Permit" />
+                <ScalarProperty Name="Index" ColumnName="Index" />
+                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+                <ScalarProperty Name="ParentId" ColumnName="ParentId" />
+                <ScalarProperty Name="DataId" ColumnName="DataId" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>

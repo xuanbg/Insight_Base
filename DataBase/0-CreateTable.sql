@@ -467,7 +467,15 @@ CREATE TRIGGER SYS_OrgMerger_Delete ON SYS_OrgMerger AFTER DELETE AS
 BEGIN
 SET NOCOUNT ON
 
-UPDATE O set Validity = 1 from Deleted D
+UPDATE U set [Index] = U.[Index] + 1 
+  from Deleted D
+  join SYS_Organization O on O.ID = D.MergerOrgId
+  join SYS_Organization U on U.ParentId = O.ParentId
+    and U.[Index] >= O.[Index]
+	and U.Validity = 1
+
+UPDATE O set Validity = 1 
+  from Deleted D
   join SYS_Organization O on O.ID = D.MergerOrgId
 
 END

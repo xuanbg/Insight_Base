@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.ServiceModel;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
@@ -25,14 +26,18 @@ namespace Insight.WS.Base
             throw new NotImplementedException();
         }
 
-        public JsonResult GetRole(string id)
-        {
-            throw new NotImplementedException();
-        }
-
+        /// <summary>
+        /// 获取所有角色
+        /// </summary>
+        /// <returns>JsonResult</returns>
         public JsonResult GetAllRole()
         {
-            throw new NotImplementedException();
+            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
+            var verify = new SessionVerify();
+            if (!verify.Compare(action)) return verify.Result;
+
+            var list = GetRoles();
+            return list.Any() ? verify.Result.Success(list) : verify.Result.NoContent();
         }
 
         public JsonResult AddRoleMember(string id, List<string> tids, List<string> gids, List<string> uids)
