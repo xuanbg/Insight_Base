@@ -2,7 +2,7 @@
 using System.ServiceProcess;
 using System.Windows.Forms;
 using Insight.WS.Base.Common;
-using Insight.WS.Service;
+using Insight.WS.Base.Common.Entity;
 using static Insight.WS.Base.Common.Util;
 
 namespace Insight.WS.Base

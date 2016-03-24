@@ -226,7 +226,6 @@ namespace Insight.WS.Base
             verify.Basis.OpenId = verify.Session.OpenId;
             verify.Basis.MachineId = verify.Session.MachineId;
             verify.Basis.DeptId = verify.Session.DeptId;
-            verify.Basis.DeptName = verify.Session.DeptName;
             verify.Basis.Expired = DateTime.Now.AddHours(Expired);
 
             // 返回用于验证的Key

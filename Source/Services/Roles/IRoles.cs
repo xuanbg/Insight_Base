@@ -18,7 +18,7 @@ namespace Insight.WS.Base
         /// <param name="data">数据授权表</param>
         /// <param name="custom">自定义数据授权表</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "roles", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         JsonResult AddRole(SYS_Role role, DataTable action, DataTable data, DataTable custom);
 
@@ -27,7 +27,7 @@ namespace Insight.WS.Base
         /// </summary>
         /// <param name="id">角色ID</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "DELETE", UriTemplate = "{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "DELETE", UriTemplate = "roles/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         JsonResult RemoveRole(string id);
 
@@ -43,7 +43,7 @@ namespace Insight.WS.Base
         /// <param name="ddt">相对数据授权表</param>
         /// <param name="cdt">绝对数据授权表</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "roles/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         JsonResult EditRole(string id, SYS_Role obj, List<object> adl, List<object> ddl, List<object> cdl, DataTable adt, DataTable ddt, DataTable cdt);
 
@@ -63,7 +63,7 @@ namespace Insight.WS.Base
         /// <param name="gids">用户组ID集合</param>
         /// <param name="uids">用户ID集合</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "{id}/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "roles/{id}/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         JsonResult AddRoleMember(string id, List<string> tids, List<string> gids, List<string> uids);
 
@@ -73,16 +73,16 @@ namespace Insight.WS.Base
         /// <param name="id">角色成员ID</param>
         /// <param name="type">成员类型</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "DELETE", UriTemplate = "{id}/members?type={type}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "DELETE", UriTemplate = "roles/members/{id}?type={type}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult DeleteRoleMember(string id, int type);
+        JsonResult RemoveRoleMember(string id, string type);
 
         /// <summary>
         /// 根据角色ID获取可用的组织机构列表
         /// </summary>
         /// <param name="id">角色ID</param>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "{id}/titles", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "roles/{id}/titles", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult GetMemberOfTitle(string id);
 
@@ -91,7 +91,7 @@ namespace Insight.WS.Base
         /// </summary>
         /// <param name="id">角色ID</param>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "{id}/groups", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "roles/{id}/groups", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult GetMemberOfGroup(string id);
 
@@ -100,7 +100,7 @@ namespace Insight.WS.Base
         /// </summary>
         /// <param name="id">角色ID</param>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "{id}/users", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "roles/{id}/users", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult GetMemberOfUser(string id);
 
@@ -109,7 +109,7 @@ namespace Insight.WS.Base
         /// </summary>
         /// <param name="id">角色ID</param>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "{id}/actions", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "roles/{id}/actions", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult GetRoleActions(string id);
 
@@ -118,33 +118,9 @@ namespace Insight.WS.Base
         /// </summary>
         /// <param name="id">角色ID</param>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "{id}/reldatas", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "roles/{id}/reldatas", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult GetRoleRelData(string id);
-
-        /// <summary>
-        /// 获取角色模块权限授权信息
-        /// </summary>
-        /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "allowmodules", ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        JsonResult GetRoleModulePermit();
-
-        /// <summary>
-        /// 获取角色操作权限授权信息
-        /// </summary>
-        /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "allowactions", ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        JsonResult GetRoleActionPermit();
-
-        /// <summary>
-        /// 获取角色数据权限授权信息
-        /// </summary>
-        /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "allowdatas", ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        JsonResult GetRoleDataPermit();
 
     }
 }

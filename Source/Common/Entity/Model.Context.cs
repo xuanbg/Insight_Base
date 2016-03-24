@@ -116,5 +116,24 @@ namespace Insight.WS.Base.Common.Entity
     
             return ((IObjectContextAdapter)this).ObjectContext.CreateQuery<Nullable<System.Guid>>("[BaseEntities].[Get_PermModule](@UserId, @OrgId)", userIdParameter, orgIdParameter);
         }
+    
+        [DbFunction("BaseEntities", "Get_RoleAction")]
+        public virtual IQueryable<RoleAction> Get_RoleAction(Nullable<System.Guid> roleId)
+        {
+            var roleIdParameter = roleId.HasValue ?
+                new ObjectParameter("RoleId", roleId) :
+                new ObjectParameter("RoleId", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.CreateQuery<RoleAction>("[BaseEntities].[Get_RoleAction](@RoleId)", roleIdParameter);
+        }
+    
+        public virtual ObjectResult<RoleData> Get_RoleData(Nullable<System.Guid> roleId)
+        {
+            var roleIdParameter = roleId.HasValue ?
+                new ObjectParameter("RoleId", roleId) :
+                new ObjectParameter("RoleId", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<RoleData>("Get_RoleData", roleIdParameter);
+        }
     }
 }

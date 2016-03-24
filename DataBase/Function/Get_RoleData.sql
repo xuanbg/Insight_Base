@@ -24,32 +24,32 @@ Mode as (
   select 4 as Mode, '本机构所有' as Name union all
   select 5 as Mode, '本根域所有' as Name),
 Groups as (
-  select ID, null as ParentId, [Index], 0 as Action, Name, null as CheckState, null as Info
+  select ID, null as ParentId, [Index], 0 as Type, Name as Model, 0 as Permit, null as Description
   from SYS_ModuleGroup),
 Modules as (
   select M.ID, case when M.ModuleGroupId is null then M.ParentId else M.ModuleGroupId end as ParentId, isnull(G.[Index], 10) * 10 + M.[Index] as [Index],
-  3 as Action, M.Name + '数据' as Name
+  3 as Type, M.Name + '数据' as Model
   from SYS_Module M
   left join Groups G on G.ID = M.ModuleGroupId
   where M.Type = 1),
 Actions as(
-select case when D.ID is null then newid() else D.ID end as ID, M.ID as ParentId, M.[Index] * 10 + O.Mode as [Index], O.Mode + 4 as Action, O.Name,
-case when D.Permission = 0 then 'Indeterminate' when D.Permission = 1 then 'Checked' end as CheckState,
-case when D.Permission = 0 then '只读' when D.Permission = 1 then '读写' end as Info
+select case when D.ID is null then newid() else D.ID end as ID, M.ID as ParentId, M.[Index] * 10 + O.Mode as [Index], O.Mode + 4 as Type, O.Name as Model,
+case when D.Permission = 0 then null when D.Permission = 1 then 1 else 0 end as Permit,
+case when D.Permission = 0 then '只读' when D.Permission = 1 then '读写' end as Description
 from Modules M
 join Mode O on O.Mode = O.Mode
 left join SYS_RolePerm_Data D on D.ModuleId = M.ID
   and D.RoleId = @RoleId
   and D.Mode = O.Mode)
 
-select *, CheckState as Original from Actions
+select * from Actions
 union all
-select distinct M.*, case when P.ID is not null then 'Checked' end as CheckState, null as Info, case when P.ID is not null then 'Checked' end as Original
+select distinct M.*, case when P.ID is null then 0 else 1 end as Permit, null as Description
 from Modules M
 left join SYS_RolePerm_Data P on P.ModuleId = M.ID
   and P.RoleId = @RoleId
 union all
-select distinct G.*, G.CheckState as Original
+select distinct G.*
 from Groups G
 join Modules M on M.ParentId = G.ID
 order by [Index]

@@ -340,6 +340,7 @@
           <Property Name="ParentId" Type="uniqueidentifier" />
           <Property Name="Type" Type="int" />
           <Property Name="Action" Type="nvarchar" MaxLength="64" />
+          <Property Name="Permit" Type="bit" />
         </EntityType>
         <!--生成过程中发现错误:
 警告 6002: 表/视图“Insight_Base.dbo.RoleDataPermit”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
@@ -356,7 +357,8 @@
           <Property Name="ParentId" Type="uniqueidentifier" />
           <Property Name="Type" Type="int" />
           <Property Name="Model" Type="nvarchar" MaxLength="64" />
-          <Property Name="Permit" Type="varchar" MaxLength="4" />
+          <Property Name="Permit" Type="bit" />
+          <Property Name="Description" Type="varchar" MaxLength="4" />
         </EntityType>
         <!--生成过程中发现错误:
 警告 6002: 表/视图“Insight_Base.dbo.RoleMember”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
@@ -1128,6 +1130,26 @@
             </CollectionType>
           </ReturnType>
         </Function>
+        <Function Name="Get_RoleAction" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="RoleId" Type="uniqueidentifier" Mode="In" />
+          <ReturnType>
+            <CollectionType>
+              <RowType>
+                <Property Name="ID" Type="uniqueidentifier" />
+                <Property Name="ParentId" Type="uniqueidentifier" />
+                <Property Name="ActionId" Type="uniqueidentifier" />
+                <Property Name="Index" Type="int" />
+                <Property Name="Type" Type="int" Nullable="false" />
+                <Property Name="Action" Type="nvarchar" MaxLength="64" />
+                <Property Name="Permit" Type="int" />
+                <Property Name="Description" Type="varchar" MaxLength="4" />
+              </RowType>
+            </CollectionType>
+          </ReturnType>
+        </Function>
+        <Function Name="Get_RoleData" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="RoleId" Type="uniqueidentifier" Mode="In" />
+        </Function>
         <Function Name="GetCode" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="SchemeId" Type="uniqueidentifier" Mode="In" />
           <Parameter Name="DeptId" Type="uniqueidentifier" Mode="In" />
@@ -1180,7 +1202,8 @@
     [RoleActionPermit].[ActionId] AS [ActionId], 
     [RoleActionPermit].[ParentId] AS [ParentId], 
     [RoleActionPermit].[Type] AS [Type], 
-    [RoleActionPermit].[Action] AS [Action]
+    [RoleActionPermit].[Action] AS [Action], 
+    [RoleActionPermit].[Permit] AS [Permit]
     FROM [dbo].[RoleActionPermit] AS [RoleActionPermit]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="RoleDataPermit" EntityType="Self.RoleDataPermit" store:Type="Views" store:Schema="dbo">
@@ -1192,7 +1215,8 @@
     [RoleDataPermit].[ParentId] AS [ParentId], 
     [RoleDataPermit].[Type] AS [Type], 
     [RoleDataPermit].[Model] AS [Model], 
-    [RoleDataPermit].[Permit] AS [Permit]
+    [RoleDataPermit].[Permit] AS [Permit], 
+    [RoleDataPermit].[Description] AS [Description]
     FROM [dbo].[RoleDataPermit] AS [RoleDataPermit]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="RoleMember" EntityType="Self.RoleMember" store:Type="Views" store:Schema="dbo">
@@ -2487,6 +2511,12 @@
           <EntitySet Name="RoleModulePermit" EntityType="BaseModel.RoleModulePermit" />
           <EntitySet Name="RoleUser" EntityType="BaseModel.RoleUser" />
           <EntitySet Name="RoleDataPermit" EntityType="BaseModel.RoleDataPermit" />
+          <FunctionImport Name="Get_RoleAction" IsComposable="true" ReturnType="Collection(BaseModel.RoleAction)">
+          <Parameter Name="RoleId" Mode="In" Type="Guid" />
+          </FunctionImport>
+          <FunctionImport Name="Get_RoleData" ReturnType="Collection(BaseModel.RoleData)">
+          <Parameter Name="RoleId" Mode="In" Type="Guid" />
+          </FunctionImport>
         </EntityContainer>
         <EntityType Name="SYS_Allot_Record">
           <Key>
@@ -2780,6 +2810,7 @@
           <Property Name="ParentId" Type="Guid" />
           <Property Name="Type" Type="Int32" />
           <Property Name="Action" Type="String" MaxLength="64" Unicode="true" FixedLength="false" />
+          <Property Name="Permit" Type="Boolean" />
         </EntityType>
         <EntityType Name="RoleMember">
           <Key>
@@ -2828,8 +2859,28 @@
           <Property Name="ParentId" Type="Guid" />
           <Property Name="Type" Type="Int32" />
           <Property Name="Model" Type="String" MaxLength="64" FixedLength="false" Unicode="true" />
-          <Property Name="Permit" Type="String" MaxLength="4" FixedLength="false" Unicode="false" />
+          <Property Name="Permit" Type="Boolean" />
+          <Property Name="Description" Type="String" MaxLength="4" FixedLength="false" Unicode="false" />
         </EntityType>
+        <ComplexType Name="RoleAction">
+          <Property Type="Guid" Name="ID" Nullable="true" />
+          <Property Type="Guid" Name="ParentId" Nullable="true" />
+          <Property Type="Guid" Name="ActionId" Nullable="true" />
+          <Property Type="Int32" Name="Index" Nullable="true" />
+          <Property Type="Int32" Name="Type" Nullable="false" />
+          <Property Type="String" Name="Action" Nullable="true" MaxLength="64" />
+          <Property Type="Int32" Name="Permit" Nullable="true" />
+          <Property Type="String" Name="Description" Nullable="true" MaxLength="4" />
+        </ComplexType>
+        <ComplexType Name="RoleData">
+          <Property Type="Guid" Name="ID" Nullable="true" />
+          <Property Type="Guid" Name="ParentId" Nullable="true" />
+          <Property Type="Int32" Name="Index" Nullable="true" />
+          <Property Type="Int32" Name="Type" Nullable="true" />
+          <Property Type="String" Name="Model" Nullable="true" MaxLength="64" />
+          <Property Type="Int32" Name="Permit" Nullable="true" />
+          <Property Type="String" Name="Description" Nullable="true" MaxLength="4" />
+        </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -3204,6 +3255,7 @@
           <EntitySetMapping Name="RoleActionPermit">
             <EntityTypeMapping TypeName="BaseModel.RoleActionPermit">
               <MappingFragment StoreEntitySet="RoleActionPermit">
+                <ScalarProperty Name="Permit" ColumnName="Permit" />
                 <ScalarProperty Name="Type" ColumnName="Type" />
                 <ScalarProperty Name="ParentId" ColumnName="ParentId" />
                 <ScalarProperty Name="Action" ColumnName="Action" />
@@ -3256,17 +3308,45 @@
           <EntitySetMapping Name="RoleDataPermit">
             <EntityTypeMapping TypeName="BaseModel.RoleDataPermit">
               <MappingFragment StoreEntitySet="RoleDataPermit">
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Permit" ColumnName="Permit" />
                 <ScalarProperty Name="Model" ColumnName="Model" />
                 <ScalarProperty Name="Type" ColumnName="Type" />
-                <ScalarProperty Name="Permit" ColumnName="Permit" />
-                <ScalarProperty Name="Index" ColumnName="Index" />
-                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
                 <ScalarProperty Name="ParentId" ColumnName="ParentId" />
                 <ScalarProperty Name="DataId" ColumnName="DataId" />
+                <ScalarProperty Name="Index" ColumnName="Index" />
+                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="Get_RoleAction" FunctionName="BaseModel.Store.Get_RoleAction">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="BaseModel.RoleAction">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="ParentId" ColumnName="ParentId" />
+                <ScalarProperty Name="ActionId" ColumnName="ActionId" />
+                <ScalarProperty Name="Index" ColumnName="Index" />
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="Action" ColumnName="Action" />
+                <ScalarProperty Name="Permit" ColumnName="Permit" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="Get_RoleData" FunctionName="BaseModel.Store.Get_RoleData">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="BaseModel.RoleData">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="ParentId" ColumnName="ParentId" />
+                <ScalarProperty Name="Index" ColumnName="Index" />
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="Model" ColumnName="Model" />
+                <ScalarProperty Name="Permit" ColumnName="Permit" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

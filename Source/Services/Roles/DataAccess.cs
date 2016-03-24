@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using Insight.WS.Base.Common.Entity;
 using static Insight.WS.Base.Common.SqlHelper;
@@ -10,6 +8,22 @@ namespace Insight.WS.Base
 {
     public partial class Roles
     {
+        /// <summary>
+        /// 删除指定角色
+        /// </summary>
+        /// <param name="id">角色ID</param>
+        /// <returns>bool 是否成功</returns>
+        private bool? DeleteRole(Guid id)
+        {
+            using (var context = new BaseEntities())
+            {
+                var role = context.SYS_Role.SingleOrDefault(r => r.ID == id && !r.BuiltIn);
+                if (role == null) return null;
+
+                context.SYS_Role.Remove(role);
+                return context.SaveChanges() > 0;
+            }
+        }
 
         /// <summary>
         /// 获取所有角色
@@ -34,172 +48,105 @@ namespace Insight.WS.Base
                                 r.Description,
                                 Members = members.Where(m => m.RoleId == r.ID).ToList(),
                                 Users = users.Where(u => u.RoleId == r.ID).ToList(),
-                                Modules = modules.Where(m => m.RoleId == r.ID).ToList(),
-                                Actions = actions.Where(a => a.RoleId == r.ID).ToList(),
-                                Datas = datas.Where(d => d.RoleId == r.ID).ToList()
+                                Modules = modules.Where(m => m.RoleId == r.ID).OrderBy(m => m.Index).ToList(),
+                                Actions = actions.Where(a => a.RoleId == r.ID).OrderBy(a => a.Index).ToList(),
+                                Datas = datas.Where(d => d.RoleId == r.ID).OrderBy(d => d.Index).ToList()
                             };
                 return roles.ToList();
             }
         }
 
-        #region 获取数据
-
         /// <summary>
-        /// 获取用户获得授权的所有模块的组信息
+        /// 根据成员类型和ID删除角色成员
         /// </summary>
-        /// <param name="us">Session对象实体</param>
-        /// <returns>DataTable 模块组列表</returns>
-        public DataTable GetModuleGroup(Session us)
+        /// <param name="id">角色成员ID</param>
+        /// <param name="type">成员类型</param>
+        /// <returns>bool 是否删除成功</returns>
+        private bool DeleteRoleMember(Guid id, string type)
         {
-            var sql = "select ID, [Index], Name, Icon from SYS_ModuleGroup where ID in ";
-            sql += "(select ModuleGroupId from SYS_Module M join dbo.Get_PermModule(@UserId, @DeptId) P on P.ModuleId = M.ID) ";
-            sql += "order by [Index]";
-            var parm = new[]
-            {
-                new SqlParameter("@UserId", SqlDbType.UniqueIdentifier) {Value = us.UserId},
-                new SqlParameter("@DeptId", SqlDbType.UniqueIdentifier) {Value = us.DeptId}
-            };
-
-            return SqlQuery(MakeCommand(sql, parm));
+            var sql = $"Delete from {(type == "3" ? "SYS_Role_Title" : (type == "2" ? "SYS_Role_UserGroup" : "SYS_Role_User"))} where ID = '{id}'";
+            return SqlNonQuery(MakeCommand(sql)) > 0;
         }
 
         /// <summary>
-        /// 获取用户获得授权的所有模块信息
+        /// 获取非角色成员的组织机构列表
         /// </summary>
-        /// <param name="us">Session对象实体</param>
-        /// <returns>DataTable 模块列表</returns>
-        public DataTable GetUserModule(Session us)
-        {
-            var sql = "select ModuleGroupId, ID, [Index], ProgramName, MainFrom, ApplicationName, Location, [Default], Icon from SYS_Module M ";
-            sql += "join dbo.Get_PermModule(@UserId, @DeptId) P on P.ModuleId = M.ID where M.Validity = 1 order by M.[Index]";
-            var parm = new[]
-            {
-                new SqlParameter("@UserId", SqlDbType.UniqueIdentifier) {Value = us.UserId},
-                new SqlParameter("@DeptId", SqlDbType.UniqueIdentifier) {Value = us.DeptId}
-            };
-
-            return SqlQuery(MakeCommand(sql, parm));
-        }
-
-        /// <summary>
-        /// 根据ID获取模块对象实体
-        /// </summary>
-        /// <param name="us">Session对象实体</param>
-        /// <param name="id">模块ID</param>
-        /// <returns>SYS_Module 模块对象实体</returns>
-        public SYS_Module GetModuleInfo(Session us, Guid id)
+        /// <param name="id">角色ID</param>
+        /// <returns>组织机构集合</returns>
+        private IEnumerable<object> GetOtherTitle(Guid id)
         {
             using (var context = new BaseEntities())
             {
-                return context.SYS_Module.SingleOrDefault(m => m.ID == id);
+                var list = from o in context.OrgInfo
+                           join r in context.SYS_Role_Title.Where(r => r.RoleId == id) on o.ID equals r.OrgId into temp
+                           from t in temp.DefaultIfEmpty()
+                           where t == null
+                           select new { o.ID, o.ParentId, o.Index, o.NodeType, o.Name };
+                return list.OrderBy(o => o.Index).ToList();
             }
         }
 
         /// <summary>
-        /// 获取用户启动模块的工具栏操作信息
+        /// 获取非角色成员的用户组列表
         /// </summary>
-        /// <param name="us">Session对象实体</param>
-        /// <param name="id">模块ID</param>
-        /// <returns>DataTable 工具栏功能列表</returns>
-        public DataTable GetAction(Session us, Guid id)
-        {
-            var sql = "select A.*, cast(case when PA.ActionId is null then 0 else 1 end as bit) as [Enable] from SYS_ModuleAction A ";
-            sql += "left join dbo.Get_PermAction(@ModuleId, @UserId, @DeptId) PA on PA.ActionId = A.ID ";
-            sql += "where A.ModuleId = @ModuleId order by A.[Index]";
-            var parm = new[]
-            {
-                new SqlParameter("@ModuleId", SqlDbType.UniqueIdentifier) {Value = id},
-                new SqlParameter("@UserId", SqlDbType.UniqueIdentifier) {Value = us.UserId},
-                new SqlParameter("@DeptId", SqlDbType.UniqueIdentifier) {Value = us.DeptId}
-            };
-
-            return SqlQuery(MakeCommand(sql, parm));
-        }
-
-        /// <summary>
-        /// 获取模块有效选项参数
-        /// </summary>
-        /// <param name="us">Session对象实体</param>
-        /// <param name="mid"></param>
-        /// <returns>SYS_ModuleParam List 参数集合</returns>
-        public List<SYS_ModuleParam> GetModuleParam(Session us, Guid mid)
-        {
-            var ids = new List<Guid>();
-            List<SYS_ModuleParam> mps;
-            using (var context = new BaseEntities())
-            {
-                mps = context.SYS_ModuleParam.Where(p => p.ModuleId == mid && ((p.OrgId == null && p.UserId == null) || p.OrgId == us.DeptId || p.UserId == us.UserId)).ToList();
-            }
-            foreach (var pam in mps)
-            {
-                // 当前全局选项，判断是否存在同类非全局选项
-                if (pam.OrgId == null && pam.UserId == null && mps.Exists(p => p.ParamId == pam.ParamId && (p.OrgId != null || p.UserId != null)))
-                {
-                    ids.Add(pam.ID);
-                }
-                // 当前部门选项，判断是否存在同类用户选项
-                if (pam.OrgId != null && pam.UserId == null && mps.Exists(p => p.ParamId == pam.ParamId && p.UserId != null))
-                {
-                    ids.Add(pam.ID);
-                }
-            }
-            ids.ForEach(pid => mps.Remove(mps.Find(p => p.ID == pid)));
-            return mps;
-        }
-
-        /// <summary>
-        /// 获取模块个人选项参数
-        /// </summary>
-        /// <param name="us">Session对象实体</param>
-        /// <param name="mid">模块ID</param>
-        /// <returns>SYS_ModuleParam List 参数集合</returns>
-        public List<SYS_ModuleParam> GetModuleUserParam(Session us, Guid mid)
+        /// <param name="id">角色ID</param>
+        /// <returns>用户组集合</returns>
+        private IEnumerable<object> GetOtherGroup(Guid id)
         {
             using (var context = new BaseEntities())
             {
-                return context.SYS_ModuleParam.Where(p => p.ModuleId == mid && p.UserId == us.UserId).ToList();
+                var list = from g in context.SYS_UserGroup.OrderBy(g => g.SN)
+                           join r in context.SYS_Role_UserGroup.Where(r => r.RoleId == id) on g.ID equals r.GroupId into temp
+                           from t in temp.DefaultIfEmpty()
+                           where g.Visible && t == null
+                           select new { g.ID, g.Name, g.Description };
+                return list.ToList();
             }
         }
 
         /// <summary>
-        /// 获取模块部门选项参数
+        /// 获取非角色成员的用户列表
         /// </summary>
-        /// <param name="us">Session对象实体</param>
-        /// <param name="mid">模块ID</param>
-        /// <returns>SYS_ModuleParam List 参数集合</returns>
-        public List<SYS_ModuleParam> GetModuleDeptParam(Session us, Guid mid)
+        /// <param name="id">角色ID</param>
+        /// <returns>用户集合</returns>
+        private IEnumerable<object> GetOtherUser(Guid id)
         {
             using (var context = new BaseEntities())
             {
-                return context.SYS_ModuleParam.Where(p => p.ModuleId == mid && p.OrgId == us.DeptId && p.UserId == null).ToList();
+                var list = from u in context.SYS_User.OrderBy(g => g.SN)
+                           join r in context.SYS_Role_User.Where(r => r.RoleId == id) on u.ID equals r.UserId into temp
+                           from t in temp.DefaultIfEmpty()
+                           where u.Validity && u.Type > 0 && t == null
+                           select new { u.ID, u.Name, u.LoginName, u.Description };
+                return list.ToList();
             }
         }
 
         /// <summary>
-        /// 保存模块选项参数
+        /// 读取指定角色的操作资源集合
         /// </summary>
-        /// <param name="us">Session对象实体</param>
-        /// <param name="apl">新增参数集合</param>
-        /// <param name="upl">更新参数集合</param>
-        /// <returns>bool 是否保存成功</returns>
-        public bool SaveModuleParam(Session us, List<SYS_ModuleParam> apl, List<SYS_ModuleParam> upl)
+        /// <param name="id">角色ID</param>
+        /// <returns>操作资源集合</returns>
+        private IEnumerable<object> GetRoleActions(Guid id)
         {
-            const string sql = "insert SYS_ModuleParam (ModuleId, ParamId, Name, Value, OrgId, UserId, Description) select @ModuleId, @ParamId, @Name, @Value, @OrgId, @UserId, @Description";
-            var cmds = apl.Select(p => new[]
+            using (var context = new BaseEntities())
             {
-                new SqlParameter("@ModuleId", SqlDbType.UniqueIdentifier) {Value = p.ModuleId},
-                new SqlParameter("@ParamId", SqlDbType.UniqueIdentifier) {Value = p.ParamId},
-                new SqlParameter("@Name", p.Name),
-                new SqlParameter("@Value", p.Value),
-                new SqlParameter("@OrgId", SqlDbType.UniqueIdentifier) {Value = p.OrgId},
-                new SqlParameter("@UserId", SqlDbType.UniqueIdentifier) {Value = p.UserId},
-                new SqlParameter("@Description", p.Description)
-            }).Select(parm => MakeCommand(sql, parm)).ToList();
-            cmds.AddRange(upl.Select(p => $"update SYS_ModuleParam set Value = '{p.Value}' where ID = '{p.ID}'").Select(s => MakeCommand(s)));
-            return SqlExecute(cmds);
+                return context.Get_RoleAction(id).OrderBy(a => a.Index).ToList();
+            }
         }
 
-        #endregion
+        /// <summary>
+        /// 读取指定角色的数据资源集合
+        /// </summary>
+        /// <param name="id">角色ID</param>
+        /// <returns>数据资源集合</returns>
+        private IEnumerable<object> GetRoleDatas(Guid id)
+        {
+            using (var context = new BaseEntities())
+            {
+                return context.Get_RoleData(id).OrderBy(d => d.Index).ToList();
+            }
+        }
 
     }
 }

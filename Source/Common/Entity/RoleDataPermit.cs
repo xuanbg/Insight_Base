@@ -21,6 +21,7 @@ namespace Insight.WS.Base.Common.Entity
         public Nullable<System.Guid> ParentId { get; set; }
         public Nullable<int> Type { get; set; }
         public string Model { get; set; }
-        public string Permit { get; set; }
+        public Nullable<bool> Permit { get; set; }
+        public string Description { get; set; }
     }
 }

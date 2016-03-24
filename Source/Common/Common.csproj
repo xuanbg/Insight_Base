@@ -58,7 +58,13 @@
     <Compile Include="Entity\OrgInfo.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
+    <Compile Include="Entity\RoleAction.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
     <Compile Include="Entity\RoleActionPermit.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\RoleData.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="Entity\RoleDataPermit.cs">
@@ -73,6 +79,7 @@
     <Compile Include="Entity\RoleUser.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
+    <Compile Include="Entity\ServiceInfo.cs" />
     <Compile Include="Entity\SYS_Interface.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>

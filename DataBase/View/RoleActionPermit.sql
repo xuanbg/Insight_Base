@@ -32,7 +32,8 @@ select P.RoleId,
        G.ID as ActionId,
        null as ParentId,
        0 as Type,
-       G.Name as Action
+       G.Name as Action,
+       cast(null as bit) as Permit
 from Sys_ModuleGroup G
 join PermModuleGroup P on P.ModuleGroupId = G.ID
 union all
@@ -41,7 +42,8 @@ select P.RoleId,
        M.ID as ActionId,
        M.ModuleGroupId as ParentId,
        1 as Type,
-       M.ApplicationName as Action
+       M.ApplicationName as Action,
+       cast(null as bit) as Permit
 from Sys_Module M
 join PermModule P on P.ModuleId = M.ID
 where M.ModuleGroupId is not null
@@ -51,7 +53,8 @@ select M.RoleId,
        A.ID as ActionId,
        case when A.EntryId is not null then A.EntryId else A.ModuleId end as ParentId,
        case when min(isnull(P.Action, 2)) = 2 then 2 else min(P.Action) + 3 end as Type,
-       A.Alias as Action
+       A.Alias as Action,
+       cast(min(P.Action) as bit) as Permit
 from SYS_ModuleAction A
 join PermModule M on M.ModuleId = A.ModuleId
 left join SYS_RolePerm_Action P on P.ActionId = A.ID
