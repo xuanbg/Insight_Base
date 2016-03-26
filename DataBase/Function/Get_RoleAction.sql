@@ -16,11 +16,11 @@ RETURN
 
 with
 Groups as (
-  select ID, null as ParentId, null as ActionId, [Index], 0 as Type, Name as Action, cast(0 as bit) as Permit, null as Description
+  select ID, null as ParentId, '00000000-0000-0000-0000-000000000000' as ActionId, [Index], 0 as Type, Name as Action, null as Permit, null as Description
   from SYS_ModuleGroup),
 Modules as (
-  select M.ID, case when M.ModuleGroupId is null then M.ParentId else M.ModuleGroupId end as ParentId, null as ActionId, isnull(G.[Index], 10) * 10 + M.[Index] as [Index],
-  1 as Type, M.ApplicationName as Action, case when A.ModuleId is null then 0 else 1 end as Permit, null as Description
+  select M.ID, case when M.ModuleGroupId is null then M.ParentId else M.ModuleGroupId end as ParentId, '00000000-0000-0000-0000-000000000000' as ActionId, isnull(G.[Index], 10) * 10 + M.[Index] as [Index],
+  1 as Type, M.ApplicationName as Action, case when A.ModuleId is not null then 1 end as Permit, null as Description
   from SYS_Module M
   left join Groups G on G.ID = M.ModuleGroupId
   left join(
@@ -31,21 +31,20 @@ Modules as (
   ) A on A.ModuleId = M.ID),
 Actions as (
   select case when P.ID is null then A.ID else P.ID end as ID, ModuleId as ParentId, A.ID as ActionId, M.[Index] * 20 + A.[Index] as [Index], 2 as Type, A.Alias as Action,
-  case when P.Action = 0 then null when P.Action = 1 then 1 else 0 end as Permit,
-  case when P.Action = 0 then '¾Ü¾ø' when P.Action = 1 then 'ÔÊÐí' end as Description
+  P.Action as Permit, case when P.Action = 0 then '¾Ü¾ø' when P.Action = 1 then 'ÔÊÐí' end as Description
   from SYS_ModuleAction A
   join Modules M on M.ID = A.ModuleId
   left join SYS_RolePerm_Action P on P.ActionId = A.ID
     and P.RoleId = @RoleId)
 
 
-select * from Actions
+select *, Permit as state from Actions
 union all
-select distinct M.*
+select distinct M.*, null as state
 from Modules M
 join Actions A on A.ParentId = M.ID
 union all
-select distinct G.*
+select distinct G.*, null as state
 from Groups G
 join Modules M on M.ParentId = G.ID
 join Actions A on A.ParentId = M.ID

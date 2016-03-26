@@ -1137,12 +1137,13 @@
               <RowType>
                 <Property Name="ID" Type="uniqueidentifier" />
                 <Property Name="ParentId" Type="uniqueidentifier" />
-                <Property Name="ActionId" Type="uniqueidentifier" />
+                <Property Name="ActionId" Type="uniqueidentifier" Nullable="false" />
                 <Property Name="Index" Type="int" />
                 <Property Name="Type" Type="int" Nullable="false" />
                 <Property Name="Action" Type="nvarchar" MaxLength="64" />
                 <Property Name="Permit" Type="int" />
                 <Property Name="Description" Type="varchar" MaxLength="4" />
+                <Property Name="state" Type="int" />
               </RowType>
             </CollectionType>
           </ReturnType>
@@ -2862,16 +2863,6 @@
           <Property Name="Permit" Type="Boolean" />
           <Property Name="Description" Type="String" MaxLength="4" FixedLength="false" Unicode="false" />
         </EntityType>
-        <ComplexType Name="RoleAction">
-          <Property Type="Guid" Name="ID" Nullable="true" />
-          <Property Type="Guid" Name="ParentId" Nullable="true" />
-          <Property Type="Guid" Name="ActionId" Nullable="true" />
-          <Property Type="Int32" Name="Index" Nullable="true" />
-          <Property Type="Int32" Name="Type" Nullable="false" />
-          <Property Type="String" Name="Action" Nullable="true" MaxLength="64" />
-          <Property Type="Int32" Name="Permit" Nullable="true" />
-          <Property Type="String" Name="Description" Nullable="true" MaxLength="4" />
-        </ComplexType>
         <ComplexType Name="RoleData">
           <Property Type="Guid" Name="ID" Nullable="true" />
           <Property Type="Guid" Name="ParentId" Nullable="true" />
@@ -2880,6 +2871,18 @@
           <Property Type="String" Name="Model" Nullable="true" MaxLength="64" />
           <Property Type="Int32" Name="Permit" Nullable="true" />
           <Property Type="String" Name="Description" Nullable="true" MaxLength="4" />
+          <Property Type="Int32" Name="state" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="RoleAction">
+          <Property Type="Guid" Name="ID" Nullable="true" />
+          <Property Type="Guid" Name="ParentId" Nullable="true" />
+          <Property Type="Guid" Name="ActionId" Nullable="false" />
+          <Property Type="Int32" Name="Index" Nullable="true" />
+          <Property Type="Int32" Name="Type" Nullable="false" />
+          <Property Type="String" Name="Action" Nullable="true" MaxLength="64" />
+          <Property Type="Int32" Name="Permit" Nullable="true" />
+          <Property Type="String" Name="Description" Nullable="true" MaxLength="4" />
+          <Property Type="Int32" Name="state" Nullable="true" />
         </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
@@ -3331,6 +3334,7 @@
                 <ScalarProperty Name="Action" ColumnName="Action" />
                 <ScalarProperty Name="Permit" ColumnName="Permit" />
                 <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="state" ColumnName="state" />
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
@@ -3344,6 +3348,7 @@
                 <ScalarProperty Name="Model" ColumnName="Model" />
                 <ScalarProperty Name="Permit" ColumnName="Permit" />
                 <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="state" ColumnName="state" />
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>

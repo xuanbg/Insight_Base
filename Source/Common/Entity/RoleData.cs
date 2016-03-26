@@ -20,5 +20,6 @@ namespace Insight.WS.Base.Common.Entity
         public string Model { get; set; }
         public Nullable<int> Permit { get; set; }
         public string Description { get; set; }
+        public Nullable<int> state { get; set; }
     }
 }
