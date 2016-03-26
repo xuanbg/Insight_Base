@@ -10,17 +10,14 @@
 namespace Insight.WS.Base.Common.Entity
 {
     using System;
-    using System.Collections.Generic;
     
     public partial class RoleActionPermit
     {
         public System.Guid ID { get; set; }
-        public System.Guid RoleId { get; set; }
-        public Nullable<int> Index { get; set; }
-        public System.Guid ActionId { get; set; }
         public Nullable<System.Guid> ParentId { get; set; }
+        public Nullable<int> Index { get; set; }
         public Nullable<int> Type { get; set; }
         public string Action { get; set; }
-        public Nullable<bool> Permit { get; set; }
+        public Nullable<int> Permit { get; set; }
     }
 }

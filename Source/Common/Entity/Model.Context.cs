@@ -51,11 +51,8 @@ namespace Insight.WS.Base.Common.Entity
         public virtual DbSet<SYS_Interface> SYS_Interface { get; set; }
         public virtual DbSet<OrgInfo> OrgInfo { get; set; }
         public virtual DbSet<TitleMember> TitleMember { get; set; }
-        public virtual DbSet<RoleActionPermit> RoleActionPermit { get; set; }
         public virtual DbSet<RoleMember> RoleMember { get; set; }
-        public virtual DbSet<RoleModulePermit> RoleModulePermit { get; set; }
         public virtual DbSet<RoleUser> RoleUser { get; set; }
-        public virtual DbSet<RoleDataPermit> RoleDataPermit { get; set; }
     
         [DbFunction("BaseEntities", "Authority")]
         public virtual IQueryable<Authority> Authority(Nullable<System.Guid> userId, Nullable<System.Guid> deptId, Nullable<System.Guid> actionId)
@@ -134,6 +131,36 @@ namespace Insight.WS.Base.Common.Entity
                 new ObjectParameter("RoleId", typeof(System.Guid));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<RoleData>("Get_RoleData", roleIdParameter);
+        }
+    
+        [DbFunction("BaseEntities", "Get_RoleActionPermit")]
+        public virtual IQueryable<RoleActionPermit> Get_RoleActionPermit(Nullable<System.Guid> roleId)
+        {
+            var roleIdParameter = roleId.HasValue ?
+                new ObjectParameter("RoleId", roleId) :
+                new ObjectParameter("RoleId", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.CreateQuery<RoleActionPermit>("[BaseEntities].[Get_RoleActionPermit](@RoleId)", roleIdParameter);
+        }
+    
+        [DbFunction("BaseEntities", "Get_RoleDataPermit")]
+        public virtual IQueryable<RoleDataPermit> Get_RoleDataPermit(Nullable<System.Guid> roleId)
+        {
+            var roleIdParameter = roleId.HasValue ?
+                new ObjectParameter("RoleId", roleId) :
+                new ObjectParameter("RoleId", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.CreateQuery<RoleDataPermit>("[BaseEntities].[Get_RoleDataPermit](@RoleId)", roleIdParameter);
+        }
+    
+        [DbFunction("BaseEntities", "Get_RoleModulePermit")]
+        public virtual IQueryable<RoleModulePermit> Get_RoleModulePermit(Nullable<System.Guid> roleId)
+        {
+            var roleIdParameter = roleId.HasValue ?
+                new ObjectParameter("RoleId", roleId) :
+                new ObjectParameter("RoleId", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.CreateQuery<RoleModulePermit>("[BaseEntities].[Get_RoleModulePermit](@RoleId)", roleIdParameter);
         }
     }
 }

@@ -35,9 +35,6 @@ namespace Insight.WS.Base
             {
                 var members = context.RoleMember;
                 var users = context.RoleUser;
-                var modules = context.RoleModulePermit;
-                var actions = context.RoleActionPermit;
-                var datas = context.RoleDataPermit;
                 var roles = from r in context.SYS_Role.OrderBy(r => r.SN)
                             where r.Validity
                             select new
@@ -48,9 +45,9 @@ namespace Insight.WS.Base
                                 r.Description,
                                 Members = members.Where(m => m.RoleId == r.ID).ToList(),
                                 Users = users.Where(u => u.RoleId == r.ID).ToList(),
-                                Modules = modules.Where(m => m.RoleId == r.ID).OrderBy(m => m.Index).ToList(),
-                                Actions = actions.Where(a => a.RoleId == r.ID).OrderBy(a => a.Index).ToList(),
-                                Datas = datas.Where(d => d.RoleId == r.ID).OrderBy(d => d.Index).ToList()
+                                Modules = context.Get_RoleModulePermit(r.ID).OrderBy(m => m.Index).ToList(),
+                                Actions = context.Get_RoleActionPermit(r.ID).OrderBy(a => a.Index).ToList(),
+                                Datas = context.Get_RoleDataPermit(r.ID).OrderBy(d => d.Index).ToList()
                             };
                 return roles.ToList();
             }

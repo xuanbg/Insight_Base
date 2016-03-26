@@ -28,12 +28,12 @@ Groups as (
   from SYS_ModuleGroup),
 Modules as (
   select M.ID, case when M.ModuleGroupId is null then M.ParentId else M.ModuleGroupId end as ParentId, isnull(G.[Index], 10) * 10 + M.[Index] as [Index],
-  3 as Type, M.Name + '数据' as Model
+  1 as Type, M.Name + '数据' as Model
   from SYS_Module M
   left join Groups G on G.ID = M.ModuleGroupId
   where M.Type = 1),
 Actions as(
-select case when D.ID is null then newid() else D.ID end as ID, M.ID as ParentId, M.[Index] * 10 + O.Mode as [Index], O.Mode + 4 as Type, O.Name as Model,
+select case when D.ID is null then newid() else D.ID end as ID, M.ID as ParentId, M.[Index] * 10 + O.Mode as [Index], O.Mode + 2 as Type, O.Name as Model,
 D.Permission as Permit, case when D.Permission = 0 then '只读' when D.Permission = 1 then '读写' end as Description
 from Modules M
 join Mode O on O.Mode = O.Mode

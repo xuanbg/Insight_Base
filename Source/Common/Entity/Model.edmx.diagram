@@ -79,11 +79,8 @@
         <EntityTypeShape EntityType="BaseModel.SYS_Interface" Width="1.5" PointX="0.75" PointY="0.75" />
         <EntityTypeShape EntityType="BaseModel.OrgInfo" Width="1.5" PointX="0.75" PointY="3.625" />
         <EntityTypeShape EntityType="BaseModel.TitleMember" Width="1.5" PointX="2.625" PointY="0.75" />
-        <EntityTypeShape EntityType="BaseModel.RoleActionPermit" Width="1.5" PointX="4.5" PointY="3.625" />
         <EntityTypeShape EntityType="BaseModel.RoleMember" Width="1.5" PointX="4.5" PointY="0.75" />
-        <EntityTypeShape EntityType="BaseModel.RoleModulePermit" Width="1.5" PointX="2.625" PointY="3.625" />
         <EntityTypeShape EntityType="BaseModel.RoleUser" Width="1.5" PointX="6.375" PointY="0.75" />
-        <EntityTypeShape EntityType="BaseModel.RoleDataPermit" Width="1.5" PointX="6.375" PointY="3.625" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
