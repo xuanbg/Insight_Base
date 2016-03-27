@@ -24,16 +24,16 @@ Mode as (
   select 4 as Mode, '本机构所有' as Name union all
   select 5 as Mode, '本根域所有' as Name),
 Groups as (
-  select ID, null as ParentId, [Index], 0 as Type, Name as Model, null as Permit, null as Description
+  select ID, null as ParentId, [Index], 0 as Type, Name, null as Permit, null as Description
   from SYS_ModuleGroup),
 Modules as (
-  select M.ID, case when M.ModuleGroupId is null then M.ParentId else M.ModuleGroupId end as ParentId, isnull(G.[Index], 10) * 10 + M.[Index] as [Index],
-  1 as Type, M.Name + '数据' as Model
+  select M.ID, M.ModuleGroupId as ParentId, isnull(G.[Index], 10) * 10 + M.[Index] as [Index],
+  1 as Type, M.Name + '数据' as Name
   from SYS_Module M
-  left join Groups G on G.ID = M.ModuleGroupId
+  join Groups G on G.ID = M.ModuleGroupId
   where M.Type = 1),
 Actions as(
-select case when D.ID is null then newid() else D.ID end as ID, M.ID as ParentId, M.[Index] * 10 + O.Mode as [Index], O.Mode + 2 as Type, O.Name as Model,
+select case when D.ID is null then newid() else D.ID end as ID, M.ID as ParentId, M.[Index] * 10 + O.Mode as [Index], O.Mode + 2 as Type, O.Name,
 D.Permission as Permit, case when D.Permission = 0 then '只读' when D.Permission = 1 then '读写' end as Description
 from Modules M
 join Mode O on O.Mode = O.Mode

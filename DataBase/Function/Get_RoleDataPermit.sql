@@ -19,7 +19,7 @@ select distinct
        null as ParentId,
        G.[Index],
        0 as Type,
-       G.Name as Model,
+       G.Name,
        null as Permit,
 	   null as Description
 from SYS_ModuleGroup G
@@ -32,7 +32,7 @@ select distinct
        null as ParentId,
        G.[Index],
        0 as Type,
-       G.Name as Model,
+       G.Name,
        null as Permit,
 	   null as Description
 from SYS_ModuleGroup G
@@ -42,10 +42,10 @@ join SYS_RolePerm_DataAbs A on A.ModuleId = M.ID
 union
 select distinct
        M.ID,
-       case when M.ModuleGroupId is null then M.ParentId else M.ModuleGroupId end as ParentId,
+       M.ModuleGroupId as ParentId,
        M.[Index] + 100 as [Index],
        1 as Type,
-       M.Name + '数据' as Model,
+       M.Name + '数据' as Name,
        null as Permit,
 	   null as Description
 from SYS_Module M
@@ -54,10 +54,10 @@ join SYS_RolePerm_Data D on D.ModuleId = M.ID
 union
 select distinct
        M.ID,
-       case when M.ModuleGroupId is null then M.ParentId else M.ModuleGroupId end as ParentId,
+       M.ModuleGroupId as ParentId,
        M.[Index] + 100 as [Index],
        1 as Type,
-       M.Name + '数据' as Model,
+       M.Name + '数据' as Name,
        null as Permit,
 	   null as Description
 from SYS_Module M
@@ -68,7 +68,7 @@ select D.ID,
        D.ModuleId as ParentId,
        D.Mode + 201 as [Index],
        D.Mode + 2 as Type,
-       case D.Mode when 0 then '无归属' when 1 then '仅本人' when 2 then '仅本部门' when 3 then '本部门所有' when 4 then '本机构所有' when 5 then '本根域所有' end as Model,
+       case D.Mode when 0 then '无归属' when 1 then '仅本人' when 2 then '仅本部门' when 3 then '本部门所有' when 4 then '本机构所有' when 5 then '本根域所有' end as Name,
        D.Permission as Permit,
 	   case D.Permission when 0 then '只读' when 1 then '读写' else null end as Description
 from SYS_RolePerm_Data D
@@ -78,7 +78,7 @@ select A.ID,
        A.ModuleId as ParentId,
        300 as [Index],
        4 as Type,
-       O.FullName as Model,
+       O.FullName as Name,
        A.Permission as Permit,
 	   case A.Permission when 0 then '只读' when 1 then '读写' else null end as Description
 from SYS_RolePerm_DataAbs A
@@ -90,7 +90,7 @@ select A.ID,
        A.ModuleId as ParentId,
        301 as [Index],
        3 as Type,
-       U.Name + '(' + U.LoginName + ')' as Model,
+       U.Name + '(' + U.LoginName + ')' as Name,
        A.Permission as Permit,
 	   case A.Permission when 0 then '只读' when 1 then '读写' else null end as Description
 from SYS_RolePerm_DataAbs A

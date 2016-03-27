@@ -13,14 +13,13 @@ namespace Insight.WS.Base.Common.Entity
     
     public partial class RoleAction
     {
-        public Nullable<System.Guid> ID { get; set; }
+        public System.Guid ID { get; set; }
         public Nullable<System.Guid> ParentId { get; set; }
-        public System.Guid ActionId { get; set; }
         public Nullable<int> Index { get; set; }
         public int Type { get; set; }
-        public string Action { get; set; }
         public Nullable<int> Permit { get; set; }
         public string Description { get; set; }
         public Nullable<int> state { get; set; }
+        public string Name { get; set; }
     }
 }

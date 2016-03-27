@@ -152,15 +152,5 @@ namespace Insight.WS.Base.Common.Entity
     
             return ((IObjectContextAdapter)this).ObjectContext.CreateQuery<RoleDataPermit>("[BaseEntities].[Get_RoleDataPermit](@RoleId)", roleIdParameter);
         }
-    
-        [DbFunction("BaseEntities", "Get_RoleModulePermit")]
-        public virtual IQueryable<RoleModulePermit> Get_RoleModulePermit(Nullable<System.Guid> roleId)
-        {
-            var roleIdParameter = roleId.HasValue ?
-                new ObjectParameter("RoleId", roleId) :
-                new ObjectParameter("RoleId", typeof(System.Guid));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.CreateQuery<RoleModulePermit>("[BaseEntities].[Get_RoleModulePermit](@RoleId)", roleIdParameter);
-        }
     }
 }

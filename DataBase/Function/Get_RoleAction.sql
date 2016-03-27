@@ -16,13 +16,13 @@ RETURN
 
 with
 Groups as (
-  select ID, null as ParentId, '00000000-0000-0000-0000-000000000000' as ActionId, [Index], 0 as Type, Name as Action, null as Permit, null as Description
+  select ID, null as ParentId, [Index], 0 as Type, Name, null as Permit, null as Description
   from SYS_ModuleGroup),
 Modules as (
-  select M.ID, case when M.ModuleGroupId is null then M.ParentId else M.ModuleGroupId end as ParentId, '00000000-0000-0000-0000-000000000000' as ActionId, isnull(G.[Index], 10) * 10 + M.[Index] as [Index],
-  1 as Type, M.ApplicationName as Action, case when A.ModuleId is not null then 1 end as Permit, null as Description
+  select M.ID, G.ID as ParentId, isnull(G.[Index], 10) * 10 + M.[Index] as [Index],
+  1 as Type, M.ApplicationName as Name, case when A.ModuleId is not null then 1 end as Permit, null as Description
   from SYS_Module M
-  left join Groups G on G.ID = M.ModuleGroupId
+  join Groups G on G.ID = M.ModuleGroupId
   left join(
   select distinct A.ModuleId
   from SYS_ModuleAction A
@@ -30,12 +30,11 @@ Modules as (
     and P.RoleId = @RoleId
   ) A on A.ModuleId = M.ID),
 Actions as (
-  select case when P.ID is null then A.ID else P.ID end as ID, ModuleId as ParentId, A.ID as ActionId, M.[Index] * 20 + A.[Index] as [Index], 2 as Type, A.Alias as Action,
+  select A.ID, M.ID as ParentId, M.[Index] * 20 + A.[Index] as [Index], 2 as Type, A.Alias as Name,
   P.Action as Permit, case when P.Action = 0 then '¾Ü¾ø' when P.Action = 1 then 'ÔÊÐí' end as Description
   from SYS_ModuleAction A
   join Modules M on M.ID = A.ModuleId
-  left join SYS_RolePerm_Action P on P.ActionId = A.ID
-    and P.RoleId = @RoleId)
+  left join SYS_RolePerm_Action P on P.ActionId = A.ID)
 
 
 select *, Permit as state from Actions

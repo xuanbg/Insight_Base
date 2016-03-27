@@ -73,9 +73,6 @@
     <Compile Include="Entity\RoleMember.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
-    <Compile Include="Entity\RoleModulePermit.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
     <Compile Include="Entity\RoleUser.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>

@@ -45,7 +45,6 @@ namespace Insight.WS.Base
                                 r.Description,
                                 Members = members.Where(m => m.RoleId == r.ID).ToList(),
                                 Users = users.Where(u => u.RoleId == r.ID).ToList(),
-                                Modules = context.Get_RoleModulePermit(r.ID).OrderBy(m => m.Index).ToList(),
                                 Actions = context.Get_RoleActionPermit(r.ID).OrderBy(a => a.Index).ToList(),
                                 Datas = context.Get_RoleDataPermit(r.ID).OrderBy(d => d.Index).ToList()
                             };
