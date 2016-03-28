@@ -54,7 +54,10 @@ namespace Insight.WS.Base
             var verify = new SessionVerify();
             if (!verify.Compare(action)) return verify.Result;
 
-            return Update(verify.Basis.UserId, role) ? verify.Result : verify.Result.DataBaseError();
+            var result = Update(verify.Basis.UserId, role);
+            if (result == null) return verify.Result.NotFound();
+
+            return result.Value ? verify.Result : verify.Result.DataBaseError();
         }
 
         /// <summary>

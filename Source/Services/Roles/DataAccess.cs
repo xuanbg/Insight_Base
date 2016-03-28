@@ -86,58 +86,78 @@ namespace Insight.WS.Base
         /// <param name="uid">用户ID</param>
         /// <param name="role">RoleInfo</param>
         /// <returns>是否成功</returns>
-        private bool Update(Guid uid, RoleInfo role)
+        private bool? Update(Guid uid, RoleInfo role)
         {
-            var asql = "insert SYS_RolePerm_Action(RoleId, ActionId, Action, CreatorUserId) ";
-            asql += "select @RoleId, @ActionId, @Action, @CreatorUserId";
-            var actions = from a in role.Actions.Where(a => !a.state.HasValue)
-                select new[]
-                {
-                    new SqlParameter("@RoleId", SqlDbType.UniqueIdentifier) {Value = role.ID},
-                    new SqlParameter("@ActionId", SqlDbType.UniqueIdentifier) {Value = a.ID},
-                    new SqlParameter("@Action", a.Permit),
-                    new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = uid},
-                    new SqlParameter("@Read", SqlDbType.Int) {Value = 0}
-                }
-                into p
-                select MakeCommand(asql, p);
-
-            var dsql = "insert SYS_RolePerm_Data(RoleId, ModuleId, Mode, Permission, CreatorUserId) ";
-            dsql += "select @RoleId, @ModuleId, @Mode, @Permission, @CreatorUserId";
-            var datas = from d in role.Datas.Where(d => !d.state.HasValue)
-                select new[]
-                {
-                    new SqlParameter("@RoleId", SqlDbType.UniqueIdentifier) {Value = role.ID},
-                    new SqlParameter("@ModuleId", SqlDbType.UniqueIdentifier) {Value = d.ParentId},
-                    new SqlParameter("@Mode", d.Type - 2),
-                    new SqlParameter("@Permission", d.Permit),
-                    new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = uid},
-                    new SqlParameter("@Read", SqlDbType.Int) {Value = 0}
-                }
-                into p
-                select MakeCommand(dsql, p);
-
-            const string sql = "update SYS_Role set Name = @Name, Description = @Description where ID = @ID";
-            var parm = new[]
+            using (var context = new BaseEntities())
             {
-                new SqlParameter("@Name", role.Name),
-                new SqlParameter("@Description", role.Description),
-                new SqlParameter("@ID", SqlDbType.UniqueIdentifier) {Value = role.ID}
-            };
-            var cmds = new List<SqlCommand> { MakeCommand(sql, parm) };
-            cmds.AddRange(actions);
-            cmds.AddRange(datas);
+                var sr = context.SYS_Role.SingleOrDefault(r => r.ID == role.ID);
+                if (sr == null) return null;
 
-            var alist = role.Actions.Where(a => !a.Permit.HasValue).ToList();
-            alist.ForEach(a => cmds.Add(MakeCommand($"delete SYS_RolePerm_Action where RoleId = {role.ID} and ActionId = '{a.ID}'")));
-            alist = role.Actions.Where(a => a.Permit.HasValue && a.state.HasValue && a.Permit != a.state).ToList();
-            alist.ForEach(a => cmds.Add(MakeCommand($"update SYS_RolePerm_Action set Action = {a.Permit} where RoleId = {role.ID} and ActionId = '{a.ID}'")));
-            var dlist = role.Datas.Where(d => !d.Permit.HasValue).ToList();
-            dlist.ForEach(d => cmds.Add(MakeCommand($"delete SYS_RolePerm_Data where RoleId = {role.ID} and ModuleId = '{d.ParentId}'")));
-            dlist = role.Datas.Where(d => d.Permit.HasValue && d.state.HasValue && d.Permit != d.state).ToList();
-            dlist.ForEach(d => cmds.Add(MakeCommand($"update SYS_RolePerm_Data set Permission = {d.Permit} where RoleId = {role.ID} and ModuleId = '{d.ParentId}'")));
+                sr.Name = role.Name;
+                sr.Description = role.Description;
+                foreach (var action in role.Actions)
+                {
+                    var pa = context.SYS_RolePerm_Action.SingleOrDefault(p => p.RoleId == role.ID && p.ActionId == action.ID);
+                    if (pa == null && action.Permit.HasValue && !action.state.HasValue)
+                    {
+                        var ia = new SYS_RolePerm_Action
+                        {
+                            ID = Guid.NewGuid(),
+                            RoleId = role.ID,
+                            ActionId = action.ID,
+                            Action = action.Permit.Value,
+                            CreatorUserId = uid,
+                            CreateTime = DateTime.Now
+                        };
+                        context.SYS_RolePerm_Action.Add(ia);
+                        continue;
+                    }
 
-            return SqlExecute(cmds);
+                    if (pa == null) return null;
+
+                    if (action.Permit.HasValue)
+                    {
+                        pa.Action = action.Permit.Value;
+                    }
+                    else
+                    {
+                        context.SYS_RolePerm_Action.Remove(pa);
+                    }
+                }
+
+                foreach (var data in role.Datas)
+                {
+                    var pd = context.SYS_RolePerm_Data.SingleOrDefault(p => p.ID == data.ID);
+                    if (pd == null && data.Permit.HasValue && !data.state.HasValue)
+                    {
+                        // ReSharper disable once PossibleInvalidOperationException
+                        var id = new SYS_RolePerm_Data
+                        {
+                            ID = Guid.NewGuid(),
+                            RoleId = role.ID,
+                            ModuleId = data.ParentId.Value,
+                            Mode = data.Type - 2,
+                            Permission = data.Permit.Value,
+                            CreatorUserId = uid,
+                            CreateTime = DateTime.Now
+                        };
+                        context.SYS_RolePerm_Data.Add(id);
+                        continue;
+                    }
+
+                    if (pd == null) return null;
+
+                    if (data.Permit.HasValue)
+                    {
+                        pd.Permission = data.Permit.Value;
+                    }
+                    else
+                    {
+                        context.SYS_RolePerm_Data.Remove(pd);
+                    }
+                }
+                return context.SaveChanges() > 0;
+            }
         }
 
         /// <summary>

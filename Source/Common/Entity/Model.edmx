@@ -2769,7 +2769,7 @@
           <Property Type="Guid" Name="ID" Nullable="true" />
           <Property Type="Guid" Name="ParentId" Nullable="true" />
           <Property Type="Int32" Name="Index" Nullable="true" />
-          <Property Type="Int32" Name="Type" Nullable="true" />
+          <Property Type="Int32" Name="Type" Nullable="false" />
           <Property Type="Int32" Name="Permit" Nullable="true" />
           <Property Type="String" Name="Description" Nullable="true" MaxLength="4" />
           <Property Type="Int32" Name="state" Nullable="true" />
