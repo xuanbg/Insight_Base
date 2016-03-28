@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Data;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using Insight.WS.Base.Common;
@@ -13,14 +12,11 @@ namespace Insight.WS.Base
         /// <summary>
         /// 新增角色
         /// </summary>
-        /// <param name="role">角色对象实体</param>
-        /// <param name="action">功能授权表</param>
-        /// <param name="data">数据授权表</param>
-        /// <param name="custom">自定义数据授权表</param>
+        /// <param name="role">RoleInfo</param>
         /// <returns>JsonResult</returns>
         [WebInvoke(Method = "POST", UriTemplate = "roles", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult AddRole(SYS_Role role, DataTable action, DataTable data, DataTable custom);
+        JsonResult AddRole(RoleInfo role);
 
         /// <summary>
         /// 根据ID删除角色
@@ -35,17 +31,11 @@ namespace Insight.WS.Base
         /// 编辑角色
         /// </summary>
         /// <param name="id">角色ID</param>
-        /// <param name="obj">角色对象实体</param>
-        /// <param name="adl">功能删除列表</param>
-        /// <param name="ddl">相对数据授权删除列表</param>
-        /// <param name="cdl">绝对数据授权删除列表</param>
-        /// <param name="adt">功能授权表</param>
-        /// <param name="ddt">相对数据授权表</param>
-        /// <param name="cdt">绝对数据授权表</param>
+        /// <param name="role">RoleInfo</param>
         /// <returns>JsonResult</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "roles/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult EditRole(string id, SYS_Role obj, List<object> adl, List<object> ddl, List<object> cdl, DataTable adt, DataTable ddt, DataTable cdt);
+        JsonResult EditRole(string id, RoleInfo role);
 
         /// <summary>
         /// 获取所有角色

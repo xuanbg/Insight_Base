@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using Insight.WS.Base.Common.Entity;
 using static Insight.WS.Base.Common.SqlHelper;
@@ -8,6 +10,59 @@ namespace Insight.WS.Base
 {
     public partial class Roles
     {
+        /// <summary>
+        /// 将角色数据插入数据库
+        /// </summary>
+        /// <param name="uid">用户ID</param>
+        /// <param name="role">RoleInfo</param>
+        /// <returns>角色ID</returns>
+        private object InsertData(Guid uid, RoleInfo role)
+        {
+            var asql = "insert SYS_RolePerm_Action(RoleId, ActionId, Action, CreatorUserId) ";
+            asql += "select @RoleId, @ActionId, @Action, @CreatorUserId";
+            var actions = from a in role.Actions
+                select new[]
+                {
+                    new SqlParameter("@RoleId", SqlDbType.UniqueIdentifier) {Value = role.ID},
+                    new SqlParameter("@ActionId", SqlDbType.UniqueIdentifier) {Value = a.ID},
+                    new SqlParameter("@Action", a.Permit),
+                    new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = uid},
+                    new SqlParameter("@Read", SqlDbType.Int) {Value = 0}
+                }
+                into p
+                select MakeCommand(asql, p);
+
+            var dsql = "insert SYS_RolePerm_Data(RoleId, ModuleId, Mode, Permission, CreatorUserId) ";
+            dsql += "select @RoleId, @ModuleId, @Mode, @Permission, @CreatorUserId";
+            var datas = from d in role.Datas
+                select new[]
+                {
+                    new SqlParameter("@RoleId", SqlDbType.UniqueIdentifier) {Value = role.ID},
+                    new SqlParameter("@ModuleId", SqlDbType.UniqueIdentifier) {Value = d.ParentId},
+                    new SqlParameter("@Mode", d.Type - 2),
+                    new SqlParameter("@Permission", d.Permit),
+                    new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = uid},
+                    new SqlParameter("@Read", SqlDbType.Int) {Value = 0}
+                }
+                into p
+                select MakeCommand(dsql, p);
+
+            var sql = "insert SYS_Role (Name, Description, CreatorUserId) ";
+            sql += "select @Name, @Description, @CreatorUserId;";
+            sql += "select ID from SYS_Role where SN = scope_identity()";
+            var parm = new[]
+            {
+                new SqlParameter("@Name", role.Name),
+                new SqlParameter("@Description", role.Description),
+                new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = uid},
+                new SqlParameter("@Write", SqlDbType.Int) {Value = 0}
+            };
+            var cmds = new List<SqlCommand> {MakeCommand(sql, parm)};
+            cmds.AddRange(actions);
+            cmds.AddRange(datas);
+            return SqlExecute(cmds, 0);
+        }
+
         /// <summary>
         /// 删除指定角色
         /// </summary>
@@ -23,6 +78,66 @@ namespace Insight.WS.Base
                 context.SYS_Role.Remove(role);
                 return context.SaveChanges() > 0;
             }
+        }
+
+        /// <summary>
+        /// 编辑指定角色
+        /// </summary>
+        /// <param name="uid">用户ID</param>
+        /// <param name="role">RoleInfo</param>
+        /// <returns>是否成功</returns>
+        private bool Update(Guid uid, RoleInfo role)
+        {
+            var asql = "insert SYS_RolePerm_Action(RoleId, ActionId, Action, CreatorUserId) ";
+            asql += "select @RoleId, @ActionId, @Action, @CreatorUserId";
+            var actions = from a in role.Actions.Where(a => !a.state.HasValue)
+                select new[]
+                {
+                    new SqlParameter("@RoleId", SqlDbType.UniqueIdentifier) {Value = role.ID},
+                    new SqlParameter("@ActionId", SqlDbType.UniqueIdentifier) {Value = a.ID},
+                    new SqlParameter("@Action", a.Permit),
+                    new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = uid},
+                    new SqlParameter("@Read", SqlDbType.Int) {Value = 0}
+                }
+                into p
+                select MakeCommand(asql, p);
+
+            var dsql = "insert SYS_RolePerm_Data(RoleId, ModuleId, Mode, Permission, CreatorUserId) ";
+            dsql += "select @RoleId, @ModuleId, @Mode, @Permission, @CreatorUserId";
+            var datas = from d in role.Datas.Where(d => !d.state.HasValue)
+                select new[]
+                {
+                    new SqlParameter("@RoleId", SqlDbType.UniqueIdentifier) {Value = role.ID},
+                    new SqlParameter("@ModuleId", SqlDbType.UniqueIdentifier) {Value = d.ParentId},
+                    new SqlParameter("@Mode", d.Type - 2),
+                    new SqlParameter("@Permission", d.Permit),
+                    new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = uid},
+                    new SqlParameter("@Read", SqlDbType.Int) {Value = 0}
+                }
+                into p
+                select MakeCommand(dsql, p);
+
+            const string sql = "update SYS_Role set Name = @Name, Description = @Description where ID = @ID";
+            var parm = new[]
+            {
+                new SqlParameter("@Name", role.Name),
+                new SqlParameter("@Description", role.Description),
+                new SqlParameter("@ID", SqlDbType.UniqueIdentifier) {Value = role.ID}
+            };
+            var cmds = new List<SqlCommand> { MakeCommand(sql, parm) };
+            cmds.AddRange(actions);
+            cmds.AddRange(datas);
+
+            var alist = role.Actions.Where(a => !a.Permit.HasValue).ToList();
+            alist.ForEach(a => cmds.Add(MakeCommand($"delete SYS_RolePerm_Action where RoleId = {role.ID} and ActionId = '{a.ID}'")));
+            alist = role.Actions.Where(a => a.Permit.HasValue && a.state.HasValue && a.Permit != a.state).ToList();
+            alist.ForEach(a => cmds.Add(MakeCommand($"update SYS_RolePerm_Action set Action = {a.Permit} where RoleId = {role.ID} and ActionId = '{a.ID}'")));
+            var dlist = role.Datas.Where(d => !d.Permit.HasValue).ToList();
+            dlist.ForEach(d => cmds.Add(MakeCommand($"delete SYS_RolePerm_Data where RoleId = {role.ID} and ModuleId = '{d.ParentId}'")));
+            dlist = role.Datas.Where(d => d.Permit.HasValue && d.state.HasValue && d.Permit != d.state).ToList();
+            dlist.ForEach(d => cmds.Add(MakeCommand($"update SYS_RolePerm_Data set Permission = {d.Permit} where RoleId = {role.ID} and ModuleId = '{d.ParentId}'")));
+
+            return SqlExecute(cmds);
         }
 
         /// <summary>

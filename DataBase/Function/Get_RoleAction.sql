@@ -34,8 +34,8 @@ Actions as (
   P.Action as Permit, case when P.Action = 0 then '¾Ü¾ø' when P.Action = 1 then 'ÔÊÐí' end as Description
   from SYS_ModuleAction A
   join Modules M on M.ID = A.ModuleId
-  left join SYS_RolePerm_Action P on P.ActionId = A.ID)
-
+  left join SYS_RolePerm_Action P on P.ActionId = A.ID
+     and P.RoleId = @RoleId)
 
 select *, Permit as state from Actions
 union all

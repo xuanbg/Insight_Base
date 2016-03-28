@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.ServiceModel;
 using Insight.WS.Base.Common;
@@ -11,9 +10,19 @@ namespace Insight.WS.Base
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
     public partial class Roles : IRoles
     {
-        public JsonResult AddRole(SYS_Role role, DataTable action, DataTable data, DataTable custom)
+        /// <summary>
+        /// 新增角色
+        /// </summary>
+        /// <param name="role">RoleInfo</param>
+        /// <returns>JsonResult</returns>
+        public JsonResult AddRole(RoleInfo role)
         {
-            throw new NotImplementedException();
+            const string action = "10B574A2-1A69-4273-87D9-06EDA77B80B6";
+            var verify = new SessionVerify();
+            if (!verify.Compare(action)) return verify.Result;
+
+            var id = InsertData(verify.Basis.UserId, role);
+            return id == null ? verify.Result.DataBaseError() : verify.Result.Created(id.ToString());
         }
 
         /// <summary>
@@ -33,9 +42,19 @@ namespace Insight.WS.Base
             return result.Value ? verify.Result : verify.Result.DataBaseError();
         }
 
-        public JsonResult EditRole(string id, SYS_Role obj, List<object> adl, List<object> ddl, List<object> cdl, DataTable adt, DataTable ddt, DataTable cdt)
+        /// <summary>
+        /// 编辑角色
+        /// </summary>
+        /// <param name="id">角色ID</param>
+        /// <param name="role">RoleInfo</param>
+        /// <returns>JsonResult</returns>
+        public JsonResult EditRole(string id, RoleInfo role)
         {
-            throw new NotImplementedException();
+            const string action = "4DC0141D-FE3D-4504-BE70-763028796808";
+            var verify = new SessionVerify();
+            if (!verify.Compare(action)) return verify.Result;
+
+            return Update(verify.Basis.UserId, role) ? verify.Result : verify.Result.DataBaseError();
         }
 
         /// <summary>
