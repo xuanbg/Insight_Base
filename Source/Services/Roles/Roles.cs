@@ -74,7 +74,7 @@ namespace Insight.WS.Base
             return list.Any() ? verify.Result.Success(list) : verify.Result.NoContent();
         }
 
-        public JsonResult AddRoleMember(string id, List<string> tids, List<string> gids, List<string> uids)
+        public JsonResult AddRoleMember(string id, List<object> members)
         {
             throw new NotImplementedException();
         }

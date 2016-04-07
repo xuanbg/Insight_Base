@@ -36,8 +36,8 @@ namespace Insight.WS.Base.Common
         public SessionVerify()
         {
             // 从请求头获取验证数据对象
-            var dict = General.GetAuthorization();
-            Session = General.GetAuthor<Session>(dict["Auth"]);
+            var auth = General.GetAuthorization();
+            Session = General.GetAuthor<Session>(auth);
             Result = new JsonResult();
 
             // 验证数据对象不存在
