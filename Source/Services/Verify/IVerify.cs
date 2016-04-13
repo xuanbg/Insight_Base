@@ -29,7 +29,7 @@ namespace Insight.WS.Base
         /// 会话合法性验证并校验支付密码
         /// </summary>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "confirm?paykey={paykey}", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "verify/confirm?paykey={paykey}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult Confirmation(string paykey);
 
@@ -38,7 +38,7 @@ namespace Insight.WS.Base
         /// </summary>
         /// <param name="action">需要鉴权的操作ID</param>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "auth?action={action}", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "verify/auth?action={action}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult Authorization(string action);
 
@@ -53,7 +53,7 @@ namespace Insight.WS.Base
         /// <param name="type">验证类型</param>
         /// <param name="time">过期时间（分钟）</param>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "smscode?mobile={mobile}&type={type}&time={time}", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "verify/smscode?mobile={mobile}&type={type}&time={time}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult NewCode(string mobile, int type, int time);
 
@@ -65,7 +65,7 @@ namespace Insight.WS.Base
         /// <param name="type">验证码类型</param>
         /// <param name="remove">是否验证成功后删除记录</param>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "smscode/compare?mobile={mobile}&code={code}&type={type}&remove={remove}", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "verify/smscode/compare?mobile={mobile}&code={code}&type={type}&remove={remove}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult VerifyCode(string mobile, string code, int type, bool remove);
 
@@ -78,7 +78,7 @@ namespace Insight.WS.Base
         /// </summary>
         /// <param name="type">用户类型</param>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "sessions?type={type}", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "verify/sessions?type={type}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult GetSessions(string type);
 

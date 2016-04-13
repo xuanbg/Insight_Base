@@ -16,8 +16,8 @@ namespace Insight.WS.Base.Common
         /// <param name="rule">验证规则</param>
         public static JsonResult Verify(string rule)
         {
-            var dict = GetAuthorization();
-            var basis = GetAuthor<string>(dict["Auth"]);
+            var auth = GetAuthorization();
+            var basis = GetAuthor<string>(auth);
             var result = new JsonResult();
             return basis == null || basis != Hash(rule) ? result.InvalidAuth() : result.Success();
         }
@@ -26,7 +26,7 @@ namespace Insight.WS.Base.Common
         /// 获取Http请求头部承载的验证信息
         /// </summary>
         /// <returns>string Http请求头部承载的验证字符串</returns>
-        public static Dictionary<string, string> GetAuthorization()
+        public static string GetAuthorization()
         {
             var context = WebOperationContext.Current;
             if (context == null) return null;
@@ -38,26 +38,11 @@ namespace Insight.WS.Base.Common
             response.Headers.Add("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
             response.Headers.Add("Access-Control-Allow-Origin", "*");
 
-            var accept = CompareVersion(headers);
-            if (accept == null)
-            {
-                response.StatusCode = HttpStatusCode.NotAcceptable;
-                return null;
-            }
-
             var auth = headers[HttpRequestHeader.Authorization];
-            if (string.IsNullOrEmpty(auth))
-            {
-                response.StatusCode = HttpStatusCode.Unauthorized;
-                return null;
-            }
+            if (!string.IsNullOrEmpty(auth)) return auth;
 
-            return new Dictionary<string, string>
-            {
-                {"Auth", auth},
-                {"Version", accept[1].Substring(9)},
-                {"Client", accept[2].Substring(8)}
-            };
+            response.StatusCode = HttpStatusCode.Unauthorized;
+            return null;
         }
 
         /// <summary>
@@ -165,7 +150,7 @@ namespace Insight.WS.Base.Common
         {
             var request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = method;
-            request.Accept = $"application/json; version={CurrentVersion}; client=BaseServer";
+            request.Accept = "application/json; client=BaseServer";
             request.ContentType = "application/json";
             request.Headers.Add(HttpRequestHeader.Authorization, author);
 
@@ -197,24 +182,6 @@ namespace Insight.WS.Base.Common
                 LogToEvent(ex.ToString());
                 return new JsonResult().BadRequest();
             }
-        }
-
-        /// <summary>
-        /// 验证版本是否兼容
-        /// </summary>
-        /// <param name="headers"></param>
-        /// <returns></returns>
-        private static string[] CompareVersion(WebHeaderCollection headers)
-        {
-            var accept = headers[HttpRequestHeader.Accept];
-            if (accept == null) return null;
-
-            var array = accept.Split(Convert.ToChar(";"));
-            if (array.Length < 3) return null;
-
-            var ver = Convert.ToInt32(array[1].Substring(9));
-            var comp = ver >= Convert.ToInt32(CompatibleVersion) && ver <= Convert.ToInt32(UpdateVersion);
-            return comp ? array : null;
         }
 
         #endregion

@@ -21,13 +21,14 @@ namespace Insight.WS.Base
         /// 创建WCF服务主机
         /// </summary>
         /// <param name="info">ServiceInfo</param>
-        public void CreateHost(ServiceInfo info)
+        /// <param name="ver"></param>
+        public void CreateHost(ServiceInfo info, string ver)
         {
             var path = $"{Application.StartupPath}\\{info.ServiceFile}";
             if (!File.Exists(path)) return;
 
             var asm = Assembly.LoadFrom(path);
-            var address = new Uri($"{info.BaseAddress}:{info.Port}/{info.Path}");
+            var address = new Uri($"{info.BaseAddress}:{info.Port}/{ver}/{info.Path}");
             var host = new ServiceHost(asm.GetType($"{info.NameSpace}.{info.ComplyType}"), address);
             var binding = InitBinding();
             var inter = $"{info.NameSpace}.{info.Interface}";

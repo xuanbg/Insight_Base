@@ -38,21 +38,6 @@ namespace Insight.WS.Base.Common
         public static readonly Random Random = new Random(Environment.TickCount);
 
         /// <summary>
-        /// 当前程序集版本
-        /// </summary>
-        public static int CurrentVersion;
-
-        /// <summary>
-        /// 接口最后兼容版本
-        /// </summary>
-        public static string CompatibleVersion;
-
-        /// <summary>
-        /// 接口最新版本
-        /// </summary>
-        public static string UpdateVersion;
-
-        /// <summary>
         /// 是否验证微信OpenID
         /// </summary>
         public static bool CheckOpenID;
@@ -62,7 +47,9 @@ namespace Insight.WS.Base.Common
         /// </summary>
         public static bool CheckMachineId;
 
-
+        /// <summary>
+        /// Session失效时间（小时）
+        /// </summary>
         public static int Expired;
 
         #endregion

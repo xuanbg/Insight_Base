@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ServiceProcess;
-using System.Windows.Forms;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
 using static Insight.WS.Base.Common.Util;
@@ -36,6 +35,7 @@ namespace Insight.WS.Base
         protected override void OnStart(string[] args)
         {
             var list = DataAccess.GetServiceList();
+            var ver = GetAppSetting("Version");
             Services = new Services();
             foreach (var info in list)
             {
@@ -49,7 +49,7 @@ namespace Insight.WS.Base
                     ComplyType = info.Service,
                     ServiceFile = info.ServiceFile
                 };
-                Services.CreateHost(service);
+                Services.CreateHost(service, ver);
             }
             Services.StartService();
         }
@@ -69,12 +69,6 @@ namespace Insight.WS.Base
         /// </summary>
         private static void InitSeting()
         {
-            var version = new Version(Application.ProductVersion);
-            var build = $"{version.Major}{version.Minor}{version.Build.ToString("D4").Substring(0, 2)}";
-            CurrentVersion = Convert.ToInt32(build);
-            CompatibleVersion = GetAppSetting("CompatibleVersion");
-            UpdateVersion = GetAppSetting("UpdateVersion");
-
             LogServer = GetAppSetting("LogServer");
             CheckOpenID = bool.Parse(GetAppSetting("CheckOpenID"));
             CheckMachineId = bool.Parse(GetAppSetting("CheckMachineId"));

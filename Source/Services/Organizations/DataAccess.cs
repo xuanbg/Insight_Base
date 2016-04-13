@@ -100,11 +100,25 @@ namespace Insight.WS.Base
         /// 从视图查询组织机构列表
         /// </summary>
         /// <returns>DataTable</returns>
-        private IEnumerable<OrgInfo> GetOrgList()
+        private IEnumerable<object> GetOrgList()
         {
             using (var context = new BaseEntities())
             {
-                return context.OrgInfo.OrderBy(o => o.Index).ToList();
+                var members = context.TitleMember;
+                var orgs = from o in context.OrgInfo
+                           select new
+                           {
+                               o.ID,
+                               o.ParentId,
+                               o.Index,
+                               o.NodeType,
+                               o.Name,
+                               o.FullName,
+                               o.Alias,
+                               o.Code,
+                               Members = members.Where(m => m.TitleId == o.ID)
+                           };
+                return orgs.ToList();
             }
         }
 

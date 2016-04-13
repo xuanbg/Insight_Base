@@ -49,13 +49,11 @@ namespace Insight.WS.Base
         /// 根据参数组集合插入角色成员关系
         /// </summary>
         /// <param name="id">角色ID</param>
-        /// <param name="tids">职位ID集合</param>
-        /// <param name="gids">用户组ID集合</param>
-        /// <param name="uids">用户ID集合</param>
+        /// <param name="members"></param>
         /// <returns>JsonResult</returns>
         [WebInvoke(Method = "POST", UriTemplate = "roles/{id}/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult AddRoleMember(string id, List<string> tids, List<string> gids, List<string> uids);
+        JsonResult AddRoleMember(string id, List<object> members);
 
         /// <summary>
         /// 根据成员类型和ID删除角色成员
@@ -68,11 +66,11 @@ namespace Insight.WS.Base
         JsonResult RemoveRoleMember(string id, string type);
 
         /// <summary>
-        /// 根据角色ID获取可用的组织机构列表
+        /// 根据角色ID获取可用的成员集合
         /// </summary>
         /// <param name="id">角色ID</param>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "roles/{id}/titles", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "roles/{id}/othertitles", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult GetMemberOfTitle(string id);
 
@@ -81,7 +79,7 @@ namespace Insight.WS.Base
         /// </summary>
         /// <param name="id">角色ID</param>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "roles/{id}/groups", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "roles/{id}/othergroups", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult GetMemberOfGroup(string id);
 
@@ -90,7 +88,7 @@ namespace Insight.WS.Base
         /// </summary>
         /// <param name="id">角色ID</param>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "roles/{id}/users", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "roles/{id}/otherusers", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult GetMemberOfUser(string id);
 
