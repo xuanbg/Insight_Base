@@ -3,6 +3,7 @@ using System.Linq;
 using System.ServiceModel;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
+using Insight.WS.Base.Common.Utils;
 
 namespace Insight.WS.Base
 {

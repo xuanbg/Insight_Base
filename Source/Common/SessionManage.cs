@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Insight.WS.Base.Common.Entity;
+using Insight.WS.Base.Common.Utils;
 
 namespace Insight.WS.Base.Common
 {

@@ -2,7 +2,7 @@
 using System.ServiceProcess;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
-using static Insight.WS.Base.Common.Util;
+using static Insight.WS.Base.Common.Utils.Util;
 
 namespace Insight.WS.Base
 {

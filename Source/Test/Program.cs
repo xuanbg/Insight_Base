@@ -1,4 +1,5 @@
 ﻿using Insight.WS.Base.Common;
+using Insight.WS.Base.Common.Utils;
 using Insight.WS.Service;
 
 namespace Test

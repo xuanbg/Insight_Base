@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
-using static Insight.WS.Base.Common.SqlHelper;
+using static Insight.WS.Base.Common.Utils.SqlHelper;
 
 namespace Insight.WS.Base
 {

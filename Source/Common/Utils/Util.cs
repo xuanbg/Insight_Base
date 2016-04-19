@@ -10,7 +10,7 @@ using System.Text;
 using System.Web.Script.Serialization;
 using Insight.WS.Base.Common.Entity;
 
-namespace Insight.WS.Base.Common
+namespace Insight.WS.Base.Common.Utils
 {
     public static class Util
     {

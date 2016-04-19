@@ -84,7 +84,7 @@
     <Compile Include="Entity\TitleMember.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
-    <Compile Include="Function\GuidParse.cs" />
+    <Compile Include="Utils\GuidParse.cs" />
     <Compile Include="Entity\SYS_Allot_Record.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
@@ -97,8 +97,8 @@
     <Compile Include="Entity\SYS_Code_Scheme.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
-    <Compile Include="Function\General.cs" />
-    <Compile Include="Function\JsonResult.cs" />
+    <Compile Include="Utils\General.cs" />
+    <Compile Include="Utils\JsonResult.cs" />
     <Compile Include="Entity\Model.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -170,8 +170,8 @@
     <Compile Include="DataAccess.cs" />
     <Compile Include="SessionManage.cs" />
     <Compile Include="SessionVerify.cs" />
-    <Compile Include="Function\SqlHelper.cs" />
-    <Compile Include="Function\Util.cs" />
+    <Compile Include="Utils\SqlHelper.cs" />
+    <Compile Include="Utils\Util.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

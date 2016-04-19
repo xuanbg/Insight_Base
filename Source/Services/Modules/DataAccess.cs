@@ -4,7 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using Insight.WS.Base.Common.Entity;
-using static Insight.WS.Base.Common.SqlHelper;
+using static Insight.WS.Base.Common.Utils.SqlHelper;
 
 namespace Insight.WS.Base
 {

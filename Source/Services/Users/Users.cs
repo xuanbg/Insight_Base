@@ -4,7 +4,8 @@ using System.Linq;
 using System.ServiceModel;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
-using static Insight.WS.Base.Common.Util;
+using Insight.WS.Base.Common.Utils;
+using static Insight.WS.Base.Common.Utils.Util;
 
 namespace Insight.WS.Base
 {

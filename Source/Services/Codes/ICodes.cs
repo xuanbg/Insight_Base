@@ -2,6 +2,7 @@
 using System.ServiceModel.Web;
 using Insight.WS.Base.Common;
 using Insight.WS.Base.Common.Entity;
+using Insight.WS.Base.Common.Utils;
 
 namespace Insight.WS.Base
 {

@@ -4,9 +4,8 @@ using System.IO;
 using System.Net;
 using System.ServiceModel.Web;
 using System.Text;
-using static Insight.WS.Base.Common.Util;
 
-namespace Insight.WS.Base.Common
+namespace Insight.WS.Base.Common.Utils
 {
     public class General
     {
@@ -19,7 +18,7 @@ namespace Insight.WS.Base.Common
             var auth = GetAuthorization();
             var basis = GetAuthor<string>(auth);
             var result = new JsonResult();
-            return basis == null || basis != Hash(rule) ? result.InvalidAuth() : result.Success();
+            return basis == null || basis != Util.Hash(rule) ? result.InvalidAuth() : result.Success();
         }
 
         /// <summary>
@@ -57,7 +56,7 @@ namespace Insight.WS.Base.Common
             {
                 var buffer = Convert.FromBase64String(auth);
                 var json = Encoding.UTF8.GetString(buffer);
-                return Deserialize<T>(json);
+                return Util.Deserialize<T>(json);
             }
             catch (Exception ex)
             {
@@ -99,7 +98,7 @@ namespace Insight.WS.Base.Common
         /// <param name="key">查询关键字段</param>
         public static void LogToLogServer(string code, string message, string source, string action, string userid, string key)
         {
-            var url = LogServer + "logs";
+            var url = Util.LogServer + "logs";
             var dict = new Dictionary<string, string>
             {
                 {"code", code},
@@ -109,8 +108,8 @@ namespace Insight.WS.Base.Common
                 {"userid", userid },
                 {"key", key }
             };
-            var data = Serialize(dict);
-            var author = Base64(Hash(code + Secret));
+            var data = Util.Serialize(dict);
+            var author = Util.Base64(Util.Hash(code + Util.Secret));
             HttpRequest(url, "POST", author, data);
         }
 
@@ -174,12 +173,12 @@ namespace Insight.WS.Base.Common
                 {
                     var result = reader.ReadToEnd();
                     responseStream.Close();
-                    return Deserialize<JsonResult>(result);
+                    return Util.Deserialize<JsonResult>(result);
                 }
             }
             catch (Exception ex)
             {
-                LogToEvent(ex.ToString());
+                Util.LogToEvent(ex.ToString());
                 return new JsonResult().BadRequest();
             }
         }
