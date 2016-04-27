@@ -1,8 +1,8 @@
 ﻿using System.ServiceModel;
 using System.ServiceModel.Web;
-using Insight.WS.Base.Common.Utils;
+using Insight.Base.Common.Utils;
 
-namespace Insight.WS.Base
+namespace Insight.Base
 {
     [ServiceContract]
     public interface IVerify

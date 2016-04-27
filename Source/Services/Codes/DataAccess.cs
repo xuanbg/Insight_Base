@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
-using static Insight.WS.Base.Common.Utils.SqlHelper;
+using static Insight.Base.Common.Utils.SqlHelper;
 
-namespace Insight.WS.Base
+namespace Insight.Base
 {
     public partial class Codes
     {

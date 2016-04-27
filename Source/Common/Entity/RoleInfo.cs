@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Insight.WS.Base.Common.Entity
+namespace Insight.Base.Common.Entity
 {
     public class RoleInfo
     {

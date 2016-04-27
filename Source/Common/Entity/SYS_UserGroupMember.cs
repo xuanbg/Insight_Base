@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Insight.WS.Base.Common.Entity
+namespace Insight.Base.Common.Entity
 {
     using System;
     using System.Collections.Generic;

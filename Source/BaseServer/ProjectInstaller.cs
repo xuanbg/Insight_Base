@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Insight.WS.Base
+namespace Insight.Base
 {
     [RunInstaller(true)]
     public partial class ProjectInstaller : System.Configuration.Install.Installer

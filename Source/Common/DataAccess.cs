@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Insight.WS.Base.Common.Entity;
+using Insight.Base.Common.Entity;
 
-namespace Insight.WS.Base.Common
+namespace Insight.Base.Common
 {
     public class DataAccess
     {

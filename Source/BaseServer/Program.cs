@@ -1,6 +1,6 @@
 ﻿using System.ServiceProcess;
 
-namespace Insight.WS.Base
+namespace Insight.Base
 {
     static class Program
     {

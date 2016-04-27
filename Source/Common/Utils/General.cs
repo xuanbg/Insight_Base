@@ -5,7 +5,7 @@ using System.Net;
 using System.ServiceModel.Web;
 using System.Text;
 
-namespace Insight.WS.Base.Common.Utils
+namespace Insight.Base.Common.Utils
 {
     public class General
     {

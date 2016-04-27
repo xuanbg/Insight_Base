@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.ServiceModel;
-using Insight.WS.Base.Common;
-using Insight.WS.Base.Common.Entity;
-using Insight.WS.Base.Common.Utils;
+using Insight.Base.Common;
+using Insight.Base.Common.Entity;
+using Insight.Base.Common.Utils;
 
-namespace Insight.WS.Base
+namespace Insight.Base
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
     public partial class Codes : ICodes

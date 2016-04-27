@@ -8,9 +8,9 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web.Script.Serialization;
-using Insight.WS.Base.Common.Entity;
+using Insight.Base.Common.Entity;
 
-namespace Insight.WS.Base.Common.Utils
+namespace Insight.Base.Common.Utils
 {
     public static class Util
     {

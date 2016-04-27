@@ -1,10 +1,10 @@
 ﻿using System;
 using System.ServiceProcess;
-using Insight.WS.Base.Common;
-using Insight.WS.Base.Common.Entity;
-using static Insight.WS.Base.Common.Utils.Util;
+using Insight.Base.Common;
+using Insight.Base.Common.Entity;
+using static Insight.Base.Common.Utils.Util;
 
-namespace Insight.WS.Base
+namespace Insight.Base
 {
     public partial class BaseServer : ServiceBase
     {

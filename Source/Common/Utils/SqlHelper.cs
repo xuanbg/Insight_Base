@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Insight.WS.Base.Common.Entity;
+using Insight.Base.Common.Entity;
 
-namespace Insight.WS.Base.Common.Utils
+namespace Insight.Base.Common.Utils
 {
     public class SqlHelper
     {

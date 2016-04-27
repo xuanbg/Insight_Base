@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using Insight.WS.Base.Common.Entity;
-using static Insight.WS.Base.Common.DataAccess;
-using static Insight.WS.Base.Common.Utils.SqlHelper;
+using Insight.Base.Common.Entity;
+using static Insight.Base.Common.DataAccess;
+using static Insight.Base.Common.Utils.SqlHelper;
 
-namespace Insight.WS.Base
+namespace Insight.Base
 {
     public partial class Organizations
     {

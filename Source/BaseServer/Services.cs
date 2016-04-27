@@ -7,9 +7,9 @@ using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.ServiceModel.Description;
 using System.Windows.Forms;
-using Insight.WS.Base.Common.Entity;
+using Insight.Base.Common.Entity;
 
-namespace Insight.WS.Base
+namespace Insight.Base
 {
     public class Services
     {
@@ -33,7 +33,15 @@ namespace Insight.WS.Base
             var binding = InitBinding();
             var inter = $"{info.NameSpace}.{info.Interface}";
             var endpoint = host.AddServiceEndpoint(asm.GetType(inter), binding, "");
-            endpoint.Behaviors.Add(new WebHttpBehavior());
+            var behavior = new WebHttpBehavior {HelpEnabled = true};
+            var stb = new ServiceThrottlingBehavior
+            {
+                MaxConcurrentCalls = 128, 
+                MaxConcurrentInstances = 512,
+                MaxConcurrentSessions = 512
+            };
+            endpoint.Behaviors.Add(behavior);
+            host.Description.Behaviors.Add(stb);
             Hosts.Add(host);
         }
 

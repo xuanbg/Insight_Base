@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
-using Insight.WS.Base.Common;
-using Insight.WS.Base.Common.Entity;
-using Insight.WS.Base.Common.Utils;
-using static Insight.WS.Base.Common.Utils.Util;
+using Insight.Base.Common;
+using Insight.Base.Common.Entity;
+using Insight.Base.Common.Utils;
+using static Insight.Base.Common.Utils.Util;
 
-namespace Insight.WS.Base
+namespace Insight.Base
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
     public partial class Users : IUsers

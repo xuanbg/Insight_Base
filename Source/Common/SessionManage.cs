@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Insight.WS.Base.Common.Entity;
-using Insight.WS.Base.Common.Utils;
+using Insight.Base.Common.Entity;
+using Insight.Base.Common.Utils;
 
-namespace Insight.WS.Base.Common
+namespace Insight.Base.Common
 {
     public static class SessionManage
     {

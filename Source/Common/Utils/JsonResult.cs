@@ -1,4 +1,4 @@
-﻿namespace Insight.WS.Base.Common.Utils
+﻿namespace Insight.Base.Common.Utils
 {
     /// <summary>
     /// Json接口返回值
