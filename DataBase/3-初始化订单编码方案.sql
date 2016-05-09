@@ -1,2 +1,2 @@
 INSERT SYS_Code_Scheme (Name, CodeFormat, SerialFormat, Description, CreatorDeptId, CreatorUserId) 
-select '¶©µ¥±àÂë·½°¸', '@yymmdd#5', '@yymmdd', '¶©µ¥×¨ÓÃ±àÂë·½°¸£¬²»ÒªĞŞ¸Ä£¡²»ÒªÉ¾³ı£¡', NULL, N'00000000-0000-0000-0000-000000000000'
+select 'è®¢å•ç¼–ç æ–¹æ¡ˆ', '@yymmdd#5', '@yymmdd', 'è®¢å•ä¸“ç”¨ç¼–ç æ–¹æ¡ˆï¼Œä¸è¦ä¿®æ”¹ï¼ä¸è¦åˆ é™¤ï¼', NULL, N'00000000-0000-0000-0000-000000000000'

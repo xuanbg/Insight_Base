@@ -2,45 +2,45 @@ USE Insight_Base
 GO
 
 
-/*****³õÊ¼»¯½ÇÉ«£ºËùÓĞÓÃ»§*****/
+/*****åˆå§‹åŒ–è§’è‰²ï¼šæ‰€æœ‰ç”¨æˆ·*****/
 
 DECLARE @RoleId UNIQUEIDENTIFIER
-delete SYS_Role where Name = 'ËùÓĞÓÃ»§'
+delete SYS_Role where Name = 'æ‰€æœ‰ç”¨æˆ·'
 insert SYS_Role (Name, Description, BuiltIn, CreatorUserId) 
-select 'ËùÓĞÓÃ»§', 'ÄÚÖÃ½ÇÉ«£¬½ÇÉ«³ÉÔ±ÎªÈ«²¿ÓÃ»§³ÉÔ±', 1, '00000000-0000-0000-0000-000000000000';
+select 'æ‰€æœ‰ç”¨æˆ·', 'å†…ç½®è§’è‰²ï¼Œè§’è‰²æˆå‘˜ä¸ºå…¨éƒ¨ç”¨æˆ·æˆå‘˜', 1, '00000000-0000-0000-0000-000000000000';
 select @RoleId = ID from Sys_Role where SN = scope_identity()
 
--- ³õÊ¼»¯½ÇÉ«³ÉÔ±
+-- åˆå§‹åŒ–è§’è‰²æˆå‘˜
 insert SYS_Role_UserGroup (RoleId, GroupId, CreatorUserId)
 select @RoleId, ID, '00000000-0000-0000-0000-000000000000' from SYS_UserGroup where Name = 'AllUsers'
 
--- ÉèÖÃ¹¦ÄÜÈ¨ÏŞ
+-- è®¾ç½®åŠŸèƒ½æƒé™
 insert SYS_RolePerm_Action (RoleId, ActionId, Action, CreatorUserId)
 select @RoleId, A.ID, 1, '00000000-0000-0000-0000-000000000000'
 from SYS_ModuleAction A
 where A.ModuleId in('CED5A90C-092E-4B38-B21D-433DFD96BFDB', '05C1B3B4-1536-4DE7-864A-B98C474F438B')
   and A.ID not in('C6D59DAF-18C8-4A05-AA22-BA27CBC4595B', '076890FA-483A-4EBC-9168-D94367741FE9', 'EDBC058A-BDC2-4108-B690-1C2E9E65AD97')
 
--- ÉèÖÃÊı¾İÈ¨ÏŞ
+-- è®¾ç½®æ•°æ®æƒé™
 insert SYS_RolePerm_Data (RoleId, ModuleId, Mode, Permission, CreatorUserId)
 select @RoleId, '5C801552-1905-452B-AE7F-E57227BE70B8', 1, 1, '00000000-0000-0000-0000-000000000000' union all
 select @RoleId, '5C801552-1905-452B-AE7F-E57227BE70B8', 0, 0, '00000000-0000-0000-0000-000000000000'
 GO
 
 
-/*****³õÊ¼»¯½ÇÉ«£ºÏµÍ³¹ÜÀíÔ±*****/
+/*****åˆå§‹åŒ–è§’è‰²ï¼šç³»ç»Ÿç®¡ç†å‘˜*****/
 
 DECLARE @RoleId UNIQUEIDENTIFIER
-delete SYS_Role where Name = 'ÏµÍ³¹ÜÀíÔ±'
+delete SYS_Role where Name = 'ç³»ç»Ÿç®¡ç†å‘˜'
 insert SYS_Role (Name, Description, BuiltIn, CreatorUserId) 
-select 'ÏµÍ³¹ÜÀíÔ±', 'ÄÚÖÃ½ÇÉ«£¬½ÇÉ«³ÉÔ±ÎªÏµÍ³¹ÜÀíÔ±×é³ÉÔ±', 1, '00000000-0000-0000-0000-000000000000';
+select 'ç³»ç»Ÿç®¡ç†å‘˜', 'å†…ç½®è§’è‰²ï¼Œè§’è‰²æˆå‘˜ä¸ºç³»ç»Ÿç®¡ç†å‘˜ç»„æˆå‘˜', 1, '00000000-0000-0000-0000-000000000000';
 select @RoleId = ID from Sys_Role where SN = scope_identity()
 
--- ³õÊ¼»¯½ÇÉ«³ÉÔ±
+-- åˆå§‹åŒ–è§’è‰²æˆå‘˜
 insert SYS_Role_UserGroup (RoleId, GroupId, CreatorUserId)
 select @RoleId, ID, '00000000-0000-0000-0000-000000000000' from SYS_UserGroup where Name = 'Administers'
 
--- ÉèÖÃ¹¦ÄÜÈ¨ÏŞ
+-- è®¾ç½®åŠŸèƒ½æƒé™
 insert SYS_RolePerm_Action (RoleId, ActionId, Action, CreatorUserId)
 select @RoleId, A.ID, 1, '00000000-0000-0000-0000-000000000000'
 from SYS_ModuleAction A
@@ -49,7 +49,7 @@ join SYS_Module M on M.ID = A.ModuleId
     or M.ID in('5C801552-1905-452B-AE7F-E57227BE70B8', '6C0C486F-E039-4C53-9F36-9FE262FB0D3C')
     or M.ModuleGroupId = 'BDF57601-024F-41BC-9EF6-C5F2C334DF79')
   
--- ÉèÖÃÊı¾İÈ¨ÏŞ
+-- è®¾ç½®æ•°æ®æƒé™
 insert SYS_RolePerm_Data (RoleId, ModuleId, Mode, Permission, CreatorUserId)
 select @RoleId, M.ID, 0, 1, '00000000-0000-0000-0000-000000000000'
 from SYS_Module M

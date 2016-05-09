@@ -1,4 +1,4 @@
-﻿USE Insight_Base
+USE Insight_Base
 GO
 
 IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'SYS_Code_Allot') AND OBJECTPROPERTY(id, N'ISUSERTABLE') = 1)

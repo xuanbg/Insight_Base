@@ -4,17 +4,17 @@ go
 IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'SYS_Interface') AND OBJECTPROPERTY(id, N'ISUSERTABLE') = 1)
 DROP TABLE SYS_Interface
 GO
-/*****Ä£¿é±í*****/
+/*****æ¨¡å—è¡¨*****/
 
 CREATE TABLE SYS_Interface(
 [ID]               UNIQUEIDENTIFIER CONSTRAINT IX_SYS_Interface PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-[SN]               BIGINT IDENTITY(1,1),                                                                               --×ÔÔöÐòÁÐ
-[Port]             VARCHAR(8),                                                                                         --·þÎñ¶Ë¿ÚºÅ
-[Path]             VARCHAR(16),                                                                                        --·þÎñÂ·¾¶
-[NameSpace]        VARCHAR(128) NOT NULL,                                                                              --·þÎñÃüÃû¿Õ¼ä
-[Interface]        VARCHAR(64) NOT NULL,                                                                               --½Ó¿ÚÃû³Æ
-[Service]          VARCHAR(64) NOT NULL,                                                                               --·þÎñÀàÃû³Æ
-[ServiceFile]      NVARCHAR(MAX)  NOT NULL,                                                                            --ÎÄ¼þÂ·¾¶
+[SN]               BIGINT IDENTITY(1,1),                                                                               --è‡ªå¢žåºåˆ—
+[Port]             VARCHAR(8),                                                                                         --æœåŠ¡ç«¯å£å·
+[Path]             VARCHAR(16),                                                                                        --æœåŠ¡è·¯å¾„
+[NameSpace]        VARCHAR(128) NOT NULL,                                                                              --æœåŠ¡å‘½åç©ºé—´
+[Interface]        VARCHAR(64) NOT NULL,                                                                               --æŽ¥å£åç§°
+[Service]          VARCHAR(64) NOT NULL,                                                                               --æœåŠ¡ç±»åç§°
+[ServiceFile]      NVARCHAR(MAX)  NOT NULL,                                                                            --æ–‡ä»¶è·¯å¾„
 )
 GO
 
