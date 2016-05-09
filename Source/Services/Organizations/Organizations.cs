@@ -92,16 +92,17 @@ namespace Insight.Base
         /// <summary>
         /// 根据对象实体数据新增一条组织机构节点合并记录
         /// </summary>
-        /// <param name="org">组织节点合并对象</param>
+        /// <param name="id">合并目标ID</param>
+        /// <param name="org">组织节点对象（被合并节点）</param>
         /// <returns>JsonResult</returns>
-        public JsonResult AddOrgMerger(SYS_OrgMerger org)
+        public JsonResult OrgMerger(string id, SYS_Organization org)
         {
             const string action = "DAE7F2C5-E379-4F74-8043-EB616D4A5F8B";
             var verify = new SessionVerify();
-            if (!verify.Compare(action)) return verify.Result;
+            if (!verify.ParseIdAndCompare(action)) return verify.Result;
 
             org.CreatorUserId = verify.Basis.UserId;
-            return InsertData(org) ? verify.Result : verify.Result.DataBaseError();
+            return Update(verify.Guid, org) ? verify.Result : verify.Result.DataBaseError();
         }
 
         /// <summary>

@@ -11,50 +11,21 @@
         <EntityTypeShape EntityType="BaseModel.SYS_ModuleParam" Width="1.5" PointX="5.25" PointY="18.625" IsExpanded="true" />
         <EntityTypeShape EntityType="BaseModel.SYS_Organization" Width="1.5" PointX="3" PointY="17.5" IsExpanded="true" />
         <EntityTypeShape EntityType="BaseModel.SYS_OrgMember" Width="1.5" PointX="8.25" PointY="18.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="BaseModel.SYS_OrgMerger" Width="1.5" PointX="5.25" PointY="14.875" IsExpanded="true" />
         <EntityTypeShape EntityType="BaseModel.SYS_Role" Width="1.5" PointX="3" PointY="23.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="BaseModel.SYS_Role_Title" Width="1.5" PointX="5.25" PointY="22.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="BaseModel.SYS_Role_User" Width="1.5" PointX="5.25" PointY="26.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="BaseModel.SYS_Role_UserGroup" Width="1.5" PointX="8.25" PointY="26.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="BaseModel.SYS_RolePerm_Action" Width="1.5" PointX="11.25" PointY="20.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="BaseModel.SYS_RolePerm_Data" Width="1.5" PointX="8.25" PointY="14.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="BaseModel.SYS_RolePerm_DataAbs" Width="1.5" PointX="8.25" PointY="22.5" IsExpanded="true" />
         <EntityTypeShape EntityType="BaseModel.SYS_User" Width="1.5" PointX="0.75" PointY="17" IsExpanded="true" />
         <EntityTypeShape EntityType="BaseModel.SYS_UserGroup" Width="1.5" PointX="3" PointY="27.75" IsExpanded="true" />
         <EntityTypeShape EntityType="BaseModel.SYS_UserGroupMember" Width="1.5" PointX="11.25" PointY="24.625" IsExpanded="true" />
         <AssociationConnector Association="BaseModel.FK__SYS_Modul__Modul__4CC05EF3" ManuallyRouted="false" />
         <AssociationConnector Association="BaseModel.FK__SYS_Modul__Modul__536D5C82" ManuallyRouted="false" />
         <AssociationConnector Association="BaseModel.FK__SYS_Modul__Modul__5832119F" ManuallyRouted="false" />
-        <AssociationConnector Association="BaseModel.FK__SYS_RoleP__Modul__05F8DC4F" ManuallyRouted="false" />
-        <AssociationConnector Association="BaseModel.FK__SYS_RoleP__Modul__0F824689" ManuallyRouted="false" />
-        <AssociationConnector Association="BaseModel.FK__SYS_RoleP__Actio__7D63964E" ManuallyRouted="false" />
         <AssociationConnector Association="BaseModel.FK__SYS_Modul__OrgId__592635D8" ManuallyRouted="false" />
         <AssociationConnector Association="BaseModel.FK__SYS_Modul__UserI__5A1A5A11" ManuallyRouted="false" />
         <AssociationConnector Association="BaseModel.FK__SYS_Organ__Creat__34E8D562" ManuallyRouted="false" />
         <AssociationConnector Association="BaseModel.FK__SYS_Organ__Paren__33008CF0" ManuallyRouted="false" />
-        <AssociationConnector Association="BaseModel.FK__SYS_OrgMe__Merge__4336F4B9" ManuallyRouted="false" />
         <AssociationConnector Association="BaseModel.FK__SYS_OrgMe__OrgId__3AA1AEB8" ManuallyRouted="false" />
-        <AssociationConnector Association="BaseModel.FK__SYS_OrgMe__OrgId__4242D080" ManuallyRouted="false" />
-        <AssociationConnector Association="BaseModel.FK__SYS_Role___OrgId__75C27486" ManuallyRouted="false" />
-        <AssociationConnector Association="BaseModel.FK__SYS_RoleP__OrgId__10766AC2" ManuallyRouted="false" />
         <AssociationConnector Association="BaseModel.FK__SYS_OrgMe__Creat__3C89F72A" ManuallyRouted="false" />
         <AssociationConnector Association="BaseModel.FK__SYS_OrgMe__UserI__3B95D2F1" ManuallyRouted="false" />
-        <AssociationConnector Association="BaseModel.FK__SYS_OrgMe__Creat__442B18F2" ManuallyRouted="false" />
-        <AssociationConnector Association="BaseModel.FK__SYS_Role___RoleI__658C0CBD" ManuallyRouted="false" />
-        <AssociationConnector Association="BaseModel.FK__SYS_Role___RoleI__6D2D2E85" ManuallyRouted="false" />
-        <AssociationConnector Association="BaseModel.FK__SYS_Role___RoleI__74CE504D" ManuallyRouted="false" />
         <AssociationConnector Association="BaseModel.FK__SYS_Role__Creato__5FD33367" ManuallyRouted="false" />
-        <AssociationConnector Association="BaseModel.FK__SYS_RoleP__RoleI__0504B816" ManuallyRouted="false" />
-        <AssociationConnector Association="BaseModel.FK__SYS_RoleP__RoleI__0E8E2250" ManuallyRouted="false" />
-        <AssociationConnector Association="BaseModel.FK__SYS_RoleP__RoleI__7C6F7215" ManuallyRouted="false" />
-        <AssociationConnector Association="BaseModel.FK__SYS_Role___Creat__76B698BF" ManuallyRouted="false" />
-        <AssociationConnector Association="BaseModel.FK__SYS_Role___Creat__6774552F" ManuallyRouted="false" />
-        <AssociationConnector Association="BaseModel.FK__SYS_Role___UserI__668030F6" ManuallyRouted="false" />
-        <AssociationConnector Association="BaseModel.FK__SYS_Role___Creat__6F1576F7" ManuallyRouted="false" />
-        <AssociationConnector Association="BaseModel.FK__SYS_Role___Group__6E2152BE" ManuallyRouted="false" />
-        <AssociationConnector Association="BaseModel.FK__SYS_RoleP__Creat__7F4BDEC0" ManuallyRouted="false" />
-        <AssociationConnector Association="BaseModel.FK__SYS_RoleP__Creat__08D548FA" ManuallyRouted="false" />
-        <AssociationConnector Association="BaseModel.FK__SYS_RoleP__UserI__116A8EFB" ManuallyRouted="false" />
         <AssociationConnector Association="BaseModel.FK__SYS_UserG__Creat__25A691D2" ManuallyRouted="false" />
         <AssociationConnector Association="BaseModel.FK__SYS_UserG__Creat__2D47B39A" ManuallyRouted="false" />
         <AssociationConnector Association="BaseModel.FK__SYS_UserG__UserI__2C538F61" ManuallyRouted="false" />
@@ -77,10 +48,18 @@
         <AssociationConnector Association="BaseModel.FK__SYS_Code___Creat__30E33A54" />
         <AssociationConnector Association="BaseModel.FK__SYS_Code___Creat__31D75E8D" />
         <EntityTypeShape EntityType="BaseModel.SYS_Interface" Width="1.5" PointX="0.75" PointY="0.75" />
-        <EntityTypeShape EntityType="BaseModel.OrgInfo" Width="1.5" PointX="0.75" PointY="3.625" />
-        <EntityTypeShape EntityType="BaseModel.TitleMember" Width="1.5" PointX="2.625" PointY="0.75" />
-        <EntityTypeShape EntityType="BaseModel.RoleMember" Width="1.5" PointX="4.5" PointY="0.75" />
-        <EntityTypeShape EntityType="BaseModel.RoleUser" Width="1.5" PointX="6.375" PointY="0.75" />
+        <EntityTypeShape EntityType="BaseModel.SYS_Data" Width="1.5" PointX="2.75" PointY="0.75" />
+        <EntityTypeShape EntityType="BaseModel.SYS_Role_Action" Width="1.5" PointX="13.5" PointY="20" />
+        <EntityTypeShape EntityType="BaseModel.SYS_Role_Data" Width="1.5" PointX="13.5" PointY="28.625" />
+        <EntityTypeShape EntityType="BaseModel.SYS_Role_Member" Width="1.5" PointX="10.5" PointY="27.875" />
+        <AssociationConnector Association="BaseModel.FK__SYS_Role___Modul__72F0F4D3" />
+        <AssociationConnector Association="BaseModel.FK__SYS_Role___Actio__69678A99" />
+        <AssociationConnector Association="BaseModel.FK__SYS_Role___RoleI__61C668D1" />
+        <AssociationConnector Association="BaseModel.FK__SYS_Role___RoleI__68736660" />
+        <AssociationConnector Association="BaseModel.FK__SYS_Role___RoleI__71FCD09A" />
+        <AssociationConnector Association="BaseModel.FK__SYS_Role___Creat__6B4FD30B" />
+        <AssociationConnector Association="BaseModel.FK__SYS_Role___Creat__74D93D45" />
+        <AssociationConnector Association="BaseModel.FK__SYS_Role___Creat__62BA8D0A" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

@@ -12,18 +12,19 @@ namespace Insight.Base.Common.Entity
     using System;
     using System.Collections.Generic;
     
-    public partial class SYS_RolePerm_DataAbs
+    public partial class SYS_Role_Data
     {
         public System.Guid ID { get; set; }
         public long SN { get; set; }
+        public int Mode { get; set; }
         public System.Guid RoleId { get; set; }
         public System.Guid ModuleId { get; set; }
-        public Nullable<System.Guid> OrgId { get; set; }
-        public Nullable<System.Guid> UserId { get; set; }
+        public System.Guid ModeId { get; set; }
         public int Permission { get; set; }
+        public System.Guid CreatorUserId { get; set; }
+        public System.DateTime CreateTime { get; set; }
     
         public virtual SYS_Module SYS_Module { get; set; }
-        public virtual SYS_Organization SYS_Organization { get; set; }
         public virtual SYS_Role SYS_Role { get; set; }
         public virtual SYS_User SYS_User { get; set; }
     }

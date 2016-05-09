@@ -17,12 +17,9 @@ namespace Insight.Base.Common.Entity
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public SYS_Role()
         {
-            this.SYS_Role_User = new HashSet<SYS_Role_User>();
-            this.SYS_Role_UserGroup = new HashSet<SYS_Role_UserGroup>();
-            this.SYS_Role_Title = new HashSet<SYS_Role_Title>();
-            this.SYS_RolePerm_Data = new HashSet<SYS_RolePerm_Data>();
-            this.SYS_RolePerm_DataAbs = new HashSet<SYS_RolePerm_DataAbs>();
-            this.SYS_RolePerm_Action = new HashSet<SYS_RolePerm_Action>();
+            this.SYS_Role_Member = new HashSet<SYS_Role_Member>();
+            this.SYS_Role_Action = new HashSet<SYS_Role_Action>();
+            this.SYS_Role_Data = new HashSet<SYS_Role_Data>();
         }
     
         public System.Guid ID { get; set; }
@@ -34,18 +31,12 @@ namespace Insight.Base.Common.Entity
         public System.Guid CreatorUserId { get; set; }
         public System.DateTime CreateTime { get; set; }
     
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<SYS_Role_User> SYS_Role_User { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<SYS_Role_UserGroup> SYS_Role_UserGroup { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<SYS_Role_Title> SYS_Role_Title { get; set; }
         public virtual SYS_User SYS_User { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<SYS_RolePerm_Data> SYS_RolePerm_Data { get; set; }
+        public virtual ICollection<SYS_Role_Member> SYS_Role_Member { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<SYS_RolePerm_DataAbs> SYS_RolePerm_DataAbs { get; set; }
+        public virtual ICollection<SYS_Role_Action> SYS_Role_Action { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<SYS_RolePerm_Action> SYS_RolePerm_Action { get; set; }
+        public virtual ICollection<SYS_Role_Data> SYS_Role_Data { get; set; }
     }
 }

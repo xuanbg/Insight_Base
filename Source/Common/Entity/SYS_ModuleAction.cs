@@ -17,7 +17,7 @@ namespace Insight.Base.Common.Entity
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public SYS_ModuleAction()
         {
-            this.SYS_RolePerm_Action = new HashSet<SYS_RolePerm_Action>();
+            this.SYS_Role_Action = new HashSet<SYS_Role_Action>();
         }
     
         public System.Guid ID { get; set; }
@@ -35,6 +35,6 @@ namespace Insight.Base.Common.Entity
     
         public virtual SYS_Module SYS_Module { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<SYS_RolePerm_Action> SYS_RolePerm_Action { get; set; }
+        public virtual ICollection<SYS_Role_Action> SYS_Role_Action { get; set; }
     }
 }

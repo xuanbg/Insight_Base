@@ -19,11 +19,7 @@ namespace Insight.Base.Common.Entity
         {
             this.SYS_ModuleParam = new HashSet<SYS_ModuleParam>();
             this.SYS_Organization1 = new HashSet<SYS_Organization>();
-            this.SYS_OrgMerger = new HashSet<SYS_OrgMerger>();
             this.SYS_OrgMember = new HashSet<SYS_OrgMember>();
-            this.SYS_OrgMerger1 = new HashSet<SYS_OrgMerger>();
-            this.SYS_Role_Title = new HashSet<SYS_Role_Title>();
-            this.SYS_RolePerm_DataAbs = new HashSet<SYS_RolePerm_DataAbs>();
             this.SYS_Allot_Record = new HashSet<SYS_Allot_Record>();
             this.SYS_Code_Allot = new HashSet<SYS_Code_Allot>();
             this.SYS_Code_Scheme = new HashSet<SYS_Code_Scheme>();
@@ -50,15 +46,7 @@ namespace Insight.Base.Common.Entity
         public virtual ICollection<SYS_Organization> SYS_Organization1 { get; set; }
         public virtual SYS_Organization SYS_Organization2 { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<SYS_OrgMerger> SYS_OrgMerger { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SYS_OrgMember> SYS_OrgMember { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<SYS_OrgMerger> SYS_OrgMerger1 { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<SYS_Role_Title> SYS_Role_Title { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<SYS_RolePerm_DataAbs> SYS_RolePerm_DataAbs { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SYS_Allot_Record> SYS_Allot_Record { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

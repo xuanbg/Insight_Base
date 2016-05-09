@@ -138,25 +138,24 @@ namespace Insight.Base
         /// <summary>
         /// 根据对象实体数据新增一条组织机构节点合并记录
         /// </summary>
-        /// <param name="obj">组织节点合并对象</param>
+        /// <param name="id">合并目标ID</param>
+        /// <param name="obj">组织节点对象（被合并节点）</param>
         /// <returns>bool 是否成功</returns>
-        private bool InsertData(SYS_OrgMerger obj)
+        private bool Update(Guid id, SYS_Organization obj)
         {
-            var sql = "insert SYS_OrgMerger (OrgId, MergerOrgId, CreatorUserId) ";
-            sql += "select @OrgId, @MergerOrgId, @CreatorUserId";
-            var parm = new[]
+            var cmd = MakeCommand(ChangeIndex("SYS_Organization", obj.Index, 999, obj.ParentId, false));
+            var cmds = new List<SqlCommand> {cmd};
+            if (obj.NodeType < 3)
             {
-                new SqlParameter("@OrgId", SqlDbType.UniqueIdentifier) {Value = obj.OrgId},
-                new SqlParameter("@MergerOrgId", SqlDbType.UniqueIdentifier) {Value = obj.MergerOrgId},
-                new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = obj.CreatorUserId}
-            };
-            var org = GetOrg(obj.MergerOrgId);
-            var cmds = new List<SqlCommand>
+                var org = GetOrg(id);
+                cmds.Add(MakeCommand($"update SYS_Organization set ParentId = '{org.ParentId}' where ParentId = '{obj.ParentId}'"));
+            }
+            else
             {
-                MakeCommand(ChangeIndex("SYS_Organization", org.Index, 999, org.ParentId, false)),
-                MakeCommand(sql, parm)
-            };
+                cmds.Add(MakeCommand($"update SYS_OrgMember set OrgId = '{id}' where OrgId = '{obj.ID}'"));
+            }
 
+            cmds.Add(MakeCommand($"delete SYS_Organization where id = '{obj.ID}'"));
             return SqlExecute(cmds);
         }
 

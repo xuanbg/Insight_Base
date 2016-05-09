@@ -17,7 +17,6 @@ namespace Insight.Base.Common.Entity
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public SYS_UserGroup()
         {
-            this.SYS_Role_UserGroup = new HashSet<SYS_Role_UserGroup>();
             this.SYS_UserGroupMember = new HashSet<SYS_UserGroupMember>();
         }
     
@@ -30,8 +29,6 @@ namespace Insight.Base.Common.Entity
         public System.Guid CreatorUserId { get; set; }
         public System.DateTime CreateTime { get; set; }
     
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<SYS_Role_UserGroup> SYS_Role_UserGroup { get; set; }
         public virtual SYS_User SYS_User { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SYS_UserGroupMember> SYS_UserGroupMember { get; set; }

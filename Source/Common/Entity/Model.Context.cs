@@ -12,8 +12,6 @@ namespace Insight.Base.Common.Entity
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
-    using System.Data.Entity.Core.Objects;
-    using System.Linq;
     
     public partial class BaseEntities : DbContext
     {
@@ -33,14 +31,7 @@ namespace Insight.Base.Common.Entity
         public virtual DbSet<SYS_ModuleParam> SYS_ModuleParam { get; set; }
         public virtual DbSet<SYS_Organization> SYS_Organization { get; set; }
         public virtual DbSet<SYS_OrgMember> SYS_OrgMember { get; set; }
-        public virtual DbSet<SYS_OrgMerger> SYS_OrgMerger { get; set; }
         public virtual DbSet<SYS_Role> SYS_Role { get; set; }
-        public virtual DbSet<SYS_Role_Title> SYS_Role_Title { get; set; }
-        public virtual DbSet<SYS_Role_User> SYS_Role_User { get; set; }
-        public virtual DbSet<SYS_Role_UserGroup> SYS_Role_UserGroup { get; set; }
-        public virtual DbSet<SYS_RolePerm_Action> SYS_RolePerm_Action { get; set; }
-        public virtual DbSet<SYS_RolePerm_Data> SYS_RolePerm_Data { get; set; }
-        public virtual DbSet<SYS_RolePerm_DataAbs> SYS_RolePerm_DataAbs { get; set; }
         public virtual DbSet<SYS_User> SYS_User { get; set; }
         public virtual DbSet<SYS_UserGroup> SYS_UserGroup { get; set; }
         public virtual DbSet<SYS_UserGroupMember> SYS_UserGroupMember { get; set; }
@@ -49,108 +40,9 @@ namespace Insight.Base.Common.Entity
         public virtual DbSet<SYS_Code_Record> SYS_Code_Record { get; set; }
         public virtual DbSet<SYS_Code_Scheme> SYS_Code_Scheme { get; set; }
         public virtual DbSet<SYS_Interface> SYS_Interface { get; set; }
-        public virtual DbSet<OrgInfo> OrgInfo { get; set; }
-        public virtual DbSet<TitleMember> TitleMember { get; set; }
-        public virtual DbSet<RoleMember> RoleMember { get; set; }
-        public virtual DbSet<RoleUser> RoleUser { get; set; }
-    
-        [DbFunction("BaseEntities", "Authority")]
-        public virtual IQueryable<Authority> Authority(Nullable<System.Guid> userId, Nullable<System.Guid> deptId, Nullable<System.Guid> actionId)
-        {
-            var userIdParameter = userId.HasValue ?
-                new ObjectParameter("UserId", userId) :
-                new ObjectParameter("UserId", typeof(System.Guid));
-    
-            var deptIdParameter = deptId.HasValue ?
-                new ObjectParameter("DeptId", deptId) :
-                new ObjectParameter("DeptId", typeof(System.Guid));
-    
-            var actionIdParameter = actionId.HasValue ?
-                new ObjectParameter("ActionId", actionId) :
-                new ObjectParameter("ActionId", typeof(System.Guid));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.CreateQuery<Authority>("[BaseEntities].[Authority](@UserId, @DeptId, @ActionId)", userIdParameter, deptIdParameter, actionIdParameter);
-        }
-    
-        [DbFunction("BaseEntities", "Get_LoginDept")]
-        public virtual IQueryable<LoginDept> Get_LoginDept(string loginName)
-        {
-            var loginNameParameter = loginName != null ?
-                new ObjectParameter("LoginName", loginName) :
-                new ObjectParameter("LoginName", typeof(string));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.CreateQuery<LoginDept>("[BaseEntities].[Get_LoginDept](@LoginName)", loginNameParameter);
-        }
-    
-        [DbFunction("BaseEntities", "Get_PermAction")]
-        public virtual IQueryable<Nullable<System.Guid>> Get_PermAction(Nullable<System.Guid> moduleId, Nullable<System.Guid> userId, Nullable<System.Guid> orgId)
-        {
-            var moduleIdParameter = moduleId.HasValue ?
-                new ObjectParameter("ModuleId", moduleId) :
-                new ObjectParameter("ModuleId", typeof(System.Guid));
-    
-            var userIdParameter = userId.HasValue ?
-                new ObjectParameter("UserId", userId) :
-                new ObjectParameter("UserId", typeof(System.Guid));
-    
-            var orgIdParameter = orgId.HasValue ?
-                new ObjectParameter("OrgId", orgId) :
-                new ObjectParameter("OrgId", typeof(System.Guid));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.CreateQuery<Nullable<System.Guid>>("[BaseEntities].[Get_PermAction](@ModuleId, @UserId, @OrgId)", moduleIdParameter, userIdParameter, orgIdParameter);
-        }
-    
-        [DbFunction("BaseEntities", "Get_PermModule")]
-        public virtual IQueryable<Nullable<System.Guid>> Get_PermModule(Nullable<System.Guid> userId, Nullable<System.Guid> orgId)
-        {
-            var userIdParameter = userId.HasValue ?
-                new ObjectParameter("UserId", userId) :
-                new ObjectParameter("UserId", typeof(System.Guid));
-    
-            var orgIdParameter = orgId.HasValue ?
-                new ObjectParameter("OrgId", orgId) :
-                new ObjectParameter("OrgId", typeof(System.Guid));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.CreateQuery<Nullable<System.Guid>>("[BaseEntities].[Get_PermModule](@UserId, @OrgId)", userIdParameter, orgIdParameter);
-        }
-    
-        [DbFunction("BaseEntities", "Get_RoleAction")]
-        public virtual IQueryable<RoleAction> Get_RoleAction(Nullable<System.Guid> roleId)
-        {
-            var roleIdParameter = roleId.HasValue ?
-                new ObjectParameter("RoleId", roleId) :
-                new ObjectParameter("RoleId", typeof(System.Guid));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.CreateQuery<RoleAction>("[BaseEntities].[Get_RoleAction](@RoleId)", roleIdParameter);
-        }
-    
-        public virtual ObjectResult<RoleData> Get_RoleData(Nullable<System.Guid> roleId)
-        {
-            var roleIdParameter = roleId.HasValue ?
-                new ObjectParameter("RoleId", roleId) :
-                new ObjectParameter("RoleId", typeof(System.Guid));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<RoleData>("Get_RoleData", roleIdParameter);
-        }
-    
-        [DbFunction("BaseEntities", "Get_RoleActionPermit")]
-        public virtual IQueryable<RoleActionPermit> Get_RoleActionPermit(Nullable<System.Guid> roleId)
-        {
-            var roleIdParameter = roleId.HasValue ?
-                new ObjectParameter("RoleId", roleId) :
-                new ObjectParameter("RoleId", typeof(System.Guid));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.CreateQuery<RoleActionPermit>("[BaseEntities].[Get_RoleActionPermit](@RoleId)", roleIdParameter);
-        }
-    
-        [DbFunction("BaseEntities", "Get_RoleDataPermit")]
-        public virtual IQueryable<RoleDataPermit> Get_RoleDataPermit(Nullable<System.Guid> roleId)
-        {
-            var roleIdParameter = roleId.HasValue ?
-                new ObjectParameter("RoleId", roleId) :
-                new ObjectParameter("RoleId", typeof(System.Guid));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.CreateQuery<RoleDataPermit>("[BaseEntities].[Get_RoleDataPermit](@RoleId)", roleIdParameter);
-        }
+        public virtual DbSet<SYS_Data> SYS_Data { get; set; }
+        public virtual DbSet<SYS_Role_Action> SYS_Role_Action { get; set; }
+        public virtual DbSet<SYS_Role_Data> SYS_Role_Data { get; set; }
+        public virtual DbSet<SYS_Role_Member> SYS_Role_Member { get; set; }
     }
 }

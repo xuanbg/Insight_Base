@@ -12,7 +12,7 @@ namespace Insight.Base.Common.Entity
     using System;
     using System.Collections.Generic;
     
-    public partial class SYS_RolePerm_Action
+    public partial class SYS_Role_Action
     {
         public System.Guid ID { get; set; }
         public long SN { get; set; }

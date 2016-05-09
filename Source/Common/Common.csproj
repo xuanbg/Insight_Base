@@ -7,7 +7,7 @@
     <ProjectGuid>{C4F26DD1-DE5A-4773-A789-7823E96EA166}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Insight.WS.Base.Common</RootNamespace>
+    <RootNamespace>Insight.Base.Common</RootNamespace>
     <AssemblyName>Common</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -49,39 +49,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Entity\Authority.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entity\LoginDept.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entity\OrgInfo.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entity\RoleAction.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entity\RoleActionPermit.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entity\RoleData.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entity\RoleDataPermit.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
+    <Compile Include="Authority.cs" />
+    <Compile Include="Entity\OrgInfo.cs" />
     <Compile Include="Entity\RoleInfo.cs" />
-    <Compile Include="Entity\RoleMember.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entity\RoleUser.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
     <Compile Include="Entity\ServiceInfo.cs" />
+    <Compile Include="Entity\SYS_Data.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
     <Compile Include="Entity\SYS_Interface.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
-    <Compile Include="Entity\TitleMember.cs">
+    <Compile Include="Entity\SYS_Role_Action.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SYS_Role_Data.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SYS_Role_Member.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="Utils\GuidParse.cs" />
@@ -132,28 +116,7 @@
     <Compile Include="Entity\SYS_OrgMember.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
-    <Compile Include="Entity\SYS_OrgMerger.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
     <Compile Include="Entity\SYS_Role.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entity\SYS_RolePerm_Action.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entity\SYS_RolePerm_Data.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entity\SYS_RolePerm_DataAbs.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entity\SYS_Role_Title.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entity\SYS_Role_User.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entity\SYS_Role_UserGroup.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="Entity\SYS_User.cs">

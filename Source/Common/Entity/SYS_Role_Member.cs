@@ -10,14 +10,19 @@
 namespace Insight.Base.Common.Entity
 {
     using System;
+    using System.Collections.Generic;
     
-    public partial class RoleActionPermit
+    public partial class SYS_Role_Member
     {
         public System.Guid ID { get; set; }
-        public Nullable<System.Guid> ParentId { get; set; }
-        public Nullable<int> Index { get; set; }
-        public Nullable<int> Type { get; set; }
-        public Nullable<int> Permit { get; set; }
-        public string Name { get; set; }
+        public long SN { get; set; }
+        public int Type { get; set; }
+        public System.Guid RoleId { get; set; }
+        public System.Guid MemberId { get; set; }
+        public System.Guid CreatorUserId { get; set; }
+        public System.DateTime CreateTime { get; set; }
+    
+        public virtual SYS_Role SYS_Role { get; set; }
+        public virtual SYS_User SYS_User { get; set; }
     }
 }

@@ -71,11 +71,12 @@ namespace Insight.Base
         /// <summary>
         /// 根据对象实体数据新增一条组织机构节点合并记录
         /// </summary>
-        /// <param name="org">组织节点合并对象</param>
+        /// <param name="id">合并目标ID</param>
+        /// <param name="org">组织节点对象（被合并节点）</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "orgs/merger", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "orgs/{id}/merger", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult AddOrgMerger(SYS_OrgMerger org);
+        JsonResult OrgMerger(string id, SYS_Organization org);
 
         /// <summary>
         /// 根据参数组集合批量插入职位成员关系

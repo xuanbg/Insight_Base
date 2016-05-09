@@ -10,9 +10,13 @@
 namespace Insight.Base.Common.Entity
 {
     using System;
+    using System.Collections.Generic;
     
-    public partial class Authority
+    public partial class SYS_Data
     {
-        public System.Guid ActionId { get; set; }
+        public System.Guid ID { get; set; }
+        public long SN { get; set; }
+        public int Type { get; set; }
+        public string Alias { get; set; }
     }
 }

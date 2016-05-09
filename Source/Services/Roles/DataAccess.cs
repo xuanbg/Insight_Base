@@ -95,12 +95,14 @@ namespace Insight.Base
 
                 sr.Name = role.Name;
                 sr.Description = role.Description;
+
+                // 更新操作权限
                 foreach (var action in role.Actions)
                 {
-                    var pa = context.SYS_RolePerm_Action.SingleOrDefault(p => p.RoleId == role.ID && p.ActionId == action.ID);
+                    var pa = context.SYS_Role_Action.SingleOrDefault(p => p.RoleId == role.ID && p.ActionId == action.ID);
                     if (pa == null && action.Permit.HasValue && !action.state.HasValue)
                     {
-                        var ia = new SYS_RolePerm_Action
+                        var ia = new SYS_Role_Action
                         {
                             ID = Guid.NewGuid(),
                             RoleId = role.ID,
@@ -109,7 +111,7 @@ namespace Insight.Base
                             CreatorUserId = uid,
                             CreateTime = DateTime.Now
                         };
-                        context.SYS_RolePerm_Action.Add(ia);
+                        context.SYS_Role_Action.Add(ia);
                         continue;
                     }
 
@@ -121,23 +123,25 @@ namespace Insight.Base
                     }
                     else
                     {
-                        context.SYS_RolePerm_Action.Remove(pa);
+                        context.SYS_Role_Action.Remove(pa);
                     }
                 }
 
+                // 更新数据权限
                 foreach (var data in role.Datas)
                 {
-                    var pd = context.SYS_RolePerm_Data.SingleOrDefault(p => p.ID == data.ID);
+                    var pd = context.SYS_Role_Data.SingleOrDefault(p => p.ID == data.ID);
                     if (pd == null && data.Permit.HasValue && !data.state.HasValue)
                     {
-                        // ReSharper disable once PossibleInvalidOperationException
-                        var id = new SYS_RolePerm_Data
+                        var id = new SYS_Role_Data
                         {
                             ID = Guid.NewGuid(),
+                            Mode = 0,
                             RoleId = role.ID,
+                            // ReSharper disable once PossibleInvalidOperationException
                             ModuleId = data.ParentId.Value,
-                            Mode = data.Type - 2,
                             Permission = data.Permit.Value,
+                            ModeId = data.ID,
                             CreatorUserId = uid,
                             CreateTime = DateTime.Now
                         };
@@ -153,7 +157,7 @@ namespace Insight.Base
                     }
                     else
                     {
-                        context.SYS_RolePerm_Data.Remove(pd);
+                        context.SYS_Role_Data.Remove(pd);
                     }
                 }
                 return context.SaveChanges() > 0;
@@ -209,7 +213,7 @@ namespace Insight.Base
             using (var context = new BaseEntities())
             {
                 var list = from o in context.OrgInfo
-                           join r in context.SYS_Role_Title.Where(r => r.RoleId == id) on o.ID equals r.OrgId into temp
+                           join r in context.SYS_Role_Member.Where(r => r.RoleId == id && r.Type == 3) on o.ID equals r.MemberId into temp
                            from t in temp.DefaultIfEmpty()
                            where t == null
                            select new { o.ID, o.ParentId, o.Index, o.NodeType, o.Name };
@@ -227,7 +231,7 @@ namespace Insight.Base
             using (var context = new BaseEntities())
             {
                 var list = from g in context.SYS_UserGroup.OrderBy(g => g.SN)
-                           join r in context.SYS_Role_UserGroup.Where(r => r.RoleId == id) on g.ID equals r.GroupId into temp
+                           join r in context.SYS_Role_Member.Where(r => r.RoleId == id && r.Type == 2) on g.ID equals r.MemberId into temp
                            from t in temp.DefaultIfEmpty()
                            where g.Visible && t == null
                            select new { g.ID, g.Name, g.Description };
@@ -245,7 +249,7 @@ namespace Insight.Base
             using (var context = new BaseEntities())
             {
                 var list = from u in context.SYS_User.OrderBy(g => g.SN)
-                           join r in context.SYS_Role_User.Where(r => r.RoleId == id) on u.ID equals r.UserId into temp
+                           join r in context.SYS_Role_Member.Where(r => r.RoleId == id && r.Type == 1) on u.ID equals r.MemberId into temp
                            from t in temp.DefaultIfEmpty()
                            where u.Validity && u.Type > 0 && t == null
                            select new { u.ID, u.Name, u.LoginName, u.Description };
