@@ -273,10 +273,10 @@ GO
 CREATE TABLE SYS_Role_Data(
 [ID]               UNIQUEIDENTIFIER CONSTRAINT IX_SYS_RolePerm_Data_Rel PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
 [SN]               BIGINT IDENTITY(1,1),                                                                                                   --自增序列
-[Mode]             INT DEFAULT 0 NOT NULL,                                                                                                 --数据授权模式：0、相对模式；1、用户模式；2、部门模式；
 [RoleId]           UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_Role(ID) ON DELETE CASCADE NOT NULL,                                        --角色ID
 [ModuleId]         UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_Module(ID) ON DELETE CASCADE NOT NULL,                                      --业务模块ID
-[ModeId]           UNIQUEIDENTIFIER NOT NULL,                                                                                              --模式ID
+[Mode]             INT DEFAULT 0 NOT NULL,                                                                                                 --数据授权模式：0、相对模式；1、用户模式；2、部门模式；
+[ModeId]           UNIQUEIDENTIFIER NOT NULL,                                                                                              --模式ID或部门/用户ID（绝对模式）
 [Permission]       INT DEFAULT 0 NOT NULL,                                                                                                 --权限：0、只读；1、读写
 [CreatorUserId]    UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_User(ID) DEFAULT '00000000-0000-0000-0000-000000000000' NOT NULL,           --创建人ID
 [CreateTime]       DATETIME DEFAULT GETDATE() NOT NULL                                                                                     --创建时间
