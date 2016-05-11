@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using Insight.Base.Common;
 using Insight.Base.Common.Entity;
-using static Insight.Base.Common.DataAccess;
-using static Insight.Base.Common.Utils.SqlHelper;
+using Insight.Base.Common.Utils;
 
-namespace Insight.Base
+namespace Insight.Base.Services
 {
     public partial class Organizations
     {
@@ -37,9 +37,9 @@ namespace Insight.Base
                 new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = obj.CreatorUserId},
                 new SqlParameter("@Write", SqlDbType.Int) {Value = 0}
             };
-            cmds.Add(MakeCommand(ChangeIndex("SYS_Organization", index, obj.Index, obj.ParentId, false)));
-            cmds.Add(MakeCommand(sql, parm));
-            return SqlExecute(cmds, 0);
+            cmds.Add(SqlHelper.MakeCommand(DataAccess.ChangeIndex("SYS_Organization", index, obj.Index, obj.ParentId, false)));
+            cmds.Add(SqlHelper.MakeCommand(sql, parm));
+            return SqlHelper.SqlExecute(cmds, 0);
         }
 
         /// <summary>
@@ -51,9 +51,9 @@ namespace Insight.Base
         {
             var cmds = new List<SqlCommand>();
             var obj = GetOrg(id);
-            cmds.Add(MakeCommand($"Delete from SYS_Organization where ID = '{id}'"));
-            cmds.Add(MakeCommand(ChangeIndex("SYS_Organization", obj.Index, 99999, obj.ParentId, false)));
-            return SqlExecute(cmds);
+            cmds.Add(SqlHelper.MakeCommand($"Delete from SYS_Organization where ID = '{id}'"));
+            cmds.Add(SqlHelper.MakeCommand(DataAccess.ChangeIndex("SYS_Organization", obj.Index, 99999, obj.ParentId, false)));
+            return SqlHelper.SqlExecute(cmds);
         }
 
         /// <summary>
@@ -78,9 +78,9 @@ namespace Insight.Base
                 new SqlParameter("@PositionId", SqlDbType.UniqueIdentifier) {Value = obj.PositionId}
             };
 
-            cmds.Add(MakeCommand(ChangeIndex("SYS_Organization", index, obj.Index, obj.ParentId, false)));
-            cmds.Add(MakeCommand(sql, parm));
-            return SqlExecute(cmds);
+            cmds.Add(SqlHelper.MakeCommand(DataAccess.ChangeIndex("SYS_Organization", index, obj.Index, obj.ParentId, false)));
+            cmds.Add(SqlHelper.MakeCommand(sql, parm));
+            return SqlHelper.SqlExecute(cmds);
         }
 
         /// <summary>
@@ -104,34 +104,37 @@ namespace Insight.Base
         {
             using (var context = new BaseEntities())
             {
-                var members = context.TitleMember;
-                var orgs = from o in context.OrgInfo
-                           select new
-                           {
-                               o.ID,
-                               o.ParentId,
-                               o.Index,
-                               o.NodeType,
-                               o.Name,
-                               o.FullName,
-                               o.Alias,
-                               o.Code,
-                               Members = members.Where(m => m.TitleId == o.ID)
-                           };
-                return orgs.ToList();
+                return from o in context.SYS_Organization
+                       select new
+                       {
+                           o.ID,
+                           o.ParentId,
+                           o.Index,
+                           o.NodeType,
+                           o.Name,
+                           o.FullName,
+                           o.Alias,
+                           o.Code,
+                           Members = from m in context.SYS_OrgMember.Where(m => m.OrgId == o.ID)
+                                     join u in context.SYS_User on m.UserId equals u.ID
+                                     select new { m.ID, u.LoginName, u.Name, u.Validity }
+                       };
             }
         }
 
         /// <summary>
         /// 根据用户登录名获取可登录部门列表
         /// </summary>
-        /// <param name="loginName">用户登录名</param>
+        /// <param name="id">用户ID</param>
         /// <returns>DataTable 可登录部门列表</returns>
-        private List<LoginDept> GetDeptList(string loginName)
+        private IEnumerable<object> GetDeptList(Guid id)
         {
             using (var context = new BaseEntities())
             {
-                return context.Get_LoginDept(loginName).ToList();
+                return from m in context.SYS_OrgMember.Where(m => m.UserId == id)
+                    join t in context.SYS_Organization on m.OrgId equals t.ID
+                    join d in context.SYS_Organization on t.ParentId equals d.ID
+                    select new {d.ID, d.FullName};
             }
         }
 
@@ -143,20 +146,20 @@ namespace Insight.Base
         /// <returns>bool 是否成功</returns>
         private bool Update(Guid id, SYS_Organization obj)
         {
-            var cmd = MakeCommand(ChangeIndex("SYS_Organization", obj.Index, 999, obj.ParentId, false));
+            var cmd = SqlHelper.MakeCommand(DataAccess.ChangeIndex("SYS_Organization", obj.Index, 999, obj.ParentId, false));
             var cmds = new List<SqlCommand> {cmd};
             if (obj.NodeType < 3)
             {
                 var org = GetOrg(id);
-                cmds.Add(MakeCommand($"update SYS_Organization set ParentId = '{org.ParentId}' where ParentId = '{obj.ParentId}'"));
+                cmds.Add(SqlHelper.MakeCommand($"update SYS_Organization set ParentId = '{org.ParentId}' where ParentId = '{obj.ParentId}'"));
             }
             else
             {
-                cmds.Add(MakeCommand($"update SYS_OrgMember set OrgId = '{id}' where OrgId = '{obj.ID}'"));
+                cmds.Add(SqlHelper.MakeCommand($"update SYS_OrgMember set OrgId = '{id}' where OrgId = '{obj.ID}'"));
             }
 
-            cmds.Add(MakeCommand($"delete SYS_Organization where id = '{obj.ID}'"));
-            return SqlExecute(cmds);
+            cmds.Add(SqlHelper.MakeCommand($"delete SYS_Organization where id = '{obj.ID}'"));
+            return SqlHelper.SqlExecute(cmds);
         }
 
         /// <summary>
@@ -177,11 +180,11 @@ namespace Insight.Base
             var org = GetOrg(obj.ID);
             var cmds = new List<SqlCommand>
             {
-                MakeCommand(ChangeIndex("SYS_Organization", org.Index, 999, org.ParentId, false)),
-                MakeCommand(sql, parm)
+                SqlHelper.MakeCommand(DataAccess.ChangeIndex("SYS_Organization", org.Index, 999, org.ParentId, false)),
+                SqlHelper.MakeCommand(sql, parm)
             };
 
-            return SqlExecute(cmds);
+            return SqlHelper.SqlExecute(cmds);
         }
 
         /// <summary>
@@ -199,8 +202,8 @@ namespace Insight.Base
                 new SqlParameter("@OrgId", SqlDbType.UniqueIdentifier) {Value = tid},
                 new SqlParameter("@UserId", SqlDbType.UniqueIdentifier) {Value = id},
                 new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = uid}
-            }).Select(parm => MakeCommand(sql, parm)).ToList();
-            return SqlExecute(cmds);
+            }).Select(parm => SqlHelper.MakeCommand(sql, parm)).ToList();
+            return SqlHelper.SqlExecute(cmds);
         }
 
         /// <summary>
@@ -214,20 +217,8 @@ namespace Insight.Base
             var cmds = ids.Select(id => new[]
             {
                 new SqlParameter("@ID", SqlDbType.UniqueIdentifier) {Value = id}
-            }).Select(parm => MakeCommand(sql, parm)).ToList();
-            return SqlExecute(cmds);
-        }
-
-        /// <summary>
-        /// 获取所有职位成员用户
-        /// </summary>
-        /// <returns>DataTable 节点成员信息结果集</returns>
-        private List<TitleMember> GetOrgMemberList()
-        {
-            using (var context = new BaseEntities())
-            {
-                return context.TitleMember.ToList();
-            }
+            }).Select(parm => SqlHelper.MakeCommand(sql, parm)).ToList();
+            return SqlHelper.SqlExecute(cmds);
         }
 
         /// <summary>

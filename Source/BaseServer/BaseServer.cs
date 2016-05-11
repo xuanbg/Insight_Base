@@ -2,9 +2,9 @@
 using System.ServiceProcess;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
-using static Insight.Base.Common.Utils.Util;
+using Insight.Base.Common.Utils;
 
-namespace Insight.Base
+namespace Insight.Base.Server
 {
     public partial class BaseServer : ServiceBase
     {
@@ -35,14 +35,14 @@ namespace Insight.Base
         protected override void OnStart(string[] args)
         {
             var list = DataAccess.GetServiceList();
-            var ver = GetAppSetting("Version");
+            var ver = Util.GetAppSetting("Version");
             Services = new Services();
             foreach (var info in list)
             {
                 var service = new ServiceInfo
                 {
-                    BaseAddress = GetAppSetting("Address"),
-                    Port = info.Port ?? GetAppSetting("Port"),
+                    BaseAddress = Util.GetAppSetting("Address"),
+                    Port = info.Port ?? Util.GetAppSetting("Port"),
                     Path = info.Path,
                     NameSpace = info.NameSpace,
                     Interface = info.Interface,
@@ -69,10 +69,10 @@ namespace Insight.Base
         /// </summary>
         private static void InitSeting()
         {
-            LogServer = GetAppSetting("LogServer");
-            CheckOpenID = bool.Parse(GetAppSetting("CheckOpenID"));
-            CheckMachineId = bool.Parse(GetAppSetting("CheckMachineId"));
-            Expired = Convert.ToInt32(GetAppSetting("Expired"));
+            Util.LogServer = Util.GetAppSetting("LogServer");
+            Util.CheckOpenID = bool.Parse(Util.GetAppSetting("CheckOpenID"));
+            Util.CheckMachineId = bool.Parse(Util.GetAppSetting("CheckMachineId"));
+            Util.Expired = Convert.ToInt32(Util.GetAppSetting("Expired"));
         }
 
     }

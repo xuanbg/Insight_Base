@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.ServiceModel;
 using System.ServiceModel.Web;
-using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Base.Common.Utils;
 
-namespace Insight.Base
+namespace Insight.Base.Services
 {
     [ServiceContract]
     interface IModules

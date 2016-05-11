@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
-using static Insight.Base.Common.Utils.SqlHelper;
+using Insight.Base.Common.Utils;
 
-namespace Insight.Base
+namespace Insight.Base.Services
 {
     public partial class Codes
     {
@@ -30,7 +30,7 @@ namespace Insight.Base
                 new SqlParameter("@ModuleId", SqlDbType.UniqueIdentifier) {Value = mid},
                 new SqlParameter("@Char", mark)
             };
-            return SqlScalar(MakeCommand(sql, parm));
+            return SqlHelper.SqlScalar(SqlHelper.MakeCommand(sql, parm));
         }
 
     }

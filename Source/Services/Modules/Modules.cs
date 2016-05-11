@@ -6,7 +6,7 @@ using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Base.Common.Utils;
 
-namespace Insight.Base
+namespace Insight.Base.Services
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
     public partial class Modules:IModules
@@ -20,7 +20,8 @@ namespace Insight.Base
             var verify = new SessionVerify();
             if (!verify.Compare()) return verify.Result;
 
-            var data = GetModuleGroup(verify.Session);
+            var auth = new Authority(verify.Session.UserId, verify.Session.DeptId);
+            var data = auth.PermModuleGroups();
             return data.Any() ? verify.Result.Success(data) : verify.Result.NoContent();
         }
 
@@ -33,7 +34,8 @@ namespace Insight.Base
             var verify = new SessionVerify();
             if (!verify.Compare()) return verify.Result;
 
-            var data = GetUserModule(verify.Session);
+            var auth = new Authority(verify.Session.UserId, verify.Session.DeptId);
+            var data = auth.PermModules();
             return data.Any() ? verify.Result.Success(data) : verify.Result.NoContent();
         }
 
@@ -72,7 +74,8 @@ namespace Insight.Base
             var verify = new SessionVerify();
             if (!verify.ParseIdAndCompare(id)) return verify.Result;
 
-            var data = GetAction(verify.Session, verify.Guid);
+            var auth = new Authority(verify.Session.UserId, verify.Session.DeptId);
+            var data = auth.ModuleActions(verify.Guid);
             return data.Any() ? verify.Result.Success(data) : verify.Result.NoContent();
         }
 

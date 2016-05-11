@@ -5,9 +5,8 @@ using System.ServiceModel;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Base.Common.Utils;
-using static Insight.Base.Common.Utils.Util;
 
-namespace Insight.Base
+namespace Insight.Base.Services
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
     public partial class Organizations : IOrganizations
@@ -72,7 +71,7 @@ namespace Insight.Base
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
             var org = GetOrg(verify.Guid);
-            return org == null ? verify.Result.NotFound() : verify.Result.Success(Serialize(org));
+            return org == null ? verify.Result.NotFound() : verify.Result.Success(Util.Serialize(org));
         }
 
         /// <summary>
@@ -150,20 +149,6 @@ namespace Insight.Base
         }
 
         /// <summary>
-        /// 获取所有职位成员用户
-        /// </summary>
-        /// <returns>JsonResult</returns>
-        public JsonResult GetOrgMembers()
-        {
-            const string action = "928C7527-A2F7-49A3-A548-12B3834D8822";
-            var verify = new SessionVerify();
-            if (!verify.Compare(action)) return verify.Result;
-
-            var data = GetOrgMemberList();
-            return data.Any() ? verify.Result.Success(data) : verify.Result.NoContent();
-        }
-
-        /// <summary>
         /// 获取职位成员之外的所有用户
         /// </summary>
         /// <param name="id">节点ID</param>
@@ -184,11 +169,17 @@ namespace Insight.Base
         /// <returns>JsonResult</returns>
         public JsonResult GetLoginDepts(string account)
         {
-            var verify = General.Verify(account.ToUpper() + Secret);
+            var verify = General.Verify(account.ToUpper() + Util.Secret);
             if (!verify.Successful) return verify;
 
-            var data = GetDeptList(account);
-            return data.Count > 0 ? verify.Success(Serialize(data)) : verify.NoContent();
+            using (var context = new BaseEntities())
+            {
+                var user = context.SYS_User.SingleOrDefault(u => u.LoginName == account);
+                if (user == null) return verify.NotFound();
+
+                var data = GetDeptList(user.ID);
+                return data.Any() ? verify.Success(Util.Serialize(data)) : verify.NoContent();
+            }
         }
 
     }

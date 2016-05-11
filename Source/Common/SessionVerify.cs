@@ -171,7 +171,8 @@ namespace Insight.Base.Common
             }
 
             // 根据传入的操作码进行鉴权
-            if (DataAccess.Authority(Session, aid)) return true;
+            var auth = new Authority(Basis.UserId, Basis.DeptId);
+            if (auth.Identify(aid)) return true;
 
             Result.Forbidden();
             return false;

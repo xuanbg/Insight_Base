@@ -4,9 +4,9 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using Insight.Base.Common.Entity;
-using static Insight.Base.Common.Utils.SqlHelper;
+using Insight.Base.Common.Utils;
 
-namespace Insight.Base
+namespace Insight.Base.Services
 {
     public partial class Users
     {
@@ -34,7 +34,7 @@ namespace Insight.Base
                 new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = obj.CreatorUserId},
                 new SqlParameter("@Read", SqlDbType.Int) {Value = 0}
             };
-            return SqlScalar(MakeCommand(sql, parm));
+            return SqlHelper.SqlScalar(SqlHelper.MakeCommand(sql, parm));
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace Insight.Base
         private bool DeleteUser(Guid id)
         {
             var sql = $"Delete from SYS_User where ID = '{id}' and BuiltIn = 0";
-            return SqlNonQuery(MakeCommand(sql)) > 0;
+            return SqlHelper.SqlNonQuery(SqlHelper.MakeCommand(sql)) > 0;
         }
 
         /// <summary>
@@ -64,6 +64,8 @@ namespace Insight.Base
                 if (user.Password == password) return true;
 
                 user.Password = password;
+                if (!context.ChangeTracker.HasChanges()) return true;
+
                 return context.SaveChanges() > 0;
             }
         }
@@ -85,6 +87,8 @@ namespace Insight.Base
                 user.Name = obj.Name;
                 user.Description = obj.Description;
                 user.Type = obj.Type;
+                if (!context.ChangeTracker.HasChanges()) return true;
+
                 return context.SaveChanges() > 0;
             }
         }
@@ -105,6 +109,8 @@ namespace Insight.Base
                 if (user.Validity == validity) return true;
 
                 user.Validity = validity;
+                if (!context.ChangeTracker.HasChanges()) return true;
+
                 return context.SaveChanges() > 0;
             }
         }
@@ -150,7 +156,7 @@ namespace Insight.Base
                 new SqlParameter("@Description", obj.Description),
                 new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = id}
             };
-            return SqlScalar(MakeCommand(sql, parm));
+            return SqlHelper.SqlScalar(SqlHelper.MakeCommand(sql, parm));
         }
 
         /// <summary>
@@ -161,7 +167,7 @@ namespace Insight.Base
         private bool DeleteGroup(Guid id)
         {
             var sql = $"Delete from SYS_UserGroup where ID = '{id}' and BuiltIn = 0";
-            return SqlNonQuery(MakeCommand(sql)) > 0;
+            return SqlHelper.SqlNonQuery(SqlHelper.MakeCommand(sql)) > 0;
         }
 
         /// <summary>
@@ -178,7 +184,7 @@ namespace Insight.Base
                 new SqlParameter("@Name", obj.Name),
                 new SqlParameter("@Description", obj.Description)
             };
-            return SqlNonQuery(MakeCommand(sql, parm)) > 0;
+            return SqlHelper.SqlNonQuery(SqlHelper.MakeCommand(sql, parm)) > 0;
         }
 
         /// <summary>
@@ -222,8 +228,8 @@ namespace Insight.Base
                 new SqlParameter("@GroupId", SqlDbType.UniqueIdentifier) {Value = gid},
                 new SqlParameter("@UserId", SqlDbType.UniqueIdentifier) {Value = uid},
                 new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = id}
-            }).Select(parm => MakeCommand(sql, parm)).ToList();
-            return SqlExecute(cmds);
+            }).Select(parm => SqlHelper.MakeCommand(sql, parm)).ToList();
+            return SqlHelper.SqlExecute(cmds);
         }
 
         /// <summary>
@@ -237,8 +243,8 @@ namespace Insight.Base
             var cmds = ids.Select(id => new[]
             {
                 new SqlParameter("@ID", SqlDbType.UniqueIdentifier) {Value = id}
-            }).Select(parm => MakeCommand(sql, parm)).ToList();
-            return SqlExecute(cmds);
+            }).Select(parm => SqlHelper.MakeCommand(sql, parm)).ToList();
+            return SqlHelper.SqlExecute(cmds);
         }
 
         /// <summary>

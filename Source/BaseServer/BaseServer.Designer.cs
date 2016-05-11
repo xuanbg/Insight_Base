@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Insight.Base
+namespace Insight.Base.Server
 {
     partial class BaseServer
     {

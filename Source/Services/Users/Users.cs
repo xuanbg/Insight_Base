@@ -5,9 +5,8 @@ using System.ServiceModel;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Base.Common.Utils;
-using static Insight.Base.Common.Utils.Util;
 
-namespace Insight.Base
+namespace Insight.Base.Services
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
     public partial class Users : IUsers
@@ -35,21 +34,21 @@ namespace Insight.Base
             if (verify.Basis == null)
             {
                 var session = verify.Session;
-                var sign = Hash(session.LoginName + user.LoginName + user.Password);
+                var sign = Util.Hash(session.LoginName + user.LoginName + user.Password);
                 if (sign != session.Signature) return verify.Result.InvalidAuth();
 
                 if (InsertData(user) == null) return verify.Result.DataBaseError();
 
                 // 返回用于验证的Key
                 var us = SessionManage.GetSession(session);
-                return verify.Result.Created(CreateKey(us));
+                return verify.Result.Created(Util.CreateKey(us));
             }
 
             // 管理员添加用户，验证管理员身份及鉴权
             if (!verify.Compare(action)) return verify.Result;
 
             user.ID = Guid.NewGuid();
-            user.Password = Hash("123456");
+            user.Password = Util.Hash("123456");
             user.Type = 1;
             user.CreatorUserId = verify.Basis.UserId;
             var id = InsertData(user);
@@ -146,7 +145,7 @@ namespace Insight.Base
             const string action = "26481E60-0917-49B4-BBAA-2265E71E7B3F";
             var verify = new SessionVerify();
             var session = verify.Basis;
-            if (!StringCompare(session.LoginName, account)) session = SessionManage.GetSession(account);
+            if (!Util.StringCompare(session.LoginName, account)) session = SessionManage.GetSession(account);
 
             if (!verify.Compare(action, account)) return verify.Result;
 
@@ -157,8 +156,8 @@ namespace Insight.Base
 
             if (session == null) return verify.Result;
 
-            session.Signature = Hash(session.LoginName.ToUpper() + password);
-            return verify.Result.Success(CreateKey(session));
+            session.Signature = Util.Hash(session.LoginName.ToUpper() + password);
+            return verify.Result.Success(Util.CreateKey(session));
         }
 
         /// <summary>
@@ -174,23 +173,23 @@ namespace Insight.Base
             var session = verify.Basis;
             if (session == null) return verify.Result.NotFound();
 
-            var sign = Hash(session.LoginName.ToUpper() + code + password);
+            var sign = Util.Hash(session.LoginName.ToUpper() + code + password);
             if (verify.Session.Signature != sign) return verify.Result.InvalidAuth();
 
             // 验证短信验证码
             var mobile = session.LoginName;
-            SmsCodes.RemoveAll(c => c.FailureTime < DateTime.Now);
-            var record = SmsCodes.FirstOrDefault(c => c.Mobile == mobile && c.Code == code && c.Type == 2);
+            Util.SmsCodes.RemoveAll(c => c.FailureTime < DateTime.Now);
+            var record = Util.SmsCodes.FirstOrDefault(c => c.Mobile == mobile && c.Code == code && c.Type == 2);
             if (record == null) return verify.Result.SMSCodeError();
 
-            SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == 2);
+            Util.SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == 2);
 
             // 更新用户登录密码
             var reset = Update(account, password);
             if (reset == null || !reset.Value) return verify.Result.DataBaseError();
 
-            session.Signature = Hash(account.ToUpper() + password);
-            return verify.Result.Success(CreateKey(session));
+            session.Signature = Util.Hash(account.ToUpper() + password);
+            return verify.Result.Success(Util.CreateKey(session));
         }
 
         /// <summary>
@@ -227,10 +226,10 @@ namespace Insight.Base
             verify.Basis.OpenId = verify.Session.OpenId;
             verify.Basis.MachineId = verify.Session.MachineId;
             verify.Basis.DeptId = verify.Session.DeptId;
-            verify.Basis.Expired = DateTime.Now.AddHours(Expired);
+            verify.Basis.Expired = DateTime.Now.AddHours(Util.Expired);
 
             // 返回用于验证的Key
-            var key = CreateKey(verify.Basis);
+            var key = Util.CreateKey(verify.Basis);
             return verify.Result.Success(key);
         }
 

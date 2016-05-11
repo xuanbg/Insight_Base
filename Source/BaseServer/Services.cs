@@ -9,7 +9,7 @@ using System.ServiceModel.Description;
 using System.Windows.Forms;
 using Insight.Base.Common.Entity;
 
-namespace Insight.Base
+namespace Insight.Base.Server
 {
     public class Services
     {

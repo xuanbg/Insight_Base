@@ -4,9 +4,9 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using Insight.Base.Common.Entity;
-using static Insight.Base.Common.Utils.SqlHelper;
+using Insight.Base.Common.Utils;
 
-namespace Insight.Base
+namespace Insight.Base.Services
 {
     public partial class Roles
     {
@@ -18,7 +18,7 @@ namespace Insight.Base
         /// <returns>角色ID</returns>
         private object InsertData(Guid uid, RoleInfo role)
         {
-            var asql = "insert SYS_RolePerm_Action(RoleId, ActionId, Action, CreatorUserId) ";
+            var asql = "insert SYS_Role_Action(RoleId, ActionId, Action, CreatorUserId) ";
             asql += "select @RoleId, @ActionId, @Action, @CreatorUserId";
             var actions = from a in role.Actions
                 select new[]
@@ -30,7 +30,7 @@ namespace Insight.Base
                     new SqlParameter("@Read", SqlDbType.Int) {Value = 0}
                 }
                 into p
-                select MakeCommand(asql, p);
+                select SqlHelper.MakeCommand(asql, p);
 
             var dsql = "insert SYS_RolePerm_Data(RoleId, ModuleId, Mode, Permission, CreatorUserId) ";
             dsql += "select @RoleId, @ModuleId, @Mode, @Permission, @CreatorUserId";
@@ -45,7 +45,7 @@ namespace Insight.Base
                     new SqlParameter("@Read", SqlDbType.Int) {Value = 0}
                 }
                 into p
-                select MakeCommand(dsql, p);
+                select SqlHelper.MakeCommand(dsql, p);
 
             var sql = "insert SYS_Role (Name, Description, CreatorUserId) ";
             sql += "select @Name, @Description, @CreatorUserId;";
@@ -57,10 +57,10 @@ namespace Insight.Base
                 new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = uid},
                 new SqlParameter("@Write", SqlDbType.Int) {Value = 0}
             };
-            var cmds = new List<SqlCommand> {MakeCommand(sql, parm)};
+            var cmds = new List<SqlCommand> {SqlHelper.MakeCommand(sql, parm)};
             cmds.AddRange(actions);
             cmds.AddRange(datas);
-            return SqlExecute(cmds, 0);
+            return SqlHelper.SqlExecute(cmds, 0);
         }
 
         /// <summary>
@@ -200,7 +200,7 @@ namespace Insight.Base
         private bool DeleteRoleMember(Guid id, string type)
         {
             var sql = $"Delete from {(type == "3" ? "SYS_Role_Title" : (type == "2" ? "SYS_Role_UserGroup" : "SYS_Role_User"))} where ID = '{id}'";
-            return SqlNonQuery(MakeCommand(sql)) > 0;
+            return SqlHelper.SqlNonQuery(SqlHelper.MakeCommand(sql)) > 0;
         }
 
         /// <summary>

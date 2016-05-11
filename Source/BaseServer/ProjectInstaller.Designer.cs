@@ -1,4 +1,4 @@
-﻿namespace Insight.Base
+﻿namespace Insight.Base.Server
 {
     partial class ProjectInstaller
     {
