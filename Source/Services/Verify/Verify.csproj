@@ -7,7 +7,7 @@
     <ProjectGuid>{B18DFF40-4EB9-4777-B63E-756F36D5C5E2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Insight.WS.Base.Verify</RootNamespace>
+    <RootNamespace>Insight.Base.Services</RootNamespace>
     <AssemblyName>Verify</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

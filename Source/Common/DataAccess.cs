@@ -57,20 +57,6 @@ namespace Insight.Base.Common
         }
 
         /// <summary>
-        /// 根据操作ID返回鉴权结果
-        /// </summary>
-        /// <param name="obj">用户会话</param>
-        /// <param name="id">操作ID</param>
-        /// <returns>bool 是否授权</returns>
-        public static bool Authority(Session obj, Guid id)
-        {
-            using (var context = new BaseEntities())
-            {
-                return context.Authority(obj.UserId, obj.DeptId, id).Any();
-            }
-        }
-
-        /// <summary>
         /// 校验支付密码
         /// </summary>
         /// <param name="id">用户ID</param>
@@ -83,6 +69,5 @@ namespace Insight.Base.Common
                 return context.SYS_User.Any(u => u.ID == id && u.PayPassword == key);
             }
         }
-
     }
 }

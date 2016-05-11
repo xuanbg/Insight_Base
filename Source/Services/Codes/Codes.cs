@@ -5,7 +5,7 @@ using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Base.Common.Utils;
 
-namespace Insight.Base
+namespace Insight.Base.Services
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
     public partial class Codes : ICodes

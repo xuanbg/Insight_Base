@@ -2,7 +2,7 @@
 using System.ServiceModel.Web;
 using Insight.Base.Common.Utils;
 
-namespace Insight.Base
+namespace Insight.Base.Services
 {
     [ServiceContract]
     public interface IVerify

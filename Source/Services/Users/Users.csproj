@@ -7,7 +7,7 @@
     <ProjectGuid>{F6F13CEC-CCA4-450E-8F02-743FC17A4F96}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Insight.WS.Base.Users</RootNamespace>
+    <RootNamespace>Insight.Base.Services</RootNamespace>
     <AssemblyName>Users</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

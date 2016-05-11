@@ -5,9 +5,8 @@ using System.ServiceModel.Web;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Base.Common.Utils;
-using static Insight.Base.Common.Utils.Util;
 
-namespace Insight.Base
+namespace Insight.Base.Services
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
     public class Verify : IVerify
@@ -77,10 +76,10 @@ namespace Insight.Base
         /// <returns>JsonResult</returns>
         public JsonResult NewCode(string mobile, int type, int time)
         {
-            var verify = General.Verify(mobile + Secret);
+            var verify = General.Verify(mobile + Util.Secret);
             if (!verify.Successful) return verify;
 
-            var record = SmsCodes.OrderByDescending(r => r.CreateTime).FirstOrDefault(r => r.Mobile == mobile && r.Type == type);
+            var record = Util.SmsCodes.OrderByDescending(r => r.CreateTime).FirstOrDefault(r => r.Mobile == mobile && r.Type == type);
             if (record != null && (DateTime.Now - record.CreateTime).TotalSeconds < 60) return verify.TimeTooShort();
 
             var code = Util.Random.Next(100000, 999999).ToString();
@@ -92,7 +91,7 @@ namespace Insight.Base
                 FailureTime = DateTime.Now.AddMinutes(time),
                 CreateTime = DateTime.Now
             };
-            SmsCodes.Add(record);
+            Util.SmsCodes.Add(record);
             General.LogToLogServer("700501", $"已经为手机号【{mobile}】的用户生成了类型为【{type}】的短信验证码：【{code}】。此验证码将于{record.FailureTime}失效。", "验证服务", "生成短信验证码");
             return verify.Success(code);
         }
@@ -107,16 +106,16 @@ namespace Insight.Base
         /// <returns>JsonResult</returns>
         public JsonResult VerifyCode(string mobile, string code, int type, bool remove = true)
         {
-            var verify = General.Verify(mobile + Secret);
+            var verify = General.Verify(mobile + Util.Secret);
             if (!verify.Successful) return verify;
 
-            SmsCodes.RemoveAll(c => c.FailureTime < DateTime.Now);
-            var record = SmsCodes.FirstOrDefault(c => c.Mobile == mobile && c.Code == code && c.Type == type);
+            Util.SmsCodes.RemoveAll(c => c.FailureTime < DateTime.Now);
+            var record = Util.SmsCodes.FirstOrDefault(c => c.Mobile == mobile && c.Code == code && c.Type == type);
             if (record == null) return verify.SMSCodeError();
 
             if (!remove) return verify;
 
-            SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == type);
+            Util.SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == type);
             return verify;
         }
 

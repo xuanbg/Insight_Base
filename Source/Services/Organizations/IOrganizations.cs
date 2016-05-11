@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.ServiceModel;
 using System.ServiceModel.Web;
-using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Base.Common.Utils;
 
-namespace Insight.Base
+namespace Insight.Base.Services
 {
     [ServiceContract]
     public interface IOrganizations
@@ -96,14 +95,6 @@ namespace Insight.Base
         [WebInvoke(Method = "DELETE", UriTemplate = "orgs/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         JsonResult RemoveOrgMember(List<Guid> ids);
-
-        /// <summary>
-        /// 获取所有职位成员用户
-        /// </summary>
-        /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "orgs/members", ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        JsonResult GetOrgMembers();
 
         /// <summary>
         /// 获取职位成员之外的所有用户
