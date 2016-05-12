@@ -179,7 +179,8 @@ namespace Insight.Base.Services
                                r.ID, r.BuiltIn, r.Name, r.Description,
                                Members = context.RoleMember.Where(m => m.RoleId == r.ID),
                                MemberUsers = context.RoleMemberUser.Where(u => u.RoleId == r.ID),
-                               Actions = context.RoleAction.Where(a => a.RoleId == r.ID)
+                               Actions = context.RoleAction.Where(a => a.RoleId == r.ID),
+                               Datas = context.RoleData.Where(d => d.RoleId == r.ID)
                            };
                 return list;
             }

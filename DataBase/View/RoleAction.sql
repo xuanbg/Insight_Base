@@ -6,7 +6,7 @@ DROP VIEW RoleAction
 GO
 
 
-/*****视图：查询所有角色的成员用户*****/
+/*****视图：查询所有角色的操作权限*****/
 
 CREATE VIEW RoleAction
 AS

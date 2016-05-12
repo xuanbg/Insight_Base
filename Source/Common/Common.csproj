@@ -54,6 +54,9 @@
     <Compile Include="Entity\RoleAction.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
+    <Compile Include="Entity\RoleData.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
     <Compile Include="Entity\RoleInfo.cs" />
     <Compile Include="Entity\RoleMember.cs">
       <DependentUpon>Model.tt</DependentUpon>

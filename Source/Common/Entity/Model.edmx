@@ -273,6 +273,8 @@
 警告 6002: 表/视图“Insight_Base.dbo.RoleAction”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
         <EntityType Name="RoleAction">
           <Key>
+            
+            
             <PropertyRef Name="ID" />
           </Key>
           <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
@@ -286,10 +288,34 @@
           <Property Name="Name" Type="nvarchar" MaxLength="64" />
         </EntityType>
         <!--生成过程中发现错误:
+警告 6002: 表/视图“Insight_Base.dbo.RoleData”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="RoleData">
+          <Key>
+            
+            
+            
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ParentId" Type="uniqueidentifier" />
+          <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Mode" Type="int" Nullable="false" />
+          <Property Name="ModeId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Permission" Type="int" />
+          <Property Name="Permit" Type="int" />
+          <Property Name="Index" Type="int" />
+          <Property Name="NodeType" Type="int" />
+          <Property Name="Name" Type="nvarchar" MaxLength="64" />
+        </EntityType>
+        <!--生成过程中发现错误:
 警告 6002: 表/视图“Insight_Base.dbo.RoleMember”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
         <EntityType Name="RoleMember">
           <Key>
             <PropertyRef Name="ID" />
+            
+            
+            
+            
           </Key>
           <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="ParentId" Type="int" />
@@ -304,6 +330,10 @@
         <EntityType Name="RoleMemberUser">
           <Key>
             <PropertyRef Name="ID" />
+            
+            
+            
+            
           </Key>
           <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
@@ -826,6 +856,20 @@
     [RoleAction].[NodeType] AS [NodeType], 
     [RoleAction].[Name] AS [Name]
     FROM [dbo].[RoleAction] AS [RoleAction]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="RoleData" EntityType="Self.RoleData" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [RoleData].[ID] AS [ID], 
+    [RoleData].[ParentId] AS [ParentId], 
+    [RoleData].[RoleId] AS [RoleId], 
+    [RoleData].[Mode] AS [Mode], 
+    [RoleData].[ModeId] AS [ModeId], 
+    [RoleData].[Permission] AS [Permission], 
+    [RoleData].[Permit] AS [Permit], 
+    [RoleData].[Index] AS [Index], 
+    [RoleData].[NodeType] AS [NodeType], 
+    [RoleData].[Name] AS [Name]
+    FROM [dbo].[RoleData] AS [RoleData]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="RoleMember" EntityType="Self.RoleMember" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
@@ -1550,6 +1594,7 @@
           <EntitySet Name="RoleAction" EntityType="BaseModel.RoleAction" />
           <EntitySet Name="RoleMember" EntityType="BaseModel.RoleMember" />
           <EntitySet Name="RoleMemberUser" EntityType="BaseModel.RoleMemberUser" />
+          <EntitySet Name="RoleData" EntityType="BaseModel.RoleData" />
         </EntityContainer>
         <EntityType Name="SYS_Allot_Record">
           <Key>
@@ -2002,6 +2047,21 @@
           <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="Validity" Type="Boolean" Nullable="false" />
         </EntityType>
+        <EntityType Name="RoleData">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="ParentId" Type="Guid" />
+          <Property Name="RoleId" Type="Guid" Nullable="false" />
+          <Property Name="Mode" Type="Int32" Nullable="false" />
+          <Property Name="ModeId" Type="Guid" Nullable="false" />
+          <Property Name="Permission" Type="Int32" />
+          <Property Name="Permit" Type="Int32" />
+          <Property Name="Index" Type="Int32" />
+          <Property Name="NodeType" Type="Int32" />
+          <Property Name="Name" Type="String" MaxLength="64" FixedLength="false" Unicode="true" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -2327,6 +2387,22 @@
                 <ScalarProperty Name="LoginName" ColumnName="LoginName" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RoleData">
+            <EntityTypeMapping TypeName="BaseModel.RoleData">
+              <MappingFragment StoreEntitySet="RoleData">
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="NodeType" ColumnName="NodeType" />
+                <ScalarProperty Name="Index" ColumnName="Index" />
+                <ScalarProperty Name="Permit" ColumnName="Permit" />
+                <ScalarProperty Name="Permission" ColumnName="Permission" />
+                <ScalarProperty Name="ModeId" ColumnName="ModeId" />
+                <ScalarProperty Name="Mode" ColumnName="Mode" />
+                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+                <ScalarProperty Name="ParentId" ColumnName="ParentId" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>
