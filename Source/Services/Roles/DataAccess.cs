@@ -169,7 +169,7 @@ namespace Insight.Base.Services
         /// 获取所有角色
         /// </summary>
         /// <returns>角色信息结果集</returns>
-        private IQueryable<object> GetRoles()
+        private IEnumerable<object> GetRoles()
         {
             using (var context = new BaseEntities())
             {
@@ -182,7 +182,7 @@ namespace Insight.Base.Services
                                Actions = context.RoleAction.Where(a => a.RoleId == r.ID),
                                Datas = context.RoleData.Where(d => d.RoleId == r.ID)
                            };
-                return list;
+                return list.ToList();
             }
         }
 

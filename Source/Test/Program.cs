@@ -2,8 +2,7 @@
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Base.Common.Utils;
-using Insight.WS.Service;
-using ServiceInfo = Insight.WS.Service.ServiceInfo;
+using Insight.Base.Server;
 
 namespace Test
 {
@@ -13,16 +12,6 @@ namespace Test
 
         static void Main(string[] args)
         {
-
-            using (var context = new BaseEntities())
-            {
-                var obj = context.SYS_User.Single(u => u.LoginName == "Admin");
-                obj.LoginName = "Admin";
-                var r = context.ChangeTracker.HasChanges();
-                obj.LoginName = "admin";
-                var t = context.ChangeTracker.HasChanges();
-            }
-
             var list = DataAccess.GetServiceList();
             Services = new Services();
             foreach (var info in list)
@@ -37,7 +26,7 @@ namespace Test
                     ComplyType = info.Service,
                     ServiceFile = info.ServiceFile
                 };
-                Services.CreateHost(service);
+                Services.CreateHost(service, "V1.0");
             }
             Services.StartService();
         }

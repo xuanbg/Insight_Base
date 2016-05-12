@@ -38,10 +38,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.dll</HintPath>
     </Reference>
-    <Reference Include="Service, Version=2.0.5913.24093, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Service.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -61,6 +57,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BaseServer\BaseServer.csproj">
+      <Project>{3419DA7E-3706-4E91-9821-E66CDE1836CE}</Project>
+      <Name>BaseServer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{C4F26DD1-DE5A-4773-A789-7823E96EA166}</Project>
       <Name>Common</Name>

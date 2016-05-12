@@ -35,7 +35,8 @@ namespace Insight.Base.Common
         /// <returns>bool 是否授权</returns>
         public bool Identify(Guid aid)
         {
-            return UserPermActions(aid).Any(p => p.Authority > 0);
+            var result = UserPermActions(aid);
+            return result.Any(p => p.Authority > 0);
         }
 
         /// <summary>
@@ -103,13 +104,15 @@ namespace Insight.Base.Common
         /// </summary>
         /// <param name="aid">功能操作ID</param>
         /// <returns>操作授权情况</returns>
-        private IQueryable<ActionAuth> UserPermActions(Guid aid)
+        private IEnumerable<ActionAuth> UserPermActions(Guid aid)
         {
             using (var context = new BaseEntities())
             {
-                return from p in context.SYS_Role_Action.Where(a => a.ActionId == aid && UserRoles().Any(id => id == a.RoleId))
-                       group p by p.ActionId into g
-                       select new ActionAuth { ID = g.Key, Authority = g.Min(p => p.Action) };
+                var roles = UserRoles();
+                var list = from p in context.SYS_Role_Action.Where(a => a.ActionId == aid && roles.Any(id => id == a.RoleId))
+                           group p by p.ActionId into g
+                           select new ActionAuth { ID = g.Key, Authority = g.Min(p => p.Action) };
+                return list.ToList();
             }
         }
 
@@ -117,7 +120,7 @@ namespace Insight.Base.Common
         /// 根据登录用户ID和登录部门ID，获取用户的角色集合
         /// </summary>
         /// <returns>角色ID集合</returns>
-        private IQueryable<Guid> UserRoles()
+        private IEnumerable<Guid> UserRoles()
         {
             using (var context = new BaseEntities())
             {
@@ -133,7 +136,7 @@ namespace Insight.Base.Common
                             join o in context.SYS_Organization on m.OrgId equals o.ID
                             where r.Type == 3 && o.ParentId == DeptId
                             select r.RoleId;
-                return rid_u.Union(rid_g).Union(rid_t);
+                return rid_u.Union(rid_g).Union(rid_t).ToList();
             }
         }
     }
