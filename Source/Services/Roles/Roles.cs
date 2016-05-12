@@ -140,35 +140,5 @@ namespace Insight.Base.Services
             return list.Any() ? verify.Result.Success(list) : verify.Result.NoContent();
         }
 
-        /// <summary>
-        /// 获取指定角色的所有功能操作和授权
-        /// </summary>
-        /// <param name="id">角色ID</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult GetRoleActions(string id)
-        {
-            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
-            var verify = new SessionVerify();
-            if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
-
-            var list = GetRoleActions(verify.Guid);
-            return list.Any() ? verify.Result.Success(list) : verify.Result.NoContent();
-        }
-
-        /// <summary>
-        /// 获取指定角色的所有相对数据权限
-        /// </summary>
-        /// <param name="id">角色ID</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult GetRoleRelData(string id)
-        {
-            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
-            var verify = new SessionVerify();
-            if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
-
-            var list = GetRoleDatas(verify.Guid);
-            return list.Any() ? verify.Result.Success(list) : verify.Result.NoContent();
-        }
-
     }
 }

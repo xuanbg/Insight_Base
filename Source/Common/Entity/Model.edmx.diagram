@@ -60,6 +60,9 @@
         <AssociationConnector Association="BaseModel.FK__SYS_Role___Creat__6B4FD30B" />
         <AssociationConnector Association="BaseModel.FK__SYS_Role___Creat__74D93D45" />
         <AssociationConnector Association="BaseModel.FK__SYS_Role___Creat__62BA8D0A" />
+        <EntityTypeShape EntityType="BaseModel.RoleAction" Width="1.5" PointX="4.75" PointY="3.625" />
+        <EntityTypeShape EntityType="BaseModel.RoleMember" Width="1.5" PointX="0.75" PointY="3.625" />
+        <EntityTypeShape EntityType="BaseModel.RoleMemberUser" Width="1.5" PointX="2.75" PointY="3.625" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

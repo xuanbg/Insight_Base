@@ -92,23 +92,5 @@ namespace Insight.Base.Services
         [OperationContract]
         JsonResult GetMemberOfUser(string id);
 
-        /// <summary>
-        /// 获取指定角色的所有功能操作和授权
-        /// </summary>
-        /// <param name="id">角色ID</param>
-        /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "roles/{id}/actions", ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        JsonResult GetRoleActions(string id);
-
-        /// <summary>
-        /// 获取指定角色的所有相对数据权限
-        /// </summary>
-        /// <param name="id">角色ID</param>
-        /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "roles/{id}/reldatas", ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        JsonResult GetRoleRelData(string id);
-
     }
 }

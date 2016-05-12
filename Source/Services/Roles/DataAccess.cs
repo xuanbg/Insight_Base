@@ -32,14 +32,15 @@ namespace Insight.Base.Services
                 into p
                 select SqlHelper.MakeCommand(asql, p);
 
-            var dsql = "insert SYS_RolePerm_Data(RoleId, ModuleId, Mode, Permission, CreatorUserId) ";
-            dsql += "select @RoleId, @ModuleId, @Mode, @Permission, @CreatorUserId";
+            var dsql = "insert SYS_Role_Data(RoleId, ModuleId, Mode, ModeId, Permission, CreatorUserId) ";
+            dsql += "select @RoleId, @ModuleId, @Mode, @ModeId, @Permission, @CreatorUserId";
             var datas = from d in role.Datas
                 select new[]
                 {
                     new SqlParameter("@RoleId", SqlDbType.UniqueIdentifier) {Value = role.ID},
                     new SqlParameter("@ModuleId", SqlDbType.UniqueIdentifier) {Value = d.ParentId},
-                    new SqlParameter("@Mode", d.Type - 2),
+                    new SqlParameter("@Mode", d.Mode),
+                    new SqlParameter("@ModeId", SqlDbType.UniqueIdentifier) {Value = d.ModeId},
                     new SqlParameter("@Permission", d.Permit),
                     new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = uid},
                     new SqlParameter("@Read", SqlDbType.Int) {Value = 0}
@@ -100,7 +101,7 @@ namespace Insight.Base.Services
                 foreach (var action in role.Actions)
                 {
                     var pa = context.SYS_Role_Action.SingleOrDefault(p => p.RoleId == role.ID && p.ActionId == action.ID);
-                    if (pa == null && action.Permit.HasValue && !action.state.HasValue)
+                    if (pa == null && action.Permit.HasValue && !action.Action.HasValue)
                     {
                         var ia = new SYS_Role_Action
                         {
@@ -131,21 +132,21 @@ namespace Insight.Base.Services
                 foreach (var data in role.Datas)
                 {
                     var pd = context.SYS_Role_Data.SingleOrDefault(p => p.ID == data.ID);
-                    if (pd == null && data.Permit.HasValue && !data.state.HasValue)
+                    if (pd == null && data.Permit.HasValue && !data.Permission.HasValue)
                     {
+                        // ReSharper disable once PossibleInvalidOperationException
                         var id = new SYS_Role_Data
                         {
                             ID = Guid.NewGuid(),
-                            Mode = 0,
                             RoleId = role.ID,
-                            // ReSharper disable once PossibleInvalidOperationException
                             ModuleId = data.ParentId.Value,
+                            Mode = data.Mode,
+                            ModeId = data.ModeId,
                             Permission = data.Permit.Value,
-                            ModeId = data.ID,
                             CreatorUserId = uid,
                             CreateTime = DateTime.Now
                         };
-                        context.SYS_RolePerm_Data.Add(id);
+                        context.SYS_Role_Data.Add(id);
                         continue;
                     }
 
@@ -168,26 +169,19 @@ namespace Insight.Base.Services
         /// 获取所有角色
         /// </summary>
         /// <returns>角色信息结果集</returns>
-        private IEnumerable<object> GetRoles()
+        private IQueryable<object> GetRoles()
         {
             using (var context = new BaseEntities())
             {
-                var members = context.RoleMember;
-                var users = context.RoleUser;
-                var roles = from r in context.SYS_Role.OrderBy(r => r.SN)
-                            where r.Validity
-                            select new
-                            {
-                                r.ID,
-                                r.BuiltIn,
-                                r.Name,
-                                r.Description,
-                                Members = members.Where(m => m.RoleId == r.ID).ToList(),
-                                Users = users.Where(u => u.RoleId == r.ID).ToList(),
-                                Actions = context.Get_RoleActionPermit(r.ID).OrderBy(a => a.Index).ToList(),
-                                Datas = context.Get_RoleDataPermit(r.ID).OrderBy(d => d.Index).ToList()
-                            };
-                return roles.ToList();
+                var list = from r in context.SYS_Role.Where(r => r.Validity).OrderBy(r => r.SN)
+                           select new
+                           {
+                               r.ID, r.BuiltIn, r.Name, r.Description,
+                               Members = context.RoleMember.Where(m => m.RoleId == r.ID),
+                               MemberUsers = context.RoleMemberUser.Where(u => u.RoleId == r.ID),
+                               Actions = context.RoleAction.Where(a => a.RoleId == r.ID)
+                           };
+                return list;
             }
         }
 
@@ -212,7 +206,7 @@ namespace Insight.Base.Services
         {
             using (var context = new BaseEntities())
             {
-                var list = from o in context.OrgInfo
+                var list = from o in context.SYS_Organization
                            join r in context.SYS_Role_Member.Where(r => r.RoleId == id && r.Type == 3) on o.ID equals r.MemberId into temp
                            from t in temp.DefaultIfEmpty()
                            where t == null
@@ -254,32 +248,6 @@ namespace Insight.Base.Services
                            where u.Validity && u.Type > 0 && t == null
                            select new { u.ID, u.Name, u.LoginName, u.Description };
                 return list.ToList();
-            }
-        }
-
-        /// <summary>
-        /// 读取指定角色的操作资源集合
-        /// </summary>
-        /// <param name="id">角色ID</param>
-        /// <returns>操作资源集合</returns>
-        private IEnumerable<object> GetRoleActions(Guid id)
-        {
-            using (var context = new BaseEntities())
-            {
-                return context.Get_RoleAction(id).OrderBy(a => a.Index).ToList();
-            }
-        }
-
-        /// <summary>
-        /// 读取指定角色的数据资源集合
-        /// </summary>
-        /// <param name="id">角色ID</param>
-        /// <returns>数据资源集合</returns>
-        private IEnumerable<object> GetRoleDatas(Guid id)
-        {
-            using (var context = new BaseEntities())
-            {
-                return context.Get_RoleData(id).OrderBy(d => d.Index).ToList();
             }
         }
 

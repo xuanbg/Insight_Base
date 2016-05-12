@@ -207,9 +207,9 @@
           </Key>
           <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="SN" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Mode" Type="int" Nullable="false" />
           <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="ModuleId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Mode" Type="int" Nullable="false" />
           <Property Name="ModeId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="Permission" Type="int" Nullable="false" />
           <Property Name="CreatorUserId" Type="uniqueidentifier" Nullable="false" />
@@ -269,7 +269,50 @@
           <Property Name="CreatorUserId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="CreateTime" Type="datetime" Nullable="false" />
         </EntityType>
-        <Association Name="FK__SYS_Allot__Creat__050FA50E">
+        <!--生成过程中发现错误:
+警告 6002: 表/视图“Insight_Base.dbo.RoleAction”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="RoleAction">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ParentId" Type="uniqueidentifier" />
+          <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ActionId" Type="uniqueidentifier" />
+          <Property Name="Action" Type="int" />
+          <Property Name="Permit" Type="int" />
+          <Property Name="Index" Type="int" />
+          <Property Name="NodeType" Type="int" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="64" />
+        </EntityType>
+        <!--生成过程中发现错误:
+警告 6002: 表/视图“Insight_Base.dbo.RoleMember”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="RoleMember">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ParentId" Type="int" />
+          <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="MemberId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Index" Type="bigint" Nullable="false" />
+          <Property Name="NodeType" Type="int" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="64" />
+        </EntityType>
+        <!--生成过程中发现错误:
+警告 6002: 表/视图“Insight_Base.dbo.RoleMemberUser”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="RoleMemberUser">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="16" Nullable="false" />
+          <Property Name="LoginName" Type="nvarchar" MaxLength="32" Nullable="false" />
+          <Property Name="Description" Type="nvarchar(max)" />
+          <Property Name="Validity" Type="bit" Nullable="false" />
+        </EntityType>
+        <Association Name="FK__SYS_Allot__Creat__04DA9AE4">
           <End Role="SYS_Organization" Type="Self.SYS_Organization" Multiplicity="0..1" />
           <End Role="SYS_Allot_Record" Type="Self.SYS_Allot_Record" Multiplicity="*" />
           <ReferentialConstraint>
@@ -281,7 +324,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Allot__Creat__0603C947">
+        <Association Name="FK__SYS_Allot__Creat__05CEBF1D">
           <End Role="SYS_User" Type="Self.SYS_User" Multiplicity="1" />
           <End Role="SYS_Allot_Record" Type="Self.SYS_Allot_Record" Multiplicity="*" />
           <ReferentialConstraint>
@@ -293,7 +336,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Allot__Modul__03275C9C">
+        <Association Name="FK__SYS_Allot__Modul__02F25272">
           <End Role="SYS_Module" Type="Self.SYS_Module" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -307,7 +350,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Allot__Owner__041B80D5">
+        <Association Name="FK__SYS_Allot__Owner__03E676AB">
           <End Role="SYS_User" Type="Self.SYS_User" Multiplicity="1" />
           <End Role="SYS_Allot_Record" Type="Self.SYS_Allot_Record" Multiplicity="*" />
           <ReferentialConstraint>
@@ -319,7 +362,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Allot__Schem__02333863">
+        <Association Name="FK__SYS_Allot__Schem__01FE2E39">
           <End Role="SYS_Code_Scheme" Type="Self.SYS_Code_Scheme" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -333,7 +376,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Code___Creat__1269A02C">
+        <Association Name="FK__SYS_Code___Creat__12349602">
           <End Role="SYS_Organization" Type="Self.SYS_Organization" Multiplicity="0..1" />
           <End Role="SYS_Code_Allot" Type="Self.SYS_Code_Allot" Multiplicity="*" />
           <ReferentialConstraint>
@@ -345,7 +388,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Code___Creat__135DC465">
+        <Association Name="FK__SYS_Code___Creat__1328BA3B">
           <End Role="SYS_User" Type="Self.SYS_User" Multiplicity="1" />
           <End Role="SYS_Code_Allot" Type="Self.SYS_Code_Allot" Multiplicity="*" />
           <ReferentialConstraint>
@@ -357,7 +400,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Code___Creat__7B863AD4">
+        <Association Name="FK__SYS_Code___Creat__7B5130AA">
           <End Role="SYS_Organization" Type="Self.SYS_Organization" Multiplicity="0..1" />
           <End Role="SYS_Code_Scheme" Type="Self.SYS_Code_Scheme" Multiplicity="*" />
           <ReferentialConstraint>
@@ -369,7 +412,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Code___Creat__7C7A5F0D">
+        <Association Name="FK__SYS_Code___Creat__7C4554E3">
           <End Role="SYS_User" Type="Self.SYS_User" Multiplicity="1" />
           <End Role="SYS_Code_Scheme" Type="Self.SYS_Code_Scheme" Multiplicity="*" />
           <ReferentialConstraint>
@@ -381,7 +424,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Code___Modul__108157BA">
+        <Association Name="FK__SYS_Code___Modul__104C4D90">
           <End Role="SYS_Module" Type="Self.SYS_Module" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -395,7 +438,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Code___Owner__11757BF3">
+        <Association Name="FK__SYS_Code___Owner__114071C9">
           <End Role="SYS_User" Type="Self.SYS_User" Multiplicity="1" />
           <End Role="SYS_Code_Allot" Type="Self.SYS_Code_Allot" Multiplicity="*" />
           <ReferentialConstraint>
@@ -407,7 +450,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Code___Schem__0AC87E64">
+        <Association Name="FK__SYS_Code___Schem__0A93743A">
           <End Role="SYS_Code_Scheme" Type="Self.SYS_Code_Scheme" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -421,7 +464,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Code___Schem__0F8D3381">
+        <Association Name="FK__SYS_Code___Schem__0F582957">
           <End Role="SYS_Code_Scheme" Type="Self.SYS_Code_Scheme" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -435,7 +478,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Modul__Modul__461E4E5C">
+        <Association Name="FK__SYS_Modul__Modul__45E94432">
           <End Role="SYS_ModuleGroup" Type="Self.SYS_ModuleGroup" Multiplicity="0..1" />
           <End Role="SYS_Module" Type="Self.SYS_Module" Multiplicity="*" />
           <ReferentialConstraint>
@@ -447,7 +490,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Modul__Modul__4CCB4BEB">
+        <Association Name="FK__SYS_Modul__Modul__4C9641C1">
           <End Role="SYS_Module" Type="Self.SYS_Module" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -461,7 +504,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Modul__Modul__51900108">
+        <Association Name="FK__SYS_Modul__Modul__515AF6DE">
           <End Role="SYS_Module" Type="Self.SYS_Module" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -475,7 +518,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Modul__OrgId__52842541">
+        <Association Name="FK__SYS_Modul__OrgId__524F1B17">
           <End Role="SYS_Organization" Type="Self.SYS_Organization" Multiplicity="0..1" />
           <End Role="SYS_ModuleParam" Type="Self.SYS_ModuleParam" Multiplicity="*" />
           <ReferentialConstraint>
@@ -487,7 +530,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Modul__UserI__5378497A">
+        <Association Name="FK__SYS_Modul__UserI__53433F50">
           <End Role="SYS_User" Type="Self.SYS_User" Multiplicity="0..1" />
           <End Role="SYS_ModuleParam" Type="Self.SYS_ModuleParam" Multiplicity="*" />
           <ReferentialConstraint>
@@ -499,7 +542,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Organ__Creat__35E7E693">
+        <Association Name="FK__SYS_Organ__Creat__35B2DC69">
           <End Role="SYS_User" Type="Self.SYS_User" Multiplicity="1" />
           <End Role="SYS_Organization" Type="Self.SYS_Organization" Multiplicity="*" />
           <ReferentialConstraint>
@@ -511,7 +554,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Organ__Paren__33FF9E21">
+        <Association Name="FK__SYS_Organ__Paren__33CA93F7">
           <End Role="SYS_Organization" Type="Self.SYS_Organization" Multiplicity="0..1" />
           <End Role="SYS_Organization1" Type="Self.SYS_Organization" Multiplicity="*" />
           <ReferentialConstraint>
@@ -523,7 +566,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_OrgMe__Creat__3D89085B">
+        <Association Name="FK__SYS_OrgMe__Creat__3D53FE31">
           <End Role="SYS_User" Type="Self.SYS_User" Multiplicity="1" />
           <End Role="SYS_OrgMember" Type="Self.SYS_OrgMember" Multiplicity="*" />
           <ReferentialConstraint>
@@ -535,7 +578,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_OrgMe__OrgId__3BA0BFE9">
+        <Association Name="FK__SYS_OrgMe__OrgId__3B6BB5BF">
           <End Role="SYS_Organization" Type="Self.SYS_Organization" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -549,7 +592,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_OrgMe__UserI__3C94E422">
+        <Association Name="FK__SYS_OrgMe__UserI__3C5FD9F8">
           <End Role="SYS_User" Type="Self.SYS_User" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -563,7 +606,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Role___Actio__69678A99">
+        <Association Name="FK__SYS_Role___Actio__6932806F">
           <End Role="SYS_ModuleAction" Type="Self.SYS_ModuleAction" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -577,7 +620,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Role___Creat__62BA8D0A">
+        <Association Name="FK__SYS_Role___Creat__628582E0">
           <End Role="SYS_User" Type="Self.SYS_User" Multiplicity="1" />
           <End Role="SYS_Role_Member" Type="Self.SYS_Role_Member" Multiplicity="*" />
           <ReferentialConstraint>
@@ -589,7 +632,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Role___Creat__6B4FD30B">
+        <Association Name="FK__SYS_Role___Creat__6B1AC8E1">
           <End Role="SYS_User" Type="Self.SYS_User" Multiplicity="1" />
           <End Role="SYS_Role_Action" Type="Self.SYS_Role_Action" Multiplicity="*" />
           <ReferentialConstraint>
@@ -601,7 +644,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Role___Creat__74D93D45">
+        <Association Name="FK__SYS_Role___Creat__74A4331B">
           <End Role="SYS_User" Type="Self.SYS_User" Multiplicity="1" />
           <End Role="SYS_Role_Data" Type="Self.SYS_Role_Data" Multiplicity="*" />
           <ReferentialConstraint>
@@ -613,7 +656,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Role___Modul__72F0F4D3">
+        <Association Name="FK__SYS_Role___Modul__71C7C670">
           <End Role="SYS_Module" Type="Self.SYS_Module" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -627,7 +670,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Role___RoleI__61C668D1">
+        <Association Name="FK__SYS_Role___RoleI__61915EA7">
           <End Role="SYS_Role" Type="Self.SYS_Role" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -641,7 +684,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Role___RoleI__68736660">
+        <Association Name="FK__SYS_Role___RoleI__683E5C36">
           <End Role="SYS_Role" Type="Self.SYS_Role" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -655,7 +698,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Role___RoleI__71FCD09A">
+        <Association Name="FK__SYS_Role___RoleI__70D3A237">
           <End Role="SYS_Role" Type="Self.SYS_Role" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -669,7 +712,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_Role__Creato__5C0D8F7B">
+        <Association Name="FK__SYS_Role__Creato__5BD88551">
           <End Role="SYS_User" Type="Self.SYS_User" Multiplicity="1" />
           <End Role="SYS_Role" Type="Self.SYS_Role" Multiplicity="*" />
           <ReferentialConstraint>
@@ -681,7 +724,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_UserG__Creat__26A5A303">
+        <Association Name="FK__SYS_UserG__Creat__267098D9">
           <End Role="SYS_User" Type="Self.SYS_User" Multiplicity="1" />
           <End Role="SYS_UserGroup" Type="Self.SYS_UserGroup" Multiplicity="*" />
           <ReferentialConstraint>
@@ -693,7 +736,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_UserG__Creat__2E46C4CB">
+        <Association Name="FK__SYS_UserG__Creat__2E11BAA1">
           <End Role="SYS_User" Type="Self.SYS_User" Multiplicity="1" />
           <End Role="SYS_UserGroupMember" Type="Self.SYS_UserGroupMember" Multiplicity="*" />
           <ReferentialConstraint>
@@ -705,7 +748,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_UserG__Group__2C5E7C59">
+        <Association Name="FK__SYS_UserG__Group__2C29722F">
           <End Role="SYS_UserGroup" Type="Self.SYS_UserGroup" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -719,7 +762,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SYS_UserG__UserI__2D52A092">
+        <Association Name="FK__SYS_UserG__UserI__2D1D9668">
           <End Role="SYS_User" Type="Self.SYS_User" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -771,147 +814,181 @@
           <EntitySet Name="SYS_User" EntityType="Self.SYS_User" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SYS_UserGroup" EntityType="Self.SYS_UserGroup" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SYS_UserGroupMember" EntityType="Self.SYS_UserGroupMember" Schema="dbo" store:Type="Tables" />
-          <AssociationSet Name="FK__SYS_Allot__Creat__050FA50E" Association="Self.FK__SYS_Allot__Creat__050FA50E">
+          <EntitySet Name="RoleAction" EntityType="Self.RoleAction" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [RoleAction].[ID] AS [ID], 
+    [RoleAction].[ParentId] AS [ParentId], 
+    [RoleAction].[RoleId] AS [RoleId], 
+    [RoleAction].[ActionId] AS [ActionId], 
+    [RoleAction].[Action] AS [Action], 
+    [RoleAction].[Permit] AS [Permit], 
+    [RoleAction].[Index] AS [Index], 
+    [RoleAction].[NodeType] AS [NodeType], 
+    [RoleAction].[Name] AS [Name]
+    FROM [dbo].[RoleAction] AS [RoleAction]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="RoleMember" EntityType="Self.RoleMember" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [RoleMember].[ID] AS [ID], 
+    [RoleMember].[ParentId] AS [ParentId], 
+    [RoleMember].[RoleId] AS [RoleId], 
+    [RoleMember].[MemberId] AS [MemberId], 
+    [RoleMember].[Index] AS [Index], 
+    [RoleMember].[NodeType] AS [NodeType], 
+    [RoleMember].[Name] AS [Name]
+    FROM [dbo].[RoleMember] AS [RoleMember]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="RoleMemberUser" EntityType="Self.RoleMemberUser" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [RoleMemberUser].[ID] AS [ID], 
+    [RoleMemberUser].[RoleId] AS [RoleId], 
+    [RoleMemberUser].[Name] AS [Name], 
+    [RoleMemberUser].[LoginName] AS [LoginName], 
+    [RoleMemberUser].[Description] AS [Description], 
+    [RoleMemberUser].[Validity] AS [Validity]
+    FROM [dbo].[RoleMemberUser] AS [RoleMemberUser]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK__SYS_Allot__Creat__04DA9AE4" Association="Self.FK__SYS_Allot__Creat__04DA9AE4">
             <End Role="SYS_Organization" EntitySet="SYS_Organization" />
             <End Role="SYS_Allot_Record" EntitySet="SYS_Allot_Record" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Allot__Creat__0603C947" Association="Self.FK__SYS_Allot__Creat__0603C947">
+          <AssociationSet Name="FK__SYS_Allot__Creat__05CEBF1D" Association="Self.FK__SYS_Allot__Creat__05CEBF1D">
             <End Role="SYS_User" EntitySet="SYS_User" />
             <End Role="SYS_Allot_Record" EntitySet="SYS_Allot_Record" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Allot__Modul__03275C9C" Association="Self.FK__SYS_Allot__Modul__03275C9C">
+          <AssociationSet Name="FK__SYS_Allot__Modul__02F25272" Association="Self.FK__SYS_Allot__Modul__02F25272">
             <End Role="SYS_Module" EntitySet="SYS_Module" />
             <End Role="SYS_Allot_Record" EntitySet="SYS_Allot_Record" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Allot__Owner__041B80D5" Association="Self.FK__SYS_Allot__Owner__041B80D5">
+          <AssociationSet Name="FK__SYS_Allot__Owner__03E676AB" Association="Self.FK__SYS_Allot__Owner__03E676AB">
             <End Role="SYS_User" EntitySet="SYS_User" />
             <End Role="SYS_Allot_Record" EntitySet="SYS_Allot_Record" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Allot__Schem__02333863" Association="Self.FK__SYS_Allot__Schem__02333863">
+          <AssociationSet Name="FK__SYS_Allot__Schem__01FE2E39" Association="Self.FK__SYS_Allot__Schem__01FE2E39">
             <End Role="SYS_Code_Scheme" EntitySet="SYS_Code_Scheme" />
             <End Role="SYS_Allot_Record" EntitySet="SYS_Allot_Record" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Code___Creat__1269A02C" Association="Self.FK__SYS_Code___Creat__1269A02C">
+          <AssociationSet Name="FK__SYS_Code___Creat__12349602" Association="Self.FK__SYS_Code___Creat__12349602">
             <End Role="SYS_Organization" EntitySet="SYS_Organization" />
             <End Role="SYS_Code_Allot" EntitySet="SYS_Code_Allot" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Code___Creat__135DC465" Association="Self.FK__SYS_Code___Creat__135DC465">
+          <AssociationSet Name="FK__SYS_Code___Creat__1328BA3B" Association="Self.FK__SYS_Code___Creat__1328BA3B">
             <End Role="SYS_User" EntitySet="SYS_User" />
             <End Role="SYS_Code_Allot" EntitySet="SYS_Code_Allot" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Code___Creat__7B863AD4" Association="Self.FK__SYS_Code___Creat__7B863AD4">
+          <AssociationSet Name="FK__SYS_Code___Creat__7B5130AA" Association="Self.FK__SYS_Code___Creat__7B5130AA">
             <End Role="SYS_Organization" EntitySet="SYS_Organization" />
             <End Role="SYS_Code_Scheme" EntitySet="SYS_Code_Scheme" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Code___Creat__7C7A5F0D" Association="Self.FK__SYS_Code___Creat__7C7A5F0D">
+          <AssociationSet Name="FK__SYS_Code___Creat__7C4554E3" Association="Self.FK__SYS_Code___Creat__7C4554E3">
             <End Role="SYS_User" EntitySet="SYS_User" />
             <End Role="SYS_Code_Scheme" EntitySet="SYS_Code_Scheme" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Code___Modul__108157BA" Association="Self.FK__SYS_Code___Modul__108157BA">
+          <AssociationSet Name="FK__SYS_Code___Modul__104C4D90" Association="Self.FK__SYS_Code___Modul__104C4D90">
             <End Role="SYS_Module" EntitySet="SYS_Module" />
             <End Role="SYS_Code_Allot" EntitySet="SYS_Code_Allot" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Code___Owner__11757BF3" Association="Self.FK__SYS_Code___Owner__11757BF3">
+          <AssociationSet Name="FK__SYS_Code___Owner__114071C9" Association="Self.FK__SYS_Code___Owner__114071C9">
             <End Role="SYS_User" EntitySet="SYS_User" />
             <End Role="SYS_Code_Allot" EntitySet="SYS_Code_Allot" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Code___Schem__0AC87E64" Association="Self.FK__SYS_Code___Schem__0AC87E64">
+          <AssociationSet Name="FK__SYS_Code___Schem__0A93743A" Association="Self.FK__SYS_Code___Schem__0A93743A">
             <End Role="SYS_Code_Scheme" EntitySet="SYS_Code_Scheme" />
             <End Role="SYS_Code_Record" EntitySet="SYS_Code_Record" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Code___Schem__0F8D3381" Association="Self.FK__SYS_Code___Schem__0F8D3381">
+          <AssociationSet Name="FK__SYS_Code___Schem__0F582957" Association="Self.FK__SYS_Code___Schem__0F582957">
             <End Role="SYS_Code_Scheme" EntitySet="SYS_Code_Scheme" />
             <End Role="SYS_Code_Allot" EntitySet="SYS_Code_Allot" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Modul__Modul__461E4E5C" Association="Self.FK__SYS_Modul__Modul__461E4E5C">
+          <AssociationSet Name="FK__SYS_Modul__Modul__45E94432" Association="Self.FK__SYS_Modul__Modul__45E94432">
             <End Role="SYS_ModuleGroup" EntitySet="SYS_ModuleGroup" />
             <End Role="SYS_Module" EntitySet="SYS_Module" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Modul__Modul__4CCB4BEB" Association="Self.FK__SYS_Modul__Modul__4CCB4BEB">
+          <AssociationSet Name="FK__SYS_Modul__Modul__4C9641C1" Association="Self.FK__SYS_Modul__Modul__4C9641C1">
             <End Role="SYS_Module" EntitySet="SYS_Module" />
             <End Role="SYS_ModuleAction" EntitySet="SYS_ModuleAction" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Modul__Modul__51900108" Association="Self.FK__SYS_Modul__Modul__51900108">
+          <AssociationSet Name="FK__SYS_Modul__Modul__515AF6DE" Association="Self.FK__SYS_Modul__Modul__515AF6DE">
             <End Role="SYS_Module" EntitySet="SYS_Module" />
             <End Role="SYS_ModuleParam" EntitySet="SYS_ModuleParam" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Modul__OrgId__52842541" Association="Self.FK__SYS_Modul__OrgId__52842541">
+          <AssociationSet Name="FK__SYS_Modul__OrgId__524F1B17" Association="Self.FK__SYS_Modul__OrgId__524F1B17">
             <End Role="SYS_Organization" EntitySet="SYS_Organization" />
             <End Role="SYS_ModuleParam" EntitySet="SYS_ModuleParam" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Modul__UserI__5378497A" Association="Self.FK__SYS_Modul__UserI__5378497A">
+          <AssociationSet Name="FK__SYS_Modul__UserI__53433F50" Association="Self.FK__SYS_Modul__UserI__53433F50">
             <End Role="SYS_User" EntitySet="SYS_User" />
             <End Role="SYS_ModuleParam" EntitySet="SYS_ModuleParam" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Organ__Creat__35E7E693" Association="Self.FK__SYS_Organ__Creat__35E7E693">
+          <AssociationSet Name="FK__SYS_Organ__Creat__35B2DC69" Association="Self.FK__SYS_Organ__Creat__35B2DC69">
             <End Role="SYS_User" EntitySet="SYS_User" />
             <End Role="SYS_Organization" EntitySet="SYS_Organization" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Organ__Paren__33FF9E21" Association="Self.FK__SYS_Organ__Paren__33FF9E21">
+          <AssociationSet Name="FK__SYS_Organ__Paren__33CA93F7" Association="Self.FK__SYS_Organ__Paren__33CA93F7">
             <End Role="SYS_Organization" EntitySet="SYS_Organization" />
             <End Role="SYS_Organization1" EntitySet="SYS_Organization" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_OrgMe__Creat__3D89085B" Association="Self.FK__SYS_OrgMe__Creat__3D89085B">
+          <AssociationSet Name="FK__SYS_OrgMe__Creat__3D53FE31" Association="Self.FK__SYS_OrgMe__Creat__3D53FE31">
             <End Role="SYS_User" EntitySet="SYS_User" />
             <End Role="SYS_OrgMember" EntitySet="SYS_OrgMember" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_OrgMe__OrgId__3BA0BFE9" Association="Self.FK__SYS_OrgMe__OrgId__3BA0BFE9">
+          <AssociationSet Name="FK__SYS_OrgMe__OrgId__3B6BB5BF" Association="Self.FK__SYS_OrgMe__OrgId__3B6BB5BF">
             <End Role="SYS_Organization" EntitySet="SYS_Organization" />
             <End Role="SYS_OrgMember" EntitySet="SYS_OrgMember" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_OrgMe__UserI__3C94E422" Association="Self.FK__SYS_OrgMe__UserI__3C94E422">
+          <AssociationSet Name="FK__SYS_OrgMe__UserI__3C5FD9F8" Association="Self.FK__SYS_OrgMe__UserI__3C5FD9F8">
             <End Role="SYS_User" EntitySet="SYS_User" />
             <End Role="SYS_OrgMember" EntitySet="SYS_OrgMember" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Role___Actio__69678A99" Association="Self.FK__SYS_Role___Actio__69678A99">
+          <AssociationSet Name="FK__SYS_Role___Actio__6932806F" Association="Self.FK__SYS_Role___Actio__6932806F">
             <End Role="SYS_ModuleAction" EntitySet="SYS_ModuleAction" />
             <End Role="SYS_Role_Action" EntitySet="SYS_Role_Action" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Role___Creat__62BA8D0A" Association="Self.FK__SYS_Role___Creat__62BA8D0A">
+          <AssociationSet Name="FK__SYS_Role___Creat__628582E0" Association="Self.FK__SYS_Role___Creat__628582E0">
             <End Role="SYS_User" EntitySet="SYS_User" />
             <End Role="SYS_Role_Member" EntitySet="SYS_Role_Member" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Role___Creat__6B4FD30B" Association="Self.FK__SYS_Role___Creat__6B4FD30B">
+          <AssociationSet Name="FK__SYS_Role___Creat__6B1AC8E1" Association="Self.FK__SYS_Role___Creat__6B1AC8E1">
             <End Role="SYS_User" EntitySet="SYS_User" />
             <End Role="SYS_Role_Action" EntitySet="SYS_Role_Action" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Role___Creat__74D93D45" Association="Self.FK__SYS_Role___Creat__74D93D45">
+          <AssociationSet Name="FK__SYS_Role___Creat__74A4331B" Association="Self.FK__SYS_Role___Creat__74A4331B">
             <End Role="SYS_User" EntitySet="SYS_User" />
             <End Role="SYS_Role_Data" EntitySet="SYS_Role_Data" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Role___Modul__72F0F4D3" Association="Self.FK__SYS_Role___Modul__72F0F4D3">
+          <AssociationSet Name="FK__SYS_Role___Modul__71C7C670" Association="Self.FK__SYS_Role___Modul__71C7C670">
             <End Role="SYS_Module" EntitySet="SYS_Module" />
             <End Role="SYS_Role_Data" EntitySet="SYS_Role_Data" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Role___RoleI__61C668D1" Association="Self.FK__SYS_Role___RoleI__61C668D1">
+          <AssociationSet Name="FK__SYS_Role___RoleI__61915EA7" Association="Self.FK__SYS_Role___RoleI__61915EA7">
             <End Role="SYS_Role" EntitySet="SYS_Role" />
             <End Role="SYS_Role_Member" EntitySet="SYS_Role_Member" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Role___RoleI__68736660" Association="Self.FK__SYS_Role___RoleI__68736660">
+          <AssociationSet Name="FK__SYS_Role___RoleI__683E5C36" Association="Self.FK__SYS_Role___RoleI__683E5C36">
             <End Role="SYS_Role" EntitySet="SYS_Role" />
             <End Role="SYS_Role_Action" EntitySet="SYS_Role_Action" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Role___RoleI__71FCD09A" Association="Self.FK__SYS_Role___RoleI__71FCD09A">
+          <AssociationSet Name="FK__SYS_Role___RoleI__70D3A237" Association="Self.FK__SYS_Role___RoleI__70D3A237">
             <End Role="SYS_Role" EntitySet="SYS_Role" />
             <End Role="SYS_Role_Data" EntitySet="SYS_Role_Data" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_Role__Creato__5C0D8F7B" Association="Self.FK__SYS_Role__Creato__5C0D8F7B">
+          <AssociationSet Name="FK__SYS_Role__Creato__5BD88551" Association="Self.FK__SYS_Role__Creato__5BD88551">
             <End Role="SYS_User" EntitySet="SYS_User" />
             <End Role="SYS_Role" EntitySet="SYS_Role" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_UserG__Creat__26A5A303" Association="Self.FK__SYS_UserG__Creat__26A5A303">
+          <AssociationSet Name="FK__SYS_UserG__Creat__267098D9" Association="Self.FK__SYS_UserG__Creat__267098D9">
             <End Role="SYS_User" EntitySet="SYS_User" />
             <End Role="SYS_UserGroup" EntitySet="SYS_UserGroup" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_UserG__Creat__2E46C4CB" Association="Self.FK__SYS_UserG__Creat__2E46C4CB">
+          <AssociationSet Name="FK__SYS_UserG__Creat__2E11BAA1" Association="Self.FK__SYS_UserG__Creat__2E11BAA1">
             <End Role="SYS_User" EntitySet="SYS_User" />
             <End Role="SYS_UserGroupMember" EntitySet="SYS_UserGroupMember" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_UserG__Group__2C5E7C59" Association="Self.FK__SYS_UserG__Group__2C5E7C59">
+          <AssociationSet Name="FK__SYS_UserG__Group__2C29722F" Association="Self.FK__SYS_UserG__Group__2C29722F">
             <End Role="SYS_UserGroup" EntitySet="SYS_UserGroup" />
             <End Role="SYS_UserGroupMember" EntitySet="SYS_UserGroupMember" />
           </AssociationSet>
-          <AssociationSet Name="FK__SYS_UserG__UserI__2D52A092" Association="Self.FK__SYS_UserG__UserI__2D52A092">
+          <AssociationSet Name="FK__SYS_UserG__UserI__2D1D9668" Association="Self.FK__SYS_UserG__UserI__2D1D9668">
             <End Role="SYS_User" EntitySet="SYS_User" />
             <End Role="SYS_UserGroupMember" EntitySet="SYS_UserGroupMember" />
           </AssociationSet>
@@ -1470,6 +1547,9 @@
             <End Role="SYS_User" EntitySet="SYS_User" />
             <End Role="SYS_Role_Member" EntitySet="SYS_Role_Member" />
           </AssociationSet>
+          <EntitySet Name="RoleAction" EntityType="BaseModel.RoleAction" />
+          <EntitySet Name="RoleMember" EntityType="BaseModel.RoleMember" />
+          <EntitySet Name="RoleMemberUser" EntityType="BaseModel.RoleMemberUser" />
         </EntityContainer>
         <EntityType Name="SYS_Allot_Record">
           <Key>
@@ -1885,6 +1965,43 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="RoleAction">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="ParentId" Type="Guid" />
+          <Property Name="RoleId" Type="Guid" Nullable="false" />
+          <Property Name="ActionId" Type="Guid" />
+          <Property Name="Action" Type="Int32" />
+          <Property Name="Permit" Type="Int32" />
+          <Property Name="Index" Type="Int32" />
+          <Property Name="NodeType" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="64" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="RoleMember">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="ParentId" Type="Int32" />
+          <Property Name="RoleId" Type="Guid" Nullable="false" />
+          <Property Name="MemberId" Type="Guid" Nullable="false" />
+          <Property Name="Index" Type="Int64" Nullable="false" />
+          <Property Name="NodeType" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="64" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="RoleMemberUser">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="RoleId" Type="Guid" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="16" FixedLength="false" Unicode="true" />
+          <Property Name="LoginName" Type="String" Nullable="false" MaxLength="32" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Validity" Type="Boolean" Nullable="false" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -2170,6 +2287,46 @@
                 <ScalarProperty Name="RoleId" ColumnName="RoleId" />
                 <ScalarProperty Name="Type" ColumnName="Type" />
                 <ScalarProperty Name="SN" ColumnName="SN" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RoleAction">
+            <EntityTypeMapping TypeName="BaseModel.RoleAction">
+              <MappingFragment StoreEntitySet="RoleAction">
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="NodeType" ColumnName="NodeType" />
+                <ScalarProperty Name="Index" ColumnName="Index" />
+                <ScalarProperty Name="Permit" ColumnName="Permit" />
+                <ScalarProperty Name="Action" ColumnName="Action" />
+                <ScalarProperty Name="ActionId" ColumnName="ActionId" />
+                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+                <ScalarProperty Name="ParentId" ColumnName="ParentId" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RoleMember">
+            <EntityTypeMapping TypeName="BaseModel.RoleMember">
+              <MappingFragment StoreEntitySet="RoleMember">
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="NodeType" ColumnName="NodeType" />
+                <ScalarProperty Name="Index" ColumnName="Index" />
+                <ScalarProperty Name="MemberId" ColumnName="MemberId" />
+                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+                <ScalarProperty Name="ParentId" ColumnName="ParentId" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RoleMemberUser">
+            <EntityTypeMapping TypeName="BaseModel.RoleMemberUser">
+              <MappingFragment StoreEntitySet="RoleMemberUser">
+                <ScalarProperty Name="Validity" ColumnName="Validity" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="LoginName" ColumnName="LoginName" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>
