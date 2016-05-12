@@ -1,4 +1,4 @@
-USE Insight_Base
+锘縐SE Insight_Base
 GO
 
 IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'RoleMember') AND OBJECTPROPERTY(id, N'ISVIEW') = 1)
@@ -6,7 +6,7 @@ DROP VIEW RoleMember
 GO
 
 
-/*****视图：查询所有角色的成员*****/
+/*****瑙嗗浘锛氭煡璇㈡墍鏈夎鑹茬殑鎴愬憳*****/
 
 CREATE VIEW RoleMember
 AS

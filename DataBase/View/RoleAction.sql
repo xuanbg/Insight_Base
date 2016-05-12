@@ -1,4 +1,4 @@
-USE Insight_Base
+锘縐SE Insight_Base
 GO
 
 IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'RoleAction') AND OBJECTPROPERTY(id, N'ISVIEW') = 1)
@@ -6,7 +6,7 @@ DROP VIEW RoleAction
 GO
 
 
-/*****视图：查询所有角色的成员用户*****/
+/*****瑙嗗浘锛氭煡璇㈡墍鏈夎鑹茬殑鎴愬憳鐢ㄦ埛*****/
 
 CREATE VIEW RoleAction
 AS
