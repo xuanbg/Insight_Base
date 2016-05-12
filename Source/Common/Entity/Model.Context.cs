@@ -9,10 +9,9 @@
 
 namespace Insight.Base.Common.Entity
 {
-    using System;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
-    
+
     public partial class BaseEntities : DbContext
     {
         public BaseEntities()

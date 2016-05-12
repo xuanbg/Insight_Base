@@ -10,8 +10,7 @@
 namespace Insight.Base.Common.Entity
 {
     using System;
-    using System.Collections.Generic;
-    
+
     public partial class RoleMember
     {
         public System.Guid ID { get; set; }

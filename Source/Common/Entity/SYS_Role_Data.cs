@@ -9,9 +9,7 @@
 
 namespace Insight.Base.Common.Entity
 {
-    using System;
-    using System.Collections.Generic;
-    
+
     public partial class SYS_Role_Data
     {
         public System.Guid ID { get; set; }

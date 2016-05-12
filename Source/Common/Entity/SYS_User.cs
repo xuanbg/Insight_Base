@@ -9,9 +9,8 @@
 
 namespace Insight.Base.Common.Entity
 {
-    using System;
     using System.Collections.Generic;
-    
+
     public partial class SYS_User
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
