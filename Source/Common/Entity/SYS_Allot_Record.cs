@@ -10,7 +10,8 @@
 namespace Insight.Base.Common.Entity
 {
     using System;
-
+    using System.Collections.Generic;
+    
     public partial class SYS_Allot_Record
     {
         public System.Guid ID { get; set; }

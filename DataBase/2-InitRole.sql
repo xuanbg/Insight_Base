@@ -23,8 +23,8 @@ where A.ModuleId in('CED5A90C-092E-4B38-B21D-433DFD96BFDB', '05C1B3B4-1536-4DE7-
 
 -- 设置数据权限
 insert SYS_Role_Data (RoleId, ModuleId, Mode, ModeId, Permission, CreatorUserId)
-select @RoleId, '5C801552-1905-452B-AE7F-E57227BE70B8', 0, ID, 1, '00000000-0000-0000-0000-000000000000' from SYS_Data where Type = 0 union all
-select @RoleId, '5C801552-1905-452B-AE7F-E57227BE70B8', 0, ID, 0, '00000000-0000-0000-0000-000000000000' from SYS_Data where Type = 1
+select @RoleId, '5C801552-1905-452B-AE7F-E57227BE70B8', 0, ID, 0, '00000000-0000-0000-0000-000000000000' from SYS_Data where Type = 0 union all
+select @RoleId, '5C801552-1905-452B-AE7F-E57227BE70B8', 0, ID, 1, '00000000-0000-0000-0000-000000000000' from SYS_Data where Type = 1
 GO
 
 

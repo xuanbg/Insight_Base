@@ -26,7 +26,7 @@ namespace Insight.Base.Common.Entity
     
         public System.Guid ID { get; set; }
         public long SN { get; set; }
-        public Nullable<System.Guid> ModuleGroupId { get; set; }
+        public System.Guid ModuleGroupId { get; set; }
         public int Type { get; set; }
         public Nullable<int> Index { get; set; }
         public string Name { get; set; }

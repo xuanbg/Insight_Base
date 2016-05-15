@@ -162,7 +162,7 @@ GO
 CREATE TABLE SYS_Module(
 [ID]               UNIQUEIDENTIFIER PRIMARY KEY NONCLUSTERED,
 [SN]               BIGINT CONSTRAINT IX_SYS_Module UNIQUE CLUSTERED IDENTITY(1,1),                                                         --自增序列
-[ModuleGroupId]    UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_ModuleGroup(ID),                                                            --模块组ID
+[ModuleGroupId]    UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_ModuleGroup(ID) NOT NULL,                                                   --模块组ID
 [Type]             INT NOT NULL,                                                                                                           --模块类型：0、系统模块；1、业务模块；2、个人模块
 [Index]            INT,                                                                                                                    --序号
 [Name]             NVARCHAR(16),                                                                                                           --模块名称

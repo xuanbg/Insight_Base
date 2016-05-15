@@ -177,10 +177,10 @@ namespace Insight.Base.Services
                            select new
                            {
                                r.ID, r.BuiltIn, r.Name, r.Description,
-                               Members = context.RoleMember.Where(m => m.RoleId == r.ID),
-                               MemberUsers = context.RoleMemberUser.Where(u => u.RoleId == r.ID),
-                               Actions = context.RoleAction.Where(a => a.RoleId == r.ID),
-                               Datas = context.RoleData.Where(d => d.RoleId == r.ID)
+                               Members = context.RoleMember.Where(m => m.RoleId == r.ID).OrderBy(m => m.ParentId),
+                               MemberUsers = context.RoleMemberUser.Where(u => u.RoleId == r.ID).OrderBy(m => m.Name),
+                               Actions = context.RoleAction.Where(a => a.RoleId == r.ID).OrderBy(m => m.ParentId),
+                               Datas = context.RoleData.Where(d => d.RoleId == r.ID).OrderBy(m => m.ParentId)
                            };
                 return list.ToList();
             }

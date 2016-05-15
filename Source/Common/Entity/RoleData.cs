@@ -10,7 +10,8 @@
 namespace Insight.Base.Common.Entity
 {
     using System;
-
+    using System.Collections.Generic;
+    
     public partial class RoleData
     {
         public System.Guid ID { get; set; }
@@ -23,5 +24,6 @@ namespace Insight.Base.Common.Entity
         public Nullable<int> Index { get; set; }
         public Nullable<int> NodeType { get; set; }
         public string Name { get; set; }
+        public string Description { get; set; }
     }
 }

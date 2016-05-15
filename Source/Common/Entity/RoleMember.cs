@@ -10,13 +10,14 @@
 namespace Insight.Base.Common.Entity
 {
     using System;
-
+    using System.Collections.Generic;
+    
     public partial class RoleMember
     {
         public System.Guid ID { get; set; }
-        public Nullable<int> ParentId { get; set; }
+        public Nullable<System.Guid> ParentId { get; set; }
         public System.Guid RoleId { get; set; }
-        public System.Guid MemberId { get; set; }
+        public Nullable<System.Guid> MemberId { get; set; }
         public long Index { get; set; }
         public int NodeType { get; set; }
         public string Name { get; set; }

@@ -104,21 +104,22 @@ namespace Insight.Base.Services
         {
             using (var context = new BaseEntities())
             {
-                return from o in context.SYS_Organization
-                       select new
-                       {
-                           o.ID,
-                           o.ParentId,
-                           o.Index,
-                           o.NodeType,
-                           o.Name,
-                           o.FullName,
-                           o.Alias,
-                           o.Code,
-                           Members = from m in context.SYS_OrgMember.Where(m => m.OrgId == o.ID)
-                                     join u in context.SYS_User on m.UserId equals u.ID
-                                     select new { m.ID, u.LoginName, u.Name, u.Validity }
-                       };
+                var list = from o in context.SYS_Organization
+                           select new
+                           {
+                               o.ID,
+                               o.ParentId,
+                               o.Index,
+                               o.NodeType,
+                               o.Name,
+                               o.FullName,
+                               o.Alias,
+                               o.Code,
+                               Members = from m in context.SYS_OrgMember.Where(m => m.OrgId == o.ID)
+                                         join u in context.SYS_User on m.UserId equals u.ID
+                                         select new { m.ID, u.LoginName, u.Name, u.Validity }
+                           };
+                return list.ToList();
             }
         }
 
@@ -131,10 +132,11 @@ namespace Insight.Base.Services
         {
             using (var context = new BaseEntities())
             {
-                return from m in context.SYS_OrgMember.Where(m => m.UserId == id)
-                    join t in context.SYS_Organization on m.OrgId equals t.ID
-                    join d in context.SYS_Organization on t.ParentId equals d.ID
-                    select new {d.ID, d.FullName};
+                var list = from m in context.SYS_OrgMember.Where(m => m.UserId == id)
+                           join t in context.SYS_Organization on m.OrgId equals t.ID
+                           join d in context.SYS_Organization on t.ParentId equals d.ID
+                           select new { d.ID, d.FullName };
+                return list.ToList();
             }
         }
 

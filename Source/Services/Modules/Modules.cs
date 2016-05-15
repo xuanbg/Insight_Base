@@ -40,31 +40,6 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 根据ID获取模块对象实体
-        /// </summary>
-        /// <param name="id">模块ID</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult GetModuleInfo(string id)
-        {
-            var verify = new SessionVerify();
-            if (!verify.ParseIdAndCompare(id)) return verify.Result;
-
-            var data = GetModuleInfo(verify.Guid);
-            if (data == null) return verify.Result.NotFound();
-
-            var info = new
-            {
-                data.ID,
-                data.ApplicationName,
-                data.ProgramName,
-                data.MainFrom,
-                data.Location,
-                data.Icon
-            };
-            return verify.Result.Success(info);
-        }
-
-        /// <summary>
         /// 获取用户启动模块的工具栏操作信息
         /// </summary>
         /// <param name="id">模块ID</param>

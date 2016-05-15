@@ -13,7 +13,7 @@ namespace Insight.Base.Services
         /// 获取用户获得授权的所有模块的组信息
         /// </summary>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "groups/allow", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "groups", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult GetModuleGroup();
 
@@ -21,18 +21,9 @@ namespace Insight.Base.Services
         /// 获取用户获得授权的所有模块信息
         /// </summary>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "modules/allow", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "modules", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult GetUserModule();
-
-        /// <summary>
-        /// 根据ID获取模块对象实体
-        /// </summary>
-        /// <param name="id">模块ID</param>
-        /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "modules/{id}", ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        JsonResult GetModuleInfo(string id);
 
         /// <summary>
         /// 获取用户启动模块的工具栏操作信息
