@@ -26,7 +26,8 @@ Actions as (
   case P.Action when 0 then '拒绝' when 1 then '允许' else null end as Description
   from SYS_ModuleAction A
   join Modules M on M.ID = A.ModuleId
-  left join SYS_Role_Action P on P.ActionId = A.ID)
+  left join SYS_Role_Action P on P.ActionId = A.ID
+    and P.RoleId = M.RoleId)
 
 select * from Groups union all
 select * from Modules union all

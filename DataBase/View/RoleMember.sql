@@ -11,17 +11,17 @@ GO
 CREATE VIEW RoleMember
 AS
 
-select cast('00000000-0000-0000-0000-000000000001' as uniqueidentifier) as ID,
+select distinct cast('00000000-0000-0000-0000-000000000001' as uniqueidentifier) as ID,
        null as ParentId,
        RoleId,
-	   newid() as MemberId,
+	   cast('00000000-0000-0000-0000-000000000000' as uniqueidentifier) as MemberId,
        1 as [Index],
        1 as NodeType,
        '用户' as Name
 from SYS_Role_Member
 where Type = 1
 union
-select M.ID,
+select distinct M.ID,
        cast('00000000-0000-0000-0000-000000000001' as uniqueidentifier) as ParentId,
        M.RoleId,
        U.ID as MemberId,
@@ -31,17 +31,17 @@ select M.ID,
 from SYS_Role_Member M
 join Sys_User U on U.ID = M.MemberId
 union
-select cast('00000000-0000-0000-0000-000000000002' as uniqueidentifier) as ID,
+select distinct cast('00000000-0000-0000-0000-000000000002' as uniqueidentifier) as ID,
        null as ParentId,
        RoleId,
-	   newid() as MemberId,
+	   cast('00000000-0000-0000-0000-000000000000' as uniqueidentifier) as MemberId,
        2 as [Index],
        2 as NodeType,
        '用户组' as Name
 from SYS_Role_Member
 where Type = 2
 union
-select M.ID,
+select distinct M.ID,
        cast('00000000-0000-0000-0000-000000000002' as uniqueidentifier) as ParentId,
        M.RoleId,
        G.ID as MemberId,
@@ -51,10 +51,10 @@ select M.ID,
 from SYS_Role_Member M
 join Sys_UserGroup G on G.ID = M.MemberId
 union
-select cast('00000000-0000-0000-0000-000000000003' as uniqueidentifier) as ID,
+select distinct cast('00000000-0000-0000-0000-000000000003' as uniqueidentifier) as ID,
        null as ParentId,
        RoleId,
-	   newid() as MemberId,
+	   cast('00000000-0000-0000-0000-000000000000' as uniqueidentifier) as MemberId,
        3 as [Index],
        3 as NodeType,
        '职位' as Name

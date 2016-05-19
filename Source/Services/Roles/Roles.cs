@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using Insight.Base.Common;
@@ -75,9 +74,20 @@ namespace Insight.Base.Services
             return list.Any() ? verify.Result.Success(list) : verify.Result.NoContent();
         }
 
-        public JsonResult AddRoleMember(string id, List<object> members)
+        /// <summary>
+        /// 根据参数组集合插入角色成员关系
+        /// </summary>
+        /// <param name="id">角色ID</param>
+        /// <param name="members">成员对象集合</param>
+        /// <returns>JsonResult</returns>
+        public JsonResult AddRoleMember(string id, List<RoleMember> members)
         {
-            throw new NotImplementedException();
+            const string action = "13D93852-53EC-4A15-AAB2-46C9C48C313A";
+            var verify = new SessionVerify();
+            if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
+
+            var result = AddRoleMember(verify.Guid, members, verify.Basis.UserId);
+            return result == null ? verify.Result.DataBaseError() : verify.Result.Success(result);
         }
 
         /// <summary>

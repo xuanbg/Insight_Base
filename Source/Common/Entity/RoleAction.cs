@@ -21,7 +21,7 @@ namespace Insight.Base.Common.Entity
         public Nullable<int> Action { get; set; }
         public Nullable<int> Permit { get; set; }
         public Nullable<int> Index { get; set; }
-        public int NodeType { get; set; }
+        public Nullable<int> NodeType { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
     }

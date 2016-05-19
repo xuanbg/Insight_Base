@@ -49,11 +49,11 @@ namespace Insight.Base.Services
         /// 根据参数组集合插入角色成员关系
         /// </summary>
         /// <param name="id">角色ID</param>
-        /// <param name="members"></param>
+        /// <param name="members">成员对象集合</param>
         /// <returns>JsonResult</returns>
         [WebInvoke(Method = "POST", UriTemplate = "roles/{id}/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult AddRoleMember(string id, List<object> members);
+        JsonResult AddRoleMember(string id, List<RoleMember> members);
 
         /// <summary>
         /// 根据成员类型和ID删除角色成员

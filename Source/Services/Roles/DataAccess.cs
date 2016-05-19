@@ -187,6 +187,38 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
+        /// 保存角色成员到数据库
+        /// </summary>
+        /// <param name="id">角色ID</param>
+        /// <param name="members">角色成员对象集合</param>
+        /// <param name="uid">登录用户ID</param>
+        /// <returns>bool 是否保存成功</returns>
+        private object AddRoleMember(Guid id, List<RoleMember> members, Guid uid)
+        {
+            using (var context = new BaseEntities())
+            {
+                var data = from m in members
+                           select new SYS_Role_Member
+                           {
+                               ID = m.ID,
+                               Type = m.NodeType,
+                               RoleId = id,
+                               MemberId = m.MemberId,
+                               CreatorUserId = uid,
+                               CreateTime = DateTime.Now
+                           };
+                context.SYS_Role_Member.AddRange(data);
+                if (context.SaveChanges() <= 0) return null;
+
+                return new 
+                {
+                    Members = context.RoleMember.Where(m => m.RoleId == id).OrderBy(m => m.ParentId).ToList(),
+                    MemberUsers = context.RoleMemberUser.Where(u => u.RoleId == id).OrderBy(m => m.Name).ToList()
+                };
+            }
+        }
+
+        /// <summary>
         /// 根据成员类型和ID删除角色成员
         /// </summary>
         /// <param name="id">角色成员ID</param>
