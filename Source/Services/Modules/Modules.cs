@@ -50,7 +50,7 @@ namespace Insight.Base.Services
             if (!verify.ParseIdAndCompare(id)) return verify.Result;
 
             var auth = new Authority(verify.Session.UserId, verify.Session.DeptId);
-            var data = auth.ModuleActions(verify.Guid);
+            var data = auth.ModuleActions(verify.ID);
             return data.Any() ? verify.Result.Success(data) : verify.Result.NoContent();
         }
 

@@ -39,6 +39,7 @@
     <Reference Include="EntityFramework.SqlServer">
       <HintPath>..\..\..\insight_ws3\Source\packages\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -50,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Authority.cs" />
+    <Compile Include="Entity\DataInfo.cs" />
     <Compile Include="Entity\OrgInfo.cs" />
     <Compile Include="Entity\RoleAction.cs">
       <DependentUpon>Model.tt</DependentUpon>
@@ -80,6 +82,7 @@
     <Compile Include="Entity\SYS_Role_Member.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
+    <Compile Include="Entity\ActionInfo.cs" />
     <Compile Include="Utils\GuidParse.cs" />
     <Compile Include="Entity\SYS_Allot_Record.cs">
       <DependentUpon>Model.tt</DependentUpon>

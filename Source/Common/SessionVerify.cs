@@ -9,7 +9,12 @@ namespace Insight.Base.Common
         /// <summary>
         /// Guid转换结果
         /// </summary>
-        public Guid Guid;
+        public Guid ID;
+
+        /// <summary>
+        /// Guid转换结果（可为空）
+        /// </summary>
+        public Guid? NID;
 
         /// <summary>
         /// 用于验证的基准对象
@@ -68,33 +73,52 @@ namespace Insight.Base.Common
         /// </summary>
         /// <param name="id">要转换的Guid字符串</param>
         /// <param name="action">操作码，默认为空</param>
+        /// <param name="nullable">是否可为空（默认不可为空）</param>
         /// <returns>bool</returns>
-        public bool ParseIdAndCompare(string id, string action = null)
+        public bool ParseIdAndCompare(string id, string action = null, bool nullable = false)
         {
-            if (Guid.TryParse(id, out Guid)) return Compare(action);
+            if (nullable && string.IsNullOrEmpty(id)) return Compare(action);
 
-            Result.InvalidGuid();
-            return false;
+            var gp = new GuidParse(id, nullable);
+            if (!gp.Successful)
+            {
+                Result.InvalidGuid();
+                return false;
+            }
+
+            if (nullable)
+            {
+                NID = gp.Result;
+            }
+            else
+            {
+                ID = gp.Result;
+            }
+
+            return Compare(action);
         }
 
         /// <summary>
         /// 转换一个用户ID，并对Session进行校验（如id一致，忽略鉴权），返回验证结果，
         /// </summary>
         /// <param name="action">操作码</param>
-        /// <param name="id">用户ID</param>
+        /// <param name="uid">用户ID</param>
         /// <returns>bool</returns>
-        public bool CompareAsID(string action, string id)
+        public bool CompareAsID(string action, string uid)
         {
-            if (Guid.TryParse(id, out Guid))
+            var gp = new GuidParse(uid);
+            if (!gp.Successful)
             {
-                // 如指定的用户ID是操作人ID，则不进行鉴权
-                if (Session.UserId == Guid) action = null;
-
-                return Compare(action);
+                Result.InvalidGuid();
+                return false;
             }
 
-            Result.InvalidGuid();
-            return false;
+            ID = gp.Result;
+
+            // 如指定的用户ID是操作人ID，则不进行鉴权
+            if (Session.UserId == ID) action = null;
+
+            return Compare(action);
         }
 
         /// <summary>

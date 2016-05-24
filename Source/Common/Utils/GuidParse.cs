@@ -13,19 +13,20 @@ namespace Insight.Base.Common.Utils
         /// <summary>
         /// 转换成功后的结果
         /// </summary>
-        public Guid? Guid;
+        public dynamic Result;
 
         /// <summary>
         /// 将一个字符串转换为可为空的GUID
         /// </summary>
         /// <param name="str">要转换的字符串</param>
-        public GuidParse(string str)
+        /// <param name="nullable">是否可为空（默认不可为空）</param>
+        public GuidParse(string str, bool nullable = false)
         {
-            if (string.IsNullOrEmpty(str)) return;
+            if (nullable && string.IsNullOrEmpty(str)) return;
 
             Guid guid;
-            Successful = System.Guid.TryParse(str, out guid);
-            if (Successful) Guid = guid;
+            Successful = Guid.TryParse(str, out guid);
+            if (Successful) Result = guid;
         }
 
     }

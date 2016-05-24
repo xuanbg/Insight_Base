@@ -40,7 +40,7 @@ namespace Insight.Base.Services
             var verify = new SessionVerify();
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
-            return DeleteOrg(verify.Guid) ? verify.Result : verify.Result.DataBaseError();
+            return DeleteOrg(verify.ID) ? verify.Result : verify.Result.DataBaseError();
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Insight.Base.Services
             var verify = new SessionVerify();
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
-            var org = GetOrg(verify.Guid);
+            var org = GetOrg(verify.ID);
             return org == null ? verify.Result.NotFound() : verify.Result.Success(Util.Serialize(org));
         }
 
@@ -101,7 +101,7 @@ namespace Insight.Base.Services
             if (!verify.ParseIdAndCompare(action)) return verify.Result;
 
             org.CreatorUserId = verify.Basis.UserId;
-            return Update(verify.Guid, org) ? verify.Result : verify.Result.DataBaseError();
+            return Update(verify.ID, org) ? verify.Result : verify.Result.DataBaseError();
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace Insight.Base.Services
             var verify = new SessionVerify();
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
-            return InsertData(verify.Basis.UserId, verify.Guid, ids) ? verify.Result : verify.Result.DataBaseError();
+            return InsertData(verify.Basis.UserId, verify.ID, ids) ? verify.Result : verify.Result.DataBaseError();
         }
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace Insight.Base.Services
             var verify = new SessionVerify();
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
-            var data = GetOtherOrgMember(verify.Guid);
+            var data = GetOtherOrgMember(verify.ID);
             return data.Any() ? verify.Result.Success(data) : verify.Result.NoContent();
         }
 

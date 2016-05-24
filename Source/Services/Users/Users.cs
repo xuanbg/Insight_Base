@@ -66,7 +66,7 @@ namespace Insight.Base.Services
             var verify = new SessionVerify();
             if (!verify.CompareAsID(action, id)) return verify.Result;
 
-            return DeleteUser(verify.Guid) ? verify.Result : verify.Result.DataBaseError();
+            return DeleteUser(verify.ID) ? verify.Result : verify.Result.DataBaseError();
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Insight.Base.Services
             var verify = new SessionVerify();
             if (!verify.CompareAsID(action, id)) return verify.Result;
 
-            var user = GetUser(verify.Guid);
+            var user = GetUser(verify.ID);
             return user == null ? verify.Result.NotFound() : verify.Result.Success(user);
         }
 
@@ -280,7 +280,7 @@ namespace Insight.Base.Services
             var verify = new SessionVerify();
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
-            return DeleteGroup(verify.Guid) ? verify.Result : verify.Result.DataBaseError();
+            return DeleteGroup(verify.ID) ? verify.Result : verify.Result.DataBaseError();
         }
 
         /// <summary>
@@ -309,7 +309,7 @@ namespace Insight.Base.Services
             var verify = new SessionVerify();
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
-            var data = GetGroup(verify.Guid);
+            var data = GetGroup(verify.ID);
             return data == null ? verify.Result.NotFound() : verify.Result.Success(data);
         }
 
@@ -339,7 +339,7 @@ namespace Insight.Base.Services
             var verify = new SessionVerify();
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
-            return AddGroupMember(verify.Basis.UserId, verify.Guid, uids) ? verify.Result : verify.Result.DataBaseError();
+            return AddGroupMember(verify.Basis.UserId, verify.ID, uids) ? verify.Result : verify.Result.DataBaseError();
         }
 
         /// <summary>
@@ -381,7 +381,7 @@ namespace Insight.Base.Services
             var verify = new SessionVerify();
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
-            var data = GetOtherUser(verify.Guid);
+            var data = GetOtherUser(verify.ID);
             return data.Any() ? verify.Result.Success(data) : verify.Result.NoContent();
         }
 

@@ -36,7 +36,7 @@ namespace Insight.Base.Services
             var verify = new SessionVerify();
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
-            var result = DeleteRole(verify.Guid);
+            var result = DeleteRole(verify.ID);
             if (!result.HasValue) return verify.Result.NotFound();
 
             return result.Value ? verify.Result : verify.Result.DataBaseError();
@@ -86,7 +86,7 @@ namespace Insight.Base.Services
             var verify = new SessionVerify();
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
-            var result = AddRoleMember(verify.Guid, members, verify.Basis.UserId);
+            var result = AddRoleMember(verify.ID, members, verify.Basis.UserId);
             return result == null ? verify.Result.DataBaseError() : verify.Result.Success(result);
         }
 
@@ -102,7 +102,7 @@ namespace Insight.Base.Services
             var verify = new SessionVerify();
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
-            return DeleteRoleMember(verify.Guid, type) ? verify.Result : verify.Result.DataBaseError();
+            return DeleteRoleMember(verify.ID, type) ? verify.Result : verify.Result.DataBaseError();
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace Insight.Base.Services
             var verify = new SessionVerify();
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
-            var list = GetOtherTitle(verify.Guid);
+            var list = GetOtherTitle(verify.ID);
             return list.Any() ? verify.Result.Success(list) : verify.Result.NoContent();
         }
 
@@ -131,7 +131,7 @@ namespace Insight.Base.Services
             var verify = new SessionVerify();
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
-            var list = GetOtherGroup(verify.Guid);
+            var list = GetOtherGroup(verify.ID);
             return list.Any() ? verify.Result.Success(list) : verify.Result.NoContent();
         }
 
@@ -146,9 +146,38 @@ namespace Insight.Base.Services
             var verify = new SessionVerify();
             if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
 
-            var list = GetOtherUser(verify.Guid);
+            var list = GetOtherUser(verify.ID);
             return list.Any() ? verify.Result.Success(list) : verify.Result.NoContent();
         }
 
+        /// <summary>
+        /// 获取可用的操作资源列表
+        /// </summary>
+        /// <param name="id">角色ID（可为空）</param>
+        /// <returns>JsonResult</returns>
+        public JsonResult GetActions(string id)
+        {
+            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
+            var verify = new SessionVerify();
+            if (!verify.ParseIdAndCompare(id, action, true)) return verify.Result;
+
+            var list = GetAllActions(verify.NID);
+            return list.Any() ? verify.Result.Success(list) : verify.Result.NoContent();
+        }
+
+        /// <summary>
+        /// 获取可用的数据资源列表
+        /// </summary>
+        /// <param name="id">角色ID（可为空）</param>
+        /// <returns>JsonResult</returns>
+        public JsonResult GetDatas(string id)
+        {
+            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
+            var verify = new SessionVerify();
+            if (!verify.ParseIdAndCompare(id, action, true)) return verify.Result;
+
+            var list = GetAllDatas(verify.NID);
+            return list.Any() ? verify.Result.Success(list) : verify.Result.NoContent();
+        }
     }
 }
