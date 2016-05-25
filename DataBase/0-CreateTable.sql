@@ -189,7 +189,6 @@ CREATE TABLE SYS_ModuleAction(
 [ShowText]         BIT NOT NULL,                                                                                                           --是否显示文字：0、不显示；1、显示
 [Name]             VARCHAR(64) NOT NULL,                                                                                                   --名称
 [Alias]            NVARCHAR(16) NOT NULL,                                                                                                  --别名/简称
-[EntryId]          UNIQUEIDENTIFIER,                                                                                                       --入口功能ID
 [Description]      NVARCHAR(MAX),                                                                                                          --描述
 [Validity]         BIT DEFAULT 1 NOT NULL,                                                                                                 --是否有效：0、无效；1、有效
 [Icon]             IMAGE,                                                                                                                  --图标

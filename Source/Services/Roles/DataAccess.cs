@@ -294,19 +294,21 @@ namespace Insight.Base.Services
             using (var context = new BaseEntities())
             {
                 var gl = from g in context.SYS_ModuleGroup
+                         join m in context.SYS_Module.Where(m => m.Validity) on g.ID equals m.ModuleGroupId
                          select new ActionInfo { ID = g.ID, Index = g.Index, NodeType = 0, Name = g.Name };
                 var ml = from m in context.SYS_Module.Where(m => m.Validity)
                          select new ActionInfo { ID = m.ID, ParentId = m.ModuleGroupId, Index = m.Index, NodeType = 1, Name = m.ApplicationName };
                 var al = from a in context.SYS_ModuleAction.Where(a => a.Validity)
-                         join r in context.SYS_Role_Action.Where(r => r.RoleId == rid.Value ) on a.ID equals r.ActionId into temp
+                         join m in context.SYS_Module.Where(m => m.Validity) on a.ModuleId equals m.ID
+                         join r in context.SYS_Role_Action.Where(r => r.RoleId == rid.Value) on a.ID equals r.ActionId into temp
                          from t in temp.DefaultIfEmpty()
                          let id = t == null ? Guid.NewGuid() : t.ID
                          let perm = t == null ? null : (int?) t.Action
-                         select new ActionInfo { ID = id, ParentId = a.ModuleId, ActionId = a.ID, Action = perm, Index = a.Index, NodeType = 3, Name = a.Alias };
+                         select new ActionInfo { ID = id, ParentId = a.ModuleId, ActionId = a.ID, Action = perm, Index = a.Index, NodeType = 2, Name = a.Alias };
                 var list = new List<ActionInfo>();
-                list.AddRange(gl);
+                list.AddRange(gl.Distinct());
                 list.AddRange(ml);
-                list.AddRange(al);
+                list.AddRange(al.Distinct());
                 return list;
             }
         }
@@ -321,11 +323,12 @@ namespace Insight.Base.Services
             using (var context = new BaseEntities())
             {
                 var gl = from g in context.SYS_ModuleGroup
+                         join m in context.SYS_Module.Where(m => m.Validity && m.Name != null) on g.ID equals m.ModuleGroupId
                          select new DataInfo { ID = g.ID, Index = g.Index, NodeType = 0, Name = g.Name };
                 var ml = from m in context.SYS_Module.Where(m => m.Validity && m.Name != null)
                          select new DataInfo { ID = m.ID, ParentId = m.ModuleGroupId, Index = m.Index, NodeType = 1, Name = m.Name + "数据" };
                 var list = new List<DataInfo>();
-                list.AddRange(gl);
+                list.AddRange(gl.Distinct());
                 list.AddRange(ml);
                 foreach (var m in ml)
                 {
@@ -337,10 +340,10 @@ namespace Insight.Base.Services
                               select new DataInfo { ID = id, ParentId = m.ID, Mode = 0, ModeId = d.ID, Permission = perm, Index = d.Type, NodeType = d.Type + 2, Name = d.Alias };
                     var dl1 = from r in context.SYS_Role_Data.Where(r => r.RoleId == rid.Value && r.ModuleId == m.ID && r.Mode == 1)
                               join u in context.SYS_User on r.ModeId equals u.ID
-                              select new DataInfo { ID = r.ID, ParentId = m.ID, Mode = 1, ModeId = r.ModeId, Permission = r.Permission, Index = 6, NodeType = 1, Name = u.Name };
+                              select new DataInfo { ID = r.ID, ParentId = m.ID, Mode = 1, ModeId = r.ModeId, Permission = r.Permission, Index = 6, NodeType = 3, Name = u.Name };
                     var dl2 = from r in context.SYS_Role_Data.Where(r => r.RoleId == rid.Value && r.ModuleId == m.ID && r.Mode == 2)
                               join o in context.SYS_Organization on r.ModeId equals o.ID
-                              select new DataInfo { ID = r.ID, ParentId = m.ID, Mode = 2, ModeId = r.ModeId, Permission = r.Permission, Index = 7, NodeType = 2, Name = o.FullName };
+                              select new DataInfo { ID = r.ID, ParentId = m.ID, Mode = 2, ModeId = r.ModeId, Permission = r.Permission, Index = 7, NodeType = 4, Name = o.FullName };
                     list.AddRange(dl0);
                     list.AddRange(dl1);
                     list.AddRange(dl2);

@@ -16,7 +16,8 @@ Modules as (
   select distinct M.ID, M.ModuleGroupId as ParentId, R.RoleId, '00000000-0000-0000-0000-000000000000' as ActionId, null as Action, null as Permit, M.[Index], 1 as NodeType, M.ApplicationName as Name, null as Description
   from SYS_Module M
   join SYS_ModuleAction A on A.ModuleId = M.ID
-  join SYS_Role_Action R on R.ActionId = A.ID),
+  join SYS_Role_Action R on R.ActionId = A.ID
+  where M.Validity = 1),
 Groups as (
   select distinct G.ID, null as ParentId, M.RoleId, '00000000-0000-0000-0000-000000000000' as ActionId, null as Action, null as Permit, G.[Index], 0 as NodeType, G.Name, null as Description
   from SYS_ModuleGroup G

@@ -45,8 +45,8 @@ namespace Insight.Base.Common.Entity
         public virtual DbSet<SYS_Role_Data> SYS_Role_Data { get; set; }
         public virtual DbSet<SYS_Role_Member> SYS_Role_Member { get; set; }
         public virtual DbSet<RoleAction> RoleAction { get; set; }
-        public virtual DbSet<RoleMember> RoleMember { get; set; }
         public virtual DbSet<RoleMemberUser> RoleMemberUser { get; set; }
         public virtual DbSet<RoleData> RoleData { get; set; }
+        public virtual DbSet<RoleMember> RoleMember { get; set; }
     }
 }

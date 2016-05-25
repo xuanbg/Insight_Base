@@ -28,7 +28,6 @@ namespace Insight.Base.Common.Entity
         public bool ShowText { get; set; }
         public string Name { get; set; }
         public string Alias { get; set; }
-        public Nullable<System.Guid> EntryId { get; set; }
         public string Description { get; set; }
         public bool Validity { get; set; }
         public byte[] Icon { get; set; }
