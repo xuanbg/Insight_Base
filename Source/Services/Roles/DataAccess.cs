@@ -293,21 +293,25 @@ namespace Insight.Base.Services
         {
             using (var context = new BaseEntities())
             {
+                var ids = from r in context.SYS_Role_Action.Where(r => r.RoleId == rid.Value)
+                          join a in context.SYS_ModuleAction.Where(a => a.Validity) on r.ActionId equals a.ID
+                          select a.ModuleId;
                 var gl = from g in context.SYS_ModuleGroup
                          join m in context.SYS_Module.Where(m => m.Validity) on g.ID equals m.ModuleGroupId
                          select new ActionInfo { ID = g.ID, Index = g.Index, NodeType = 0, Name = g.Name };
                 var ml = from m in context.SYS_Module.Where(m => m.Validity)
-                         select new ActionInfo { ID = m.ID, ParentId = m.ModuleGroupId, Index = m.Index, NodeType = 1, Name = m.ApplicationName };
+                         let perm = ids.Any(id => id == m.ID) ? (int?)1 : null
+                         select new ActionInfo { ID = m.ID, ParentId = m.ModuleGroupId, Permit = perm, Index = m.Index, NodeType = 1, Name = m.ApplicationName };
                 var al = from a in context.SYS_ModuleAction.Where(a => a.Validity)
                          join m in context.SYS_Module.Where(m => m.Validity) on a.ModuleId equals m.ID
                          join r in context.SYS_Role_Action.Where(r => r.RoleId == rid.Value) on a.ID equals r.ActionId into temp
                          from t in temp.DefaultIfEmpty()
                          let id = t == null ? Guid.NewGuid() : t.ID
                          let perm = t == null ? null : (int?) t.Action
-                         select new ActionInfo { ID = id, ParentId = a.ModuleId, ActionId = a.ID, Action = perm, Index = a.Index, NodeType = 2, Name = a.Alias };
+                         select new ActionInfo { ID = id, ParentId = a.ModuleId, ActionId = a.ID, Action = perm, Permit = perm, Index = a.Index, NodeType = 2, Name = a.Alias };
                 var list = new List<ActionInfo>();
                 list.AddRange(gl.Distinct());
-                list.AddRange(ml);
+                list.AddRange(ml.Distinct());
                 list.AddRange(al.Distinct());
                 return list;
             }
@@ -322,14 +326,17 @@ namespace Insight.Base.Services
         {
             using (var context = new BaseEntities())
             {
+                var ids = from r in context.SYS_Role_Data.Where(r => r.RoleId == rid.Value)
+                          select r.ModuleId;
                 var gl = from g in context.SYS_ModuleGroup
                          join m in context.SYS_Module.Where(m => m.Validity && m.Name != null) on g.ID equals m.ModuleGroupId
                          select new DataInfo { ID = g.ID, Index = g.Index, NodeType = 0, Name = g.Name };
                 var ml = from m in context.SYS_Module.Where(m => m.Validity && m.Name != null)
-                         select new DataInfo { ID = m.ID, ParentId = m.ModuleGroupId, Index = m.Index, NodeType = 1, Name = m.Name + "数据" };
+                         let perm = ids.Any(id => id == m.ID) ? (int?)1 : null
+                         select new DataInfo { ID = m.ID, ParentId = m.ModuleGroupId, Permit = perm, Index = m.Index, NodeType = 1, Name = m.Name + "数据" };
                 var list = new List<DataInfo>();
                 list.AddRange(gl.Distinct());
-                list.AddRange(ml);
+                list.AddRange(ml.Distinct());
                 foreach (var m in ml)
                 {
                     var dl0 = from d in context.SYS_Data
