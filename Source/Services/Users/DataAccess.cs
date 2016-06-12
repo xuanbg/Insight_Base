@@ -20,7 +20,6 @@ namespace Insight.Base.Services
         {
             var sql = "insert SYS_User (ID, Name, LoginName, Password, PayPassword, OpenId, Description, Type, CreatorUserId) ";
             sql += "select @ID, @Name, @LoginName, @Password, @PayPassword, @OpenId, @Description, @Type, @CreatorUserId;";
-            sql += "select ID From SYS_User where SN = SCOPE_IDENTITY()";
             var parm = new[]
             {
                 new SqlParameter("@ID", SqlDbType.UniqueIdentifier) {Value = obj.ID},

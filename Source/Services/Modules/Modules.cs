@@ -17,8 +17,9 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult GetModuleGroup()
         {
-            var verify = new SessionVerify();
-            if (!verify.Compare()) return verify.Result;
+            var verify = new Compare();
+            var result = verify.Result;
+            if (!result.Successful) return result;
 
             var auth = new Authority(verify.Session.UserId, verify.Session.DeptId);
             var data = auth.PermModuleGroups();
@@ -31,8 +32,9 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult GetUserModule()
         {
-            var verify = new SessionVerify();
-            if (!verify.Compare()) return verify.Result;
+            var verify = new Compare();
+            var result = verify.Result;
+            if (!result.Successful) return result;
 
             var auth = new Authority(verify.Session.UserId, verify.Session.DeptId);
             var data = auth.PermModules();
@@ -46,12 +48,16 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult GetAction(string id)
         {
-            var verify = new SessionVerify();
-            if (!verify.ParseIdAndCompare(id)) return verify.Result;
+            Guid mid;
+            if (Guid.TryParse(id, out mid)) return new JsonResult().InvalidGuid();
+
+            var verify = new Compare();
+            var result = verify.Result;
+            if (!result.Successful) return result;
 
             var auth = new Authority(verify.Session.UserId, verify.Session.DeptId);
-            var data = auth.ModuleActions(verify.ID);
-            return data.Any() ? verify.Result.Success(data) : verify.Result.NoContent();
+            var data = auth.ModuleActions(mid);
+            return data.Any() ? result.Success(data) : result.NoContent();
         }
 
         public JsonResult GetModuleParam(string id)

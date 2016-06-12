@@ -68,6 +68,16 @@ namespace Insight.Base.Services
         JsonResult GetOnlineUsers(string type);
 
         /// <summary>
+        /// 根据对象实体数据注册一个用户
+        /// </summary>
+        /// <param name="account">登录账号</param>
+        /// <param name="user">用户对象</param>
+        /// <returns>JsonResult</returns>
+        [WebInvoke(Method = "POST", UriTemplate = "users/{account}/signup", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [OperationContract]
+        JsonResult SignUp(string account, SYS_User user);
+
+        /// <summary>
         /// 更新指定用户Session的签名
         /// </summary>
         /// <param name="account">登录账号</param>

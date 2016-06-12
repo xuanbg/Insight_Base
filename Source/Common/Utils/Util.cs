@@ -33,6 +33,11 @@ namespace Insight.Base.Common.Utils
         public static readonly List<VerifyRecord> SmsCodes = new List<VerifyRecord>();
 
         /// <summary>
+        /// 接口调用时间记录
+        /// </summary>
+        public static Dictionary<string, DateTime> Requests = new Dictionary<string, DateTime>();
+
+        /// <summary>
         /// 用于生成短信验证码的随机数发生器
         /// </summary>
         public static readonly Random Random = new Random(Environment.TickCount);

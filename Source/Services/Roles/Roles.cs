@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using Insight.Base.Common;
@@ -18,11 +19,12 @@ namespace Insight.Base.Services
         public JsonResult AddRole(RoleInfo role)
         {
             const string action = "10B574A2-1A69-4273-87D9-06EDA77B80B6";
-            var verify = new SessionVerify();
-            if (!verify.Compare(action)) return verify.Result;
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
 
             var id = InsertData(verify.Basis.UserId, role);
-            return id == null ? verify.Result.DataBaseError() : verify.Result.Created(id.ToString());
+            return id == null ? result.DataBaseError() : result.Created(id.ToString());
         }
 
         /// <summary>
@@ -32,14 +34,18 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult RemoveRole(string id)
         {
+            Guid rid;
+            if (Guid.TryParse(id, out rid)) return new JsonResult().InvalidGuid();
+
             const string action = "FBCEE515-8576-4B10-BA68-CF46743D2199";
-            var verify = new SessionVerify();
-            if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
 
-            var result = DeleteRole(verify.ID);
-            if (!result.HasValue) return verify.Result.NotFound();
+            var del = DeleteRole(rid);
+            if (!del.HasValue) return result.NotFound();
 
-            return result.Value ? verify.Result : verify.Result.DataBaseError();
+            return del.Value ? result : result.DataBaseError();
         }
 
         /// <summary>
@@ -51,13 +57,14 @@ namespace Insight.Base.Services
         public JsonResult EditRole(string id, RoleInfo role)
         {
             const string action = "4DC0141D-FE3D-4504-BE70-763028796808";
-            var verify = new SessionVerify();
-            if (!verify.Compare(action)) return verify.Result;
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
 
-            var result = Update(verify.Basis.UserId, role);
-            if (result == null) return verify.Result.NotFound();
+            var data = Update(verify.Basis.UserId, role);
+            if (data == null) return verify.Result.NotFound();
 
-            return result.Value ? verify.Result : verify.Result.DataBaseError();
+            return data.Value ? result : result.DataBaseError();
         }
 
         /// <summary>
@@ -67,11 +74,12 @@ namespace Insight.Base.Services
         public JsonResult GetAllRole()
         {
             const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
-            var verify = new SessionVerify();
-            if (!verify.Compare(action)) return verify.Result;
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
 
             var list = GetRoles();
-            return list.Any() ? verify.Result.Success(list) : verify.Result.NoContent();
+            return list.Any() ? result.Success(list) : result.NoContent();
         }
 
         /// <summary>
@@ -82,12 +90,16 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult AddRoleMember(string id, List<RoleMember> members)
         {
-            const string action = "13D93852-53EC-4A15-AAB2-46C9C48C313A";
-            var verify = new SessionVerify();
-            if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
+            Guid rid;
+            if (Guid.TryParse(id, out rid)) return new JsonResult().InvalidGuid();
 
-            var result = AddRoleMember(verify.ID, members, verify.Basis.UserId);
-            return result == null ? verify.Result.DataBaseError() : verify.Result.Success(result);
+            const string action = "13D93852-53EC-4A15-AAB2-46C9C48C313A";
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
+
+            var add = AddRoleMember(rid, members, verify.Basis.UserId);
+            return add == null ? result.DataBaseError() : result.Success(result);
         }
 
         /// <summary>
@@ -98,11 +110,15 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult RemoveRoleMember(string id, string type)
         {
-            const string action = "2EF4D82B-4A75-4902-BD9E-B63153D093D2";
-            var verify = new SessionVerify();
-            if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
+            Guid rid;
+            if (Guid.TryParse(id, out rid)) return new JsonResult().InvalidGuid();
 
-            return DeleteRoleMember(verify.ID, type) ? verify.Result : verify.Result.DataBaseError();
+            const string action = "2EF4D82B-4A75-4902-BD9E-B63153D093D2";
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
+
+            return DeleteRoleMember(rid, type) ? result : result.DataBaseError();
         }
 
         /// <summary>
@@ -112,12 +128,16 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult GetMemberOfTitle(string id)
         {
-            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
-            var verify = new SessionVerify();
-            if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
+            Guid rid;
+            if (Guid.TryParse(id, out rid)) return new JsonResult().InvalidGuid();
 
-            var list = GetOtherTitle(verify.ID);
-            return list.Any() ? verify.Result.Success(list) : verify.Result.NoContent();
+            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
+
+            var list = GetOtherTitle(rid);
+            return list.Any() ? result.Success(list) : result.NoContent();
         }
 
         /// <summary>
@@ -127,12 +147,16 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult GetMemberOfGroup(string id)
         {
-            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
-            var verify = new SessionVerify();
-            if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
+            Guid rid;
+            if (Guid.TryParse(id, out rid)) return new JsonResult().InvalidGuid();
 
-            var list = GetOtherGroup(verify.ID);
-            return list.Any() ? verify.Result.Success(list) : verify.Result.NoContent();
+            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
+
+            var list = GetOtherGroup(rid);
+            return list.Any() ? result.Success(list) : result.NoContent();
         }
 
         /// <summary>
@@ -142,12 +166,16 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult GetMemberOfUser(string id)
         {
-            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
-            var verify = new SessionVerify();
-            if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
+            Guid rid;
+            if (Guid.TryParse(id, out rid)) return new JsonResult().InvalidGuid();
 
-            var list = GetOtherUser(verify.ID);
-            return list.Any() ? verify.Result.Success(list) : verify.Result.NoContent();
+            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
+
+            var list = GetOtherUser(rid);
+            return list.Any() ? result.Success(list) : result.NoContent();
         }
 
         /// <summary>
@@ -157,11 +185,16 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult GetActions(string id)
         {
-            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
-            var verify = new SessionVerify();
-            if (!verify.ParseIdAndCompare(id, action, true)) return verify.Result;
+            var rid = Guid.Empty;
+            var hasid = string.IsNullOrEmpty(id);
+            if (hasid && Guid.TryParse(id, out rid)) return new JsonResult().InvalidGuid();
 
-            var list = GetAllActions(verify.NID);
+            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
+
+            var list = GetAllActions(hasid ? (Guid?) rid : null);
             return list.Any() ? verify.Result.Success(list) : verify.Result.NoContent();
         }
 
@@ -172,11 +205,16 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult GetDatas(string id)
         {
-            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
-            var verify = new SessionVerify();
-            if (!verify.ParseIdAndCompare(id, action, true)) return verify.Result;
+            var rid = Guid.Empty;
+            var hasid = string.IsNullOrEmpty(id);
+            if (hasid && Guid.TryParse(id, out rid)) return new JsonResult().InvalidGuid();
 
-            var list = GetAllDatas(verify.NID);
+            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
+
+            var list = GetAllDatas(hasid ? (Guid?)rid : null);
             return list.Any() ? verify.Result.Success(list) : verify.Result.NoContent();
         }
     }

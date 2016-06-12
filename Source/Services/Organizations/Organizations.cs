@@ -20,10 +20,10 @@ namespace Insight.Base.Services
         public JsonResult AddOrg(SYS_Organization org, int index)
         {
             const string action = "88AC97EF-52A3-4F7F-8121-4C311206535F";
-            var verify = new SessionVerify();
-            if (!verify.Compare(action)) return verify.Result;
-
+            var verify = new Compare(action);
             var result = verify.Result;
+            if (!result.Successful) return result;
+
             org.CreatorUserId = verify.Basis.UserId;
             var id = InsertData(org, index);
             return id == null ? result.DataBaseError() : result.Created(id.ToString());
@@ -36,11 +36,15 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult RemoveOrg(string id)
         {
-            const string action = "71803766-97FE-4E6E-82DB-D5C90D2B7004";
-            var verify = new SessionVerify();
-            if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
+            Guid oid;
+            if (Guid.TryParse(id, out oid)) return new JsonResult().InvalidGuid();
 
-            return DeleteOrg(verify.ID) ? verify.Result : verify.Result.DataBaseError();
+            const string action = "71803766-97FE-4E6E-82DB-D5C90D2B7004";
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
+
+            return DeleteOrg(oid) ? result : result.DataBaseError();
         }
 
         /// <summary>
@@ -53,10 +57,11 @@ namespace Insight.Base.Services
         public JsonResult UpdateOrg(string id, SYS_Organization org, int index)
         {
             const string action = "542D5E28-8102-40C6-9C01-190D13DBF6C6";
-            var verify = new SessionVerify();
-            if (!verify.Compare(action)) return verify.Result;
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
 
-            return Update(org, index) ? verify.Result : verify.Result.DataBaseError();
+            return Update(org, index) ? result : result.DataBaseError();
         }
 
         /// <summary>
@@ -66,12 +71,16 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult GetOrg(string id)
         {
-            const string action = "928C7527-A2F7-49A3-A548-12B3834D8822";
-            var verify = new SessionVerify();
-            if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
+            Guid oid;
+            if (Guid.TryParse(id, out oid)) return new JsonResult().InvalidGuid();
 
-            var org = GetOrg(verify.ID);
-            return org == null ? verify.Result.NotFound() : verify.Result.Success(Util.Serialize(org));
+            const string action = "928C7527-A2F7-49A3-A548-12B3834D8822";
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
+
+            var org = GetOrg(oid);
+            return org == null ? result.NotFound() : result.Success(Util.Serialize(org));
         }
 
         /// <summary>
@@ -81,11 +90,12 @@ namespace Insight.Base.Services
         public JsonResult GetOrgTree()
         {
             const string action = "928C7527-A2F7-49A3-A548-12B3834D8822";
-            var verify = new SessionVerify();
-            if (!verify.Compare(action)) return verify.Result;
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
 
             var data = GetOrgList();
-            return data.Any() ? verify.Result.Success(data) : verify.Result.NoContent();
+            return data.Any() ? result.Success(data) : result.NoContent();
         }
 
         /// <summary>
@@ -96,12 +106,16 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult OrgMerger(string id, SYS_Organization org)
         {
+            Guid oid;
+            if (Guid.TryParse(id, out oid)) return new JsonResult().InvalidGuid();
+
             const string action = "DAE7F2C5-E379-4F74-8043-EB616D4A5F8B";
-            var verify = new SessionVerify();
-            if (!verify.ParseIdAndCompare(action)) return verify.Result;
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
 
             org.CreatorUserId = verify.Basis.UserId;
-            return Update(verify.ID, org) ? verify.Result : verify.Result.DataBaseError();
+            return Update(oid, org) ? result : result.DataBaseError();
         }
 
         /// <summary>
@@ -113,10 +127,11 @@ namespace Insight.Base.Services
         public JsonResult SetOrgParent(string id, SYS_Organization org)
         {
             const string action = "DB1A4EA2-1B3E-41AD-91FA-A3945AB7D901";
-            var verify = new SessionVerify();
-            if (!verify.Compare(action)) return verify.Result;
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
 
-            return Update(org) ? verify.Result : verify.Result.DataBaseError();
+            return Update(org) ? result : result.DataBaseError();
         }
 
         /// <summary>
@@ -127,11 +142,15 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult AddOrgMember(string id, List<Guid> ids)
         {
-            const string action = "1F29DDEA-A4D7-4EF9-8136-0D4AFE88CB08";
-            var verify = new SessionVerify();
-            if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
+            Guid oid;
+            if (Guid.TryParse(id, out oid)) return new JsonResult().InvalidGuid();
 
-            return InsertData(verify.Basis.UserId, verify.ID, ids) ? verify.Result : verify.Result.DataBaseError();
+            const string action = "1F29DDEA-A4D7-4EF9-8136-0D4AFE88CB08";
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
+
+            return InsertData(verify.Basis.UserId, oid, ids) ? result : result.DataBaseError();
         }
 
         /// <summary>
@@ -142,10 +161,11 @@ namespace Insight.Base.Services
         public JsonResult RemoveOrgMember(List<Guid> ids)
         {
             const string action = "70AC8EEB-F920-468D-8C8F-2DBA049ADAE9";
-            var verify = new SessionVerify();
-            if (!verify.Compare(action)) return verify.Result;
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
 
-            return DeleteOrgMember(ids) ? verify.Result : verify.Result.DataBaseError();
+            return DeleteOrgMember(ids) ? result : result.DataBaseError();
         }
 
         /// <summary>
@@ -154,12 +174,16 @@ namespace Insight.Base.Services
         /// <param name="id">节点ID</param>
         public JsonResult GetOtherOrgMember(string id)
         {
-            const string action = "928C7527-A2F7-49A3-A548-12B3834D8822";
-            var verify = new SessionVerify();
-            if (!verify.ParseIdAndCompare(id, action)) return verify.Result;
+            Guid oid;
+            if (Guid.TryParse(id, out oid)) return new JsonResult().InvalidGuid();
 
-            var data = GetOtherOrgMember(verify.ID);
-            return data.Any() ? verify.Result.Success(data) : verify.Result.NoContent();
+            const string action = "928C7527-A2F7-49A3-A548-12B3834D8822";
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
+
+            var data = GetOtherOrgMember(oid);
+            return data.Any() ? result.Success(data) : result.NoContent();
         }
 
         /// <summary>
@@ -169,16 +193,17 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult GetLoginDepts(string account)
         {
-            var verify = General.Verify(account.ToUpper() + Util.Secret);
-            if (!verify.Successful) return verify;
+            var verify = new Compare(account.ToUpper() + Util.Secret, 0);
+            var result = verify.Result;
+            if (!result.Successful) return result;
 
             using (var context = new BaseEntities())
             {
                 var user = context.SYS_User.SingleOrDefault(u => u.LoginName == account);
-                if (user == null) return verify.NotFound();
+                if (user == null) return result.NotFound();
 
                 var data = GetDeptList(user.ID);
-                return data.Any() ? verify.Success(Util.Serialize(data)) : verify.NoContent();
+                return data.Any() ? result.Success(data) : result.NoContent();
             }
         }
 

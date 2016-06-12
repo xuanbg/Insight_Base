@@ -26,14 +26,6 @@ namespace Insight.Base.Services
         JsonResult Verification();
 
         /// <summary>
-        /// 会话合法性验证并校验支付密码
-        /// </summary>
-        /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "verify/confirm?paykey={paykey}", ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        JsonResult Confirmation(string paykey);
-
-        /// <summary>
         /// 带鉴权的会话合法性验证
         /// </summary>
         /// <param name="action">需要鉴权的操作ID</param>

@@ -35,20 +35,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult Verification()
         {
-            var verify = new SessionVerify();
-            verify.Compare();
-            return verify.Result;
-        }
-
-        /// <summary>
-        /// 会话合法性验证并校验支付密码
-        /// </summary>
-        /// <returns>JsonResult</returns>
-        public JsonResult Confirmation(string paykey)
-        {
-            var verify = new SessionVerify();
-            verify.Confirm(paykey);
-            return verify.Result;
+            return new Compare().Result;
         }
 
         /// <summary>
@@ -58,9 +45,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult Authorization(string action)
         {
-            var verify = new SessionVerify();
-            verify.Compare(action);
-            return verify.Result;
+            return new Compare(action).Result;
         }
 
         #endregion
@@ -76,11 +61,12 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult NewCode(string mobile, int type, int time)
         {
-            var verify = General.Verify(mobile + Util.Secret);
-            if (!verify.Successful) return verify;
+            var verify = new Compare(mobile + Util.Secret, 0);
+            var result = verify.Result;
+            if (!result.Successful) return result;
 
             var record = Util.SmsCodes.OrderByDescending(r => r.CreateTime).FirstOrDefault(r => r.Mobile == mobile && r.Type == type);
-            if (record != null && (DateTime.Now - record.CreateTime).TotalSeconds < 60) return verify.TimeTooShort();
+            if (record != null && (DateTime.Now - record.CreateTime).TotalSeconds < 60) return result.TimeTooShort();
 
             var code = Util.Random.Next(100000, 999999).ToString();
             record = new VerifyRecord
@@ -92,8 +78,8 @@ namespace Insight.Base.Services
                 CreateTime = DateTime.Now
             };
             Util.SmsCodes.Add(record);
-            General.LogToLogServer("700501", $"已经为手机号【{mobile}】的用户生成了类型为【{type}】的短信验证码：【{code}】。此验证码将于{record.FailureTime}失效。", "验证服务", "生成短信验证码");
-            return verify.Success(code);
+            new Logger("700501", $"已经为手机号【{mobile}】的用户生成了类型为【{type}】的短信验证码：【{code}】。此验证码将于{record.FailureTime}失效。", "验证服务", "生成短信验证码").Write();
+            return result.Success(code);
         }
 
         /// <summary>
@@ -106,17 +92,18 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult VerifyCode(string mobile, string code, int type, bool remove = true)
         {
-            var verify = General.Verify(mobile + Util.Secret);
-            if (!verify.Successful) return verify;
+            var verify = new Compare(mobile + Util.Secret, 0);
+            var result = verify.Result;
+            if (!result.Successful) return result;
 
             Util.SmsCodes.RemoveAll(c => c.FailureTime < DateTime.Now);
             var record = Util.SmsCodes.FirstOrDefault(c => c.Mobile == mobile && c.Code == code && c.Type == type);
-            if (record == null) return verify.SMSCodeError();
+            if (record == null) return result.SMSCodeError();
 
-            if (!remove) return verify;
+            if (!remove) return result;
 
             Util.SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == type);
-            return verify;
+            return result;
         }
 
         #endregion
@@ -131,11 +118,12 @@ namespace Insight.Base.Services
         public JsonResult GetSessions(string type)
         {
             const string action = "331BF752-CDB7-44DE-9631-DF2605BB527E";
-            var verify = new SessionVerify();
-            if (!verify.Compare(action)) return verify.Result;
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
 
             var list = SessionManage.GetSessions(Convert.ToInt32(type));
-            return list.Count > 0 ? verify.Result.Success(list) : verify.Result.NoContent();
+            return list.Count > 0 ? result.Success(list) : result.NoContent();
         }
 
         #endregion

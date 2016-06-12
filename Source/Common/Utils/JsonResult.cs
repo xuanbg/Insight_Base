@@ -314,15 +314,43 @@
         }
 
         /// <summary>
-        /// 返回错误的支付密码（418）的错误信息
+        /// 返回调用接口过于频繁（416）的错误信息
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns>JsonResult</returns>
+        public JsonResult TooFrequent(string data)
+        {
+            Successful = false;
+            Code = "416";
+            Name = "CallInterfaceTooFrequent";
+            Message = "调用接口过于频繁";
+            Data = data;
+            return this;
+        }
+
+        /// <summary>
+        /// 返回错误的支付密码（417）的错误信息
         /// </summary>
         /// <returns>JsonResult</returns>
         public JsonResult InvalidPayKey()
         {
             Successful = false;
-            Code = "418";
+            Code = "417";
             Name = "InvalidPayKey";
             Message = "错误的支付密码";
+            return this;
+        }
+
+        /// <summary>
+        /// 返回指定的编码方案不存在（418）的错误信息
+        /// </summary>
+        /// <returns>JsonResult</returns>
+        public JsonResult CodeSchemeNotExists()
+        {
+            Successful = false;
+            Code = "418";
+            Name = "CodeSchemeNotExists";
+            Message = "指定的编码方案不存在";
             return this;
         }
 

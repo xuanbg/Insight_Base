@@ -64,11 +64,12 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult GetCode(string name, string id, string mark)
         {
-            var verify = new SessionVerify();
-            if (!verify.Compare()) return verify.Result;
+            Guid bid;
+            if (!Guid.TryParse(id, out bid)) return new JsonResult().InvalidGuid();
 
-            Guid oid;
-            if (!Guid.TryParse(id, out oid)) return verify.Result.InvalidGuid();
+            var verify = new Compare();
+            var result = verify.Result;
+            if (!result.Successful) return result;
 
             var session = verify.Session;
             using (var context = new BaseEntities())
@@ -76,12 +77,12 @@ namespace Insight.Base.Services
                 var scheme = context.SYS_Code_Scheme.SingleOrDefault(s => s.Name == name);
                 if (scheme == null)
                 {
-                    General.LogToLogServer("001101", $"不存在名称为：【{name}】的编码方案", "编码规则", "生成编码");
-                    return verify.Result.ServiceUnavailable();
+                    new Logger("001101", $"不存在名称为：【{name}】的编码方案", "编码规则", "生成编码").Write();
+                    return result.CodeSchemeNotExists();
                 }
 
-                var code = GetCode(scheme.ID, null, session.UserId, oid, null, mark);
-                return code == null ? verify.Result.DataBaseError() : verify.Result.Success(code.ToString());
+                var code = GetCode(scheme.ID, null, session.UserId, bid, null, mark);
+                return code == null ? result.DataBaseError() : result.Success(code.ToString());
             }
         }
     }
