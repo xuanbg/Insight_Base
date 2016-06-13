@@ -141,7 +141,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult SignUp(string account, SYS_User user)
         {
-            var verify = new Compare(account.ToUpper() + Util.Secret);
+            var verify = new Compare(account.ToUpper() + Util.Secret, 0);
             var result = verify.Result;
             if (!result.Successful) return result;
 
