@@ -2,6 +2,7 @@
 using System.Linq;
 using System.ServiceModel;
 using System.ServiceModel.Web;
+using System.Threading;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Base.Common.Utils;
@@ -78,7 +79,10 @@ namespace Insight.Base.Services
                 CreateTime = DateTime.Now
             };
             Util.SmsCodes.Add(record);
-            new Logger("700501", $"已经为手机号【{mobile}】的用户生成了类型为【{type}】的短信验证码：【{code}】。此验证码将于{record.FailureTime}失效。", "验证服务", "生成短信验证码").Write();
+
+            var ts = new ThreadStart(() => new Logger("700501", $"已经为手机号【{mobile}】的用户生成了类型为【{type}】的短信验证码：【{code}】。此验证码将于{record.FailureTime}失效。", "验证服务", "生成短信验证码").Write());
+            new Thread(ts).Start();
+
             return result.Success(code);
         }
 

@@ -4,6 +4,7 @@ using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.ServiceModel.Web;
 using System.Text;
+using System.Threading;
 using Insight.Base.Common.Entity;
 using Insight.Base.Common.Utils;
 
@@ -155,8 +156,8 @@ namespace Insight.Base.Common
             }
             catch (Exception ex)
             {
-                var log = new Logger("500601", $"提取验证信息失败。\r\nException:{ex}");
-                log.Write();
+                var ts = new ThreadStart(() => new Logger("500601", $"提取验证信息失败。\r\nException:{ex}").Write());
+                new Thread(ts).Start();
                 throw new Exception("提取验证信息失败");
             }
         }
@@ -256,10 +257,10 @@ namespace Insight.Base.Common
         /// <returns>int 剩余限制时间（秒）</returns>
         private int LimitCall(int seconds)
         {
-            var endpoint = Properties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
-            if (endpoint == null) return 0;
+            var property = Properties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
+            if (property == null) return 0;
 
-            var ip = endpoint.Address;
+            var ip = property.Address;
             if (!Util.Requests.ContainsKey(ip))
             {
                 Util.Requests.Add(ip, DateTime.Now);

@@ -148,12 +148,13 @@
         /// 返回请求参数错误（400）的错误信息
         /// </summary>
         /// <returns>JsonResult</returns>
-        public JsonResult BadRequest()
+        public JsonResult BadRequest(string data = null)
         {
             Successful = false;
             Code = "400";
             Name = "BadRequest";
             Message = "请求参数错误";
+            Data = data;
             return this;
         }
 

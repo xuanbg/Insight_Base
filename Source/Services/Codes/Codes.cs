@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.ServiceModel;
+using System.Threading;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Base.Common.Utils;
@@ -77,7 +78,8 @@ namespace Insight.Base.Services
                 var scheme = context.SYS_Code_Scheme.SingleOrDefault(s => s.Name == name);
                 if (scheme == null)
                 {
-                    new Logger("001101", $"不存在名称为：【{name}】的编码方案", "编码规则", "生成编码").Write();
+                    var ts = new ThreadStart(() => new Logger("001101", $"不存在名称为：【{name}】的编码方案", "编码规则", "生成编码").Write());
+                    new Thread(ts).Start();
                     return result.CodeSchemeNotExists();
                 }
 

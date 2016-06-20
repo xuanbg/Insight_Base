@@ -38,12 +38,19 @@ namespace Insight.Base.Common.Utils
             var request = GetWebRequest(url, method, author);
             var buffer = Encoding.UTF8.GetBytes(data);
             request.ContentLength = buffer.Length;
-            using (var stream = request.GetRequestStream())
+            try
             {
-                stream.Write(buffer, 0, buffer.Length);
-            }
+                using (var stream = request.GetRequestStream())
+                {
+                    stream.Write(buffer, 0, buffer.Length);
+                }
 
-            GetResponse(request);
+                GetResponse(request);
+            }
+            catch (Exception ex)
+            {
+                Result.BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
