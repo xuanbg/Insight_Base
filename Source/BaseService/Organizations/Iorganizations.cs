@@ -49,6 +49,15 @@ namespace Insight.WS.Base
         JsonResult UpdateOrg(string id, SYS_Organization obj, int index);
 
         /// <summary>
+        /// 根据登录账号获取可选登录部门对象列表
+        /// </summary>
+        /// <param name="account">登录账号</param>
+        /// <returns>JsonResult</returns>
+        [WebGet(UriTemplate = "logindept?account={account}", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        JsonResult GetLoginDept(string account);
+
+        /// <summary>
         /// 根据ID获取机构对象实体
         /// </summary>
         /// <param name="id">节点ID</param>

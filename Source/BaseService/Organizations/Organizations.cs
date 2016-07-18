@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using Insight.WS.Base.Common;
@@ -71,6 +72,30 @@ namespace Insight.WS.Base
             if (!verify.Compare(action)) return verify.Result;
 
             return Update(obj) ? verify.Result : verify.Result.DataBaseError();
+        }
+
+        /// <summary>
+        /// 根据登录账号获取可选登录部门对象列表
+        /// </summary>
+        /// <param name="account">登录账号</param>
+        /// <returns>JsonResult</returns>
+        public JsonResult GetLoginDept(string account)
+        {
+            var verify = new Verify(account.ToUpper() + Secret);
+            var result = verify.Result;
+            if (!result.Successful) return result;
+
+            using (var context = new BaseEntities())
+            {
+                var user = context.SYS_User.SingleOrDefault(u => u.LoginName == account);
+                if (user == null) return result.NotFound();
+
+                var list = from m in context.SYS_OrgMember.Where(m => m.UserId == user.ID)
+                           join t in context.SYS_Organization on m.OrgId equals t.ID
+                           join d in context.SYS_Organization on t.ParentId equals d.ID
+                           select new { d.ID, d.FullName };
+                return list.Any() ? result.Success(Serialize(list)) : result.NoContent();
+            }
         }
 
         /// <summary>
