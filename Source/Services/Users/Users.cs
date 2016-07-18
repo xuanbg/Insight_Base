@@ -79,7 +79,7 @@ namespace Insight.Base.Services
 
             if (!reset.Value) return result.DataBaseError();
 
-            SessionManage.UpdateSession(user);
+            TokenManage.Update(user);
             return result;
         }
 
@@ -129,7 +129,7 @@ namespace Insight.Base.Services
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            var list = SessionManage.GetSessions(Convert.ToInt32(type));
+            var list = TokenManage.GetOnlineUsers(Convert.ToInt32(type));
             return list.Any() ? result.Success(list) : result.NoContent();
         }
 
@@ -141,7 +141,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult SignUp(string account, SYS_User user)
         {
-            var verify = new Compare(account.ToUpper() + Util.Secret, 0);
+            var verify = new Compare();
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -154,7 +154,7 @@ namespace Insight.Base.Services
             if (InsertData(user) == null) return verify.Result.DataBaseError();
 
             // 返回用于验证的Key
-            var us = SessionManage.GetSession(user.LoginName);
+            var us = TokenManage.Get(user.LoginName);
             return verify.Result.Created(Util.CreateKey(us));
         }
 
@@ -171,9 +171,9 @@ namespace Insight.Base.Services
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            var session = Util.StringCompare(verify.Session.LoginName, account)
+            var session = Util.StringCompare(verify.Token.LoginName, account)
                 ? verify.Basis
-                : SessionManage.GetSession(account);
+                : TokenManage.Get(account);
             if (session == null) return result;
 
             var reset = Update(account, password);
@@ -194,11 +194,11 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult ResetSignature(string account, string password, string code)
         {
-            var verify = new Compare(account.ToUpper() + code + Util.Secret, 0);
+            var verify = new Compare();
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            var session = SessionManage.GetSession(account);
+            var session = TokenManage.Get(account);
             if (session == null) return result.NotFound();
 
             // 验证短信验证码
@@ -235,7 +235,7 @@ namespace Insight.Base.Services
 
             if (!reset.Value) return result.DataBaseError();
 
-            SessionManage.SetValidity(account, validity);
+            TokenManage.SetValidity(account, validity);
             return result;
         }
 
@@ -245,14 +245,14 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult UserSignIn(string account)
         {
-            var verify = new Compare(null, true);
+            var verify = new Compare(null, 30, true);
             var result = verify.Result;
             if (!result.Successful) return result;
 
             // 更新缓存信息
-            verify.Basis.OpenId = verify.Session.OpenId;
-            verify.Basis.MachineId = verify.Session.MachineId;
-            verify.Basis.DeptId = verify.Session.DeptId;
+            verify.Basis.OpenId = verify.Token.OpenId;
+            verify.Basis.MachineId = verify.Token.MachineId;
+            verify.Basis.DeptId = verify.Token.DeptId;
             verify.Basis.Expired = DateTime.Now.AddHours(Util.Expired);
 
             // 返回用于验证的Key
@@ -273,7 +273,7 @@ namespace Insight.Base.Services
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            SessionManage.Offline(account);
+            TokenManage.Offline(account);
             return result;
         }
 

@@ -193,7 +193,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult GetLoginDepts(string account)
         {
-            var verify = new Compare(account.ToUpper() + Util.Secret, 0);
+            var verify = new Compare();
             var result = verify.Result;
             if (!result.Successful) return result;
 

@@ -5,7 +5,7 @@ namespace Insight.Base.Common.Entity
     /// <summary>
     /// 用户会话信息
     /// </summary>
-    public class Session
+    public class Token
     {
         /// <summary>
         /// 自增ID

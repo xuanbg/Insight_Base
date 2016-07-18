@@ -143,10 +143,10 @@
     <Compile Include="Entity\SYS_UserGroupMember.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
-    <Compile Include="Entity\Session.cs" />
+    <Compile Include="Entity\Token.cs" />
     <Compile Include="Entity\VerifyRecord.cs" />
     <Compile Include="DataAccess.cs" />
-    <Compile Include="SessionManage.cs" />
+    <Compile Include="TokenManage.cs" />
     <Compile Include="Utils\Logger.cs" />
     <Compile Include="Utils\SqlHelper.cs" />
     <Compile Include="Utils\Util.cs" />

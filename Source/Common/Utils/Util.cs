@@ -87,7 +87,7 @@ namespace Insight.Base.Common.Utils
         /// </summary>
         /// <param name="session">Session</param>
         /// <returns>string 用于验证的Key</returns>
-        public static string CreateKey(Session session)
+        public static string CreateKey(Token session)
         {
             var obj = new
             {

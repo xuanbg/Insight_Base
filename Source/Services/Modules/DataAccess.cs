@@ -32,7 +32,7 @@ namespace Insight.Base.Services
         /// <param name="us">Session对象实体</param>
         /// <param name="mid"></param>
         /// <returns>SYS_ModuleParam List 参数集合</returns>
-        public List<SYS_ModuleParam> GetModuleParam(Session us, Guid mid)
+        public List<SYS_ModuleParam> GetModuleParam(Token us, Guid mid)
         {
             var ids = new List<Guid>();
             List<SYS_ModuleParam> mps;
@@ -63,7 +63,7 @@ namespace Insight.Base.Services
         /// <param name="us">Session对象实体</param>
         /// <param name="mid">模块ID</param>
         /// <returns>SYS_ModuleParam List 参数集合</returns>
-        public List<SYS_ModuleParam> GetModuleUserParam(Session us, Guid mid)
+        public List<SYS_ModuleParam> GetModuleUserParam(Token us, Guid mid)
         {
             using (var context = new BaseEntities())
             {
@@ -77,7 +77,7 @@ namespace Insight.Base.Services
         /// <param name="us">Session对象实体</param>
         /// <param name="mid">模块ID</param>
         /// <returns>SYS_ModuleParam List 参数集合</returns>
-        public List<SYS_ModuleParam> GetModuleDeptParam(Session us, Guid mid)
+        public List<SYS_ModuleParam> GetModuleDeptParam(Token us, Guid mid)
         {
             using (var context = new BaseEntities())
             {
@@ -92,7 +92,7 @@ namespace Insight.Base.Services
         /// <param name="apl">新增参数集合</param>
         /// <param name="upl">更新参数集合</param>
         /// <returns>bool 是否保存成功</returns>
-        public bool SaveModuleParam(Session us, List<SYS_ModuleParam> apl, List<SYS_ModuleParam> upl)
+        public bool SaveModuleParam(Token us, List<SYS_ModuleParam> apl, List<SYS_ModuleParam> upl)
         {
             const string sql = "insert SYS_ModuleParam (ModuleId, ParamId, Name, Value, OrgId, UserId, Description) select @ModuleId, @ParamId, @Name, @Value, @OrgId, @UserId, @Description";
             var cmds = apl.Select(p => new[]

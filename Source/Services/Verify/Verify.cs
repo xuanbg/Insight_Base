@@ -62,7 +62,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult NewCode(string mobile, int type, int time)
         {
-            var verify = new Compare(mobile + Util.Secret, 0);
+            var verify = new Compare();
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -96,7 +96,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult VerifyCode(string mobile, string code, int type, bool remove = true)
         {
-            var verify = new Compare(mobile + Util.Secret, 0);
+            var verify = new Compare();
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -126,7 +126,7 @@ namespace Insight.Base.Services
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            var list = SessionManage.GetSessions(Convert.ToInt32(type));
+            var list = TokenManage.GetOnlineUsers(Convert.ToInt32(type));
             return list.Count > 0 ? result.Success(list) : result.NoContent();
         }
 
