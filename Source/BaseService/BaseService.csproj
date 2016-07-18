@@ -46,6 +46,9 @@
     <Compile Include="Codes\Codes.cs" />
     <Compile Include="Codes\DataAccess.cs" />
     <Compile Include="Codes\ICodes.cs" />
+    <Compile Include="Modules\DataAccess.cs" />
+    <Compile Include="Modules\IModules.cs" />
+    <Compile Include="Modules\Modules.cs" />
     <Compile Include="Organizations\DataAccess.cs" />
     <Compile Include="Organizations\IOrganizations.cs" />
     <Compile Include="Organizations\Organizations.cs" />
