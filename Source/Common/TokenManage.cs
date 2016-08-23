@@ -127,6 +127,7 @@ namespace Insight.Base.Common
                 OpenId = user.OpenId,
                 LoginName = user.LoginName,
                 Signature = sign,
+                Password = user.Password,
                 UserId = user.ID,
                 UserName = user.Name,
                 UserType = user.Type,

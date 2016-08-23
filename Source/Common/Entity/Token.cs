@@ -23,9 +23,14 @@ namespace Insight.Base.Common.Entity
         public string LoginName { get; set; }
 
         /// <summary>
-        /// 用户签名，用户名（大写）+ 密码MD5值的结果的MD5值
+        /// 用户签名
         /// </summary>
         public string Signature { get; set; }
+
+        /// <summary>
+        /// 用户签名，用户密码
+        /// </summary>
+        public string Password { get; set; }
 
         /// <summary>
         /// 用户机器码

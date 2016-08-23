@@ -141,9 +141,19 @@ namespace Insight.Base.Common
             }
 
             Basis.LastConnect = DateTime.Now;
+            var same = Basis.MachineId == Token.MachineId;
+            bool identify;
+            if (login)
+            {
+                identify = Util.Hash(Basis.LoginName.ToUpper() + Basis.Password) == Token.Signature;
+            }
+            else
+            {
+                identify = Basis.Signature == Token.Signature;
+            }
 
             // 签名不正确或验证签名失败超过5次（冒用时）则不能通过验证，且连续失败计数累加1次
-            if (Basis.Signature != Token.Signature || (Basis.FailureCount >= 5 && Basis.MachineId != Token.MachineId))
+            if (!identify || (Basis.FailureCount >= 5 && !same))
             {
                 Basis.FailureCount++;
                 if (Basis.FailureCount >= 5) Result.AccountIsBlocked();
