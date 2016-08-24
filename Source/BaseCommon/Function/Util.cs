@@ -42,21 +42,6 @@ namespace Insight.WS.Base.Common
         /// </summary>
         public static readonly Random Random = new Random(Environment.TickCount);
 
-        /// <summary>
-        /// 当前程序集版本
-        /// </summary>
-        public static int CurrentVersion;
-
-        /// <summary>
-        /// 接口最后兼容版本
-        /// </summary>
-        public static string CompatibleVersion;
-
-        /// <summary>
-        /// 接口最新版本
-        /// </summary>
-        public static string UpdateVersion;
-
         #endregion
 
         #region 静态公共方法

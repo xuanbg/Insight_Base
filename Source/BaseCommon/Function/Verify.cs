@@ -54,8 +54,8 @@ namespace Insight.WS.Base.Common
         public Verify()
         {
             // 从请求头获取验证数据
-            var dict = GetAuthorization();
-            Session = GetAuthor<Session>(dict["Auth"]);
+            var auth = GetAuthorization();
+            Session = GetAuthor<Session>(auth);
 
             // 验证数据不存在
             if (Session == null) return;
@@ -82,8 +82,8 @@ namespace Insight.WS.Base.Common
         /// <param name="rule">验证规则</param>
         public Verify(string rule)
         {
-            var dict = GetAuthorization();
-            VerifyString = GetAuthor<string>(dict["Auth"]);
+            var auth = GetAuthorization();
+            VerifyString = GetAuthor<string>(auth);
             Rule = Hash(rule);
             if (VerifyString == null) Result.InvalidAuth();
 

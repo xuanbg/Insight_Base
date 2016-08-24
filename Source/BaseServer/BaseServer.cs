@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ServiceProcess;
-using System.Windows.Forms;
 using Insight.WS.Service;
 using static Insight.WS.Base.Common.Util;
 
@@ -56,12 +54,6 @@ namespace Insight.WS.Base
         /// </summary>
         private static void InitSeting()
         {
-            var version = new Version(Application.ProductVersion);
-            var build = $"{version.Major}{version.Minor}{version.Build.ToString("D4").Substring(0, 2)}";
-            CurrentVersion = Convert.ToInt32(build);
-            CompatibleVersion = GetAppSetting("CompatibleVersion");
-            UpdateVersion = GetAppSetting("UpdateVersion");
-
             LogServer = GetAppSetting("LogServer");
         }
 
