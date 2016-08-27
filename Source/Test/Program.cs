@@ -1,7 +1,8 @@
 ﻿using Insight.Base.Common;
-using Insight.Base.Common.Entity;
-using Insight.Base.Common.Utils;
-using Insight.Base.Server;
+using Insight.Utils;
+using Insight.Utils.Common;
+using Insight.WCF;
+using Insight.WCF.Entity;
 
 namespace Test
 {

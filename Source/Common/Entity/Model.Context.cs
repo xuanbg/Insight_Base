@@ -12,6 +12,8 @@ namespace Insight.Base.Common.Entity
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
+    using System.Data.Entity.Core.Objects;
+    using System.Linq;
     
     public partial class BaseEntities : DbContext
     {
@@ -25,6 +27,14 @@ namespace Insight.Base.Common.Entity
             throw new UnintentionalCodeFirstException();
         }
     
+        public virtual DbSet<SYS_Allot_Record> SYS_Allot_Record { get; set; }
+        public virtual DbSet<SYS_Code_Allot> SYS_Code_Allot { get; set; }
+        public virtual DbSet<SYS_Code_Record> SYS_Code_Record { get; set; }
+        public virtual DbSet<SYS_Code_Scheme> SYS_Code_Scheme { get; set; }
+        public virtual DbSet<SYS_Data> SYS_Data { get; set; }
+        public virtual DbSet<SYS_Interface> SYS_Interface { get; set; }
+        public virtual DbSet<SYS_Logs> SYS_Logs { get; set; }
+        public virtual DbSet<SYS_Logs_Rules> SYS_Logs_Rules { get; set; }
         public virtual DbSet<SYS_Module> SYS_Module { get; set; }
         public virtual DbSet<SYS_ModuleAction> SYS_ModuleAction { get; set; }
         public virtual DbSet<SYS_ModuleGroup> SYS_ModuleGroup { get; set; }
@@ -32,21 +42,44 @@ namespace Insight.Base.Common.Entity
         public virtual DbSet<SYS_Organization> SYS_Organization { get; set; }
         public virtual DbSet<SYS_OrgMember> SYS_OrgMember { get; set; }
         public virtual DbSet<SYS_Role> SYS_Role { get; set; }
-        public virtual DbSet<SYS_User> SYS_User { get; set; }
-        public virtual DbSet<SYS_UserGroup> SYS_UserGroup { get; set; }
-        public virtual DbSet<SYS_UserGroupMember> SYS_UserGroupMember { get; set; }
-        public virtual DbSet<SYS_Allot_Record> SYS_Allot_Record { get; set; }
-        public virtual DbSet<SYS_Code_Allot> SYS_Code_Allot { get; set; }
-        public virtual DbSet<SYS_Code_Record> SYS_Code_Record { get; set; }
-        public virtual DbSet<SYS_Code_Scheme> SYS_Code_Scheme { get; set; }
-        public virtual DbSet<SYS_Interface> SYS_Interface { get; set; }
-        public virtual DbSet<SYS_Data> SYS_Data { get; set; }
         public virtual DbSet<SYS_Role_Action> SYS_Role_Action { get; set; }
         public virtual DbSet<SYS_Role_Data> SYS_Role_Data { get; set; }
         public virtual DbSet<SYS_Role_Member> SYS_Role_Member { get; set; }
+        public virtual DbSet<SYS_User> SYS_User { get; set; }
+        public virtual DbSet<SYS_UserGroup> SYS_UserGroup { get; set; }
+        public virtual DbSet<SYS_UserGroupMember> SYS_UserGroupMember { get; set; }
         public virtual DbSet<RoleAction> RoleAction { get; set; }
-        public virtual DbSet<RoleMemberUser> RoleMemberUser { get; set; }
         public virtual DbSet<RoleData> RoleData { get; set; }
         public virtual DbSet<RoleMember> RoleMember { get; set; }
+        public virtual DbSet<RoleMemberUser> RoleMemberUser { get; set; }
+    
+        public virtual int GetCode(Nullable<System.Guid> schemeId, Nullable<System.Guid> deptId, Nullable<System.Guid> userId, Nullable<System.Guid> businessId, Nullable<System.Guid> moduleId, string @char)
+        {
+            var schemeIdParameter = schemeId.HasValue ?
+                new ObjectParameter("SchemeId", schemeId) :
+                new ObjectParameter("SchemeId", typeof(System.Guid));
+    
+            var deptIdParameter = deptId.HasValue ?
+                new ObjectParameter("DeptId", deptId) :
+                new ObjectParameter("DeptId", typeof(System.Guid));
+    
+            var userIdParameter = userId.HasValue ?
+                new ObjectParameter("UserId", userId) :
+                new ObjectParameter("UserId", typeof(System.Guid));
+    
+            var businessIdParameter = businessId.HasValue ?
+                new ObjectParameter("BusinessId", businessId) :
+                new ObjectParameter("BusinessId", typeof(System.Guid));
+    
+            var moduleIdParameter = moduleId.HasValue ?
+                new ObjectParameter("ModuleId", moduleId) :
+                new ObjectParameter("ModuleId", typeof(System.Guid));
+    
+            var charParameter = @char != null ?
+                new ObjectParameter("Char", @char) :
+                new ObjectParameter("Char", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("GetCode", schemeIdParameter, deptIdParameter, userIdParameter, businessIdParameter, moduleIdParameter, charParameter);
+        }
     }
 }

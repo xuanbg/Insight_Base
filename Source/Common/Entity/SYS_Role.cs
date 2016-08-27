@@ -31,12 +31,12 @@ namespace Insight.Base.Common.Entity
         public System.Guid CreatorUserId { get; set; }
         public System.DateTime CreateTime { get; set; }
     
-        public virtual SYS_User SYS_User { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SYS_Role_Member> SYS_Role_Member { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SYS_Role_Action> SYS_Role_Action { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SYS_Role_Data> SYS_Role_Data { get; set; }
+        public virtual SYS_User SYS_User { get; set; }
     }
 }

@@ -44,6 +44,11 @@
     <Compile Include="Verify.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Utils\Utils\Utils.csproj">
+      <Project>{0C3F2F08-6816-49FD-BB13-8526E43ACCC6}</Project>
+      <Name>Utils</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\..\Common\Common.csproj">
       <Project>{c4f26dd1-de5a-4773-a789-7823e96ea166}</Project>
       <Name>Common</Name>

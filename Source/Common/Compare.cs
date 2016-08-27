@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Net;
-using System.ServiceModel;
-using System.ServiceModel.Channels;
 using System.ServiceModel.Web;
 using System.Text;
 using System.Threading;
 using Insight.Base.Common.Entity;
-using Insight.Base.Common.Utils;
+using Insight.Utils.Common;
+using Insight.Utils.Entity;
+using static Insight.Base.Common.Parameters;
 
 namespace Insight.Base.Common
 {
@@ -15,27 +15,22 @@ namespace Insight.Base.Common
         /// <summary>
         /// 验证结果
         /// </summary>
-        public JsonResult Result = new JsonResult().InvalidAuth();
+        public JsonResult Result;
 
         /// <summary>
         /// 用于验证的基准对象
         /// </summary>
-        public Token Basis;
+        public Session Basis;
 
         /// <summary>
         /// 用于验证的目标对象
         /// </summary>
-        public Token Token;
+        public AccessToken Token;
 
         /// <summary>
         /// 当前Web操作上下文
         /// </summary>
         private readonly WebOperationContext Context = WebOperationContext.Current;
-
-        /// <summary>
-        /// 远程客户端信息
-        /// </summary>
-        private readonly MessageProperties Properties;
 
         /// <summary>
         /// 最大授权数
@@ -54,8 +49,7 @@ namespace Insight.Base.Common
         {
             if (limit > 0)
             {
-                Properties = OperationContext.Current.IncomingMessageProperties;
-                var time = LimitCall(limit);
+                var time = Util.LimitCall(limit);
                 if (time > 0)
                 {
                     Result.TooFrequent(time.ToString());
@@ -90,7 +84,7 @@ namespace Insight.Base.Common
         public Compare(string action, string account)
         {
             InitVerify();
-            if (Util.StringCompare(Token.LoginName, account)) action = null;
+            if (Util.StringCompare(Token.Account, account)) action = null;
 
             CompareToken(action);
         }
@@ -106,13 +100,14 @@ namespace Insight.Base.Common
                 var auth = headers[HttpRequestHeader.Authorization];
                 var buffer = Convert.FromBase64String(auth);
                 var json = Encoding.UTF8.GetString(buffer);
-                Token = Util.Deserialize<Token>(json);
+                Token = Util.Deserialize<AccessToken>(json);
                 Basis = TokenManage.Get(Token);
             }
             catch (Exception ex)
             {
                 Context.OutgoingResponse.StatusCode = HttpStatusCode.Unauthorized;
-                var ts = new ThreadStart(() => new Logger("500601", $"提取验证信息失败。\r\nException:{ex}").Write());
+                var msg = $"提取验证信息失败。\r\nException:{ex}";
+                var ts = new ThreadStart(() => new Logger("500101", msg).Write());
                 new Thread(ts).Start();
                 throw new Exception("提取验证信息失败");
             }
@@ -145,11 +140,11 @@ namespace Insight.Base.Common
             bool identify;
             if (login)
             {
-                identify = Util.Hash(Basis.LoginName.ToUpper() + Basis.Password) == Token.Signature;
+                identify = Basis.Signature == Token.Signature;
             }
             else
             {
-                identify = Basis.Signature == Token.Signature;
+                identify = Basis.Secret == Token.Secret;
             }
 
             // 签名不正确或验证签名失败超过5次（冒用时）则不能通过验证，且连续失败计数累加1次
@@ -164,9 +159,7 @@ namespace Insight.Base.Common
             // 检查验证信息是否过期
             if (!login && ExpiredCheck())
             {
-                var check = Util.CheckMachineId || Util.CheckOpenID;
-                var key = check ? null : Util.CreateKey(Basis);
-                Result.Expired(key);
+                Result.Expired();
                 return;
             }
 
@@ -201,59 +194,23 @@ namespace Insight.Base.Common
         private bool ExpiredCheck()
         {
             // Session.ID失效（服务重启）或超过设定时间过期（长期未操作）
-            if (Basis.ID != Token.ID || Basis.Expired < DateTime.Now)
+            if (Basis.ID != Token.ID || Basis.FailureTime < DateTime.Now)
             {
                 Basis.Signature = Util.Hash(Guid.NewGuid().ToString());
                 return true;
             }
 
             // 设备码不同造成过期（用户在另一台设备登录）
-            if (Util.CheckMachineId && Basis.MachineId != Token.MachineId) return true;
+            if (CheckMachineId && Basis.MachineId != Token.MachineId) return true;
 
             // OpenID不同造成过期（用户使用另一个微信账号登录）
-            if (Util.CheckOpenID && Basis.OpenId != Token.OpenId) return true;
+            if (CheckOpenID && Basis.OpenId != Token.OpenId) return true;
 
             // 在过期前1天通过验证，过期时间自动延期
-            var time = Basis.Expired.AddDays(-1);
-            if (time < DateTime.Now) Basis.Expired = DateTime.Now.AddHours(Util.Expired);
+            var time = Basis.FailureTime.AddDays(-1);
+            if (time < DateTime.Now) Basis.FailureTime = DateTime.Now.AddHours(Expired);
 
             return false;
-        }
-
-        /// <summary>
-        /// 根据传入的时长返回当前调用的剩余限制时间（秒）
-        /// </summary>
-        /// <param name="seconds">限制访问时长（秒）</param>
-        /// <returns>int 剩余限制时间（秒）</returns>
-        private int LimitCall(int seconds)
-        {
-            var property = Properties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
-            if (property == null) return 0;
-
-            var ip = property.Address;
-            if (!Util.Requests.ContainsKey(ip))
-            {
-                Util.Requests.Add(ip, DateTime.Now);
-                return 0;
-            }
-
-            // 计算剩余秒数surplus
-            var span = Util.Requests[ip].AddSeconds(seconds) - DateTime.Now;
-            var surplus = (int)Math.Floor(span.TotalSeconds);
-
-            // 已过限制时间，更新调用时间，返回0
-            if (surplus <= 0)
-            {
-                Util.Requests[ip] = DateTime.Now;
-                return 0;
-            }
-
-            // 未过限制时间，且调用间隔3秒，不更新调用时间返回剩余秒数
-            if (seconds - surplus > 3) return surplus;
-
-            // 更新调用时间，返回设定时间
-            Util.Requests[ip] = DateTime.Now;
-            return seconds;
         }
     }
 }

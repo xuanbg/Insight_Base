@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Insight.Base.Common.Entity;
-using Insight.Base.Common.Utils;
+using Insight.Utils;
+using Insight.Utils.Common;
+using Insight.Utils.Entity;
 
 namespace Insight.Base.Common
 {
@@ -12,7 +14,7 @@ namespace Insight.Base.Common
         /// <summary>
         /// Token缓存
         /// </summary>
-        private static readonly List<Token> Tokens;
+        private static readonly List<Session> Tokens;
 
         /// <summary>
         /// 进程同步基元
@@ -24,7 +26,7 @@ namespace Insight.Base.Common
         /// </summary>
         static TokenManage()
         {
-            Tokens = new List<Token>();
+            Tokens = new List<Session>();
         }
 
         /// <summary>
@@ -32,7 +34,7 @@ namespace Insight.Base.Common
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static List<Token> GetOnlineUsers(int type)
+        public static List<Session> GetOnlineUsers(int type)
         {
             return Tokens.Where(s => s.UserType == type && s.OnlineStatus).ToList();
         }
@@ -81,9 +83,9 @@ namespace Insight.Base.Common
         /// </summary>
         /// <param name="account">登录账号</param>
         /// <returns>Token</returns>
-        public static Token Get(string account)
+        public static Session Get(string account)
         {
-            return Tokens.SingleOrDefault(s => Util.StringCompare(s.LoginName, account));
+            return Tokens.SingleOrDefault(s => Util.StringCompare(s.Account, account));
         }
 
         /// <summary>
@@ -91,10 +93,35 @@ namespace Insight.Base.Common
         /// </summary>
         /// <param name="token">Token</param>
         /// <returns>Token</returns>
-        public static Token Get(Token token)
+        public static Session Get(AccessToken token)
         {
-            var fast = token.ID < Tokens.Count && Util.StringCompare(token.LoginName, Tokens[token.ID].LoginName);
+            var fast = token.ID < Tokens.Count && Util.StringCompare(token.Account, Tokens[token.ID].Account);
             return fast ? Tokens[token.ID] : Find(token);
+        }
+
+        /// <summary>
+        /// 生成用于验证的Key
+        /// </summary>
+        /// <param name="session">Session</param>
+        /// <returns>string 用于验证的Key</returns>
+        public static string CreateKey(Session session)
+        {
+            var token = new AccessToken
+            {
+                ID = session.ID,
+                UserType = session.UserType,
+                OpenId = session.OpenId,
+                Account = session.Account,
+                Signature = session.Signature,
+                UserId = session.UserId,
+                UserName = session.UserName,
+                DeptId = session.DeptId,
+                DeptName = session.DeptName,
+                MachineId = session.MachineId,
+                Secret = session.Secret,
+                FailureTime = session.FailureTime
+            };
+            return Util.Base64(token);
         }
 
         /// <summary>
@@ -102,10 +129,10 @@ namespace Insight.Base.Common
         /// </summary>
         /// <param name="token">Token</param>
         /// <returns>Token</returns>
-        private static Token Find(Token token)
+        private static Session Find(AccessToken token)
         {
             Mutex.WaitOne();
-            var obj = Tokens.SingleOrDefault(s => Util.StringCompare(s.LoginName, token.LoginName)) ?? Add(token.LoginName);
+            var obj = Tokens.SingleOrDefault(s => Util.StringCompare(s.Account, token.Account)) ?? Add(token.Account);
             Mutex.ReleaseMutex();
             return obj;
         }
@@ -114,29 +141,28 @@ namespace Insight.Base.Common
         /// 根据登录账号从数据库读取用户信息更新Session加入缓存并返回
         /// </summary>
         /// <param name="account">登录账号</param>
-        private static Token Add(string account)
+        private static Session Add(string account)
         {
             var user = DataAccess.GetUser(account);
             if (user == null) return null;
 
-            var sign = Util.Hash(Guid.NewGuid().ToString());
-            var expi = DateTime.Now.AddHours(user.Type == 0 ? 24 : Util.Expired);
-            var token = new Token
+            var secret = Util.Hash(Guid.NewGuid().ToString());
+            var expi = DateTime.Now.AddHours(user.Type == 0 ? 24 : Parameters.Expired);
+            var token = new Session
             {
                 ID = Tokens.Count,
                 OpenId = user.OpenId,
-                LoginName = user.LoginName,
-                Signature = sign,
-                Password = user.Password,
+                Account = user.LoginName,
+                Signature = user.Password,
                 UserId = user.ID,
                 UserName = user.Name,
                 UserType = user.Type,
                 Validity = user.Validity,
-                Expired = expi
+                Secret = secret,
+                FailureTime = expi
             };
             Tokens.Add(token);
             return token;
         }
-
     }
 }

@@ -52,6 +52,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Utils\Utils\Utils.csproj">
+      <Project>{0C3F2F08-6816-49FD-BB13-8526E43ACCC6}</Project>
+      <Name>Utils</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\..\Common\Common.csproj">
       <Project>{C4F26DD1-DE5A-4773-A789-7823E96EA166}</Project>
       <Name>Common</Name>

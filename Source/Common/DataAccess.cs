@@ -1,7 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using Insight.Base.Common.Entity;
+using Insight.Utils.Common;
+using Insight.WS.Log.Entity;
+using static Insight.Base.Common.Parameters;
 
 namespace Insight.Base.Common
 {
@@ -68,6 +73,65 @@ namespace Insight.Base.Common
             {
                 return context.SYS_User.Any(u => u.ID == id && u.PayPassword == key);
             }
+        }
+
+        /// <summary>
+        /// 将日志写入数据库
+        /// </summary>
+        /// <param name="log"></param>
+        /// <returns>bool 是否写入成功</returns>
+        public static bool WriteToDB(SYS_Logs log)
+        {
+            using (var context = new BaseEntities())
+            {
+                context.SYS_Logs.Add(log);
+                return context.SaveChanges() > 0;
+            }
+        }
+
+        /// <summary>
+        /// 将日志写入文件
+        /// </summary>
+        /// <param name="log"></param>
+        /// <returns>bool 是否写入成功</returns>
+        public static bool WriteToFile(SYS_Logs log)
+        {
+            Mutex.WaitOne();
+            var path = $"{Util.GetAppSetting("LogLocal")}\\{GetLevelName(log.Level)}\\";
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            path += $"{DateTime.Today.ToString("yyyy-MM-dd")}.log";
+            var time = log.CreateTime.ToString("O");
+            var text = $"[{log.CreateTime.Kind} {time}] [{log.Code}] [{log.Source}] [{log.Action}] Message:{log.Message}\r\n";
+            var buffer = Encoding.UTF8.GetBytes(text);
+            try
+            {
+                using (var stream = new FileStream(path, FileMode.Append))
+                {
+                    stream.Write(buffer, 0, buffer.Length);
+                }
+                Mutex.ReleaseMutex();
+                return true;
+            }
+            catch (Exception)
+            {
+                Mutex.ReleaseMutex();
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 获取事件等级名称
+        /// </summary>
+        /// <param name="level"></param>
+        /// <returns></returns>
+        private static string GetLevelName(int level)
+        {
+            var name = (Level)level;
+            return name.ToString();
         }
     }
 }

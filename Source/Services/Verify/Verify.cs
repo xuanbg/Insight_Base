@@ -5,7 +5,7 @@ using System.ServiceModel.Web;
 using System.Threading;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
-using Insight.Base.Common.Utils;
+using static Insight.Base.Common.Parameters;
 
 namespace Insight.Base.Services
 {
@@ -66,10 +66,14 @@ namespace Insight.Base.Services
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            var record = Util.SmsCodes.OrderByDescending(r => r.CreateTime).FirstOrDefault(r => r.Mobile == mobile && r.Type == type);
-            if (record != null && (DateTime.Now - record.CreateTime).TotalSeconds < 60) return result.TimeTooShort();
+            var record = SmsCodes.OrderByDescending(r => r.CreateTime).FirstOrDefault(r => r.Mobile == mobile && r.Type == type);
+            if (record != null && (DateTime.Now - record.CreateTime).TotalSeconds < 60)
+            {
+                result.TimeTooShort();
+                return result;
+            }
 
-            var code = Util.Random.Next(100000, 999999).ToString();
+            var code = Parameters.Random.Next(100000, 999999).ToString();
             record = new VerifyRecord
             {
                 Type = type,
@@ -78,12 +82,14 @@ namespace Insight.Base.Services
                 FailureTime = DateTime.Now.AddMinutes(time),
                 CreateTime = DateTime.Now
             };
-            Util.SmsCodes.Add(record);
+            SmsCodes.Add(record);
 
-            var ts = new ThreadStart(() => new Logger("700501", $"已经为手机号【{mobile}】的用户生成了类型为【{type}】的短信验证码：【{code}】。此验证码将于{record.FailureTime}失效。", "验证服务", "生成短信验证码").Write());
+            var msg = $"已经为手机号【{mobile}】的用户生成了类型为【{type}】的短信验证码：【{code}】。此验证码将于{record.FailureTime}失效。";
+            var ts = new ThreadStart(() => new Logger("700501", msg).Write());
             new Thread(ts).Start();
 
-            return result.Success(code);
+            result.Success(code);
+            return result;
         }
 
         /// <summary>
@@ -100,13 +106,16 @@ namespace Insight.Base.Services
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            Util.SmsCodes.RemoveAll(c => c.FailureTime < DateTime.Now);
-            var record = Util.SmsCodes.FirstOrDefault(c => c.Mobile == mobile && c.Code == code && c.Type == type);
-            if (record == null) return result.SMSCodeError();
+            SmsCodes.RemoveAll(c => c.FailureTime < DateTime.Now);
+            var record = SmsCodes.FirstOrDefault(c => c.Mobile == mobile && c.Code == code && c.Type == type);
+            if (record == null)
+            {
+                result.SMSCodeError();
+            }
 
             if (!remove) return result;
 
-            Util.SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == type);
+            SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == type);
             return result;
         }
 
@@ -127,7 +136,10 @@ namespace Insight.Base.Services
             if (!result.Successful) return result;
 
             var list = TokenManage.GetOnlineUsers(Convert.ToInt32(type));
-            return list.Count > 0 ? result.Success(list) : result.NoContent();
+            if (list.Any()) result.Success(list);
+            else result.NoContent();
+
+            return result;
         }
 
         #endregion

@@ -57,6 +57,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Utils\Utils\Utils.csproj">
+      <Project>{0C3F2F08-6816-49FD-BB13-8526E43ACCC6}</Project>
+      <Name>Utils</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Utils\WCF\WCF.csproj">
+      <Project>{4BB72AF9-EADB-418A-9764-18DC29BE749D}</Project>
+      <Name>WCF</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BaseServer\BaseServer.csproj">
       <Project>{3419DA7E-3706-4E91-9821-E66CDE1836CE}</Project>
       <Name>BaseServer</Name>

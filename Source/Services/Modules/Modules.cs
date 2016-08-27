@@ -4,7 +4,6 @@ using System.Linq;
 using System.ServiceModel;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
-using Insight.Base.Common.Utils;
 
 namespace Insight.Base.Services
 {
@@ -23,7 +22,10 @@ namespace Insight.Base.Services
 
             var auth = new Authority(verify.Token.UserId, verify.Token.DeptId);
             var data = auth.PermModuleGroups();
-            return data.Any() ? verify.Result.Success(data) : verify.Result.NoContent();
+            if (data.Any()) result.Success(data);
+            else result.NoContent();
+
+            return result;
         }
 
         /// <summary>
@@ -38,7 +40,10 @@ namespace Insight.Base.Services
 
             var auth = new Authority(verify.Token.UserId, verify.Token.DeptId);
             var data = auth.PermModules();
-            return data.Any() ? verify.Result.Success(data) : verify.Result.NoContent();
+            if (data.Any()) result.Success(data);
+            else result.NoContent();
+
+            return result;
         }
 
         /// <summary>
@@ -49,15 +54,23 @@ namespace Insight.Base.Services
         public JsonResult GetAction(string id)
         {
             Guid mid;
-            if (Guid.TryParse(id, out mid)) return new JsonResult().InvalidGuid();
+            var result = new JsonResult();
+            if (Guid.TryParse(id, out mid))
+            {
+                result.InvalidGuid();
+                return result;
+            }
 
             var verify = new Compare();
-            var result = verify.Result;
+            result = verify.Result;
             if (!result.Successful) return result;
 
             var auth = new Authority(verify.Token.UserId, verify.Token.DeptId);
             var data = auth.ModuleActions(mid);
-            return data.Any() ? result.Success(data) : result.NoContent();
+            if (data.Any()) result.Success(data);
+            else result.NoContent();
+
+            return result;
         }
 
         public JsonResult GetModuleParam(string id)
