@@ -15,7 +15,7 @@ namespace Insight.Base.Common
         /// <summary>
         /// 验证结果
         /// </summary>
-        public JsonResult Result;
+        public JsonResult Result = new JsonResult();
 
         /// <summary>
         /// 用于验证的基准对象
@@ -152,6 +152,7 @@ namespace Insight.Base.Common
             {
                 Basis.FailureCount++;
                 if (Basis.FailureCount >= 5) Result.AccountIsBlocked();
+                else Result.InvalidAuth();
 
                 return;
             }

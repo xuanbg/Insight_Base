@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Insight.Base.Common.Entity;
-using Insight.Utils;
 using Insight.Utils.Common;
 using Insight.Utils.Entity;
 
@@ -146,20 +145,21 @@ namespace Insight.Base.Common
             var user = DataAccess.GetUser(account);
             if (user == null) return null;
 
-            var secret = Util.Hash(Guid.NewGuid().ToString());
-            var expi = DateTime.Now.AddHours(user.Type == 0 ? 24 : Parameters.Expired);
+            var signature = Util.Hash(user.LoginName.ToUpper() + user.Password);
+            var secret = Util.Hash(Guid.NewGuid() + signature + DateTime.Now);
+            var expired = DateTime.Now.AddHours(user.Type == 0 ? 24 : Parameters.Expired);
             var token = new Session
             {
                 ID = Tokens.Count,
                 OpenId = user.OpenId,
                 Account = user.LoginName,
-                Signature = user.Password,
+                Signature = signature,
                 UserId = user.ID,
                 UserName = user.Name,
                 UserType = user.Type,
                 Validity = user.Validity,
                 Secret = secret,
-                FailureTime = expi
+                FailureTime = expired
             };
             Tokens.Add(token);
             return token;

@@ -55,7 +55,7 @@ namespace Insight.Base.Services
         {
             Guid mid;
             var result = new JsonResult();
-            if (Guid.TryParse(id, out mid))
+            if (!Guid.TryParse(id, out mid))
             {
                 result.InvalidGuid();
                 return result;

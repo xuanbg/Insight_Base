@@ -40,7 +40,7 @@ namespace Insight.Base.Services
         {
             var result = new JsonResult();
             Guid oid;
-            if (Guid.TryParse(id, out oid))
+            if (!Guid.TryParse(id, out oid))
             {
                 result.InvalidGuid();
                 return result;
@@ -84,7 +84,7 @@ namespace Insight.Base.Services
         {
             var result = new JsonResult();
             Guid oid;
-            if (Guid.TryParse(id, out oid))
+            if (!Guid.TryParse(id, out oid))
             {
                 result.InvalidGuid();
                 return result;
@@ -130,7 +130,7 @@ namespace Insight.Base.Services
         {
             var result = new JsonResult();
             Guid oid;
-            if (Guid.TryParse(id, out oid))
+            if (!Guid.TryParse(id, out oid))
             {
                 result.InvalidGuid();
                 return result;
@@ -175,7 +175,7 @@ namespace Insight.Base.Services
         {
             var result = new JsonResult();
             Guid oid;
-            if (Guid.TryParse(id, out oid))
+            if (!Guid.TryParse(id, out oid))
             {
                 result.InvalidGuid();
                 return result;
@@ -216,7 +216,7 @@ namespace Insight.Base.Services
         {
             var result = new JsonResult();
             Guid oid;
-            if (Guid.TryParse(id, out oid))
+            if (!Guid.TryParse(id, out oid))
             {
                 result.InvalidGuid();
                 return result;
