@@ -17,10 +17,10 @@ namespace Insight.Base.Common.Entity
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public SYS_Module()
         {
-            this.SYS_ModuleAction = new HashSet<SYS_ModuleAction>();
-            this.SYS_ModuleParam = new HashSet<SYS_ModuleParam>();
             this.SYS_Allot_Record = new HashSet<SYS_Allot_Record>();
             this.SYS_Code_Allot = new HashSet<SYS_Code_Allot>();
+            this.SYS_ModuleAction = new HashSet<SYS_ModuleAction>();
+            this.SYS_ModuleParam = new HashSet<SYS_ModuleParam>();
             this.SYS_Role_Data = new HashSet<SYS_Role_Data>();
         }
     
@@ -40,15 +40,15 @@ namespace Insight.Base.Common.Entity
         public bool Validity { get; set; }
         public byte[] Icon { get; set; }
     
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<SYS_Allot_Record> SYS_Allot_Record { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<SYS_Code_Allot> SYS_Code_Allot { get; set; }
         public virtual SYS_ModuleGroup SYS_ModuleGroup { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SYS_ModuleAction> SYS_ModuleAction { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SYS_ModuleParam> SYS_ModuleParam { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<SYS_Allot_Record> SYS_Allot_Record { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<SYS_Code_Allot> SYS_Code_Allot { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SYS_Role_Data> SYS_Role_Data { get; set; }
     }

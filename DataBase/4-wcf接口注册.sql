@@ -19,9 +19,10 @@ CREATE TABLE SYS_Interface(
 GO
 
 insert SYS_Interface (Port, Path, NameSpace, Interface, Service, ServiceFile)
-select NULL, NULL, 'Insight.Base.Services', 'IVerify', 'Verify', 'Services\Verify.dll' union all
-select NULL, 'm', 'Insight.Base.Services', 'IModules', 'Modules', 'Services\Modules.dll' union all
-select NULL, 'o', 'Insight.Base.Services', 'IOrganizations', 'Organizations', 'Services\Organizations.dll' union all
-select NULL, 'u', 'Insight.Base.Services', 'IUsers', 'Users', 'Services\Users.dll' union all
-select NULL, 'r', 'Insight.Base.Services', 'IRoles', 'Roles', 'Services\Roles.dll' union all
-select NULL, 'c', 'Insight.Base.Services', 'ICodes', 'Codes', 'Services\Codes.dll'
+select NULL, 'verifyapi', 'Insight.Base.Services', 'IVerify', 'Verify', 'Services\Verify.dll' union all
+select NULL, 'moduleapi', 'Insight.Base.Services', 'IModules', 'Modules', 'Services\Modules.dll' union all
+select NULL, 'orgapi', 'Insight.Base.Services', 'IOrganizations', 'Organizations', 'Services\Organizations.dll' union all
+select NULL, 'userapi', 'Insight.Base.Services', 'IUsers', 'Users', 'Services\Users.dll' union all
+select NULL, 'roleapi', 'Insight.Base.Services', 'IRoles', 'Roles', 'Services\Roles.dll' union all
+select NULL, 'codeapi', 'Insight.Base.Services', 'ICodes', 'Codes', 'Services\Codes.dll' union all
+select NULL, 'logapi', 'Insight.Base.Services', 'ILogs', 'Logs', 'Services\Logs.dll'

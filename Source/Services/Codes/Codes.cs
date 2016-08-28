@@ -4,7 +4,6 @@ using System.ServiceModel;
 using System.Threading;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
-using Insight.Base.Common.Utils;
 
 namespace Insight.Base.Services
 {
@@ -65,26 +64,36 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult GetCode(string name, string id, string mark)
         {
+            var result = new JsonResult();
             Guid bid;
-            if (!Guid.TryParse(id, out bid)) return new JsonResult().InvalidGuid();
+            if (!Guid.TryParse(id, out bid))
+            {
+                result.InvalidGuid();
+                return result;
+            }
 
             var verify = new Compare();
-            var result = verify.Result;
+            result = verify.Result;
             if (!result.Successful) return result;
 
-            var session = verify.Session;
+            var session = verify.Token;
             using (var context = new BaseEntities())
             {
                 var scheme = context.SYS_Code_Scheme.SingleOrDefault(s => s.Name == name);
                 if (scheme == null)
                 {
-                    var ts = new ThreadStart(() => new Logger("001101", $"不存在名称为：【{name}】的编码方案", "编码规则", "生成编码").Write());
+                    var msg = $"不存在名称为：【{name}】的编码方案";
+                    var ts = new ThreadStart(() => new Logger("001101", msg, "编码规则", "生成编码"));
                     new Thread(ts).Start();
-                    return result.CodeSchemeNotExists();
+                    result.CodeSchemeNotExists();
+                    return result;
                 }
 
                 var code = GetCode(scheme.ID, null, session.UserId, bid, null, mark);
-                return code == null ? result.DataBaseError() : result.Success(code.ToString());
+                if (code == null) result.DataBaseError();
+                else result.Success(code.ToString());
+
+                return result;
             }
         }
     }

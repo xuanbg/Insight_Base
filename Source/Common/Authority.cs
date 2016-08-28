@@ -134,7 +134,6 @@ namespace Insight.Base.Common
                 return rid_u.Union(rid_g).Union(rid_t).ToList();
             }
         }
-
     }
 
     public class ModuleInfo

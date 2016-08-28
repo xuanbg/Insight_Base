@@ -17,12 +17,12 @@ namespace Insight.Base.Common.Entity
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public SYS_Organization()
         {
-            this.SYS_ModuleParam = new HashSet<SYS_ModuleParam>();
-            this.SYS_Organization1 = new HashSet<SYS_Organization>();
-            this.SYS_OrgMember = new HashSet<SYS_OrgMember>();
             this.SYS_Allot_Record = new HashSet<SYS_Allot_Record>();
             this.SYS_Code_Allot = new HashSet<SYS_Code_Allot>();
             this.SYS_Code_Scheme = new HashSet<SYS_Code_Scheme>();
+            this.SYS_ModuleParam = new HashSet<SYS_ModuleParam>();
+            this.SYS_Organization1 = new HashSet<SYS_Organization>();
+            this.SYS_OrgMember = new HashSet<SYS_OrgMember>();
         }
     
         public System.Guid ID { get; set; }
@@ -40,6 +40,12 @@ namespace Insight.Base.Common.Entity
         public System.DateTime CreateTime { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<SYS_Allot_Record> SYS_Allot_Record { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<SYS_Code_Allot> SYS_Code_Allot { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<SYS_Code_Scheme> SYS_Code_Scheme { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SYS_ModuleParam> SYS_ModuleParam { get; set; }
         public virtual SYS_User SYS_User { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
@@ -47,11 +53,5 @@ namespace Insight.Base.Common.Entity
         public virtual SYS_Organization SYS_Organization2 { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SYS_OrgMember> SYS_OrgMember { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<SYS_Allot_Record> SYS_Allot_Record { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<SYS_Code_Allot> SYS_Code_Allot { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<SYS_Code_Scheme> SYS_Code_Scheme { get; set; }
     }
 }

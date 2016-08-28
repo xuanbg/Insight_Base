@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.ServiceProcess;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
-using Insight.Base.Common.Utils;
+using Insight.Utils.Common;
+using Insight.WCF;
+using Insight.WCF.Entity;
 
 namespace Insight.Base.Server
 {
@@ -69,11 +72,14 @@ namespace Insight.Base.Server
         /// </summary>
         private static void InitSeting()
         {
-            Util.LogServer = Util.GetAppSetting("LogServer");
-            Util.CheckOpenID = bool.Parse(Util.GetAppSetting("CheckOpenID"));
-            Util.CheckMachineId = bool.Parse(Util.GetAppSetting("CheckMachineId"));
-            Util.Expired = Convert.ToInt32(Util.GetAppSetting("Expired"));
+            using (var context = new BaseEntities())
+            {
+                Parameters.Rules = context.SYS_Logs_Rules.ToList();
+            }
+            Parameters.LogServer = Util.GetAppSetting("LogServer");
+            Parameters.CheckOpenID = bool.Parse(Util.GetAppSetting("CheckOpenID"));
+            Parameters.CheckMachineId = bool.Parse(Util.GetAppSetting("CheckMachineId"));
+            Parameters.Expired = Convert.ToInt32(Util.GetAppSetting("Expired"));
         }
-
     }
 }
