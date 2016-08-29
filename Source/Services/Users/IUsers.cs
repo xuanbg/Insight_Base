@@ -108,14 +108,6 @@ namespace Insight.Base.Services
         JsonResult SetUserStatus(string account, bool validity);
 
         /// <summary>
-        /// 用户登录
-        /// </summary>
-        /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "users/{account}/token", ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        JsonResult UserSignIn(string account);
-
-        /// <summary>
         /// 设置指定用户的登录状态为离线
         /// </summary>
         /// <param name="account">用户账号</param>

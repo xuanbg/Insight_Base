@@ -76,7 +76,7 @@ namespace Insight.Base.Server
             {
                 Parameters.Rules = context.SYS_Logs_Rules.ToList();
             }
-            Parameters.LogServer = Util.GetAppSetting("LogServer");
+
             Parameters.CheckOpenID = bool.Parse(Util.GetAppSetting("CheckOpenID"));
             Parameters.CheckMachineId = bool.Parse(Util.GetAppSetting("CheckMachineId"));
             Parameters.Expired = Convert.ToInt32(Util.GetAppSetting("Expired"));

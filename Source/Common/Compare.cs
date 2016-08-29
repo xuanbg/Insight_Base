@@ -136,40 +136,10 @@ namespace Insight.Base.Common
             }
 
             Basis.LastConnect = DateTime.Now;
-            var same = Basis.MachineId == Token.MachineId;
-            bool identify;
-            if (login)
-            {
-                identify = Basis.Signature == Token.Signature;
-            }
-            else
-            {
-                identify = Basis.Secret == Token.Secret;
-            }
-
-            // 签名不正确或验证签名失败超过5次（冒用时）则不能通过验证，且连续失败计数累加1次
-            if (!identify || (Basis.FailureCount >= 5 && !same))
-            {
-                Basis.FailureCount++;
-                if (Basis.FailureCount >= 5) Result.AccountIsBlocked();
-                else Result.InvalidAuth();
-
-                return;
-            }
-
-            // 检查验证信息是否过期
-            if (!login && ExpiredCheck())
-            {
-                Result.Expired();
-                return;
-            }
-
-            Basis.OnlineStatus = true;
-            Basis.FailureCount = 0;
-            Result.Success();
+            if (!Identify(login)) return;
 
             // 如配置为不验证设备ID，设备ID不一致时返回多点登录信息
-            if (Basis.MachineId != Token.MachineId) Result.Multiple();
+            if (!CheckMachineId && Basis.MachineId != Token.MachineId) Result.Multiple();
 
             // 如action为空，立即返回；否则进行鉴权
             if (action == null) return;
@@ -189,17 +159,59 @@ namespace Insight.Base.Common
         }
 
         /// <summary>
+        /// 对AccessToken进行合法性校验
+        /// </summary>
+        /// <param name="login">是否登录</param>
+        /// <returns>bool 是否通过合法性校验</returns>
+        private bool Identify(bool login)
+        {
+            // 检查验证信息是否过期
+            if (!login && ExpiredCheck())
+            {
+                Basis.Secret = TokenManage.GetSecret(Basis.Signature);
+                Result.Expired();
+                return false;
+            }
+
+            // 检查是否验证签名失败超过5次
+            if (Basis.FailureCount >= 5 && Basis.MachineId != Token.MachineId)
+            {
+                Result.AccountIsBlocked();
+                return false;
+            }
+
+            // 验证用户签名（登录时）或Secret
+            var identify = login ? Basis.Signature == Token.Signature : Basis.Secret == Token.Secret;
+            if (!identify)
+            {
+                Basis.FailureCount++;
+                Result.InvalidAuth();
+                return false;
+            }
+
+            Basis.OnlineStatus = true;
+            Basis.FailureCount = 0;
+            Result.Success();
+            if (!login) return true;
+
+            // 登录时更新缓存信息
+            Basis.OpenId = Token.OpenId;
+            Basis.DeptId = Token.DeptId;
+            Basis.DeptName = Token.DeptName;
+            Basis.MachineId = Token.MachineId;
+            return true;
+        }
+
+        /// <summary>
         /// 检查验证信息是否过期
         /// </summary>
         /// <returns>bool 信息是否过期</returns>
         private bool ExpiredCheck()
         {
-            // Session.ID失效（服务重启）或超过设定时间过期（长期未操作）
-            if (Basis.ID != Token.ID || Basis.FailureTime < DateTime.Now)
-            {
-                Basis.Signature = Util.Hash(Guid.NewGuid().ToString());
-                return true;
-            }
+            if (Basis.FailureTime < DateTime.Now) return true;
+
+            // Session.ID失效（服务重启）
+            if (Basis.ID != Token.ID) return true;
 
             // 设备码不同造成过期（用户在另一台设备登录）
             if (CheckMachineId && Basis.MachineId != Token.MachineId) return true;

@@ -322,27 +322,6 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 获取用户登录结果
-        /// </summary>
-        /// <returns>JsonResult</returns>
-        public JsonResult UserSignIn(string account)
-        {
-            var verify = new Compare(null, 30, true);
-            var result = verify.Result;
-            if (!result.Successful) return result;
-
-            // 更新缓存信息
-            verify.Basis.OpenId = verify.Token.OpenId;
-            verify.Basis.MachineId = verify.Token.MachineId;
-            verify.Basis.DeptId = verify.Token.DeptId;
-
-            // 返回用于验证的Key
-            var token = TokenManage.CreateKey(verify.Basis);
-            result.Success(token);
-            return result;
-        }
-
-        /// <summary>
         /// 设置指定用户的登录状态为离线
         /// </summary>
         /// <param name="account">用户账号</param>

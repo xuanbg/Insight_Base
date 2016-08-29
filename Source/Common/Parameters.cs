@@ -41,15 +41,5 @@ namespace Insight.Base.Common
         /// Session失效时间（小时）
         /// </summary>
         public static int Expired;
-
-        /// <summary>
-        /// 日志服务路径
-        /// </summary>
-        public static string LogServer;
-
-        /// <summary>
-        /// 日志服务AccessToken
-        /// </summary>
-        public static string LogToken;
     }
 }
