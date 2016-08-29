@@ -124,6 +124,16 @@ namespace Insight.Base.Common
         }
 
         /// <summary>
+        /// 计算Secret值
+        /// </summary>
+        /// <param name="signature">用户签名</param>
+        /// <returns>string Secret</returns>
+        public static string GetSecret(string signature)
+        {
+            return Util.Hash(Guid.NewGuid() + signature + DateTime.Now);
+        }
+
+        /// <summary>
         /// 在缓存中查找Token并返回
         /// </summary>
         /// <param name="token">Token</param>
@@ -146,7 +156,6 @@ namespace Insight.Base.Common
             if (user == null) return null;
 
             var signature = Util.Hash(user.LoginName.ToUpper() + user.Password);
-            var secret = Util.Hash(Guid.NewGuid() + signature + DateTime.Now);
             var expired = DateTime.Now.AddHours(user.Type == 0 ? 24 : Parameters.Expired);
             var token = new Session
             {
@@ -158,7 +167,7 @@ namespace Insight.Base.Common
                 UserName = user.Name,
                 UserType = user.Type,
                 Validity = user.Validity,
-                Secret = secret,
+                Secret = GetSecret(signature),
                 FailureTime = expired
             };
             Tokens.Add(token);

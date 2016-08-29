@@ -18,6 +18,22 @@ namespace Insight.Base.Services
         void ResponseOptions();
 
         /// <summary>
+        /// 获取指定账户的AccessToken
+        /// </summary>
+        /// <returns>JsonResult</returns>
+        [WebGet(UriTemplate = "tokens", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        JsonResult GetToken();
+
+        /// <summary>
+        /// 移除指定账户的AccessToken
+        /// </summary>
+        /// <returns>JsonResult</returns>
+        [WebInvoke(Method = "DELETE", UriTemplate = "tokens", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [OperationContract]
+        JsonResult RemoveToken();
+
+        /// <summary>
         /// 会话合法性验证
         /// </summary>
         /// <returns>JsonResult</returns>

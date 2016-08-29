@@ -31,6 +31,37 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
+        /// 获取指定账户的AccessToken
+        /// </summary>
+        /// <returns>JsonResult</returns>
+        public JsonResult GetToken()
+        {
+            var verify = new Compare(null, 30, true);
+            var result = verify.Result;
+            if (!result.Successful) return result;
+
+            // 返回用于验证的Key
+            var token = TokenManage.CreateKey(verify.Basis);
+            result.Success(token);
+            return result;
+        }
+
+        /// <summary>
+        /// 移除指定账户的AccessToken
+        /// </summary>
+        /// <returns>JsonResult</returns>
+        public JsonResult RemoveToken()
+        {
+            var verify = new Compare();
+            var result = verify.Result;
+            if (!result.Successful) return result;
+
+            verify.Basis.Secret = Guid.NewGuid().ToString();
+            verify.Basis.OnlineStatus = false;
+            return result;
+        }
+
+        /// <summary>
         /// 会话合法性验证
         /// </summary>
         /// <returns>JsonResult</returns>
