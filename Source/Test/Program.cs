@@ -1,5 +1,4 @@
 ﻿using Insight.Base.Common;
-using Insight.Utils;
 using Insight.Utils.Common;
 using Insight.WCF;
 using Insight.WCF.Entity;
@@ -26,7 +25,7 @@ namespace Test
                     ComplyType = info.Service,
                     ServiceFile = info.ServiceFile
                 };
-                Services.CreateHost(service, "V1.0");
+                Services.CreateHost(service);
             }
             Services.StartService();
         }

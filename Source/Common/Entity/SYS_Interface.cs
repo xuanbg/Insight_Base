@@ -18,6 +18,7 @@ namespace Insight.Base.Common.Entity
         public long SN { get; set; }
         public string Port { get; set; }
         public string Path { get; set; }
+        public string Version { get; set; }
         public string NameSpace { get; set; }
         public string Interface { get; set; }
         public string Service { get; set; }
