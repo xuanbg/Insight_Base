@@ -11,6 +11,7 @@ CREATE TABLE SYS_Interface(
 [SN]               BIGINT IDENTITY(1,1),                                                                               --自增序列
 [Port]             VARCHAR(8),                                                                                         --服务端口号
 [Path]             VARCHAR(16),                                                                                        --服务路径
+[Version]          VARCHAR(8),                                                                                         --服务版本号
 [NameSpace]        VARCHAR(128) NOT NULL,                                                                              --服务命名空间
 [Interface]        VARCHAR(64) NOT NULL,                                                                               --接口名称
 [Service]          VARCHAR(64) NOT NULL,                                                                               --服务类名称
@@ -18,11 +19,11 @@ CREATE TABLE SYS_Interface(
 )
 GO
 
-insert SYS_Interface (Port, Path, NameSpace, Interface, Service, ServiceFile)
-select NULL, 'verifyapi', 'Insight.Base.Services', 'IVerify', 'Verify', 'Services\Verify.dll' union all
-select NULL, 'moduleapi', 'Insight.Base.Services', 'IModules', 'Modules', 'Services\Modules.dll' union all
-select NULL, 'orgapi', 'Insight.Base.Services', 'IOrganizations', 'Organizations', 'Services\Organizations.dll' union all
-select NULL, 'userapi', 'Insight.Base.Services', 'IUsers', 'Users', 'Services\Users.dll' union all
-select NULL, 'roleapi', 'Insight.Base.Services', 'IRoles', 'Roles', 'Services\Roles.dll' union all
-select NULL, 'codeapi', 'Insight.Base.Services', 'ICodes', 'Codes', 'Services\Codes.dll' union all
-select NULL, 'logapi', 'Insight.Base.Services', 'ILogs', 'Logs', 'Services\Logs.dll'
+insert SYS_Interface (Port, Path, Version, NameSpace, Interface, Service, ServiceFile)
+select '6200', 'verifyapi', 'v1.0', 'Insight.Base.Services', 'IVerify', 'Verify', 'Services\Verify.dll' union all
+select '6200', 'moduleapi', 'v1.0', 'Insight.Base.Services', 'IModules', 'Modules', 'Services\Modules.dll' union all
+select '6200', 'orgapi', 'v1.0', 'Insight.Base.Services', 'IOrganizations', 'Organizations', 'Services\Organizations.dll' union all
+select '6200', 'userapi', 'v1.0', 'Insight.Base.Services', 'IUsers', 'Users', 'Services\Users.dll' union all
+select '6200', 'roleapi', 'v1.0', 'Insight.Base.Services', 'IRoles', 'Roles', 'Services\Roles.dll' union all
+select '6200', 'codeapi', 'v1.0', 'Insight.Base.Services', 'ICodes', 'Codes', 'Services\Codes.dll' union all
+select '6200', 'logapi', 'v1.0', 'Insight.Base.Services', 'ILogs', 'Logs', 'Services\Logs.dll'

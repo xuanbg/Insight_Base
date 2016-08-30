@@ -80,6 +80,7 @@
           <Property Name="SN" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Port" Type="varchar" MaxLength="8" />
           <Property Name="Path" Type="varchar" MaxLength="16" />
+          <Property Name="Version" Type="varchar" MaxLength="8" />
           <Property Name="NameSpace" Type="varchar" MaxLength="128" Nullable="false" />
           <Property Name="Interface" Type="varchar" MaxLength="64" Nullable="false" />
           <Property Name="Service" Type="varchar" MaxLength="64" Nullable="false" />
@@ -1164,6 +1165,7 @@
           <Property Name="SN" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Port" Type="String" MaxLength="8" FixedLength="false" Unicode="false" />
           <Property Name="Path" Type="String" MaxLength="16" FixedLength="false" Unicode="false" />
+          <Property Name="Version" Type="String" MaxLength="8" FixedLength="false" Unicode="false" />
           <Property Name="NameSpace" Type="String" MaxLength="128" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="Interface" Type="String" MaxLength="64" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="Service" Type="String" MaxLength="64" FixedLength="false" Unicode="false" Nullable="false" />
@@ -2216,6 +2218,7 @@
           <EntitySetMapping Name="SYS_Interface">
             <EntityTypeMapping TypeName="BaseModel.SYS_Interface">
               <MappingFragment StoreEntitySet="SYS_Interface">
+                <ScalarProperty Name="Version" ColumnName="Version" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="SN" ColumnName="SN" />
                 <ScalarProperty Name="Port" ColumnName="Port" />

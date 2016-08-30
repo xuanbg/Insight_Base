@@ -38,21 +38,21 @@ namespace Insight.Base.Server
         protected override void OnStart(string[] args)
         {
             var list = DataAccess.GetServiceList();
-            var ver = Util.GetAppSetting("Version");
             Services = new Services();
             foreach (var info in list)
             {
                 var service = new ServiceInfo
                 {
                     BaseAddress = Util.GetAppSetting("Address"),
-                    Port = info.Port ?? Util.GetAppSetting("Port"),
+                    Port = info.Port,
                     Path = info.Path,
+                    Version = info.Version,
                     NameSpace = info.NameSpace,
                     Interface = info.Interface,
                     ComplyType = info.Service,
                     ServiceFile = info.ServiceFile
                 };
-                Services.CreateHost(service, ver);
+                Services.CreateHost(service);
             }
             Services.StartService();
         }
