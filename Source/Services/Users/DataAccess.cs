@@ -27,7 +27,6 @@ namespace Insight.Base.Services
                 new SqlParameter("@LoginName", obj.LoginName),
                 new SqlParameter("@Password", obj.Password),
                 new SqlParameter("@PayPassword", obj.PayPassword),
-                new SqlParameter("@OpenId", obj.OpenId),
                 new SqlParameter("@Description", obj.Description),
                 new SqlParameter("@Type", SqlDbType.Int) {Value = obj.Type},
                 new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = obj.CreatorUserId},
@@ -81,7 +80,6 @@ namespace Insight.Base.Services
                 var user = context.SYS_User.SingleOrDefault(u => u.ID == obj.ID);
                 if (user == null) return null;
 
-                user.OpenId = obj.OpenId;
                 user.LoginName = obj.LoginName;
                 user.Name = obj.Name;
                 user.Description = obj.Description;

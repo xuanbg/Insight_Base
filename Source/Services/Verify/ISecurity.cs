@@ -5,7 +5,7 @@ using Insight.Base.Common.Entity;
 namespace Insight.Base.Services
 {
     [ServiceContract]
-    public interface IVerify
+    public interface ISecurity
     {
 
         #region Verify
@@ -20,10 +20,14 @@ namespace Insight.Base.Services
         /// <summary>
         /// 获取指定账户的AccessToken
         /// </summary>
+        /// <param name="account"></param>
+        /// <param name="signature"></param>
+        /// <param name="stamp"></param>
+        /// <param name="deptid"></param>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "tokens", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "tokens?account={account}&secret={secret}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        JsonResult GetToken();
+        JsonResult GetToken(string account, string signature, string stamp, string deptid);
 
         /// <summary>
         /// 移除指定账户的AccessToken

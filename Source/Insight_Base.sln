@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Codes", "Services\Codes\Cod
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Organizations", "Services\Organizations\Organizations.csproj", "{0803E544-B979-4397-A853-DEB7FAF267BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Verify", "Services\Verify\Verify.csproj", "{B18DFF40-4EB9-4777-B63E-756F36D5C5E2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Security", "Services\Verify\Security.csproj", "{B18DFF40-4EB9-4777-B63E-756F36D5C5E2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules", "Services\Modules\Modules.csproj", "{06751A2C-C718-4F53-A9F8-61401BA119D6}"
 EndProject

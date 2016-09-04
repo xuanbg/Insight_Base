@@ -5,12 +5,13 @@ using System.ServiceModel.Web;
 using System.Threading;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
+using Insight.Utils.Entity;
 using static Insight.Base.Common.Parameters;
 
 namespace Insight.Base.Services
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
-    public class Verify : IVerify
+    public class Security : ISecurity
     {
 
         #region Verify
@@ -33,17 +34,20 @@ namespace Insight.Base.Services
         /// <summary>
         /// 获取指定账户的AccessToken
         /// </summary>
+        /// <param name="account">账号</param>
+        /// <param name="signature">签名</param>
+        /// <param name="stamp">特征码</param>
+        /// <param name="deptid">登录部门ID</param>
         /// <returns>JsonResult</returns>
-        public JsonResult GetToken()
+        public JsonResult GetToken(string account, string signature, string stamp, string deptid)
         {
-            var verify = new Compare(null, 30, true);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            var token = new AccessToken
+            {
+                Account = account,
+                Stamp = stamp
+            };
 
-            // 返回用于验证的Key
-            var token = TokenManage.CreateKey(verify.Basis);
-            result.Success(token);
-            return result;
+            return new Compare(token, signature, deptid).Result;
         }
 
         /// <summary>

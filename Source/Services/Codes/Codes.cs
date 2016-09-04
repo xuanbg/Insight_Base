@@ -76,7 +76,7 @@ namespace Insight.Base.Services
             result = verify.Result;
             if (!result.Successful) return result;
 
-            var session = verify.Token;
+            var session = verify.Basis;
             using (var context = new BaseEntities())
             {
                 var scheme = context.SYS_Code_Scheme.SingleOrDefault(s => s.Name == name);

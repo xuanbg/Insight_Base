@@ -30,6 +30,17 @@ namespace Insight.Base.Common.Entity
         }
 
         /// <summary>
+        /// 用户未取得授权（403）
+        /// </summary>
+        public void Forbidden()
+        {
+            Successful = false;
+            Code = "403";
+            Name = "Forbidden";
+            Message = "当前用户未取得授权";
+        }
+
+        /// <summary>
         /// 用户被禁止登录（406）
         /// </summary>
         public void Disabled()
@@ -38,6 +49,17 @@ namespace Insight.Base.Common.Entity
             Code = "402";
             Name = "AccountIsDisabled";
             Message = "当前用户被禁止登录";
+        }
+
+        /// <summary>
+        /// 已在其他设备登录（407）
+        /// </summary>
+        public void SignInOther()
+        {
+            Successful = false;
+            Code = "405";
+            Name = "SignInOtherDevice";
+            Message = "用户已在其他设备登录";
         }
 
         /// <summary>

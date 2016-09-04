@@ -79,8 +79,8 @@ namespace Insight.Base.Services
                 return result;
             }
 
-            var token = verify.Token;
-            rule.CreatorUserId = token.UserId;
+            var session = verify.Basis;
+            rule.CreatorUserId = session.UserId;
             if (!Insert(rule))
             {
                 result.DataBaseError();
@@ -89,8 +89,8 @@ namespace Insight.Base.Services
 
             var log = new
             {
-                UserID = token.UserId,
-                Message = $"事件代码【{rule.Code}】已由{token.UserName}创建和配置为：{Util.Serialize(rule)}"
+                UserID = session.UserId,
+                Message = $"事件代码【{rule.Code}】已由{session.UserName}创建和配置为：{Util.Serialize(rule)}"
             };
             var logger = new Logger("600601", Util.Serialize(log));
             logger.Write();
@@ -122,11 +122,11 @@ namespace Insight.Base.Services
                 return result;
             }
 
-            var token = verify.Token;
+            var session = verify.Basis;
             var log = new
             {
-                UserID = token.UserId,
-                Message = $"事件配置【{id}】已被{token.UserName}删除"
+                UserID = session.UserId,
+                Message = $"事件配置【{id}】已被{session.UserName}删除"
             };
             var logger = new Logger("600602", Util.Serialize(log));
             logger.Write();
@@ -151,11 +151,11 @@ namespace Insight.Base.Services
                 return result;
             }
 
-            var token = verify.Token;
+            var session = verify.Basis;
             var log = new
             {
-                UserID = token.UserId,
-                Message = $"事件代码【{rule.Code}】已被{token.UserName}修改为：{Util.Serialize(rule)}"
+                UserID = session.UserId,
+                Message = $"事件代码【{rule.Code}】已被{session.UserName}修改为：{Util.Serialize(rule)}"
             };
             var logger = new Logger("600603", Util.Serialize(log));
             logger.Write();

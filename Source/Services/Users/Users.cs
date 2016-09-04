@@ -5,6 +5,7 @@ using System.ServiceModel;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Utils.Common;
+using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
 {
@@ -63,7 +64,7 @@ namespace Insight.Base.Services
             }
 
             const string action = "BE2DE9AB-C109-418D-8626-236DEF8E8504";
-            var verify = new Compare(action, uid);
+            var verify = new Compare(action);
             result = verify.Result;
             if (!result.Successful) return result;
 
@@ -89,7 +90,7 @@ namespace Insight.Base.Services
             }
 
             const string action = "3BC17B61-327D-4EAA-A0D7-7F825A6C71DB";
-            var verify = new Compare(action, uid);
+            var verify = new Compare(action, 0, uid);
             result = verify.Result;
             if (!result.Successful) return result;
 
@@ -126,7 +127,7 @@ namespace Insight.Base.Services
             }
 
             const string action = "3BC17B61-327D-4EAA-A0D7-7F825A6C71DB";
-            var verify = new Compare(action, uid);
+            var verify = new Compare(action, 0, uid);
             result = verify.Result;
             if (!result.Successful) return result;
 
@@ -202,9 +203,14 @@ namespace Insight.Base.Services
                 return result;
             }
 
-            // 返回用于验证的Key
-            var token = TokenManage.CreateKey(verify.Basis);
-            verify.Result.Created(token);
+            var token = new AccessToken {Account = account};
+            var session = TokenManage.Get(token);
+            token.ID = session.ID;
+            token.UserName = session.UserName;
+            token.Secret = session.Secret;
+            token.FailureTime = session.FailureTime;
+
+            verify.Result.Data = Util.Base64(token);
             return result;
         }
 
@@ -221,11 +227,9 @@ namespace Insight.Base.Services
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            var session = Util.StringCompare(verify.Token.Account, account)
+            var session = Util.StringCompare(verify.Basis.Account, account)
                 ? verify.Basis
                 : TokenManage.Get(account);
-            if (session == null) return result;
-
             var reset = Update(account, password);
             if (!reset.HasValue)
             {
@@ -239,9 +243,9 @@ namespace Insight.Base.Services
                 return result;
             }
 
+            if (session == null) return result;
+
             session.Signature = Util.Hash(session.Account.ToUpper() + password);
-            var token = TokenManage.CreateKey(session);
-            result.Success(token);
             return result;
         }
 
@@ -258,7 +262,8 @@ namespace Insight.Base.Services
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            var session = TokenManage.Get(account);
+            var token = new AccessToken {Account = account, Stamp = verify.Basis.Stamp};
+            var session = TokenManage.Get(token);
             if (session == null)
             {
                 result.NotFound();
@@ -266,7 +271,7 @@ namespace Insight.Base.Services
             }
 
             // 验证短信验证码
-            var mobile = session.Account;
+            var mobile = session.Mobile;
             Parameters.SmsCodes.RemoveAll(c => c.FailureTime < DateTime.Now);
             var record = Parameters.SmsCodes.FirstOrDefault(c => c.Mobile == mobile && c.Code == code && c.Type == 2);
             if (record == null)
@@ -277,7 +282,7 @@ namespace Insight.Base.Services
 
             Parameters.SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == 2);
 
-            // 更新用户登录密码
+            // 更新数据库
             var reset = Update(account, password);
             if (reset == null || !reset.Value)
             {
@@ -286,8 +291,14 @@ namespace Insight.Base.Services
             }
 
             session.Signature = Util.Hash(account.ToUpper() + password);
-            var token = TokenManage.CreateKey(session);
-            result.Success(token);
+            session.Stamp = verify.Basis.Stamp;
+
+            token.ID = session.ID;
+            token.UserName = session.UserName;
+            token.Secret = session.Secret;
+            token.FailureTime = session.FailureTime;
+
+            result.Data = Util.Base64(token);
             return result;
         }
 

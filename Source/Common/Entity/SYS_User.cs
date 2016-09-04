@@ -41,13 +41,13 @@ namespace Insight.Base.Common.Entity
         public string LoginName { get; set; }
         public string Password { get; set; }
         public string PayPassword { get; set; }
-        public string OpenId { get; set; }
         public string Description { get; set; }
         public int Type { get; set; }
         public bool BuiltIn { get; set; }
         public bool Validity { get; set; }
         public System.Guid CreatorUserId { get; set; }
         public System.DateTime CreateTime { get; set; }
+        public string Mobile { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SYS_Allot_Record> SYS_Allot_Record { get; set; }

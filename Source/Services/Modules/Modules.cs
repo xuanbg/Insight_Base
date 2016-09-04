@@ -20,7 +20,7 @@ namespace Insight.Base.Services
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            var auth = new Authority(verify.Token.UserId, verify.Token.DeptId);
+            var auth = new Authority(verify.Basis.UserId, verify.Basis.DeptId);
             var data = auth.PermModuleGroups();
             if (data.Any()) result.Success(data);
             else result.NoContent();
@@ -38,7 +38,7 @@ namespace Insight.Base.Services
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            var auth = new Authority(verify.Token.UserId, verify.Token.DeptId);
+            var auth = new Authority(verify.Basis.UserId, verify.Basis.DeptId);
             var data = auth.PermModules();
             if (data.Any()) result.Success(data);
             else result.NoContent();
@@ -65,7 +65,7 @@ namespace Insight.Base.Services
             result = verify.Result;
             if (!result.Successful) return result;
 
-            var auth = new Authority(verify.Token.UserId, verify.Token.DeptId);
+            var auth = new Authority(verify.Basis.UserId, verify.Basis.DeptId);
             var data = auth.ModuleActions(mid);
             if (data.Any()) result.Success(data);
             else result.NoContent();

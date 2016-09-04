@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Insight.Base.Services</RootNamespace>
-    <AssemblyName>Verify</AssemblyName>
+    <AssemblyName>Security</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -39,9 +39,9 @@
     <Reference Include="System.ServiceModel.Web" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IVerify.cs" />
+    <Compile Include="ISecurity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Verify.cs" />
+    <Compile Include="Security.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Utils\Utils\Utils.csproj">

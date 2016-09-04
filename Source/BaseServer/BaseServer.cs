@@ -77,8 +77,7 @@ namespace Insight.Base.Server
                 Parameters.Rules = context.SYS_Logs_Rules.ToList();
             }
 
-            Parameters.CheckOpenID = bool.Parse(Util.GetAppSetting("CheckOpenID"));
-            Parameters.CheckMachineId = bool.Parse(Util.GetAppSetting("CheckMachineId"));
+            Parameters.CheckStamp = bool.Parse(Util.GetAppSetting("CheckStamp"));
             Parameters.Expired = Convert.ToInt32(Util.GetAppSetting("Expired"));
         }
     }

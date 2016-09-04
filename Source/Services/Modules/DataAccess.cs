@@ -30,16 +30,16 @@ namespace Insight.Base.Services
         /// <summary>
         /// 获取模块有效选项参数
         /// </summary>
-        /// <param name="us">Session对象实体</param>
+        /// <param name="session">Session对象实体</param>
         /// <param name="mid"></param>
         /// <returns>SYS_ModuleParam List 参数集合</returns>
-        public List<SYS_ModuleParam> GetModuleParam(AccessToken us, Guid mid)
+        public List<SYS_ModuleParam> GetModuleParam(Session session, Guid mid)
         {
             var ids = new List<Guid>();
             List<SYS_ModuleParam> mps;
             using (var context = new BaseEntities())
             {
-                mps = context.SYS_ModuleParam.Where(p => p.ModuleId == mid && ((p.OrgId == null && p.UserId == null) || p.OrgId == us.DeptId || p.UserId == us.UserId)).ToList();
+                mps = context.SYS_ModuleParam.Where(p => p.ModuleId == mid && ((p.OrgId == null && p.UserId == null) || p.OrgId == session.DeptId || p.UserId == session.UserId)).ToList();
             }
             foreach (var pam in mps)
             {
@@ -61,28 +61,28 @@ namespace Insight.Base.Services
         /// <summary>
         /// 获取模块个人选项参数
         /// </summary>
-        /// <param name="us">Session对象实体</param>
+        /// <param name="session">Session对象实体</param>
         /// <param name="mid">模块ID</param>
         /// <returns>SYS_ModuleParam List 参数集合</returns>
-        public List<SYS_ModuleParam> GetModuleUserParam(AccessToken us, Guid mid)
+        public List<SYS_ModuleParam> GetModuleUserParam(Session session, Guid mid)
         {
             using (var context = new BaseEntities())
             {
-                return context.SYS_ModuleParam.Where(p => p.ModuleId == mid && p.UserId == us.UserId).ToList();
+                return context.SYS_ModuleParam.Where(p => p.ModuleId == mid && p.UserId == session.UserId).ToList();
             }
         }
 
         /// <summary>
         /// 获取模块部门选项参数
         /// </summary>
-        /// <param name="us">Session对象实体</param>
+        /// <param name="session">Session对象实体</param>
         /// <param name="mid">模块ID</param>
         /// <returns>SYS_ModuleParam List 参数集合</returns>
-        public List<SYS_ModuleParam> GetModuleDeptParam(AccessToken us, Guid mid)
+        public List<SYS_ModuleParam> GetModuleDeptParam(Session session, Guid mid)
         {
             using (var context = new BaseEntities())
             {
-                return context.SYS_ModuleParam.Where(p => p.ModuleId == mid && p.OrgId == us.DeptId && p.UserId == null).ToList();
+                return context.SYS_ModuleParam.Where(p => p.ModuleId == mid && p.OrgId == session.DeptId && p.UserId == null).ToList();
             }
         }
 

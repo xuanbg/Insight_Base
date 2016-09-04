@@ -28,14 +28,9 @@ namespace Insight.Base.Common
         public static readonly Random Random = new Random(Environment.TickCount);
 
         /// <summary>
-        /// 是否验证微信OpenID
-        /// </summary>
-        public static bool CheckOpenID;
-
-        /// <summary>
         /// 是否验证用户设备ID
         /// </summary>
-        public static bool CheckMachineId;
+        public static bool CheckStamp;
 
         /// <summary>
         /// Session失效时间（小时）

@@ -20,7 +20,7 @@ CREATE TABLE SYS_Interface(
 GO
 
 insert SYS_Interface (Port, Path, Version, NameSpace, Interface, Service, ServiceFile)
-select '6200', 'verifyapi', 'v1.0', 'Insight.Base.Services', 'IVerify', 'Verify', 'Services\Verify.dll' union all
+select '6200', 'securityapi', 'v1.0', 'Insight.Base.Services', 'ISecurity', 'Security', 'Services\Security.dll' union all
 select '6200', 'moduleapi', 'v1.0', 'Insight.Base.Services', 'IModules', 'Modules', 'Services\Modules.dll' union all
 select '6200', 'orgapi', 'v1.0', 'Insight.Base.Services', 'IOrganizations', 'Organizations', 'Services\Organizations.dll' union all
 select '6200', 'userapi', 'v1.0', 'Insight.Base.Services', 'IUsers', 'Users', 'Services\Users.dll' union all

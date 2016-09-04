@@ -44,11 +44,11 @@ namespace Insight.Base.Common
         /// <param name="user">SYS_User</param>
         public static void Update(SYS_User user)
         {
-            var token = Get(user.LoginName);
-            if (token == null) return;
+            var session = Get(user.LoginName);
+            if (session == null) return;
 
-            token.UserName = user.Name;
-            token.UserType = user.Type;
+            session.UserName = user.Name;
+            session.UserType = user.Type;
         }
 
         /// <summary>
@@ -57,10 +57,10 @@ namespace Insight.Base.Common
         /// <param name="account">登录账号</param>
         public static void Offline(string account)
         {
-            var token = Get(account);
-            if (token == null) return;
+            var session = Get(account);
+            if (session == null) return;
 
-            token.OnlineStatus = false;
+            session.OnlineStatus = false;
         }
 
         /// <summary>
@@ -71,10 +71,10 @@ namespace Insight.Base.Common
         /// <returns>Session</returns>
         public static void SetValidity(string account, bool validity)
         {
-            var token = Get(account);
-            if (token == null) return;
+            var session = Get(account);
+            if (session == null) return;
 
-            token.Validity = validity;
+            session.Validity = validity;
         }
 
         /// <summary>
@@ -96,31 +96,6 @@ namespace Insight.Base.Common
         {
             var fast = token.ID < Tokens.Count && Util.StringCompare(token.Account, Tokens[token.ID].Account);
             return fast ? Tokens[token.ID] : Find(token);
-        }
-
-        /// <summary>
-        /// 生成用于验证的Key
-        /// </summary>
-        /// <param name="session">Session</param>
-        /// <returns>string 用于验证的Key</returns>
-        public static string CreateKey(Session session)
-        {
-            var token = new AccessToken
-            {
-                ID = session.ID,
-                UserType = session.UserType,
-                OpenId = session.OpenId,
-                Account = session.Account,
-                Signature = session.Signature,
-                UserId = session.UserId,
-                UserName = session.UserName,
-                DeptId = session.DeptId,
-                DeptName = session.DeptName,
-                MachineId = session.MachineId,
-                Secret = session.Secret,
-                FailureTime = session.FailureTime
-            };
-            return Util.Base64(token);
         }
 
         /// <summary>
@@ -156,17 +131,19 @@ namespace Insight.Base.Common
             if (user == null) return null;
 
             var signature = Util.Hash(user.LoginName.ToUpper() + user.Password);
+            var stamp = user.Type == 0 ? Guid.NewGuid().ToString("N") : null;
             var expired = DateTime.Now.AddHours(user.Type == 0 ? 24 : Parameters.Expired);
             var token = new Session
             {
                 ID = Tokens.Count,
-                OpenId = user.OpenId,
+                UserType = user.Type,
                 Account = user.LoginName,
                 Signature = signature,
+                Mobile = user.Mobile,
                 UserId = user.ID,
                 UserName = user.Name,
-                UserType = user.Type,
                 Validity = user.Validity,
+                Stamp = stamp,
                 Secret = GetSecret(signature),
                 FailureTime = expired
             };
