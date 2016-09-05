@@ -38,14 +38,31 @@ namespace Insight.Base.Common
         private const int MaxAuth = 999999999;
 
         /// <summary>
-        /// 构造方法
-        /// 用于获取AccessToken
+        /// 构造方法，用于刷新Token
+        /// </summary>
+        public Compare()
+        {
+            InitVerify(60);
+            if (!CheckBasis()) return;
+
+            Identify();
+        }
+
+        /// <summary>
+        /// 构造方法，用于获取AccessToken
         /// </summary>
         /// <param name="token">传入参数</param>
-        /// <param name="signature"></param>
-        /// <param name="did"></param>
+        /// <param name="signature">用户签名</param>
+        /// <param name="did">登录部门ID（可为空）</param>
         public Compare(AccessToken token, string signature, string did)
         {
+            var time = Util.LimitCall(60);
+            if (time > 0)
+            {
+                Result.TooFrequent(time.ToString());
+                return;
+            }
+
             var parse = new GuidParse(did);
             if (!parse.Successful)
             {
@@ -81,10 +98,10 @@ namespace Insight.Base.Common
         /// 如Action不为空，则同时进行鉴权
         /// 如limit大于0，则指定时间内的限制调用
         /// </summary>
-        /// <param name="action">操作码，默认为空</param>
         /// <param name="limit">单位时间(秒)内限制调用，0：不限制</param>
+        /// <param name="action">操作码，默认为空</param>
         /// <param name="userid">用户ID</param>
-        public Compare(string action = null, int limit = 0, Guid? userid = null)
+        public Compare(int limit, string action = null, Guid? userid = null)
         {
             InitVerify(limit);
             if (!CheckBasis()) return;
@@ -100,14 +117,11 @@ namespace Insight.Base.Common
         /// <param name="limit"></param>
         private void InitVerify(int limit)
         {
-            if (limit > 0)
+            var time = Util.LimitCall(limit);
+            if (time > 0)
             {
-                var time = Util.LimitCall(limit);
-                if (time > 0)
-                {
-                    Result.TooFrequent(time.ToString());
-                    return;
-                }
+                Result.TooFrequent(time.ToString());
+                return;
             }
 
             try
@@ -167,7 +181,6 @@ namespace Insight.Base.Common
             // 检查验证信息是否过期
             if (ExpiredCheck())
             {
-                Basis.Secret = TokenManage.GetSecret(Basis.Signature);
                 Result.Expired();
                 return;
             }
@@ -187,12 +200,9 @@ namespace Insight.Base.Common
                 return;
             }
 
-            Basis.OnlineStatus = true;
-            Basis.FailureCount = 0;
-            Result.Success();
-
-            // 设备ID不一致时返回多点登录信息
-            if (Basis.Stamp != Token.Stamp) Result.Multiple();
+            Basis.Online();
+            if (Basis.Stamp == Token.Stamp) Result.Success();
+            else Result.Multiple();
 
             // 如action为空，立即返回；否则进行鉴权
             if (action == null) return;
@@ -226,18 +236,45 @@ namespace Insight.Base.Common
                 return;
             }
 
-            Basis.OnlineStatus = true;
-            Basis.FailureCount = 0;
+            Basis.Online();
+            if (Basis.Expired <= DateTime.Now) Basis.InitSecret(Expired);
+
             if (Basis.UserType != 0) Basis.Stamp = Token.Stamp;
 
-            Token.ID = Basis.ID;
-            Token.UserName = Basis.UserName;
-            Token.Stamp = Basis.Stamp;
-            Token.Secret = Basis.Secret;
-            Token.FailureTime = Basis.FailureTime;
-
             Result.Success();
-            Result.Data = Util.Base64(Token);
+            Result.Data = Util.CreatorKey(Basis);
+        }
+
+        /// <summary>
+        /// 对签名进行合法性校验
+        /// </summary>
+        /// <returns>bool 是否通过合法性校验</returns>
+        private void Identify()
+        {
+            // 未超时
+            if (Basis.Expired > DateTime.Now)
+            {
+                Result.WithoutRefresh();
+                return;
+            }
+
+            // 已失效
+            if (Basis.FailureTime < DateTime.Now)
+            {
+                Result.Failured();
+                return;
+            }
+
+            // 验证用户签名
+            if (Basis.RefreshKey != Token.Secret)
+            {
+                Basis.FailureCount++;
+                Result.InvalidAuth();
+                return;
+            }
+
+            Basis.Refresh();
+            Result.Success();
         }
 
         /// <summary>
@@ -246,7 +283,13 @@ namespace Insight.Base.Common
         /// <returns>bool 信息是否过期</returns>
         private bool ExpiredCheck()
         {
-            if (Basis.FailureTime < DateTime.Now) return true;
+            if (Basis.FailureTime < DateTime.Now)
+            {
+                Basis.InitSecret(Expired);
+                return true;
+            }
+
+            if (Basis.Expired < DateTime.Now) return true;
 
             // Session.ID失效（服务重启）
             if (Basis.ID != Token.ID) return true;
@@ -254,9 +297,16 @@ namespace Insight.Base.Common
             // 设备码不同造成过期（用户在另一台设备登录）
             if (CheckStamp && Basis.Stamp != Token.Stamp) return true;
 
-            // 在过期前1天通过验证，过期时间自动延期
-            var time = Basis.FailureTime.AddDays(-1);
-            if (time < DateTime.Now) Basis.FailureTime = DateTime.Now.AddHours(Expired);
+            // 如不自动延长有效期，立即返回
+            if (!AutoExten) return false;
+
+            // 在过期前通过验证，过期时间自动延期
+            var count = Basis.UserType == 0 ? 1 : 24;
+            var time = DateTime.Now.AddHours(count);
+            if (time > Basis.Expired && time <= Basis.FailureTime)
+            {
+                Basis.Expired = Basis.Expired.AddHours(count);
+            }
 
             return false;
         }

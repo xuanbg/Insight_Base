@@ -34,10 +34,10 @@ namespace Insight.Base.Services
         /// <summary>
         /// 获取指定账户的AccessToken
         /// </summary>
-        /// <param name="account">账号</param>
-        /// <param name="signature">签名</param>
-        /// <param name="stamp">特征码</param>
-        /// <param name="deptid">登录部门ID</param>
+        /// <param name="account">用户账号</param>
+        /// <param name="signature">用户签名</param>
+        /// <param name="stamp">用户特征码（随机字符串）</param>
+        /// <param name="deptid">登录部门ID（可为空）</param>
         /// <returns>JsonResult</returns>
         public JsonResult GetToken(string account, string signature, string stamp, string deptid)
         {
@@ -56,13 +56,22 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult RemoveToken()
         {
-            var verify = new Compare();
+            var verify = new Compare(0);
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            verify.Basis.Secret = Guid.NewGuid().ToString();
-            verify.Basis.OnlineStatus = false;
+            verify.Basis.SignOut();
             return result;
+        }
+
+        /// <summary>
+        /// 刷新AccessToken，延长过期时间
+        /// </summary>
+        /// <returns>JsonResult</returns>
+        public JsonResult RefreshToken()
+        {
+            var verify = new Compare();
+            return verify.Result;
         }
 
         /// <summary>
@@ -71,7 +80,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult Verification()
         {
-            return new Compare().Result;
+            return new Compare(0).Result;
         }
 
         /// <summary>
@@ -81,7 +90,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult Authorization(string action)
         {
-            return new Compare(action).Result;
+            return new Compare(0, action).Result;
         }
 
         #endregion
@@ -97,7 +106,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult NewCode(string mobile, int type, int time)
         {
-            var verify = new Compare();
+            var verify = new Compare(0);
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -137,7 +146,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult VerifyCode(string mobile, string code, int type, bool remove = true)
         {
-            var verify = new Compare();
+            var verify = new Compare(0);
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -166,7 +175,7 @@ namespace Insight.Base.Services
         public JsonResult GetSessions(string type)
         {
             const string action = "331BF752-CDB7-44DE-9631-DF2605BB527E";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             var result = verify.Result;
             if (!result.Successful) return result;
 

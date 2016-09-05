@@ -33,6 +33,11 @@ namespace Insight.Base.Common
         public static bool CheckStamp;
 
         /// <summary>
+        /// Token是否自动延期
+        /// </summary>
+        public static bool AutoExten;
+
+        /// <summary>
         /// Session失效时间（小时）
         /// </summary>
         public static int Expired;

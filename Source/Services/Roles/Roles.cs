@@ -19,7 +19,7 @@ namespace Insight.Base.Services
         public JsonResult AddRole(RoleInfo role)
         {
             const string action = "10B574A2-1A69-4273-87D9-06EDA77B80B6";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -46,7 +46,7 @@ namespace Insight.Base.Services
             }
 
             const string action = "FBCEE515-8576-4B10-BA68-CF46743D2199";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             result = verify.Result;
             if (!result.Successful) return result;
 
@@ -71,7 +71,7 @@ namespace Insight.Base.Services
         public JsonResult EditRole(string id, RoleInfo role)
         {
             const string action = "4DC0141D-FE3D-4504-BE70-763028796808";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -94,7 +94,7 @@ namespace Insight.Base.Services
         public JsonResult GetAllRole()
         {
             const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -122,7 +122,7 @@ namespace Insight.Base.Services
             }
 
             const string action = "13D93852-53EC-4A15-AAB2-46C9C48C313A";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             result = verify.Result;
             if (!result.Successful) return result;
 
@@ -150,7 +150,7 @@ namespace Insight.Base.Services
             }
 
             const string action = "2EF4D82B-4A75-4902-BD9E-B63153D093D2";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             result = verify.Result;
             if (!result.Successful) return result;
 
@@ -175,7 +175,7 @@ namespace Insight.Base.Services
             }
 
             const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             result = verify.Result;
             if (!result.Successful) return result;
 
@@ -202,7 +202,7 @@ namespace Insight.Base.Services
             }
 
             const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             result = verify.Result;
             if (!result.Successful) return result;
 
@@ -229,7 +229,7 @@ namespace Insight.Base.Services
             }
 
             const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             result = verify.Result;
             if (!result.Successful) return result;
 
@@ -256,7 +256,7 @@ namespace Insight.Base.Services
             }
 
             const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             result = verify.Result;
             if (!result.Successful) return result;
 
@@ -283,7 +283,7 @@ namespace Insight.Base.Services
             }
 
             const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             result = verify.Result;
             if (!result.Successful) return result;
 

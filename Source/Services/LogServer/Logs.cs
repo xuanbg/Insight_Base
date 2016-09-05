@@ -24,7 +24,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult WriteToLog(string code, string message, string source, string action, string key, string userid)
         {
-            var verify = new Compare();
+            var verify = new Compare(0);
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -56,7 +56,7 @@ namespace Insight.Base.Services
         public JsonResult AddRule(SYS_Logs_Rules rule)
         {
             const string action = "60A97A33-0E6E-4856-BB2B-322FEEEFD96A";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -105,7 +105,7 @@ namespace Insight.Base.Services
         public JsonResult RemoveRule(string id)
         {
             const string action = "BBC43098-A030-46CA-A681-0C3D1ECC15AB";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -141,7 +141,7 @@ namespace Insight.Base.Services
         public JsonResult EditRule(SYS_Logs_Rules rule)
         {
             const string action = "9FF1547D-2E3F-4552-963F-5EA790D586EA";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -170,7 +170,7 @@ namespace Insight.Base.Services
         public JsonResult GetRule(string id)
         {
             const string action = "E3CFC5AA-CD7D-4A3C-8900-8132ADB7099F";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -195,7 +195,7 @@ namespace Insight.Base.Services
         public JsonResult GetRules()
         {
             const string action = "E3CFC5AA-CD7D-4A3C-8900-8132ADB7099F";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             var result = verify.Result;
             if (!result.Successful) return result;
 

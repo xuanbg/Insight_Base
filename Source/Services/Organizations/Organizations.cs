@@ -19,7 +19,7 @@ namespace Insight.Base.Services
         public JsonResult AddOrg(SYS_Organization org, int index)
         {
             const string action = "88AC97EF-52A3-4F7F-8121-4C311206535F";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -47,7 +47,7 @@ namespace Insight.Base.Services
             }
 
             const string action = "71803766-97FE-4E6E-82DB-D5C90D2B7004";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             result = verify.Result;
             if (!result.Successful) return result;
 
@@ -66,7 +66,7 @@ namespace Insight.Base.Services
         public JsonResult UpdateOrg(string id, SYS_Organization org, int index)
         {
             const string action = "542D5E28-8102-40C6-9C01-190D13DBF6C6";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -91,7 +91,7 @@ namespace Insight.Base.Services
             }
 
             const string action = "928C7527-A2F7-49A3-A548-12B3834D8822";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             result = verify.Result;
             if (!result.Successful) return result;
 
@@ -109,7 +109,7 @@ namespace Insight.Base.Services
         public JsonResult GetOrgTree()
         {
             const string action = "928C7527-A2F7-49A3-A548-12B3834D8822";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -137,7 +137,7 @@ namespace Insight.Base.Services
             }
 
             const string action = "DAE7F2C5-E379-4F74-8043-EB616D4A5F8B";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             result = verify.Result;
             if (!result.Successful) return result;
 
@@ -156,7 +156,7 @@ namespace Insight.Base.Services
         public JsonResult SetOrgParent(string id, SYS_Organization org)
         {
             const string action = "DB1A4EA2-1B3E-41AD-91FA-A3945AB7D901";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -182,7 +182,7 @@ namespace Insight.Base.Services
             }
 
             const string action = "1F29DDEA-A4D7-4EF9-8136-0D4AFE88CB08";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             result = verify.Result;
             if (!result.Successful) return result;
 
@@ -199,7 +199,7 @@ namespace Insight.Base.Services
         public JsonResult RemoveOrgMember(List<Guid> ids)
         {
             const string action = "70AC8EEB-F920-468D-8C8F-2DBA049ADAE9";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -223,7 +223,7 @@ namespace Insight.Base.Services
             }
 
             const string action = "928C7527-A2F7-49A3-A548-12B3834D8822";
-            var verify = new Compare(action);
+            var verify = new Compare(0, action);
             result = verify.Result;
             if (!result.Successful) return result;
 
@@ -241,7 +241,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult GetLoginDepts(string account)
         {
-            var verify = new Compare();
+            var verify = new Compare(0);
             var result = verify.Result;
             if (!result.Successful) return result;
 

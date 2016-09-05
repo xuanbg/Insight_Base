@@ -19,14 +19,14 @@ namespace Insight.Base.Common.Entity
         }
 
         /// <summary>
-        /// AccessToken过期（405）
+        /// 无需刷新（205）
         /// </summary>
-        public void Expired()
+        public void WithoutRefresh()
         {
-            Successful = false;
-            Code = "300";
-            Name = "AccessTokenExpired";
-            Message = "AccessToken过期";
+            Successful = true;
+            Code = "205";
+            Name = "WithoutRefresh";
+            Message = "尚未过期，无需刷新";
         }
 
         /// <summary>
@@ -41,14 +41,25 @@ namespace Insight.Base.Common.Entity
         }
 
         /// <summary>
-        /// 用户被禁止登录（406）
+        /// AccessToken已过期（405）
         /// </summary>
-        public void Disabled()
+        public void Expired()
         {
             Successful = false;
-            Code = "402";
-            Name = "AccountIsDisabled";
-            Message = "当前用户被禁止登录";
+            Code = "405";
+            Name = "AccessTokenExpired";
+            Message = "AccessToken已过期";
+        }
+
+        /// <summary>
+        /// AccessToken已失效（406）
+        /// </summary>
+        public void Failured()
+        {
+            Successful = false;
+            Code = "406";
+            Name = "AccessTokenFailured";
+            Message = "AccessToken已失效";
         }
 
         /// <summary>
@@ -57,7 +68,7 @@ namespace Insight.Base.Common.Entity
         public void SignInOther()
         {
             Successful = false;
-            Code = "405";
+            Code = "407";
             Name = "SignInOtherDevice";
             Message = "用户已在其他设备登录";
         }
@@ -85,14 +96,14 @@ namespace Insight.Base.Common.Entity
         }
 
         /// <summary>
-        /// 短信验证码错误（410）
+        /// 用户被禁止登录（410）
         /// </summary>
-        public void SMSCodeError()
+        public void Disabled()
         {
             Successful = false;
             Code = "410";
-            Name = "SMSCodeError";
-            Message = "短信验证码错误";
+            Name = "AccountIsDisabled";
+            Message = "当前用户被禁止登录";
         }
 
         /// <summary>
@@ -118,14 +129,14 @@ namespace Insight.Base.Common.Entity
         }
 
         /// <summary>
-        /// 事件代码错误（413）
+        /// 短信验证码错误（413）
         /// </summary>
-        public void InvalidEventCode()
+        public void SMSCodeError()
         {
             Successful = false;
             Code = "413";
-            Name = "InvalidEventCode";
-            Message = "错误的事件代码";
+            Name = "SMSCodeError";
+            Message = "短信验证码错误";
         }
 
         /// <summary>
@@ -162,14 +173,14 @@ namespace Insight.Base.Common.Entity
         }
         
         /// <summary>
-        /// 错误的支付密码（417）
+        /// 事件代码错误（417）
         /// </summary>
-        public void InvalidPayKey()
+        public void InvalidEventCode()
         {
             Successful = false;
             Code = "417";
-            Name = "InvalidPayKey";
-            Message = "错误的支付密码";
+            Name = "InvalidEventCode";
+            Message = "错误的事件代码";
         }
 
         /// <summary>
@@ -181,6 +192,17 @@ namespace Insight.Base.Common.Entity
             Code = "418";
             Name = "CodeSchemeNotExists";
             Message = "指定的编码方案不存在";
+        }
+
+        /// <summary>
+        /// 错误的支付密码（419）
+        /// </summary>
+        public void InvalidPayKey()
+        {
+            Successful = false;
+            Code = "419";
+            Name = "InvalidPayKey";
+            Message = "错误的支付密码";
         }
     }
 }

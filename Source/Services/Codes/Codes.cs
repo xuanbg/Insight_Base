@@ -72,7 +72,7 @@ namespace Insight.Base.Services
                 return result;
             }
 
-            var verify = new Compare();
+            var verify = new Compare(0);
             result = verify.Result;
             if (!result.Successful) return result;
 
