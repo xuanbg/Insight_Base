@@ -43,7 +43,7 @@ namespace Insight.Base.Services
             user.CreatorUserId = verify.Basis.UserId;
             var id = InsertData(user);
             if (id == null) result.DataBaseError();
-            else result.Created(id.ToString());
+            else result.Created(id);
 
             return result;
         }
@@ -212,7 +212,7 @@ namespace Insight.Base.Services
             session.InitSecret(Parameters.Expired);
             session.Stamp = Guid.NewGuid().ToString("N");
 
-            verify.Result.Data = Util.CreatorKey(session);
+            verify.Result.Success(Util.CreatorKey(session));
             return result;
         }
 
@@ -296,7 +296,7 @@ namespace Insight.Base.Services
             session.InitSecret(Parameters.Expired);
             if (session.Stamp == null) session.Stamp = Guid.NewGuid().ToString("N");
 
-            result.Data = Util.CreatorKey(session);
+            result.Success(Util.CreatorKey(session));
             return result;
         }
 
@@ -369,7 +369,7 @@ namespace Insight.Base.Services
 
             var id = InsertData(verify.Basis.UserId, group);
             if (id == null) result.DataBaseError();
-            else result.Created(id.ToString());
+            else result.Created(id);
 
             return result;
         }

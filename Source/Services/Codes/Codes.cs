@@ -91,7 +91,7 @@ namespace Insight.Base.Services
 
                 var code = GetCode(scheme.ID, null, session.UserId, bid, null, mark);
                 if (code == null) result.DataBaseError();
-                else result.Success(code.ToString());
+                else result.Success(code);
 
                 return result;
             }

@@ -59,7 +59,7 @@ namespace Insight.Base.Common
             var time = Util.LimitCall(60);
             if (time > 0)
             {
-                Result.TooFrequent(time.ToString());
+                Result.TooFrequent(time);
                 return;
             }
 
@@ -120,7 +120,7 @@ namespace Insight.Base.Common
             var time = Util.LimitCall(limit);
             if (time > 0)
             {
-                Result.TooFrequent(time.ToString());
+                Result.TooFrequent(time);
                 return;
             }
 
@@ -241,8 +241,7 @@ namespace Insight.Base.Common
 
             if (Basis.UserType != 0) Basis.Stamp = Token.Stamp;
 
-            Result.Success();
-            Result.Data = Util.CreatorKey(Basis);
+            Result.Success(Util.CreatorKey(Basis));
         }
 
         /// <summary>
