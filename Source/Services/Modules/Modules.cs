@@ -16,7 +16,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult GetModuleGroup()
         {
-            var verify = new Compare(0);
+            var verify = new Compare();
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -34,7 +34,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult GetUserModule()
         {
-            var verify = new Compare(0);
+            var verify = new Compare();
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -61,7 +61,7 @@ namespace Insight.Base.Services
                 return result;
             }
 
-            var verify = new Compare(0);
+            var verify = new Compare();
             result = verify.Result;
             if (!result.Successful) return result;
 

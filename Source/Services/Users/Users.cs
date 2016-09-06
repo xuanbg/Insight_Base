@@ -23,7 +23,7 @@ namespace Insight.Base.Services
         public JsonResult AddUser(SYS_User user)
         {
             const string action = "60D5BE64-0102-4189-A999-96EDAD3DA1B5";
-            var verify = new Compare(0, action);
+            var verify = new Compare(action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -64,7 +64,7 @@ namespace Insight.Base.Services
             }
 
             const string action = "BE2DE9AB-C109-418D-8626-236DEF8E8504";
-            var verify = new Compare(0, action);
+            var verify = new Compare(action);
             result = verify.Result;
             if (!result.Successful) return result;
 
@@ -90,7 +90,7 @@ namespace Insight.Base.Services
             }
 
             const string action = "3BC17B61-327D-4EAA-A0D7-7F825A6C71DB";
-            var verify = new Compare(0, action, uid);
+            var verify = new Compare(action, 0, uid);
             result = verify.Result;
             if (!result.Successful) return result;
 
@@ -107,7 +107,7 @@ namespace Insight.Base.Services
                 return result;
             }
 
-            var session = TokenManage.Get(user.LoginName);
+            var session = SessionManage.Get(user.LoginName);
             if (session == null) return result;
 
             session.UserName = user.Name;
@@ -131,7 +131,7 @@ namespace Insight.Base.Services
             }
 
             const string action = "3BC17B61-327D-4EAA-A0D7-7F825A6C71DB";
-            var verify = new Compare(0, action, uid);
+            var verify = new Compare(action, 0, uid);
             result = verify.Result;
             if (!result.Successful) return result;
 
@@ -149,7 +149,7 @@ namespace Insight.Base.Services
         public JsonResult GetUsers()
         {
             const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
-            var verify = new Compare(0, action);
+            var verify = new Compare(action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -168,11 +168,11 @@ namespace Insight.Base.Services
         public JsonResult GetOnlineUsers(string type)
         {
             const string action = "331BF752-CDB7-44DE-9631-DF2605BB527E";
-            var verify = new Compare(0, action);
+            var verify = new Compare(action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            var list = TokenManage.GetOnlineUsers(Convert.ToInt32(type));
+            var list = SessionManage.GetOnlineUsers(Convert.ToInt32(type));
             if (list.Any()) result.Success(list);
             else result.NoContent();
 
@@ -187,7 +187,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult SignUp(string account, SYS_User user)
         {
-            var verify = new Compare(0);
+            var verify = new Compare();
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -208,11 +208,11 @@ namespace Insight.Base.Services
             }
 
             var token = new AccessToken {Account = account};
-            var session = TokenManage.Get(token);
+            var session = SessionManage.Get(token);
             session.InitSecret(Parameters.Expired);
             session.Stamp = Guid.NewGuid().ToString("N");
 
-            verify.Result.Success(Util.CreatorKey(session));
+            verify.Result.Success(session.CreatorKey());
             return result;
         }
 
@@ -231,7 +231,7 @@ namespace Insight.Base.Services
 
             var session = Util.StringCompare(verify.Basis.Account, account)
                 ? verify.Basis
-                : TokenManage.Get(account);
+                : SessionManage.Get(account);
             var reset = Update(account, password);
             if (!reset.HasValue)
             {
@@ -247,7 +247,7 @@ namespace Insight.Base.Services
 
             if (session == null) return result;
 
-            session.Signature = Util.Hash(session.Account.ToUpper() + password);
+            session.Sign(password);
             return result;
         }
 
@@ -260,12 +260,12 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult ResetSignature(string account, string password, string code)
         {
-            var verify = new Compare(0);
+            var verify = new Compare();
             var result = verify.Result;
             if (!result.Successful) return result;
 
             var token = new AccessToken {Account = account, Stamp = verify.Basis.Stamp};
-            var session = TokenManage.Get(token);
+            var session = SessionManage.Get(token);
             if (session == null)
             {
                 result.NotFound();
@@ -292,11 +292,11 @@ namespace Insight.Base.Services
                 return result;
             }
 
-            session.Signature = Util.Hash(account.ToUpper() + password);
+            session.Sign(password);
             session.InitSecret(Parameters.Expired);
             if (session.Stamp == null) session.Stamp = Guid.NewGuid().ToString("N");
 
-            result.Success(Util.CreatorKey(session));
+            result.Success(session.CreatorKey());
             return result;
         }
 
@@ -326,7 +326,7 @@ namespace Insight.Base.Services
                 return result;
             }
 
-            var session = TokenManage.Get(account);
+            var session = SessionManage.Get(account);
             if (session != null) session.Validity = validity;
 
             return result;
@@ -345,7 +345,7 @@ namespace Insight.Base.Services
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            var session = TokenManage.Get(account);
+            var session = SessionManage.Get(account);
             session?.SignOut();
 
             return result;
@@ -363,7 +363,7 @@ namespace Insight.Base.Services
         public JsonResult AddGroup(SYS_UserGroup group)
         {
             const string action = "6E80210E-6F80-4FF7-8520-B602934D635C";
-            var verify = new Compare(0, action);
+            var verify = new Compare(action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -390,7 +390,7 @@ namespace Insight.Base.Services
             }
 
             const string action = "E46B7A1C-A8B0-49B5-8494-BF1B09F43452";
-            var verify = new Compare(0, action);
+            var verify = new Compare(action);
             result = verify.Result;
             if (!result.Successful) return result;
 
@@ -408,7 +408,7 @@ namespace Insight.Base.Services
         public JsonResult UpdateGroup(string id, SYS_UserGroup @group)
         {
             const string action = "6910FD14-5654-4CF0-B159-8FE1DF68619F";
-            var verify = new Compare(0, action);
+            var verify = new Compare(action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -433,7 +433,7 @@ namespace Insight.Base.Services
             }
 
             const string action = "6910FD14-5654-4CF0-B159-8FE1DF68619F";
-            var verify = new Compare(0, action);
+            var verify = new Compare(action);
             result = verify.Result;
             if (!result.Successful) return result;
 
@@ -451,7 +451,7 @@ namespace Insight.Base.Services
         public JsonResult GetGroups()
         {
             const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
-            var verify = new Compare(0, action);
+            var verify = new Compare(action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -479,7 +479,7 @@ namespace Insight.Base.Services
             }
 
             const string action = "6C41724C-E118-4BCD-82AD-6B13D05C7894";
-            var verify = new Compare(0, action);
+            var verify = new Compare(action);
             result = verify.Result;
             if (!result.Successful) return result;
 
@@ -496,7 +496,7 @@ namespace Insight.Base.Services
         public JsonResult RemoveMember(List<Guid> ids)
         {
             const string action = "686C115A-CE2E-4E84-8F25-B63C15AC173C";
-            var verify = new Compare(0, action);
+            var verify = new Compare(action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -512,7 +512,7 @@ namespace Insight.Base.Services
         public JsonResult GetGroupMembers()
         {
             const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
-            var verify = new Compare(0, action);
+            var verify = new Compare(action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -539,7 +539,7 @@ namespace Insight.Base.Services
             }
 
             const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
-            var verify = new Compare(0, action);
+            var verify = new Compare(action);
             result = verify.Result;
             if (!result.Successful) return result;
 

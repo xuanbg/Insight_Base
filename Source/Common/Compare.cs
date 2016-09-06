@@ -38,14 +38,18 @@ namespace Insight.Base.Common
         private const int MaxAuth = 999999999;
 
         /// <summary>
-        /// 构造方法，用于刷新Token
+        /// 构造方法，如Action不为空，则同时进行鉴权
         /// </summary>
-        public Compare()
+        /// <param name="action">操作码，默认为空</param>
+        /// <param name="limit">单位时间(秒)内限制调用，0：不限制</param>
+        /// <param name="userid">用户ID</param>
+        public Compare(string action = null, int limit = 0, Guid? userid = null)
         {
-            InitVerify(60);
-            if (!CheckBasis()) return;
+            if (!InitVerify(limit)) return;
 
-            Identify();
+            if (Basis.UserId == userid) action = null;
+
+            CompareToken(action);
         }
 
         /// <summary>
@@ -78,6 +82,17 @@ namespace Insight.Base.Common
         }
 
         /// <summary>
+        /// 构造方法，用于刷新Token
+        /// </summary>
+        /// <param name="limit">限制访问秒数</param>
+        public Compare(int limit)
+        {
+            if (!InitVerify(limit)) return;
+
+            Identify();
+        }
+
+        /// <summary>
         /// 构造方法
         /// 如account和LoginName一致，忽略鉴权
         /// </summary>
@@ -85,8 +100,7 @@ namespace Insight.Base.Common
         /// <param name="account">登录账号</param>
         public Compare(string action, string account)
         {
-            InitVerify(0);
-            if (!CheckBasis()) return;
+            if (!InitVerify(0)) return;
 
             if (Util.StringCompare(Token.Account, account)) action = null;
 
@@ -94,34 +108,16 @@ namespace Insight.Base.Common
         }
 
         /// <summary>
-        /// 构造方法
-        /// 如Action不为空，则同时进行鉴权
-        /// 如limit大于0，则指定时间内的限制调用
-        /// </summary>
-        /// <param name="limit">单位时间(秒)内限制调用，0：不限制</param>
-        /// <param name="action">操作码，默认为空</param>
-        /// <param name="userid">用户ID</param>
-        public Compare(int limit, string action = null, Guid? userid = null)
-        {
-            InitVerify(limit);
-            if (!CheckBasis()) return;
-
-            if (Basis.UserId == userid) action = null;
-
-            CompareToken(action);
-        }
-
-        /// <summary>
         /// 初始化验证数据
         /// </summary>
-        /// <param name="limit"></param>
-        private void InitVerify(int limit)
+        /// <param name="limit">限制访问秒数</param>
+        private bool InitVerify(int limit)
         {
             var time = Util.LimitCall(limit);
             if (time > 0)
             {
                 Result.TooFrequent(time);
-                return;
+                return false;
             }
 
             try
@@ -131,6 +127,8 @@ namespace Insight.Base.Common
                 var buffer = Convert.FromBase64String(auth);
                 var json = Encoding.UTF8.GetString(buffer);
                 Token = Util.Deserialize<AccessToken>(json);
+
+                return CheckBasis();
             }
             catch (Exception ex)
             {
@@ -138,7 +136,8 @@ namespace Insight.Base.Common
                 var msg = $"提取验证信息失败。\r\nException:{ex}";
                 var ts = new ThreadStart(() => new Logger("500101", msg).Write());
                 new Thread(ts).Start();
-                throw new Exception("提取验证信息失败");
+                //throw new Exception("提取验证信息失败");
+                return false;
             }
         }
 
@@ -148,7 +147,7 @@ namespace Insight.Base.Common
         /// <returns>bool 是否通过检查</returns>
         private bool CheckBasis()
         {
-            Basis = TokenManage.Get(Token);
+            Basis = SessionManage.Get(Token);
             if (Basis == null || Basis.ID > MaxAuth) return false;
 
             if (!Basis.Validity)
@@ -172,7 +171,7 @@ namespace Insight.Base.Common
         }
 
         /// <summary>
-        /// 对Token进行校验，返回验证结果
+        /// 对Secret进行校验，返回验证结果
         /// </summary>
         /// <param name="action">操作码，默认为空</param>
         /// <returns>bool 是否通过验证</returns>
@@ -224,7 +223,7 @@ namespace Insight.Base.Common
         /// <summary>
         /// 对签名进行合法性校验
         /// </summary>
-        /// <param name="signature">是否登录</param>
+        /// <param name="signature">用户签名</param>
         /// <returns>bool 是否通过合法性校验</returns>
         private void Identify(string signature)
         {
@@ -241,11 +240,11 @@ namespace Insight.Base.Common
 
             if (Basis.UserType != 0) Basis.Stamp = Token.Stamp;
 
-            Result.Success(Util.CreatorKey(Basis));
+            Result.Success(Basis.CreatorKey());
         }
 
         /// <summary>
-        /// 对签名进行合法性校验
+        /// 对RefreshKey进行合法性校验
         /// </summary>
         /// <returns>bool 是否通过合法性校验</returns>
         private void Identify()
@@ -273,7 +272,7 @@ namespace Insight.Base.Common
             }
 
             Basis.Refresh();
-            Result.Success();
+            Result.Success(Basis.CreatorKey());
         }
 
         /// <summary>

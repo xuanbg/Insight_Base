@@ -56,7 +56,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult RemoveToken()
         {
-            var verify = new Compare(0);
+            var verify = new Compare();
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -70,7 +70,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult RefreshToken()
         {
-            var verify = new Compare();
+            var verify = new Compare(60);
             return verify.Result;
         }
 
@@ -80,7 +80,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult Verification()
         {
-            return new Compare(0).Result;
+            return new Compare().Result;
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult Authorization(string action)
         {
-            return new Compare(0, action).Result;
+            return new Compare(action).Result;
         }
 
         #endregion
@@ -106,7 +106,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult NewCode(string mobile, int type, int time)
         {
-            var verify = new Compare(0);
+            var verify = new Compare();
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -146,7 +146,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult VerifyCode(string mobile, string code, int type, bool remove = true)
         {
-            var verify = new Compare(0);
+            var verify = new Compare();
             var result = verify.Result;
             if (!result.Successful) return result;
 
@@ -175,11 +175,11 @@ namespace Insight.Base.Services
         public JsonResult GetSessions(string type)
         {
             const string action = "331BF752-CDB7-44DE-9631-DF2605BB527E";
-            var verify = new Compare(0, action);
+            var verify = new Compare(action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            var list = TokenManage.GetOnlineUsers(Convert.ToInt32(type));
+            var list = SessionManage.GetOnlineUsers(Convert.ToInt32(type));
             if (list.Any()) result.Success(list);
             else result.NoContent();
 

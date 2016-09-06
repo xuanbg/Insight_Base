@@ -7,25 +7,17 @@ using Insight.Utils.Entity;
 
 namespace Insight.Base.Common
 {
-    public static class TokenManage
+    public static class SessionManage
     {
         /// <summary>
         /// Token缓存
         /// </summary>
-        private static readonly List<Session> Sessions;
+        private static readonly List<Session> Sessions = new List<Session>();
 
         /// <summary>
         /// 进程同步基元
         /// </summary>
         private static readonly Mutex Mutex = new Mutex();
-
-        /// <summary>
-        /// 构造方法，初始化Token缓存
-        /// </summary>
-        static TokenManage()
-        {
-            Sessions = new List<Session>();
-        }
 
         /// <summary>
         /// 获取指定类型的所有在线用户
@@ -81,20 +73,19 @@ namespace Insight.Base.Common
             var user = DataAccess.GetUser(account);
             if (user == null) return null;
 
-            var signature = Util.Hash(user.LoginName.ToUpper() + user.Password);
             var stamp = user.Type == 0 ? Guid.NewGuid().ToString("N") : null;
             var session = new Session
             {
                 ID = Sessions.Count,
                 UserType = user.Type,
                 Account = user.LoginName,
-                Signature = signature,
                 Mobile = user.Mobile,
                 UserId = user.ID,
                 UserName = user.Name,
                 Validity = user.Validity,
                 Stamp = stamp
             };
+            session.Sign(user.Password);
             Sessions.Add(session);
             return session;
         }
