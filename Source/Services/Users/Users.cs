@@ -209,8 +209,7 @@ namespace Insight.Base.Services
 
             var token = new AccessToken {Account = account};
             var session = SessionManage.Get(token);
-            session.InitSecret(Parameters.Expired);
-            session.Stamp = Guid.NewGuid().ToString("N");
+            session.InitSecret();
 
             verify.Result.Success(session.CreatorKey());
             return result;
@@ -264,7 +263,7 @@ namespace Insight.Base.Services
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            var token = new AccessToken {Account = account, Stamp = verify.Basis.Stamp};
+            var token = new AccessToken {Account = account};
             var session = SessionManage.Get(token);
             if (session == null)
             {
@@ -293,8 +292,7 @@ namespace Insight.Base.Services
             }
 
             session.Sign(password);
-            session.InitSecret(Parameters.Expired);
-            if (session.Stamp == null) session.Stamp = Guid.NewGuid().ToString("N");
+            session.InitSecret();
 
             result.Success(session.CreatorKey());
             return result;

@@ -36,16 +36,11 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="account">用户账号</param>
         /// <param name="signature">用户签名</param>
-        /// <param name="stamp">用户特征码（随机字符串）</param>
         /// <param name="deptid">登录部门ID（可为空）</param>
         /// <returns>JsonResult</returns>
-        public JsonResult GetToken(string account, string signature, string stamp, string deptid)
+        public JsonResult GetToken(string account, string signature, string deptid)
         {
-            var token = new AccessToken
-            {
-                Account = account,
-                Stamp = stamp
-            };
+            var token = new AccessToken {Account = account};
 
             return new Compare(token, signature, deptid).Result;
         }

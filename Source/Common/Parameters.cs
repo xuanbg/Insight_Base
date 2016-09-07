@@ -28,14 +28,9 @@ namespace Insight.Base.Common
         public static readonly Random Random = new Random(Environment.TickCount);
 
         /// <summary>
-        /// 是否验证用户设备ID
+        /// 是否验证用户特征码
         /// </summary>
         public static bool CheckStamp;
-
-        /// <summary>
-        /// Token是否自动延期
-        /// </summary>
-        public static bool AutoExten;
 
         /// <summary>
         /// Session失效时间（小时）

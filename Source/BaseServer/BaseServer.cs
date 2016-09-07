@@ -78,7 +78,6 @@ namespace Insight.Base.Server
             }
 
             Parameters.CheckStamp = bool.Parse(Util.GetAppSetting("CheckStamp"));
-            Parameters.AutoExten = bool.Parse(Util.GetAppSetting("AutoExten"));
             Parameters.Expired = Convert.ToInt32(Util.GetAppSetting("Expired"));
         }
     }

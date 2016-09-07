@@ -1,5 +1,4 @@
-﻿using Insight.Utils.Common;
-using Insight.Utils.Entity;
+﻿using Insight.Utils.Entity;
 
 namespace Insight.Base.Common.Entity
 {

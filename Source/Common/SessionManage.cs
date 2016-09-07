@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Insight.Utils.Common;
 using Insight.Utils.Entity;
+using Insight.Base.Common.Entity;
 
 namespace Insight.Base.Common
 {
@@ -73,7 +73,6 @@ namespace Insight.Base.Common
             var user = DataAccess.GetUser(account);
             if (user == null) return null;
 
-            var stamp = user.Type == 0 ? Guid.NewGuid().ToString("N") : null;
             var session = new Session
             {
                 ID = Sessions.Count,
@@ -83,9 +82,9 @@ namespace Insight.Base.Common
                 UserId = user.ID,
                 UserName = user.Name,
                 Validity = user.Validity,
-                Stamp = stamp
             };
             session.Sign(user.Password);
+            session.MakeStamp();
             Sessions.Add(session);
             return session;
         }
