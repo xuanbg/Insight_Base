@@ -88,6 +88,25 @@ namespace Insight.Base.Services
         [OperationContract]
         JsonResult VerifyCode(string mobile, string code, int type, bool remove);
 
+        /// <summary>
+        /// 生成图形验证码
+        /// </summary>
+        /// <param name="id">验证图形ID</param>
+        /// <returns>JsonResult</returns>
+        [WebGet(UriTemplate = "piccodes/{id}", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        JsonResult GetPicCode(string id);
+
+        /// <summary>
+        /// 验证图形验证码是否正确
+        /// </summary>
+        /// <param name="id">验证图形ID</param>
+        /// <param name="code">验证码</param>
+        /// <returns>JsonResult</returns>
+        [WebGet(UriTemplate = "smscodes/{id}/compare?code={code}", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        JsonResult VerifyPicCode(string id, string code);
+
         #endregion
 
         #region Session

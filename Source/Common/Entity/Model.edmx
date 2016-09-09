@@ -299,6 +299,17 @@
           <Property Name="CreatorUserId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="CreateTime" Type="datetime" Nullable="false" />
         </EntityType>
+        <EntityType Name="SYS_VerifyImage">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="SN" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Type" Type="int" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="16" Nullable="false" />
+          <Property Name="Path" Type="varchar" MaxLength="256" Nullable="false" />
+          <Property Name="CreateTime" Type="datetime" Nullable="false" />
+        </EntityType>
         <!--生成过程中发现错误:
 警告 6002: 表/视图“Insight_Base.dbo.RoleAction”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
         <EntityType Name="RoleAction">
@@ -875,6 +886,7 @@
           <EntitySet Name="SYS_User" EntityType="Self.SYS_User" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SYS_UserGroup" EntityType="Self.SYS_UserGroup" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SYS_UserGroupMember" EntityType="Self.SYS_UserGroupMember" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SYS_VerifyImage" EntityType="Self.SYS_VerifyImage" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="RoleAction" EntityType="Self.RoleAction" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
     [RoleAction].[ID] AS [ID], 
@@ -2136,7 +2148,19 @@
             <Parameter Name="ModuleId" Mode="In" Type="Guid" />
             <Parameter Name="Char" Mode="In" Type="String" />
           </FunctionImport>
+          <EntitySet Name="SYS_VerifyImage" EntityType="BaseModel.SYS_VerifyImage" />
         </EntityContainer>
+        <EntityType Name="SYS_VerifyImage">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="SN" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Type" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="16" FixedLength="false" Unicode="true" />
+          <Property Name="Path" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="CreateTime" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -2517,6 +2541,18 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <FunctionImportMapping FunctionImportName="GetCode" FunctionName="BaseModel.Store.GetCode" />
+          <EntitySetMapping Name="SYS_VerifyImage">
+            <EntityTypeMapping TypeName="BaseModel.SYS_VerifyImage">
+              <MappingFragment StoreEntitySet="SYS_VerifyImage">
+                <ScalarProperty Name="CreateTime" ColumnName="CreateTime" />
+                <ScalarProperty Name="Path" ColumnName="Path" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="SN" ColumnName="SN" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

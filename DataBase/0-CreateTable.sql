@@ -1,6 +1,10 @@
 USE Insight_Base
 GO
 
+IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'SYS_VerifyImage') AND OBJECTPROPERTY(id, N'ISUSERTABLE') = 1)
+DROP TABLE SYS_VerifyImage
+GO
+
 IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'SYS_Logs') AND OBJECTPROPERTY(id, N'ISUSERTABLE') = 1)
 DROP TABLE SYS_Logs
 GO
@@ -387,6 +391,18 @@ CREATE TABLE SYS_Logs(
 [Message]          NVARCHAR(MAX),                                                                                                          --日志内容
 [Key]              VARCHAR(64),                                                                                                            --操作名称
 [SourceUserId]     UNIQUEIDENTIFIER,                                                                                                       --来源用户ID
+[CreateTime]       DATETIME DEFAULT GETDATE() NOT NULL                                                                                     --创建时间
+)
+GO
+
+/*****验证图形表*****/
+
+CREATE TABLE SYS_VerifyImage(
+[ID]               UNIQUEIDENTIFIER CONSTRAINT IX_SYS_VerifyImage PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
+[SN]               BIGINT IDENTITY(1,1),                                                                                                   --自增序列
+[Type]             INT NOT NULL,                                                                                                           --图形类型：0、遮罩图；1、背景图；
+[Name]             NVARCHAR(16) NOT NULL,                                                                                                  --图形名称
+[Path]             VARCHAR(256) NOT NULL,                                                                                                  --图片本地路径
 [CreateTime]       DATETIME DEFAULT GETDATE() NOT NULL                                                                                     --创建时间
 )
 GO

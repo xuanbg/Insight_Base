@@ -152,6 +152,9 @@
     <Compile Include="Entity\SYS_UserGroupMember.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
+    <Compile Include="Entity\SYS_VerifyImage.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
     <Compile Include="Logger.cs" />
     <Compile Include="Parameters.cs" />
     <Compile Include="Entity\JsonResult.cs" />

@@ -66,6 +66,7 @@
         <AssociationConnector Association="BaseModel.FK__SYS_UserG__Creat__793DFFAF" ManuallyRouted="false" />
         <AssociationConnector Association="BaseModel.FK__SYS_UserG__UserI__7FEAFD3E" ManuallyRouted="false" />
         <AssociationConnector Association="BaseModel.FK__SYS_UserG__Group__7EF6D905" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="BaseModel.SYS_VerifyImage" Width="1.5" PointX="8.75" PointY="4.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
