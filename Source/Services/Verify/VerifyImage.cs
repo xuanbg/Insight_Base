@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Linq;
-using System.Text;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Utils.Common;
@@ -18,10 +17,10 @@ namespace Insight.Base.Services
         private readonly int Index = Parameters.Random.Next(0, 8);
 
         // 背景图
-        private Image Background;
+        private readonly Image Background;
 
         // 遮罩图
-        private Image Mask;
+        private readonly Image Mask;
 
         /// <summary>
         /// 构造方法
@@ -41,8 +40,26 @@ namespace Insight.Base.Services
                 Background = Util.GetImage(bg.Path);
                 Mask = Util.GetImage(mp.Path);
             }
-
         }
 
+        /// <summary>
+        /// 初始化拼图
+        /// </summary>
+        private byte[] GetPuzzle()
+        {
+            var width = Background.Width;
+            var height = Background.Height;
+
+            var bitmap = new Bitmap(width, height, PixelFormat.Format24bppRgb);
+            bitmap.SetResolution(Background.HorizontalResolution, Background.VerticalResolution);
+            bitmap.MakeTransparent();
+
+            var grPhoto = Graphics.FromImage(bitmap);
+            grPhoto.SmoothingMode = SmoothingMode.AntiAlias;
+            grPhoto.DrawImage(Background, new Rectangle(0, 0, width, height), 0, 0, width, height, GraphicsUnit.Pixel);
+            grPhoto.DrawImage(Mask, new Rectangle(0, 0, width, height), 0, 0, width, height, GraphicsUnit.Pixel);
+
+            return Util.ImageToByteArray(bitmap);
+        }
     }
 }
