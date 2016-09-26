@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using Insight.Utils.Common;
 using Insight.Utils.Entity;
 
@@ -55,6 +55,31 @@ namespace Insight.Base.Common.Entity
         private DateTime LastConnect;
 
         /// <summary>
+        /// 构造方法，根据用户账号和索引构建对象
+        /// </summary>
+        /// <param name="account">用户账号</param>
+        /// <param name="index">当前索引</param>
+        public Session(string account, int index)
+        {
+            using (var context = new BaseEntities())
+            {
+                var user = context.SYS_User.SingleOrDefault(s => s.LoginName == account);
+                if (user == null) return;
+
+                ID = index;
+                UserType = user.Type;
+                Account = user.LoginName;
+                Mobile = user.Mobile;
+                UserId = user.ID;
+                UserName = user.Name;
+                Validity = user.Validity;
+                Stamp = Guid.NewGuid().ToString("N");
+
+                Sign(user.Password);
+            }
+        }
+
+        /// <summary>
         /// 检验是否已经连续错误5次
         /// </summary>
         /// <param name="stamp">用户特征码</param>
@@ -72,12 +97,25 @@ namespace Insight.Base.Common.Entity
         /// <summary>
         /// 验证Token合法性
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="key">密钥</param>
+        /// <param name="type">类型：1、验证Secret；2、验证RefreshKey；3、验证Signature</param>
         /// <returns>bool 是否通过验证</returns>
-        public bool Verify(string key)
+        public bool Verify(string key, int type)
         {
-            var keys = new List<string> {Secret, RefreshKey, Signature};
-            if (keys.Contains(key)) return true;
+            var str = "";
+            switch (type)
+            {
+                case 1:
+                    str = Secret;
+                    break;
+                case 2:
+                    str = RefreshKey;
+                    break;
+                case 3:
+                    str = Signature;
+                    break;
+            }
+            if (str == key) return true;
 
             FailureCount++;
             return false;
@@ -119,7 +157,8 @@ namespace Insight.Base.Common.Entity
         /// </summary>
         public void SignOut()
         {
-            Secret = Guid.NewGuid().ToString();
+            ExpireTime = DateTime.Now;
+            FailureTime = DateTime.Now;
             OnlineStatus = false;
         }
 
@@ -133,28 +172,19 @@ namespace Insight.Base.Common.Entity
         }
 
         /// <summary>
-        /// 生成特征码
-        /// </summary>
-        /// <param name="stamp">用户特征码（可为空）</param>
-        public void MakeStamp(string stamp = null)
-        {
-            Stamp = stamp ?? Guid.NewGuid().ToString("N");
-        }
-
-        /// <summary>
         /// 生成Token
         /// </summary>
         /// <returns>string 序列化为Json的Token数据</returns>
-        public object CreatorKey()
+        public string CreatorKey()
         {
             var obj = new
             {
                 AccessToken = Util.Base64(new {ID, Account, UserName, Stamp, Secret}),
-                RefreshToken = Util.Base64(new {ID, Account, UserName, Stamp, Secret = RefreshKey}),
+                RefreshToken = Util.Base64(new {ID, Account, Stamp, Secret = RefreshKey}),
                 ExpireTime,
                 FailureTime
             };
-            return obj;
+            return Util.Serialize(obj);
         }
 
         /// <summary>

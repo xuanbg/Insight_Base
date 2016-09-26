@@ -70,21 +70,9 @@ namespace Insight.Base.Common
         /// <returns>Session</returns>
         private static Session Add(string account)
         {
-            var user = DataAccess.GetUser(account);
-            if (user == null) return null;
+            var session = new Session(account, Sessions.Count);
+            if (session.Stamp == null) return null;
 
-            var session = new Session
-            {
-                ID = Sessions.Count,
-                UserType = user.Type,
-                Account = user.LoginName,
-                Mobile = user.Mobile,
-                UserId = user.ID,
-                UserName = user.Name,
-                Validity = user.Validity,
-            };
-            session.Sign(user.Password);
-            session.MakeStamp();
             Sessions.Add(session);
             return session;
         }

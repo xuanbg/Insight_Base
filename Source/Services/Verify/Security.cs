@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Threading;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
-using Insight.Utils.Common;
 using Insight.Utils.Entity;
 using static Insight.Base.Common.Parameters;
 
@@ -161,47 +159,22 @@ namespace Insight.Base.Services
             return result;
         }
 
+        /// <summary>
+        /// 生成图形验证码
+        /// </summary>
+        /// <param name="id">验证图形ID</param>
+        /// <returns>JsonResult</returns>
         public JsonResult GetPicCode(string id)
         {
-            var verify = new Compare();
-            var result = verify.Result;
-            if (!result.Successful) return result;
-
-            Guid vid;
-            if (!Guid.TryParse(id, out vid)) 
-            {
-                result.InvalidGuid();
-                return result;
-            }
-
-            var key = "";
-            var pic = GenerateMark(image, index);
-            var puzzle = new Puzzle
-            {
-                Name = picnum.ToString(),
-                Fragments = new SortedDictionary<string, string>()
-            };
-            using (var ms = new MemoryStream())
-            {
-                pic.Save(ms, ImageFormat.Jpeg);
-                puzzle.Cover = new byte[ms.Length];
-                ms.Read(puzzle.Cover, 0, (int)ms.Length);
-            }
-            for (var i = 0; i < 9; i++)
-            {
-                var img = $"{picnum}_0{i + 1}.jpg";
-                var fid = Guid.NewGuid().ToString().ToUpper();
-                puzzle.Fragments.Add(fid, img);
-                if (i == index) key = fid;
-            }
-
-            var record = new VerifyRecorrd { ID = vid, Key = key };
-            VerifyImages.Add(record);
-            var ts = new ThreadStart(() => new Logger("700502", $"图形验证记录ID：{id}；Key：{key}；Image：{picnum}.jpg；Fragment：{index}", "其他服务", "生成图形验证码"));
-            new Thread(ts).Start();
-            return result.Success(puzzle);
+            throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// 验证图形验证码是否正确
+        /// </summary>
+        /// <param name="id">验证图形ID</param>
+        /// <param name="code">验证码</param>
+        /// <returns>JsonResult</returns>
         public JsonResult VerifyPicCode(string id, string code)
         {
             throw new NotImplementedException();
@@ -232,5 +205,11 @@ namespace Insight.Base.Services
 
         #endregion
 
+    }
+
+    public class Puzzle
+    {
+        public object Name { get; set; }
+        public SortedDictionary<string, string> Fragments { get; set; }
     }
 }

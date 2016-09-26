@@ -93,7 +93,7 @@ namespace Insight.Base.Common
             if (!FindBasis()) return;
 
             // 验证用户签名
-            if (!Basis.Verify(signature))
+            if (!Basis.Verify(signature, 3))
             {
                 Result.InvalidAuth();
                 return;
@@ -129,7 +129,7 @@ namespace Insight.Base.Common
             }
 
             // 验证用户签名
-            if (!Basis.Verify(Token.Secret))
+            if (!Basis.Verify(Token.Secret, 2))
             {
                 Result.InvalidAuth();
                 return;
@@ -168,7 +168,6 @@ namespace Insight.Base.Common
                 var msg = $"提取验证信息失败。\r\nException:{ex}";
                 var ts = new ThreadStart(() => new Logger("500101", msg).Write());
                 new Thread(ts).Start();
-                //throw new Exception("提取验证信息失败");
                 return false;
             }
         }
@@ -216,7 +215,7 @@ namespace Insight.Base.Common
             }
 
             // 验证Secret
-            if (!Basis.Verify(Token.Secret))
+            if (!Basis.Verify(Token.Secret, 1))
             {
                 Result.InvalidAuth();
                 return;
