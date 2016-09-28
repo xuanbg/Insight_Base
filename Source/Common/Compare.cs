@@ -115,7 +115,7 @@ namespace Insight.Base.Common
 
             // 未超时
             var now = DateTime.Now;
-            if (now < Basis.ExpireTime)
+            if (now < Basis.ExpiryTime)
             {
                 Result.WithoutRefresh();
                 return;
@@ -208,7 +208,7 @@ namespace Insight.Base.Common
                 return;
             }
 
-            if (now > Basis.ExpireTime)
+            if (now > Basis.ExpiryTime)
             {
                 Result.Expired();
                 return;

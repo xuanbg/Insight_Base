@@ -34,7 +34,7 @@ namespace Insight.Base.Common.Entity
         public Guid? DeptId;
 
         // Secret过期时间
-        public DateTime ExpireTime;
+        public DateTime ExpiryTime;
 
         // Secret失效时间
         public DateTime FailureTime;
@@ -129,7 +129,7 @@ namespace Insight.Base.Common.Entity
             var now = DateTime.Now;
             Secret = Util.Hash(Guid.NewGuid() + Signature + now);
             RefreshKey = Util.Hash(Guid.NewGuid() + Secret);
-            ExpireTime = now.AddHours(2);
+            ExpiryTime = now.AddHours(2);
             FailureTime = now.AddHours(Parameters.Expired);
         }
 
@@ -138,7 +138,7 @@ namespace Insight.Base.Common.Entity
         /// </summary>
         public void Refresh()
         {
-            ExpireTime = ExpireTime.AddHours(2);
+            ExpiryTime = ExpiryTime.AddHours(2);
         }
 
         /// <summary>
@@ -157,7 +157,7 @@ namespace Insight.Base.Common.Entity
         /// </summary>
         public void SignOut()
         {
-            ExpireTime = DateTime.Now;
+            ExpiryTime = DateTime.Now;
             FailureTime = DateTime.Now;
             OnlineStatus = false;
         }
@@ -181,7 +181,7 @@ namespace Insight.Base.Common.Entity
             {
                 AccessToken = Util.Base64(new {ID, Account, UserName, Stamp, Secret}),
                 RefreshToken = Util.Base64(new {ID, Account, Stamp, Secret = RefreshKey}),
-                ExpireTime,
+                ExpiryTime,
                 FailureTime
             };
             return Util.Serialize(obj);
