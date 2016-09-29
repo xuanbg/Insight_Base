@@ -75,7 +75,7 @@ namespace Insight.Base.Common
         /// <param name="did">登录部门ID（可为空）</param>
         public Compare(AccessToken token, string signature, string did)
         {
-            var time = Util.LimitCall(60);
+            var time = Util.LimitCall(3);
             if (time > 0)
             {
                 Result.TooFrequent(time);
@@ -100,6 +100,8 @@ namespace Insight.Base.Common
             }
 
             if (DateTime.Now > Basis.FailureTime) Basis.InitSecret();
+
+            if (DateTime.Now > Basis.ExpiryTime) Basis.Refresh();
 
             Basis.Online(parse.Result);
             Result.Success(Basis.CreatorKey());
