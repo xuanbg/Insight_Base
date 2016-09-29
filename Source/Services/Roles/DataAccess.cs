@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
+using Insight.Utils.Common;
 
 namespace Insight.Base.Services
 {
@@ -18,6 +19,7 @@ namespace Insight.Base.Services
         /// <returns>角色ID</returns>
         private object InsertData(Guid uid, RoleInfo role)
         {
+            var helper = new SqlHelper(Parameters.Database);
             var asql = "insert SYS_Role_Action(RoleId, ActionId, Action, CreatorUserId) ";
             asql += "select @RoleId, @ActionId, @Action, @CreatorUserId";
             var actions = from a in role.Actions
@@ -30,7 +32,7 @@ namespace Insight.Base.Services
                     new SqlParameter("@Read", SqlDbType.Int) {Value = 0}
                 }
                 into p
-                select SqlHelper.MakeCommand(asql, p);
+                select helper.MakeCommand(asql, p);
 
             var dsql = "insert SYS_Role_Data(RoleId, ModuleId, Mode, ModeId, Permission, CreatorUserId) ";
             dsql += "select @RoleId, @ModuleId, @Mode, @ModeId, @Permission, @CreatorUserId";
@@ -46,7 +48,7 @@ namespace Insight.Base.Services
                     new SqlParameter("@Read", SqlDbType.Int) {Value = 0}
                 }
                 into p
-                select SqlHelper.MakeCommand(dsql, p);
+                select helper.MakeCommand(dsql, p);
 
             var sql = "insert SYS_Role (Name, Description, CreatorUserId) ";
             sql += "select @Name, @Description, @CreatorUserId;";
@@ -58,10 +60,10 @@ namespace Insight.Base.Services
                 new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = uid},
                 new SqlParameter("@Write", SqlDbType.Int) {Value = 0}
             };
-            var cmds = new List<SqlCommand> {SqlHelper.MakeCommand(sql, parm)};
+            var cmds = new List<SqlCommand> { helper.MakeCommand(sql, parm)};
             cmds.AddRange(actions);
             cmds.AddRange(datas);
-            return SqlHelper.SqlExecute(cmds, 0);
+            return helper.SqlExecute(cmds, 0);
         }
 
         /// <summary>
@@ -226,8 +228,9 @@ namespace Insight.Base.Services
         /// <returns>bool 是否删除成功</returns>
         private bool DeleteRoleMember(Guid id, string type)
         {
+            var helper = new SqlHelper(Parameters.Database);
             var sql = $"Delete from {(type == "3" ? "SYS_Role_Title" : (type == "2" ? "SYS_Role_UserGroup" : "SYS_Role_User"))} where ID = '{id}'";
-            return SqlHelper.SqlNonQuery(SqlHelper.MakeCommand(sql)) > 0;
+            return helper.SqlNonQuery(sql) > 0;
         }
 
         /// <summary>

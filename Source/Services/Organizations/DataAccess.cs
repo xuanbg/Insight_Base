@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
+using Insight.Utils.Common;
 
 namespace Insight.Base.Services
 {
@@ -19,6 +20,7 @@ namespace Insight.Base.Services
         /// <returns>bool 是否成功</returns>
         private object InsertData(SYS_Organization obj, int index)
         {
+            var helper = new SqlHelper(Parameters.Database);
             var cmds = new List<SqlCommand>();
             var sql = "insert SYS_Organization (ParentId, NodeType, [Index], Code, Name, Alias, FullName, PositionId, CreatorUserId)";
             sql += "select @ParentId, @NodeType, @Index, @Code, @Name, @Alias, @FullName, @PositionId, @CreatorUserId;";
@@ -36,9 +38,9 @@ namespace Insight.Base.Services
                 new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = obj.CreatorUserId},
                 new SqlParameter("@Write", SqlDbType.Int) {Value = 0}
             };
-            cmds.Add(SqlHelper.MakeCommand(DataAccess.ChangeIndex("SYS_Organization", index, obj.Index, obj.ParentId, false)));
-            cmds.Add(SqlHelper.MakeCommand(sql, parm));
-            return SqlHelper.SqlExecute(cmds, 0);
+            cmds.Add(helper.MakeCommand(DataAccess.ChangeIndex("SYS_Organization", index, obj.Index, obj.ParentId, false)));
+            cmds.Add(helper.MakeCommand(sql, parm));
+            return helper.SqlExecute(cmds, 0);
         }
 
         /// <summary>
@@ -48,11 +50,12 @@ namespace Insight.Base.Services
         /// <returns>bool 是否删除成功</returns>
         private bool DeleteOrg(Guid id)
         {
+            var helper = new SqlHelper(Parameters.Database);
             var cmds = new List<SqlCommand>();
             var obj = GetOrg(id);
-            cmds.Add(SqlHelper.MakeCommand($"Delete from SYS_Organization where ID = '{id}'"));
-            cmds.Add(SqlHelper.MakeCommand(DataAccess.ChangeIndex("SYS_Organization", obj.Index, 99999, obj.ParentId, false)));
-            return SqlHelper.SqlExecute(cmds);
+            cmds.Add(helper.MakeCommand($"Delete from SYS_Organization where ID = '{id}'"));
+            cmds.Add(helper.MakeCommand(DataAccess.ChangeIndex("SYS_Organization", obj.Index, 99999, obj.ParentId, false)));
+            return helper.SqlExecute(cmds);
         }
 
         /// <summary>
@@ -63,6 +66,7 @@ namespace Insight.Base.Services
         /// <returns>int 更新成功的记录数量</returns>
         private bool Update(SYS_Organization obj, int index)
         {
+            var helper = new SqlHelper(Parameters.Database);
             var cmds = new List<SqlCommand>();
             const string sql = "update SYS_Organization set ParentId = @ParentId, [Index] = @Index, Code = @Code, Name = @Name, Alias = @Alias, FullName = @FullName, PositionId = @PositionId where ID = @ID";
             var parm = new[]
@@ -77,9 +81,9 @@ namespace Insight.Base.Services
                 new SqlParameter("@PositionId", SqlDbType.UniqueIdentifier) {Value = obj.PositionId}
             };
 
-            cmds.Add(SqlHelper.MakeCommand(DataAccess.ChangeIndex("SYS_Organization", index, obj.Index, obj.ParentId, false)));
-            cmds.Add(SqlHelper.MakeCommand(sql, parm));
-            return SqlHelper.SqlExecute(cmds);
+            cmds.Add(helper.MakeCommand(DataAccess.ChangeIndex("SYS_Organization", index, obj.Index, obj.ParentId, false)));
+            cmds.Add(helper.MakeCommand(sql, parm));
+            return helper.SqlExecute(cmds);
         }
 
         /// <summary>
@@ -147,20 +151,21 @@ namespace Insight.Base.Services
         /// <returns>bool 是否成功</returns>
         private bool Update(Guid id, SYS_Organization obj)
         {
-            var cmd = SqlHelper.MakeCommand(DataAccess.ChangeIndex("SYS_Organization", obj.Index, 999, obj.ParentId, false));
+            var helper = new SqlHelper(Parameters.Database);
+            var cmd = helper.MakeCommand(DataAccess.ChangeIndex("SYS_Organization", obj.Index, 999, obj.ParentId, false));
             var cmds = new List<SqlCommand> {cmd};
             if (obj.NodeType < 3)
             {
                 var org = GetOrg(id);
-                cmds.Add(SqlHelper.MakeCommand($"update SYS_Organization set ParentId = '{org.ParentId}' where ParentId = '{obj.ParentId}'"));
+                cmds.Add(helper.MakeCommand($"update SYS_Organization set ParentId = '{org.ParentId}' where ParentId = '{obj.ParentId}'"));
             }
             else
             {
-                cmds.Add(SqlHelper.MakeCommand($"update SYS_OrgMember set OrgId = '{id}' where OrgId = '{obj.ID}'"));
+                cmds.Add(helper.MakeCommand($"update SYS_OrgMember set OrgId = '{id}' where OrgId = '{obj.ID}'"));
             }
 
-            cmds.Add(SqlHelper.MakeCommand($"delete SYS_Organization where id = '{obj.ID}'"));
-            return SqlHelper.SqlExecute(cmds);
+            cmds.Add(helper.MakeCommand($"delete SYS_Organization where id = '{obj.ID}'"));
+            return helper.SqlExecute(cmds);
         }
 
         /// <summary>
@@ -170,6 +175,7 @@ namespace Insight.Base.Services
         /// <returns>int 更新成功的记录数量</returns>
         private bool Update(SYS_Organization obj)
         {
+            var helper = new SqlHelper(Parameters.Database);
             const string sql = "update SYS_Organization set ParentId = @ParentId, [Index] = @Index where ID = @ID";
             var parm = new[]
             {
@@ -181,11 +187,11 @@ namespace Insight.Base.Services
             var org = GetOrg(obj.ID);
             var cmds = new List<SqlCommand>
             {
-                SqlHelper.MakeCommand(DataAccess.ChangeIndex("SYS_Organization", org.Index, 999, org.ParentId, false)),
-                SqlHelper.MakeCommand(sql, parm)
+                helper.MakeCommand(DataAccess.ChangeIndex("SYS_Organization", org.Index, 999, org.ParentId, false)),
+                helper.MakeCommand(sql, parm)
             };
 
-            return SqlHelper.SqlExecute(cmds);
+            return helper.SqlExecute(cmds);
         }
 
         /// <summary>
@@ -197,14 +203,15 @@ namespace Insight.Base.Services
         /// <returns>bool 是否成功</returns>
         private bool InsertData(Guid uid, Guid tid, IEnumerable<Guid> uids)
         {
+            var helper = new SqlHelper(Parameters.Database);
             const string sql = "insert into SYS_OrgMember ([OrgId], [UserId], [CreatorUserId]) select @OrgId, @UserId, @CreatorUserId";
             var cmds = uids.Select(id => new[]
             {
                 new SqlParameter("@OrgId", SqlDbType.UniqueIdentifier) {Value = tid},
                 new SqlParameter("@UserId", SqlDbType.UniqueIdentifier) {Value = id},
                 new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = uid}
-            }).Select(parm => SqlHelper.MakeCommand(sql, parm)).ToList();
-            return SqlHelper.SqlExecute(cmds);
+            }).Select(parm => helper.MakeCommand(sql, parm)).ToList();
+            return helper.SqlExecute(cmds);
         }
 
         /// <summary>
@@ -214,12 +221,13 @@ namespace Insight.Base.Services
         /// <returns>bool 是否删除成功</returns>
         private bool DeleteOrgMember(IEnumerable<Guid> ids)
         {
+            var helper = new SqlHelper(Parameters.Database);
             const string sql = "Delete from SYS_OrgMember where ID = @ID";
             var cmds = ids.Select(id => new[]
             {
                 new SqlParameter("@ID", SqlDbType.UniqueIdentifier) {Value = id}
-            }).Select(parm => SqlHelper.MakeCommand(sql, parm)).ToList();
-            return SqlHelper.SqlExecute(cmds);
+            }).Select(parm => helper.MakeCommand(sql, parm)).ToList();
+            return helper.SqlExecute(cmds);
         }
 
         /// <summary>

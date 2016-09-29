@@ -2,6 +2,7 @@
 using System.Data;
 using System.Data.SqlClient;
 using Insight.Base.Common;
+using Insight.Utils.Common;
 
 namespace Insight.Base.Services
 {
@@ -30,7 +31,8 @@ namespace Insight.Base.Services
                 new SqlParameter("@ModuleId", SqlDbType.UniqueIdentifier) {Value = mid},
                 new SqlParameter("@Char", mark)
             };
-            return SqlHelper.SqlScalar(SqlHelper.MakeCommand(sql, parm));
+            var helper = new SqlHelper(Parameters.Database);
+            return helper.SqlScalar(sql, parm);
         }
 
     }

@@ -36,5 +36,15 @@ namespace Insight.Base.Common
         /// Session失效时间（小时）
         /// </summary>
         public static int Expired;
+
+        /// <summary>
+        /// 日志接口URL
+        /// </summary>
+        public static string LogUrl;
+
+        /// <summary>
+        /// 数据库连结字符串
+        /// </summary>
+        public static string Database = new BaseEntities().Database.Connection.ConnectionString;
     }
 }

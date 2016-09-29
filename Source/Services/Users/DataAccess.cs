@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
+using Insight.Utils.Common;
 
 namespace Insight.Base.Services
 {
@@ -18,6 +19,7 @@ namespace Insight.Base.Services
         /// <returns>SqlCommand</returns>
         private object InsertData(SYS_User obj)
         {
+            var helper = new SqlHelper(Parameters.Database);
             var sql = "insert SYS_User (ID, Name, LoginName, Password, PayPassword, OpenId, Description, Type, CreatorUserId) ";
             sql += "select @ID, @Name, @LoginName, @Password, @PayPassword, @OpenId, @Description, @Type, @CreatorUserId;";
             var parm = new[]
@@ -32,7 +34,7 @@ namespace Insight.Base.Services
                 new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = obj.CreatorUserId},
                 new SqlParameter("@Read", SqlDbType.Int) {Value = 0}
             };
-            return SqlHelper.SqlScalar(SqlHelper.MakeCommand(sql, parm));
+            return helper.SqlScalar(sql, parm);
         }
 
         /// <summary>
@@ -42,8 +44,9 @@ namespace Insight.Base.Services
         /// <returns>bool 是否删除成功</returns>
         private bool DeleteUser(Guid id)
         {
+            var helper = new SqlHelper(Parameters.Database);
             var sql = $"Delete from SYS_User where ID = '{id}' and BuiltIn = 0";
-            return SqlHelper.SqlNonQuery(SqlHelper.MakeCommand(sql)) > 0;
+            return helper.SqlNonQuery(sql) > 0;
         }
 
         /// <summary>
@@ -146,6 +149,7 @@ namespace Insight.Base.Services
         /// <returns>object 插入的用户组ID </returns>
         private object InsertData(Guid id, SYS_UserGroup obj)
         {
+            var helper = new SqlHelper(Parameters.Database);
             const string sql = "insert into SYS_UserGroup (Name, Description, CreatorUserId) select @Name, @Description, @CreatorUserId select ID From SYS_UserGroup where SN = SCOPE_IDENTITY()";
             var parm = new[]
             {
@@ -153,7 +157,7 @@ namespace Insight.Base.Services
                 new SqlParameter("@Description", obj.Description),
                 new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = id}
             };
-            return SqlHelper.SqlScalar(SqlHelper.MakeCommand(sql, parm));
+            return helper.SqlScalar(sql, parm);
         }
 
         /// <summary>
@@ -163,8 +167,9 @@ namespace Insight.Base.Services
         /// <returns>bool 是否删除成功</returns>
         private bool DeleteGroup(Guid id)
         {
+            var helper = new SqlHelper(Parameters.Database);
             var sql = $"Delete from SYS_UserGroup where ID = '{id}' and BuiltIn = 0";
-            return SqlHelper.SqlNonQuery(SqlHelper.MakeCommand(sql)) > 0;
+            return helper.SqlNonQuery(sql) > 0;
         }
 
         /// <summary>
@@ -174,6 +179,7 @@ namespace Insight.Base.Services
         /// <returns>bool 是否更新成功</returns>
         private bool Update(SYS_UserGroup obj)
         {
+            var helper = new SqlHelper(Parameters.Database);
             const string sql = "update SYS_UserGroup set Name = @Name, Description = @Description where ID = @ID";
             var parm = new[]
             {
@@ -181,7 +187,7 @@ namespace Insight.Base.Services
                 new SqlParameter("@Name", obj.Name),
                 new SqlParameter("@Description", obj.Description)
             };
-            return SqlHelper.SqlNonQuery(SqlHelper.MakeCommand(sql, parm)) > 0;
+            return helper.SqlNonQuery(sql, parm) > 0;
         }
 
         /// <summary>
@@ -219,14 +225,15 @@ namespace Insight.Base.Services
         /// <returns>bool 是否插入成功</returns>
         private bool AddGroupMember(Guid id, Guid gid, IEnumerable<Guid> uids)
         {
+            var helper = new SqlHelper(Parameters.Database);
             const string sql = "insert into SYS_UserGroupMember (GroupId, UserId, CreatorUserId) select @GroupId, @UserId, @CreatorUserId";
             var cmds = uids.Select(uid => new[]
             {
                 new SqlParameter("@GroupId", SqlDbType.UniqueIdentifier) {Value = gid},
                 new SqlParameter("@UserId", SqlDbType.UniqueIdentifier) {Value = uid},
                 new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = id}
-            }).Select(parm => SqlHelper.MakeCommand(sql, parm)).ToList();
-            return SqlHelper.SqlExecute(cmds);
+            }).Select(parm => helper.MakeCommand(sql, parm)).ToList();
+            return helper.SqlExecute(cmds);
         }
 
         /// <summary>
@@ -236,12 +243,13 @@ namespace Insight.Base.Services
         /// <returns>bool 是否删除成功</returns>
         private bool DeleteMember(IEnumerable<Guid> ids)
         {
+            var helper = new SqlHelper(Parameters.Database);
             const string sql = "Delete from SYS_UserGroupMember where ID = @ID";
             var cmds = ids.Select(id => new[]
             {
                 new SqlParameter("@ID", SqlDbType.UniqueIdentifier) {Value = id}
-            }).Select(parm => SqlHelper.MakeCommand(sql, parm)).ToList();
-            return SqlHelper.SqlExecute(cmds);
+            }).Select(parm => helper.MakeCommand(sql, parm)).ToList();
+            return helper.SqlExecute(cmds);
         }
 
         /// <summary>

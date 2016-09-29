@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
+using Insight.Utils.Common;
 using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
@@ -95,6 +96,7 @@ namespace Insight.Base.Services
         /// <returns>bool 是否保存成功</returns>
         public bool SaveModuleParam(AccessToken us, List<SYS_ModuleParam> apl, List<SYS_ModuleParam> upl)
         {
+            var helper = new SqlHelper(Parameters.Database);
             const string sql = "insert SYS_ModuleParam (ModuleId, ParamId, Name, Value, OrgId, UserId, Description) select @ModuleId, @ParamId, @Name, @Value, @OrgId, @UserId, @Description";
             var cmds = apl.Select(p => new[]
             {
@@ -105,9 +107,9 @@ namespace Insight.Base.Services
                 new SqlParameter("@OrgId", SqlDbType.UniqueIdentifier) {Value = p.OrgId},
                 new SqlParameter("@UserId", SqlDbType.UniqueIdentifier) {Value = p.UserId},
                 new SqlParameter("@Description", p.Description)
-            }).Select(parm => SqlHelper.MakeCommand(sql, parm)).ToList();
-            cmds.AddRange(upl.Select(p => $"update SYS_ModuleParam set Value = '{p.Value}' where ID = '{p.ID}'").Select(s => SqlHelper.MakeCommand(s)));
-            return SqlHelper.SqlExecute(cmds);
+            }).Select(parm => helper.MakeCommand(sql, parm)).ToList();
+            cmds.AddRange(upl.Select(p => $"update SYS_ModuleParam set Value = '{p.Value}' where ID = '{p.ID}'").Select(s => helper.MakeCommand(s)));
+            return helper.SqlExecute(cmds);
         }
 
         #endregion
