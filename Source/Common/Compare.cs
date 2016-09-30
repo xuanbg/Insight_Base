@@ -204,13 +204,13 @@ namespace Insight.Base.Common
         private void Verify(string action = null)
         {
             var now = DateTime.Now;
-            if (now > Basis.FailureTime)
+            if (now > Basis.FailureTime.AddMinutes(10))
             {
                 Result.Failured();
                 return;
             }
 
-            if (now > Basis.ExpiryTime)
+            if (now > Basis.ExpiryTime.AddMinutes(10))
             {
                 Result.Expired();
                 return;
