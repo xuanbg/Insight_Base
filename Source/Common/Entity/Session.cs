@@ -138,7 +138,7 @@ namespace Insight.Base.Common.Entity
         /// </summary>
         public void Refresh()
         {
-            ExpiryTime = ExpiryTime.AddHours(2);
+            ExpiryTime = DateTime.Now.AddHours(2);
         }
 
         /// <summary>
