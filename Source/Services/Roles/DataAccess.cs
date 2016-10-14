@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
@@ -16,54 +14,50 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="uid">用户ID</param>
         /// <param name="role">RoleInfo</param>
-        /// <returns>角色ID</returns>
-        private object InsertData(Guid uid, RoleInfo role)
+        /// <returns>bool 是否插入成功</returns>
+        private bool InsertData(Guid uid, RoleInfo role)
         {
-            var helper = new SqlHelper(Parameters.Database);
-            var asql = "insert SYS_Role_Action(RoleId, ActionId, Action, CreatorUserId) ";
-            asql += "select @RoleId, @ActionId, @Action, @CreatorUserId";
-            var actions = from a in role.Actions
-                select new[]
-                {
-                    new SqlParameter("@RoleId", SqlDbType.UniqueIdentifier) {Value = role.ID},
-                    new SqlParameter("@ActionId", SqlDbType.UniqueIdentifier) {Value = a.ID},
-                    new SqlParameter("@Action", a.Permit),
-                    new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = uid},
-                    new SqlParameter("@Read", SqlDbType.Int) {Value = 0}
-                }
-                into p
-                select helper.MakeCommand(asql, p);
-
-            var dsql = "insert SYS_Role_Data(RoleId, ModuleId, Mode, ModeId, Permission, CreatorUserId) ";
-            dsql += "select @RoleId, @ModuleId, @Mode, @ModeId, @Permission, @CreatorUserId";
-            var datas = from d in role.Datas
-                select new[]
-                {
-                    new SqlParameter("@RoleId", SqlDbType.UniqueIdentifier) {Value = role.ID},
-                    new SqlParameter("@ModuleId", SqlDbType.UniqueIdentifier) {Value = d.ParentId},
-                    new SqlParameter("@Mode", d.Mode),
-                    new SqlParameter("@ModeId", SqlDbType.UniqueIdentifier) {Value = d.ModeId},
-                    new SqlParameter("@Permission", d.Permit),
-                    new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = uid},
-                    new SqlParameter("@Read", SqlDbType.Int) {Value = 0}
-                }
-                into p
-                select helper.MakeCommand(dsql, p);
-
-            var sql = "insert SYS_Role (Name, Description, CreatorUserId) ";
-            sql += "select @Name, @Description, @CreatorUserId;";
-            sql += "select ID from SYS_Role where SN = scope_identity()";
-            var parm = new[]
+            var now = DateTime.Now;
+            var r = new SYS_Role
             {
-                new SqlParameter("@Name", role.Name),
-                new SqlParameter("@Description", role.Description),
-                new SqlParameter("@CreatorUserId", SqlDbType.UniqueIdentifier) {Value = uid},
-                new SqlParameter("@Write", SqlDbType.Int) {Value = 0}
+                ID = role.ID,
+                Name = role.Name,
+                Description = role.Description,
+                BuiltIn = false,
+                Validity = true,
+                CreatorUserId = uid,
+                CreateTime = now
             };
-            var cmds = new List<SqlCommand> { helper.MakeCommand(sql, parm)};
-            cmds.AddRange(actions);
-            cmds.AddRange(datas);
-            return helper.SqlExecute(cmds, 0);
+            var alist = from a in role.Actions
+                        where a.NodeType > 1 && a.Permit != a.Action && (a.Permit.HasValue || a.Action.HasValue)
+                        select new SYS_Role_Action
+                        {
+                            ID = a.ID,
+                            RoleId = r.ID,
+                            ActionId = a.ActionId,
+                            Action = (int)a.Permit,
+                            CreatorUserId = uid,
+                            CreateTime = now
+                        };
+            var dlist = from d in role.Datas
+                        where d.NodeType > 1 && d.Permit != d.Permission && (d.Permit.HasValue || d.Permission.HasValue)
+                        select new SYS_Role_Data
+                        {
+                            ID = d.ID,
+                            RoleId = r.ID,
+                            ModuleId = (Guid)d.ParentId,
+                            Mode = (int)d.NodeType - 2,
+                            ModeId = d.ModeId,
+                            CreatorUserId = uid,
+                            CreateTime = now
+                        };
+            using (var context = new BaseEntities())
+            {
+                context.SYS_Role.Add(r);
+                context.SYS_Role_Action.AddRange(alist);
+                context.SYS_Role_Data.AddRange(dlist);
+                return context.SaveChanges() > 0;
+            }
         }
 
         /// <summary>
@@ -100,7 +94,8 @@ namespace Insight.Base.Services
                 sr.Description = role.Description;
 
                 // 更新操作权限
-                foreach (var action in role.Actions)
+                var actions = role.Actions.Where(a => a.NodeType > 1 && a.Permit != a.Action && (a.Permit.HasValue || a.Action.HasValue));
+                foreach (var action in actions)
                 {
                     var pa = context.SYS_Role_Action.SingleOrDefault(p => p.RoleId == role.ID && p.ActionId == action.ID);
                     if (pa == null && action.Permit.HasValue && !action.Action.HasValue)
@@ -131,12 +126,12 @@ namespace Insight.Base.Services
                 }
 
                 // 更新数据权限
-                foreach (var data in role.Datas)
+                var datas = role.Datas.Where(d => d.NodeType > 1 && d.Permit != d.Permission && (d.Permit.HasValue || d.Permission.HasValue));
+                foreach (var data in datas)
                 {
                     var pd = context.SYS_Role_Data.SingleOrDefault(p => p.ID == data.ID);
                     if (pd == null && data.Permit.HasValue && !data.Permission.HasValue)
                     {
-                        // ReSharper disable once PossibleInvalidOperationException
                         var id = new SYS_Role_Data
                         {
                             ID = Guid.NewGuid(),
@@ -307,11 +302,11 @@ namespace Insight.Base.Services
                          select new ActionInfo { ID = m.ID, ParentId = m.ModuleGroupId, Permit = perm, Index = m.Index, NodeType = 1, Name = m.ApplicationName };
                 var al = from a in context.SYS_ModuleAction.Where(a => a.Validity)
                          join m in context.SYS_Module.Where(m => m.Validity) on a.ModuleId equals m.ID
-                         join r in context.SYS_Role_Action.Where(r => r.RoleId == rid.Value) on a.ID equals r.ActionId into temp
-                         from t in temp.DefaultIfEmpty()
-                         let id = t == null ? Guid.NewGuid() : t.ID
+                         let t = context.SYS_Role_Action.FirstOrDefault(r => r.RoleId == rid.Value && r.ActionId == a.ID)
                          let perm = t == null ? null : (int?) t.Action
-                         select new ActionInfo { ID = id, ParentId = a.ModuleId, ActionId = a.ID, Action = perm, Permit = perm, Index = a.Index, NodeType = 2, Name = a.Alias };
+                         let id = perm.HasValue ? t.ID : Guid.NewGuid()
+                         let desc = perm.HasValue ? (perm.Value == 0 ? "拒绝" : "允许") : null
+                         select new ActionInfo {ID = id, ParentId = a.ModuleId, ActionId = a.ID, Action = perm, Permit = perm, Index = a.Index, NodeType = 2, Name = a.Alias, Description = desc};
                 var list = new List<ActionInfo>();
                 list.AddRange(gl.Distinct());
                 list.AddRange(ml.Distinct());
@@ -333,27 +328,29 @@ namespace Insight.Base.Services
                           select r.ModuleId;
                 var gl = from g in context.SYS_ModuleGroup
                          join m in context.SYS_Module.Where(m => m.Validity && m.Name != null) on g.ID equals m.ModuleGroupId
-                         select new DataInfo { ID = g.ID, Index = g.Index, NodeType = 0, Name = g.Name };
+                         select new DataInfo {ID = g.ID, Index = g.Index, NodeType = 0, Name = g.Name};
                 var ml = from m in context.SYS_Module.Where(m => m.Validity && m.Name != null)
                          let perm = ids.Any(id => id == m.ID) ? (int?)1 : null
-                         select new DataInfo { ID = m.ID, ParentId = m.ModuleGroupId, Permit = perm, Index = m.Index, NodeType = 1, Name = m.Name + "数据" };
+                         select new DataInfo {ID = m.ID, ParentId = m.ModuleGroupId, Permit = perm, Index = m.Index, NodeType = 1, Name = m.Name + "数据"};
                 var list = new List<DataInfo>();
                 list.AddRange(gl.Distinct());
                 list.AddRange(ml.Distinct());
                 foreach (var m in ml)
                 {
                     var dl0 = from d in context.SYS_Data
-                              join r in context.SYS_Role_Data.Where(r => r.RoleId == rid.Value && r.ModuleId == m.ID && r.Mode == 0) on d.ID equals r.ModeId into temp
-                              from t in temp.DefaultIfEmpty()
-                              let id = t == null ? Guid.NewGuid() : t.ID
+                              let t = context.SYS_Role_Data.FirstOrDefault(r => r.Mode == 0 && r.RoleId == rid.Value && r.ModuleId == m.ID && r.ModeId == d.ID)
                               let perm = t == null ? null : (int?) t.Permission
-                              select new DataInfo { ID = id, ParentId = m.ID, Mode = 0, ModeId = d.ID, Permission = perm, Index = d.Type, NodeType = d.Type + 2, Name = d.Alias };
+                              let id = perm.HasValue ? t.ID : Guid.NewGuid()
+                              let desc = perm.HasValue ? (perm.Value == 0 ? "只读" : "读写") : null
+                              select new DataInfo {ID = id, ParentId = m.ID, Mode = 0, ModeId = d.ID, Permission = perm, Permit = perm, Index = d.Type, NodeType = d.Type + 2, Name = d.Alias, Description = desc};
                     var dl1 = from r in context.SYS_Role_Data.Where(r => r.RoleId == rid.Value && r.ModuleId == m.ID && r.Mode == 1)
                               join u in context.SYS_User on r.ModeId equals u.ID
-                              select new DataInfo { ID = r.ID, ParentId = m.ID, Mode = 1, ModeId = r.ModeId, Permission = r.Permission, Index = 6, NodeType = 3, Name = u.Name };
+                              let desc = r.Permission == 0 ? "只读" : "读写"
+                              select new DataInfo {ID = r.ID, ParentId = m.ID, Mode = 1, ModeId = r.ModeId, Permission = r.Permission, Permit = r.Permission, Index = 6, NodeType = 3, Name = u.Name, Description = desc};
                     var dl2 = from r in context.SYS_Role_Data.Where(r => r.RoleId == rid.Value && r.ModuleId == m.ID && r.Mode == 2)
                               join o in context.SYS_Organization on r.ModeId equals o.ID
-                              select new DataInfo { ID = r.ID, ParentId = m.ID, Mode = 2, ModeId = r.ModeId, Permission = r.Permission, Index = 7, NodeType = 4, Name = o.FullName };
+                              let desc = r.Permission == 0 ? "只读" : "读写"
+                              select new DataInfo {ID = r.ID, ParentId = m.ID, Mode = 2, ModeId = r.ModeId, Permission = r.Permission, Permit = r.Permission, Index = 7, NodeType = 4, Name = o.FullName, Description = desc};
                     list.AddRange(dl0);
                     list.AddRange(dl1);
                     list.AddRange(dl2);

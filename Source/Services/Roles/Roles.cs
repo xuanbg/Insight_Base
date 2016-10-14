@@ -23,9 +23,8 @@ namespace Insight.Base.Services
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            var id = InsertData(verify.Basis.UserId, role);
-            if (id == null) result.DataBaseError();
-            else result.Created(id);
+            if (InsertData(verify.Basis.UserId, role)) result.Created();
+            else result.DataBaseError();
 
             return result;
         }
