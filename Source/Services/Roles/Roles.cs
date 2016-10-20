@@ -89,16 +89,39 @@ namespace Insight.Base.Services
         /// <summary>
         /// 获取所有角色
         /// </summary>
+        /// <param name="rows">每页行数</param>
+        /// <param name="page">当前页</param>
         /// <returns>JsonResult</returns>
-        public JsonResult GetAllRole()
+        public JsonResult GetAllRole(string rows, string page)
         {
             const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
             var verify = new Compare(action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            var list = GetRoles();
-            if (list.Any()) result.Success(list);
+            int r;
+            if (!int.TryParse(rows, out r))
+            {
+                result.BadRequest();
+                return result;
+            }
+
+            int p;
+            if (!int.TryParse(page, out p))
+            {
+                result.BadRequest();
+                return result;
+            }
+
+            if (r < 20 || r > 100 || p < 1)
+            {
+                result.BadRequest();
+                return result;
+            }
+
+            var list = GetRoles(r, p);
+            var count = GetRoleCount();
+            if (list.Any()) result.Success(list, count);
             else result.NoContent();
 
             return result;

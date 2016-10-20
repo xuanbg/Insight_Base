@@ -163,14 +163,29 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 获取所有角色
+        /// 获取角色总数
         /// </summary>
-        /// <returns>角色信息结果集</returns>
-        private IEnumerable<object> GetRoles()
+        /// <returns>int 角色总数</returns>
+        private int GetRoleCount()
         {
             using (var context = new BaseEntities())
             {
-                var list = from r in context.SYS_Role.Where(r => r.Validity).OrderBy(r => r.SN)
+                return context.SYS_Role.Count(r => r.Validity);
+            }
+        }
+
+        /// <summary>
+        /// 获取所有角色
+        /// </summary>
+        /// <param name="rows">每页行数</param>
+        /// <param name="page">当前页</param>
+        /// <returns>角色信息结果集</returns>
+        private IEnumerable<object> GetRoles(int rows, int page)
+        {
+            using (var context = new BaseEntities())
+            {
+                var skip = rows*(page - 1);
+                var list = from r in context.SYS_Role.Where(r => r.Validity).OrderBy(r => r.SN).Skip(skip).Take(rows)
                            select new
                            {
                                r.ID, r.BuiltIn, r.Name, r.Description,

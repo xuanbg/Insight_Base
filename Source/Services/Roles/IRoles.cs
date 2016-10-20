@@ -39,10 +39,12 @@ namespace Insight.Base.Services
         /// <summary>
         /// 获取所有角色
         /// </summary>
+        /// <param name="rows">每页行数</param>
+        /// <param name="page">当前页</param>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "roles", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "roles?rows={rows}&page={page}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        JsonResult GetAllRole();
+        JsonResult GetAllRole(string rows, string page);
 
         /// <summary>
         /// 根据参数组集合插入角色成员关系
