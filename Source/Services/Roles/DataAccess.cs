@@ -35,7 +35,7 @@ namespace Insight.Base.Services
                             ID = a.ID,
                             RoleId = r.ID,
                             ActionId = a.ActionId,
-                            Action = (int)a.Permit,
+                            Action = a.Permit.Value,
                             CreatorUserId = uid,
                             CreateTime = now
                         };
@@ -97,14 +97,14 @@ namespace Insight.Base.Services
                 var actions = role.Actions.Where(a => a.NodeType > 1 && a.Permit != a.Action && (a.Permit.HasValue || a.Action.HasValue));
                 foreach (var action in actions)
                 {
-                    var pa = context.SYS_Role_Action.SingleOrDefault(p => p.RoleId == role.ID && p.ActionId == action.ID);
+                    var pa = context.SYS_Role_Action.SingleOrDefault(p => p.ID == action.ID);
                     if (pa == null && action.Permit.HasValue && !action.Action.HasValue)
                     {
                         var ia = new SYS_Role_Action
                         {
                             ID = Guid.NewGuid(),
                             RoleId = role.ID,
-                            ActionId = action.ID,
+                            ActionId = action.ActionId,
                             Action = action.Permit.Value,
                             CreatorUserId = uid,
                             CreateTime = DateTime.Now
