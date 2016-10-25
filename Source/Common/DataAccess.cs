@@ -103,7 +103,7 @@ namespace Insight.Base.Common
                 Directory.CreateDirectory(path);
             }
 
-            path += $"{DateTime.Today.ToString("yyyy-MM-dd")}.log";
+            path += $"{DateTime.Today:yyyy-MM-dd}.log";
             var time = log.CreateTime.ToString("O");
             var text = $"[{log.CreateTime.Kind} {time}] [{log.Code}] [{log.Source}] [{log.Action}] Message:{log.Message}\r\n";
             var buffer = Encoding.UTF8.GetBytes(text);
