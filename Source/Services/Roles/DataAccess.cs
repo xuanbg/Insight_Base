@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Insight.Base.Common;
 using Insight.Base.Common.Entity;
-using Insight.Utils.Common;
 
 namespace Insight.Base.Services
 {
@@ -188,7 +186,7 @@ namespace Insight.Base.Services
                 var list = from r in context.SYS_Role.Where(r => r.Validity).OrderBy(r => r.SN).Skip(skip).Take(rows)
                            select new
                            {
-                               r.ID, r.BuiltIn, r.Name, r.Description,
+                               r.ID, r.Name, r.Description, r.BuiltIn,
                                Members = context.RoleMember.Where(m => m.RoleId == r.ID).OrderBy(m => m.ParentId),
                                MemberUsers = context.RoleMemberUser.Where(u => u.RoleId == r.ID).OrderBy(m => m.Name),
                                Actions = context.RoleAction.Where(a => a.RoleId == r.ID).OrderBy(m => m.ParentId),
@@ -199,13 +197,38 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
+        /// 根据ID获取角色信息
+        /// </summary>
+        /// <param name="id">角色ID</param>
+        /// <returns>object 角色对象</returns>
+        private RoleInfo GetRole(Guid id)
+        {
+            using (var context = new BaseEntities())
+            {
+                var role = context.SYS_Role.Single(r => r.ID == id);
+                var obj = new RoleInfo
+                {
+                    ID = role.ID,
+                    BuiltIn = role.BuiltIn,
+                    Name = role.Name,
+                    Description = role.Description,
+                    Members = context.RoleMember.Where(m => m.RoleId == id).OrderBy(m => m.ParentId).ToList(),
+                    MemberUsers = context.RoleMemberUser.Where(u => u.RoleId == id).OrderBy(m => m.Name).ToList(),
+                    Actions = context.RoleAction.Where(a => a.RoleId == id).OrderBy(m => m.ParentId).ToList(),
+                    Datas = context.RoleData.Where(d => d.RoleId == id).OrderBy(m => m.ParentId).ToList()
+                };
+                return obj;
+            }
+        }
+
+        /// <summary>
         /// 保存角色成员到数据库
         /// </summary>
         /// <param name="id">角色ID</param>
         /// <param name="members">角色成员对象集合</param>
         /// <param name="uid">登录用户ID</param>
         /// <returns>bool 是否保存成功</returns>
-        private object AddRoleMember(Guid id, List<RoleMember> members, Guid uid)
+        private bool AddRoleMember(Guid id, List<RoleMember> members, Guid uid)
         {
             using (var context = new BaseEntities())
             {
@@ -220,13 +243,7 @@ namespace Insight.Base.Services
                                CreateTime = DateTime.Now
                            };
                 context.SYS_Role_Member.AddRange(data);
-                if (context.SaveChanges() <= 0) return null;
-
-                return new 
-                {
-                    Members = context.RoleMember.Where(m => m.RoleId == id).OrderBy(m => m.ParentId).ToList(),
-                    MemberUsers = context.RoleMemberUser.Where(u => u.RoleId == id).OrderBy(m => m.Name).ToList()
-                };
+                return context.SaveChanges() > 0;
             }
         }
 
@@ -234,13 +251,30 @@ namespace Insight.Base.Services
         /// 根据成员类型和ID删除角色成员
         /// </summary>
         /// <param name="id">角色成员ID</param>
-        /// <param name="type">成员类型</param>
         /// <returns>bool 是否删除成功</returns>
-        private bool DeleteRoleMember(Guid id, string type)
+        private JsonResult DeleteRoleMember(Guid id)
         {
-            var helper = new SqlHelper(Parameters.Database);
-            var sql = $"Delete from {(type == "3" ? "SYS_Role_Title" : (type == "2" ? "SYS_Role_UserGroup" : "SYS_Role_User"))} where ID = '{id}'";
-            return helper.SqlNonQuery(sql) > 0;
+            using (var context = new BaseEntities())
+            {
+                var result = new JsonResult();
+                var obj = context.SYS_Role_Member.SingleOrDefault(m => m.ID == id);
+                if (obj == null)
+                {
+                    result.NotFound();
+                    return result;
+                }
+
+                context.SYS_Role_Member.Remove(obj);
+                if (context.SaveChanges() <= 0)
+                {
+                    result.DataBaseError();
+                    return result;
+                }
+
+                var role = GetRole(obj.RoleId);
+                result.Success(role);
+                return result;
+            }
         }
 
         /// <summary>
@@ -302,11 +336,11 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="rid">角色ID</param>
         /// <returns>可用操作资源集合</returns>
-        private IEnumerable<ActionInfo> GetAllActions(Guid? rid)
+        private IEnumerable<ActionInfo> GetAllActions(Guid rid)
         {
             using (var context = new BaseEntities())
             {
-                var ids = from r in context.SYS_Role_Action.Where(r => r.RoleId == rid.Value)
+                var ids = from r in context.SYS_Role_Action.Where(r => r.RoleId == rid)
                           join a in context.SYS_ModuleAction.Where(a => a.Validity) on r.ActionId equals a.ID
                           select a.ModuleId;
                 var gl = from g in context.SYS_ModuleGroup
@@ -317,7 +351,7 @@ namespace Insight.Base.Services
                          select new ActionInfo { ID = m.ID, ParentId = m.ModuleGroupId, Permit = perm, Index = m.Index, NodeType = 1, Name = m.ApplicationName };
                 var al = from a in context.SYS_ModuleAction.Where(a => a.Validity)
                          join m in context.SYS_Module.Where(m => m.Validity) on a.ModuleId equals m.ID
-                         let t = context.SYS_Role_Action.FirstOrDefault(r => r.RoleId == rid.Value && r.ActionId == a.ID)
+                         let t = context.SYS_Role_Action.FirstOrDefault(r => r.RoleId == rid && r.ActionId == a.ID)
                          let perm = t == null ? null : (int?) t.Action
                          let id = perm.HasValue ? t.ID : Guid.NewGuid()
                          let desc = perm.HasValue ? (perm.Value == 0 ? "拒绝" : "允许") : null
@@ -335,11 +369,11 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="rid">角色ID</param>
         /// <returns>可用数据资源集合</returns>
-        private IEnumerable<DataInfo> GetAllDatas(Guid? rid)
+        private IEnumerable<DataInfo> GetAllDatas(Guid rid)
         {
             using (var context = new BaseEntities())
             {
-                var ids = from r in context.SYS_Role_Data.Where(r => r.RoleId == rid.Value)
+                var ids = from r in context.SYS_Role_Data.Where(r => r.RoleId == rid)
                           select r.ModuleId;
                 var gl = from g in context.SYS_ModuleGroup
                          join m in context.SYS_Module.Where(m => m.Validity && m.Name != null) on g.ID equals m.ModuleGroupId
@@ -353,16 +387,16 @@ namespace Insight.Base.Services
                 foreach (var m in ml)
                 {
                     var dl0 = from d in context.SYS_Data
-                              let t = context.SYS_Role_Data.FirstOrDefault(r => r.Mode == 0 && r.RoleId == rid.Value && r.ModuleId == m.ID && r.ModeId == d.ID)
+                              let t = context.SYS_Role_Data.FirstOrDefault(r => r.Mode == 0 && r.RoleId == rid && r.ModuleId == m.ID && r.ModeId == d.ID)
                               let perm = t == null ? null : (int?) t.Permission
                               let id = perm.HasValue ? t.ID : Guid.NewGuid()
                               let desc = perm.HasValue ? (perm.Value == 0 ? "只读" : "读写") : null
                               select new DataInfo {ID = id, ParentId = m.ID, Mode = 0, ModeId = d.ID, Permission = perm, Permit = perm, Index = d.Type, NodeType = d.Type + 2, Name = d.Alias, Description = desc};
-                    var dl1 = from r in context.SYS_Role_Data.Where(r => r.RoleId == rid.Value && r.ModuleId == m.ID && r.Mode == 1)
+                    var dl1 = from r in context.SYS_Role_Data.Where(r => r.RoleId == rid && r.ModuleId == m.ID && r.Mode == 1)
                               join u in context.SYS_User on r.ModeId equals u.ID
                               let desc = r.Permission == 0 ? "只读" : "读写"
                               select new DataInfo {ID = r.ID, ParentId = m.ID, Mode = 1, ModeId = r.ModeId, Permission = r.Permission, Permit = r.Permission, Index = 6, NodeType = 3, Name = u.Name, Description = desc};
-                    var dl2 = from r in context.SYS_Role_Data.Where(r => r.RoleId == rid.Value && r.ModuleId == m.ID && r.Mode == 2)
+                    var dl2 = from r in context.SYS_Role_Data.Where(r => r.RoleId == rid && r.ModuleId == m.ID && r.Mode == 2)
                               join o in context.SYS_Organization on r.ModeId equals o.ID
                               let desc = r.Permission == 0 ? "只读" : "读写"
                               select new DataInfo {ID = r.ID, ParentId = m.ID, Mode = 2, ModeId = r.ModeId, Permission = r.Permission, Permit = r.Permission, Index = 7, NodeType = 4, Name = o.FullName, Description = desc};

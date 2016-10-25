@@ -26,7 +26,7 @@ select distinct M.ID,
        M.RoleId,
        U.ID as MemberId,
        U.SN as [Index],
-       1 as NodeType,
+       0 as NodeType,
        U.Name
 from SYS_Role_Member M
 join Sys_User U on U.ID = M.MemberId
@@ -46,7 +46,7 @@ select distinct M.ID,
        M.RoleId,
        G.ID as MemberId,
        G.SN as [Index],
-       2 as NodeType,
+       0 as NodeType,
        G.Name
 from SYS_Role_Member M
 join Sys_UserGroup G on G.ID = M.MemberId
@@ -66,7 +66,7 @@ select M.ID,
        M.RoleId,
        P.ID as MemberId,
        P.SN as [Index],
-       3 as NodeType,
+       0 as NodeType,
        P.FullName as Name
 from SYS_Role_Member M
 join Sys_Organization P on P.ID = M.MemberId

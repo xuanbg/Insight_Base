@@ -60,11 +60,10 @@ namespace Insight.Base.Services
         /// 根据成员类型和ID删除角色成员
         /// </summary>
         /// <param name="id">角色成员ID</param>
-        /// <param name="type">成员类型</param>
         /// <returns>JsonResult</returns>
-        [WebInvoke(Method = "DELETE", UriTemplate = "roles/members/{id}?type={type}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "DELETE", UriTemplate = "roles/members/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult RemoveRoleMember(string id, string type);
+        JsonResult RemoveRoleMember(string id);
 
         /// <summary>
         /// 根据角色ID获取可用的成员集合
