@@ -3,19 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using Insight.Base.Common.Entity;
 
-namespace Insight.Base.Common
+namespace Insight.Base.OAuth
 {
     public class Authority
     {
-        /// <summary>
-        /// 登录用户ID
-        /// </summary>
-        private readonly Guid UserId;
+        // 登录用户ID
+        private readonly Guid _UserId;
 
-        /// <summary>
-        /// 登录部门ID
-        /// </summary>
-        private readonly Guid? DeptId;
+        // 登录部门ID
+        private readonly Guid? _DeptId;
 
         /// <summary>
         /// 构造函数，传入业务模块ID、登录用户ID和登录部门ID
@@ -24,8 +20,8 @@ namespace Insight.Base.Common
         /// <param name="did">登录部门ID</param>
         public Authority(Guid uid, Guid? did)
         {
-            UserId = uid;
-            DeptId = did;
+            _UserId = uid;
+            _DeptId = did;
         }
 
         /// <summary>
@@ -119,17 +115,17 @@ namespace Insight.Base.Common
         {
             using (var context = new BaseEntities())
             {
-                var rid_u = from r in context.SYS_Role_Member.Where(m => m.MemberId == UserId)
+                var rid_u = from r in context.SYS_Role_Member.Where(m => m.MemberId == _UserId)
                     where r.Type == 1
                     select r.RoleId;
-                var rid_g = from m in context.SYS_UserGroupMember.Where(u => u.UserId == UserId)
+                var rid_g = from m in context.SYS_UserGroupMember.Where(u => u.UserId == _UserId)
                     join r in context.SYS_Role_Member on m.GroupId equals r.MemberId
                     where r.Type == 2
                     select r.RoleId;
-                var rid_t = from m in context.SYS_OrgMember.Where(u => u.UserId == UserId)
+                var rid_t = from m in context.SYS_OrgMember.Where(u => u.UserId == _UserId)
                     join r in context.SYS_Role_Member on m.OrgId equals r.MemberId
                     join o in context.SYS_Organization on m.OrgId equals o.ID
-                    where r.Type == 3 && o.ParentId == DeptId
+                    where r.Type == 3 && o.ParentId == _DeptId
                     select r.RoleId;
                 return rid_u.Union(rid_g).Union(rid_t).ToList();
             }

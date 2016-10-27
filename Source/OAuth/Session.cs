@@ -1,24 +1,57 @@
 ﻿using System;
 using System.Linq;
+using Insight.Base.Common.Entity;
 using Insight.Utils.Common;
 using Insight.Utils.Entity;
 
-namespace Insight.Base.Common.Entity
+namespace Insight.Base.OAuth
 {
     /// <summary>
     /// 用户会话信息
     /// </summary>
     public class Session:AccessToken
     {
-        /// <summary>
-        /// 用户类型
-        /// </summary>
-        public int UserType { get; set; }
+        // 用户签名
+        private string _Signature;
+
+        // 刷新密码
+        private string _RefreshKey;
+
+        // 连续失败次数
+        private int _FailureCount;
+
+        // 上次连接时间
+        private DateTime _LastConnect;
 
         /// <summary>
         /// 登录用户ID
         /// </summary>
-        public Guid UserId { get; set; }
+        public Guid UserId { get; private set; }
+
+        /// <summary>
+        /// 登录部门ID
+        /// </summary>
+        public Guid? DeptId { get; private set; }
+
+        /// <summary>
+        /// Secret过期时间
+        /// </summary>
+        public DateTime ExpiryTime { get; private set; }
+
+        /// <summary>
+        /// Secret失效时间
+        /// </summary>
+        public DateTime FailureTime { get; private set; }
+
+        /// <summary>
+        /// 用户在线状态
+        /// </summary>
+        public bool OnlineStatus { get; private set; }
+
+        /// <summary>
+        /// 用户类型
+        /// </summary>
+        public int UserType { get; set; }
 
         /// <summary>
         /// 绑定的手机号
@@ -30,43 +63,19 @@ namespace Insight.Base.Common.Entity
         /// </summary>
         public bool Validity { get; set; }
 
-        // 登录部门ID
-        public Guid? DeptId;
-
-        // Secret过期时间
-        public DateTime ExpiryTime;
-
-        // Secret失效时间
-        public DateTime FailureTime;
-
-        // 用户在线状态
-        public bool OnlineStatus;
-
-        // 用户签名
-        private string Signature;
-
-        // 刷新密码
-        private string RefreshKey;
-
-        // 连续失败次数
-        private int FailureCount;
-
-        // 上次连接时间
-        private DateTime LastConnect;
-
         /// <summary>
         /// 构造方法，根据用户账号和索引构建对象
         /// </summary>
         /// <param name="account">用户账号</param>
-        /// <param name="index">当前索引</param>
-        public Session(string account, int index)
+        /// <param name="id">Session.ID</param>
+        public Session(string account, int id)
         {
             using (var context = new BaseEntities())
             {
                 var user = context.SYS_User.SingleOrDefault(s => s.LoginName == account);
                 if (user == null) return;
 
-                ID = index;
+                ID = id;
                 UserType = user.Type;
                 Account = user.LoginName;
                 Mobile = user.Mobile;
@@ -87,11 +96,11 @@ namespace Insight.Base.Common.Entity
         public bool Ckeck(string stamp)
         {
             var now = DateTime.Now;
-            var span = now - LastConnect;
-            if (span.TotalMinutes > 15) FailureCount = 0;
+            var span = now - _LastConnect;
+            if (span.TotalMinutes > 15) _FailureCount = 0;
 
-            LastConnect = now;
-            return FailureCount >= 5 && Stamp != stamp;
+            _LastConnect = now;
+            return _FailureCount >= 5 && Stamp != stamp;
         }
 
         /// <summary>
@@ -109,15 +118,15 @@ namespace Insight.Base.Common.Entity
                     str = Secret;
                     break;
                 case 2:
-                    str = RefreshKey;
+                    str = _RefreshKey;
                     break;
                 case 3:
-                    str = Signature;
+                    str = _Signature;
                     break;
             }
             if (str == key) return true;
 
-            FailureCount++;
+            _FailureCount++;
             return false;
         }
 
@@ -127,10 +136,10 @@ namespace Insight.Base.Common.Entity
         public void InitSecret()
         {
             var now = DateTime.Now;
-            Secret = Util.Hash(Guid.NewGuid() + Signature + now);
-            RefreshKey = Util.Hash(Guid.NewGuid() + Secret);
+            Secret = Util.Hash(Guid.NewGuid() + _Signature + now);
+            _RefreshKey = Util.Hash(Guid.NewGuid() + Secret);
             ExpiryTime = now.AddHours(2);
-            FailureTime = now.AddHours(Parameters.Expired);
+            FailureTime = now.AddHours(Common.Expired);
         }
 
         /// <summary>
@@ -149,7 +158,7 @@ namespace Insight.Base.Common.Entity
         {
             DeptId = did;
             OnlineStatus = true;
-            FailureCount = 0;
+            _FailureCount = 0;
         }
 
         /// <summary>
@@ -168,7 +177,7 @@ namespace Insight.Base.Common.Entity
         /// <param name="password">用户密码</param>
         public void Sign(string password)
         {
-            Signature = Util.Hash(Account.ToUpper() + password);
+            _Signature = Util.Hash(Account.ToUpper() + password);
         }
 
         /// <summary>
@@ -180,7 +189,7 @@ namespace Insight.Base.Common.Entity
             var obj = new
             {
                 AccessToken = Util.Base64(new {ID, Account, UserName, Stamp, Secret}),
-                RefreshToken = Util.Base64(new {ID, Account, Stamp, Secret = RefreshKey}),
+                RefreshToken = Util.Base64(new {ID, Account, Stamp, Secret = _RefreshKey}),
                 ExpiryTime,
                 FailureTime
             };

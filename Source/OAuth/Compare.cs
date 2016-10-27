@@ -3,39 +3,30 @@ using System.Net;
 using System.ServiceModel.Web;
 using System.Text;
 using System.Threading;
-using Insight.Base.Common.Entity;
+using Insight.Base.Common;
 using Insight.Utils.Common;
 using Insight.Utils.Entity;
-using static Insight.Base.Common.Parameters;
+using Insight.Utils.Server;
 
-namespace Insight.Base.Common
+namespace Insight.Base.OAuth
 {
     public class Compare
     {
+        // 当前Web操作上下文
+        private readonly WebOperationContext _Context = WebOperationContext.Current;
+
+        // 用于验证的目标对象
+        private AccessToken _Token;
+
         /// <summary>
         /// 验证结果
         /// </summary>
-        public JsonResult Result = new JsonResult();
+        public Result Result { get; } = new Result();
 
         /// <summary>
         /// 用于验证的基准对象
         /// </summary>
-        public Session Basis;
-
-        /// <summary>
-        /// 用于验证的目标对象
-        /// </summary>
-        private AccessToken Token;
-
-        /// <summary>
-        /// 当前Web操作上下文
-        /// </summary>
-        private readonly WebOperationContext Context = WebOperationContext.Current;
-
-        /// <summary>
-        /// 最大授权数
-        /// </summary>
-        private const int MaxAuth = 999999999;
+        public Session Basis { get; private set; }
 
         /// <summary>
         /// 构造方法，如Action不为空，则同时进行鉴权
@@ -75,7 +66,7 @@ namespace Insight.Base.Common
         /// <param name="did">登录部门ID（可为空）</param>
         public Compare(AccessToken token, string signature, string did)
         {
-            var time = Util.LimitCall(3);
+            var time = CallManage.LimitCall(3);
             if (time > 0)
             {
                 Result.TooFrequent(time);
@@ -89,7 +80,7 @@ namespace Insight.Base.Common
                 return;
             }
 
-            Token = token;
+            _Token = token;
             if (!FindBasis()) return;
 
             // 验证用户签名
@@ -131,7 +122,7 @@ namespace Insight.Base.Common
             }
 
             // 验证用户签名
-            if (!Basis.Verify(Token.Secret, 2))
+            if (!Basis.Verify(_Token.Secret, 2))
             {
                 Result.InvalidAuth();
                 return;
@@ -147,7 +138,7 @@ namespace Insight.Base.Common
         /// <param name="limit">限制访问秒数</param>
         private bool InitVerify(int limit)
         {
-            var time = Util.LimitCall(limit);
+            var time = CallManage.LimitCall(limit);
             if (time > 0)
             {
                 Result.TooFrequent(time);
@@ -156,17 +147,17 @@ namespace Insight.Base.Common
 
             try
             {
-                var headers = Context.IncomingRequest.Headers;
+                var headers = _Context.IncomingRequest.Headers;
                 var auth = headers[HttpRequestHeader.Authorization];
                 var buffer = Convert.FromBase64String(auth);
                 var json = Encoding.UTF8.GetString(buffer);
-                Token = Util.Deserialize<AccessToken>(json);
+                _Token = Util.Deserialize<AccessToken>(json);
 
                 return FindBasis();
             }
             catch (Exception ex)
             {
-                Context.OutgoingResponse.StatusCode = HttpStatusCode.Unauthorized;
+                _Context.OutgoingResponse.StatusCode = HttpStatusCode.Unauthorized;
                 var msg = $"提取验证信息失败。\r\nException:{ex}";
                 var ts = new ThreadStart(() => new Logger("500101", msg).Write());
                 new Thread(ts).Start();
@@ -180,8 +171,8 @@ namespace Insight.Base.Common
         /// <returns>bool Session是否正常</returns>
         private bool FindBasis()
         {
-            Basis = SessionManage.Get(Token);
-            if (Basis == null || Basis.ID > MaxAuth) return false;
+            Basis = Common.GetSession(_Token);
+            if (Basis == null || Basis.ID > Common.MaxAuth) return false;
 
             if (!Basis.Validity)
             {
@@ -190,7 +181,7 @@ namespace Insight.Base.Common
             }
 
             // 检查是否验证签名失败超过5次
-            if (!Basis.Ckeck(Token.Stamp)) return true;
+            if (!Basis.Ckeck(_Token.Stamp)) return true;
 
             Result.AccountIsBlocked();
             return false;
@@ -217,20 +208,20 @@ namespace Insight.Base.Common
             }
 
             // 验证Secret
-            if (!Basis.Verify(Token.Secret, 1))
+            if (!Basis.Verify(_Token.Secret, 1))
             {
                 Result.InvalidAuth();
                 return;
             }
 
             // 验证设备特征码
-            if (CheckStamp && Basis.Stamp != Token.Stamp)
+            if (Common.CheckStamp && Basis.Stamp != _Token.Stamp)
             {
                 Result.SignInOther();
                 return;
             }
 
-            if (Basis.Stamp == Token.Stamp) Result.Success();
+            if (Basis.Stamp == _Token.Stamp) Result.Success();
             else Result.Multiple();
 
             // 如action为空，立即返回；否则进行鉴权

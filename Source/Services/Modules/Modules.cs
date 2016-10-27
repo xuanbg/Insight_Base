@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
-using Insight.Base.Common;
 using Insight.Base.Common.Entity;
+using Insight.Base.OAuth;
+using Insight.Utils.Common;
 
 namespace Insight.Base.Services
 {
@@ -17,7 +18,7 @@ namespace Insight.Base.Services
         public JsonResult GetModuleGroup()
         {
             var verify = new Compare();
-            var result = verify.Result;
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
             var auth = new Authority(verify.Basis.UserId, verify.Basis.DeptId);
@@ -35,7 +36,7 @@ namespace Insight.Base.Services
         public JsonResult GetUserModule()
         {
             var verify = new Compare();
-            var result = verify.Result;
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
             var auth = new Authority(verify.Basis.UserId, verify.Basis.DeptId);
@@ -53,20 +54,19 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult GetAction(string id)
         {
-            Guid mid;
-            var result = new JsonResult();
-            if (!Guid.TryParse(id, out mid))
+            var verify = new Compare();
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            if (!result.Successful) return result;
+
+            var mid = new GuidParse(id).Result;
+            if (!mid.HasValue)
             {
-                result.InvalidGuid();
+                result.BadRequest();
                 return result;
             }
 
-            var verify = new Compare();
-            result = verify.Result;
-            if (!result.Successful) return result;
-
             var auth = new Authority(verify.Basis.UserId, verify.Basis.DeptId);
-            var data = auth.ModuleActions(mid);
+            var data = auth.ModuleActions(mid.Value);
             if (data.Any()) result.Success(data);
             else result.NoContent();
 

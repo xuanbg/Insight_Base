@@ -4,6 +4,7 @@ using System.ServiceModel;
 using System.Text.RegularExpressions;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
+using Insight.Base.OAuth;
 using Insight.Utils.Common;
 using static Insight.Base.Common.Parameters;
 
@@ -25,13 +26,13 @@ namespace Insight.Base.Services
         public JsonResult WriteToLog(string code, string message, string source, string action, string key, string userid)
         {
             var verify = new Compare();
-            var result = verify.Result;
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
             var gp = new GuidParse(userid);
             if (!gp.Successful)
             {
-                result.InvalidGuid();
+                result.BadRequest();
                 return result;
             }
 
@@ -57,7 +58,7 @@ namespace Insight.Base.Services
         {
             const string action = "60A97A33-0E6E-4856-BB2B-322FEEEFD96A";
             var verify = new Compare(action);
-            var result = verify.Result;
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
             if (string.IsNullOrEmpty(rule.Code) || !Regex.IsMatch(rule.Code, @"^\d{6}$"))
@@ -106,17 +107,17 @@ namespace Insight.Base.Services
         {
             const string action = "BBC43098-A030-46CA-A681-0C3D1ECC15AB";
             var verify = new Compare(action);
-            var result = verify.Result;
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
-            Guid rid;
-            if (!Guid.TryParse(id, out rid))
+            var rid = new GuidParse(id).Result;
+            if (!rid.HasValue)
             {
                 result.InvalidGuid();
                 return result;
             }
 
-            if (!DeleteRule(rid))
+            if (!DeleteRule(rid.Value))
             {
                 result.DataBaseError();
                 return result;
@@ -142,7 +143,7 @@ namespace Insight.Base.Services
         {
             const string action = "9FF1547D-2E3F-4552-963F-5EA790D586EA";
             var verify = new Compare(action);
-            var result = verify.Result;
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
             if (!Update(rule))
@@ -171,11 +172,11 @@ namespace Insight.Base.Services
         {
             const string action = "E3CFC5AA-CD7D-4A3C-8900-8132ADB7099F";
             var verify = new Compare(action);
-            var result = verify.Result;
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
-            Guid rid;
-            if (!Guid.TryParse(id, out rid))
+            var rid = new GuidParse(id).Result;
+            if (!rid.HasValue)
             {
                 result.InvalidGuid();
                 return result;
@@ -196,7 +197,7 @@ namespace Insight.Base.Services
         {
             const string action = "E3CFC5AA-CD7D-4A3C-8900-8132ADB7099F";
             var verify = new Compare(action);
-            var result = verify.Result;
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
             if (Rules.Any()) result.Success(Rules);

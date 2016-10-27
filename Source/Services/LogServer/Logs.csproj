@@ -84,6 +84,10 @@
       <Name>Common</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\..\OAuth\OAuth.csproj">
+      <Project>{0A33F95F-4934-4860-BD25-2E75D4A1A68F}</Project>
+      <Name>OAuth</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

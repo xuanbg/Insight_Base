@@ -28,16 +28,6 @@ namespace Insight.Base.Common
         public static readonly Random Random = new Random(Environment.TickCount);
 
         /// <summary>
-        /// 是否验证用户特征码
-        /// </summary>
-        public static bool CheckStamp;
-
-        /// <summary>
-        /// Session失效时间（小时）
-        /// </summary>
-        public static int Expired;
-
-        /// <summary>
         /// 日志接口URL
         /// </summary>
         public static string LogUrl;

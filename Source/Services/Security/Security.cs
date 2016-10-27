@@ -6,6 +6,8 @@ using System.ServiceModel.Web;
 using System.Threading;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
+using Insight.Base.OAuth;
+using Insight.Utils.Common;
 using Insight.Utils.Entity;
 using static Insight.Base.Common.Parameters;
 
@@ -42,8 +44,10 @@ namespace Insight.Base.Services
         public JsonResult GetToken(string account, string signature, string deptid)
         {
             var token = new AccessToken {Account = account};
+            var verify = new Compare(token, signature, deptid);
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
 
-            return new Compare(token, signature, deptid).Result;
+            return result;
         }
 
         /// <summary>
@@ -53,7 +57,7 @@ namespace Insight.Base.Services
         public JsonResult RemoveToken()
         {
             var verify = new Compare();
-            var result = verify.Result;
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
             verify.Basis.SignOut();
@@ -67,7 +71,9 @@ namespace Insight.Base.Services
         public JsonResult RefreshToken()
         {
             var verify = new Compare(60);
-            return verify.Result;
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
+
+            return result;
         }
 
         /// <summary>
@@ -76,7 +82,10 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult Verification()
         {
-            return new Compare().Result;
+            var verify = new Compare();
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
+
+            return result;
         }
 
         /// <summary>
@@ -86,7 +95,10 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult Authorization(string action)
         {
-            return new Compare(action).Result;
+            var verify = new Compare(action);
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
+
+            return result;
         }
 
         #endregion
@@ -103,7 +115,7 @@ namespace Insight.Base.Services
         public JsonResult NewCode(string mobile, int type, int time)
         {
             var verify = new Compare();
-            var result = verify.Result;
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
             var record = SmsCodes.OrderByDescending(r => r.CreateTime).FirstOrDefault(r => r.Mobile == mobile && r.Type == type);
@@ -143,7 +155,7 @@ namespace Insight.Base.Services
         public JsonResult VerifyCode(string mobile, string code, int type, bool remove = true)
         {
             var verify = new Compare();
-            var result = verify.Result;
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
             SmsCodes.RemoveAll(c => c.FailureTime < DateTime.Now);
@@ -193,10 +205,10 @@ namespace Insight.Base.Services
         {
             const string action = "331BF752-CDB7-44DE-9631-DF2605BB527E";
             var verify = new Compare(action);
-            var result = verify.Result;
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
-            var list = SessionManage.GetOnlineUsers(Convert.ToInt32(type));
+            var list = OAuth.Common.GetOnlineUsers(Convert.ToInt32(type));
             if (list.Any()) result.Success(list);
             else result.NoContent();
 

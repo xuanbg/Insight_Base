@@ -4,68 +4,62 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B18DFF40-4EB9-4777-B63E-756F36D5C5E2}</ProjectGuid>
+    <ProjectGuid>{0A33F95F-4934-4860-BD25-2E75D4A1A68F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Insight.Base.Services</RootNamespace>
-    <AssemblyName>Security</AssemblyName>
+    <RootNamespace>Insight.Base.OAuth</RootNamespace>
+    <AssemblyName>OAuth</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\Debug\Services\</OutputPath>
+    <OutputPath>..\..\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\..\Release\Services\</OutputPath>
+    <OutputPath>..\..\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\EntityFramework.6.1.3\lib\net40\EntityFramework.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Web" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ISecurity.cs" />
+    <Compile Include="Authority.cs" />
+    <Compile Include="Compare.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Security.cs" />
-    <Compile Include="VerifyImage.cs" />
+    <Compile Include="Session.cs" />
+    <Compile Include="Common.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Utils\Utils\Utils.csproj">
+    <ProjectReference Include="..\..\..\Utils\Utils\Utils.csproj">
       <Project>{0C3F2F08-6816-49FD-BB13-8526E43ACCC6}</Project>
       <Name>Utils</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\Common\Common.csproj">
+    <ProjectReference Include="..\Common\Common.csproj">
       <Project>{c4f26dd1-de5a-4773-a789-7823e96ea166}</Project>
       <Name>Common</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\OAuth\OAuth.csproj">
-      <Project>{0A33F95F-4934-4860-BD25-2E75D4A1A68F}</Project>
-      <Name>OAuth</Name>
-    </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

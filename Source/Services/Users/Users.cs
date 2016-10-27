@@ -4,6 +4,7 @@ using System.Linq;
 using System.ServiceModel;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
+using Insight.Base.OAuth;
 using Insight.Utils.Common;
 using Insight.Utils.Entity;
 
@@ -24,7 +25,7 @@ namespace Insight.Base.Services
         {
             const string action = "60D5BE64-0102-4189-A999-96EDAD3DA1B5";
             var verify = new Compare(action);
-            var result = verify.Result;
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
             using (var context = new BaseEntities())
@@ -55,20 +56,19 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult RemoveUser(string id)
         {
-            var result = new JsonResult();
-            Guid uid;
-            if (!Guid.TryParse(id, out uid))
+            const string action = "BE2DE9AB-C109-418D-8626-236DEF8E8504";
+            var verify = new Compare(action);
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            if (!result.Successful) return result;
+
+            var uid = new GuidParse(id).Result;
+            if (!uid.HasValue)
             {
-                result.InvalidGuid();
+                result.BadRequest();
                 return result;
             }
 
-            const string action = "BE2DE9AB-C109-418D-8626-236DEF8E8504";
-            var verify = new Compare(action);
-            result = verify.Result;
-            if (!result.Successful) return result;
-
-            if (!DeleteUser(uid)) result.DataBaseError();
+            if (!DeleteUser(uid.Value)) result.DataBaseError();
 
             return result;
         }
@@ -82,16 +82,16 @@ namespace Insight.Base.Services
         public JsonResult UpdateUserInfo(string id, SYS_User user)
         {
             var result = new JsonResult();
-            Guid uid;
-            if (!Guid.TryParse(id, out uid))
+            var uid = new GuidParse(id).Result;
+            if (!uid.HasValue)
             {
-                result.InvalidGuid();
+                result.BadRequest();
                 return result;
             }
 
             const string action = "3BC17B61-327D-4EAA-A0D7-7F825A6C71DB";
             var verify = new Compare(action, 0, uid);
-            result = verify.Result;
+            result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
             var reset = Update(user);
@@ -107,7 +107,7 @@ namespace Insight.Base.Services
                 return result;
             }
 
-            var session = SessionManage.Get(user.LoginName);
+            var session = OAuth.Common.GetSession(user.LoginName);
             if (session == null) return result;
 
             session.UserName = user.Name;
@@ -123,19 +123,19 @@ namespace Insight.Base.Services
         public JsonResult GetUser(string id)
         {
             var result = new JsonResult();
-            Guid uid;
-            if (!Guid.TryParse(id, out uid))
+            var uid = new GuidParse(id).Result;
+            if (!uid.HasValue)
             {
-                result.InvalidGuid();
+                result.BadRequest();
                 return result;
             }
 
             const string action = "3BC17B61-327D-4EAA-A0D7-7F825A6C71DB";
             var verify = new Compare(action, 0, uid);
-            result = verify.Result;
+            result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
-            var user = GetUser(uid);
+            var user = GetUser(uid.Value);
             if (user == null) result.NotFound();
             else result.Success(user);
 
@@ -150,7 +150,7 @@ namespace Insight.Base.Services
         {
             const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
             var verify = new Compare(action);
-            var result = verify.Result;
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
             var list = GetUserList();
@@ -169,10 +169,10 @@ namespace Insight.Base.Services
         {
             const string action = "331BF752-CDB7-44DE-9631-DF2605BB527E";
             var verify = new Compare(action);
-            var result = verify.Result;
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
-            var list = SessionManage.GetOnlineUsers(Convert.ToInt32(type));
+            var list = OAuth.Common.GetOnlineUsers(Convert.ToInt32(type));
             if (list.Any()) result.Success(list);
             else result.NoContent();
 
@@ -188,7 +188,7 @@ namespace Insight.Base.Services
         public JsonResult SignUp(string account, SYS_User user)
         {
             var verify = new Compare();
-            var result = verify.Result;
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
             using (var context = new BaseEntities())
@@ -208,7 +208,7 @@ namespace Insight.Base.Services
             }
 
             var token = new AccessToken {Account = account};
-            var session = SessionManage.Get(token);
+            var session = OAuth.Common.GetSession(token);
             session.InitSecret();
 
             verify.Result.Success(session.CreatorKey());
@@ -225,12 +225,12 @@ namespace Insight.Base.Services
         {
             const string action = "26481E60-0917-49B4-BBAA-2265E71E7B3F";
             var verify = new Compare(action, account);
-            var result = verify.Result;
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
             var session = Util.StringCompare(verify.Basis.Account, account)
                 ? verify.Basis
-                : SessionManage.Get(account);
+                : OAuth.Common.GetSession(account);
             var reset = Update(account, password);
             if (!reset.HasValue)
             {
@@ -260,11 +260,11 @@ namespace Insight.Base.Services
         public JsonResult ResetSignature(string account, string password, string code)
         {
             var verify = new Compare();
-            var result = verify.Result;
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
             var token = new AccessToken {Account = account};
-            var session = SessionManage.Get(token);
+            var session = OAuth.Common.GetSession(token);
             if (session == null)
             {
                 result.NotFound();
@@ -308,7 +308,7 @@ namespace Insight.Base.Services
         {
             var action = validity ? "369548E9-C8DB-439B-A604-4FDC07F3CCDD" : "0FA34D43-2C52-4968-BDDA-C9191D7FCE80";
             var verify = new Compare(action, account);
-            var result = verify.Result;
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
             var reset = Update(account, validity);
@@ -324,7 +324,7 @@ namespace Insight.Base.Services
                 return result;
             }
 
-            var session = SessionManage.Get(account);
+            var session = OAuth.Common.GetSession(account);
             if (session != null) session.Validity = validity;
 
             return result;
@@ -337,13 +337,12 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult UserSignOut(string account)
         {
-            var action = "331BF752-CDB7-44DE-9631-DF2605BB527E";
-
+            const string action = "331BF752-CDB7-44DE-9631-DF2605BB527E";
             var verify = new Compare(action, account);
-            var result = verify.Result;
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
-            var session = SessionManage.Get(account);
+            var session = OAuth.Common.GetSession(account);
             session?.SignOut();
 
             return result;
@@ -362,7 +361,7 @@ namespace Insight.Base.Services
         {
             const string action = "6E80210E-6F80-4FF7-8520-B602934D635C";
             var verify = new Compare(action);
-            var result = verify.Result;
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
             var id = InsertData(verify.Basis.UserId, group);
@@ -379,20 +378,19 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult RemoveGroup(string id)
         {
-            var result = new JsonResult();
-            Guid uid;
-            if (!Guid.TryParse(id, out uid))
+            const string action = "E46B7A1C-A8B0-49B5-8494-BF1B09F43452";
+            var verify = new Compare(action);
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            if (!result.Successful) return result;
+
+            var uid = new GuidParse(id).Result;
+            if (!uid.HasValue)
             {
-                result.InvalidGuid();
+                result.BadRequest();
                 return result;
             }
 
-            const string action = "E46B7A1C-A8B0-49B5-8494-BF1B09F43452";
-            var verify = new Compare(action);
-            result = verify.Result;
-            if (!result.Successful) return result;
-
-            if (!DeleteGroup(uid)) result.DataBaseError();
+            if (!DeleteGroup(uid.Value)) result.DataBaseError();
 
             return result;
         }
@@ -403,11 +401,11 @@ namespace Insight.Base.Services
         /// <param name="id">用户组ID</param>
         /// <param name="group">用户组对象</param>
         /// <returns>JsonResult</returns>
-        public JsonResult UpdateGroup(string id, SYS_UserGroup @group)
+        public JsonResult UpdateGroup(string id, SYS_UserGroup group)
         {
             const string action = "6910FD14-5654-4CF0-B159-8FE1DF68619F";
             var verify = new Compare(action);
-            var result = verify.Result;
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
             if (!Update(group)) result.DataBaseError();
@@ -422,20 +420,19 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult GetGroup(string id)
         {
-            var result = new JsonResult();
-            Guid uid;
-            if (!Guid.TryParse(id, out uid))
+            const string action = "6910FD14-5654-4CF0-B159-8FE1DF68619F";
+            var verify = new Compare(action);
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            if (!result.Successful) return result;
+
+            var uid = new GuidParse(id).Result;
+            if (!uid.HasValue)
             {
-                result.InvalidGuid();
+                result.BadRequest();
                 return result;
             }
 
-            const string action = "6910FD14-5654-4CF0-B159-8FE1DF68619F";
-            var verify = new Compare(action);
-            result = verify.Result;
-            if (!result.Successful) return result;
-
-            var data = GetGroup(uid);
+            var data = GetGroup(uid.Value);
             if (data == null) result.NotFound();
             else result.Success(data);
 
@@ -450,7 +447,7 @@ namespace Insight.Base.Services
         {
             const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
             var verify = new Compare(action);
-            var result = verify.Result;
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
             var data = GetGroupList();
@@ -468,20 +465,19 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult AddGroupMember(string id, List<Guid> uids)
         {
-            var result = new JsonResult();
-            Guid uid;
-            if (!Guid.TryParse(id, out uid))
+            const string action = "6C41724C-E118-4BCD-82AD-6B13D05C7894";
+            var verify = new Compare(action);
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            if (!result.Successful) return result;
+
+            var uid = new GuidParse(id).Result;
+            if (!uid.HasValue)
             {
-                result.InvalidGuid();
+                result.BadRequest();
                 return result;
             }
 
-            const string action = "6C41724C-E118-4BCD-82AD-6B13D05C7894";
-            var verify = new Compare(action);
-            result = verify.Result;
-            if (!result.Successful) return result;
-
-            if (!AddGroupMember(verify.Basis.UserId, uid, uids)) result.DataBaseError();
+            if (!AddGroupMember(verify.Basis.UserId, uid.Value, uids)) result.DataBaseError();
 
             return result;
         }
@@ -495,7 +491,7 @@ namespace Insight.Base.Services
         {
             const string action = "686C115A-CE2E-4E84-8F25-B63C15AC173C";
             var verify = new Compare(action);
-            var result = verify.Result;
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
             if (!DeleteMember(ids)) result.DataBaseError();
@@ -511,7 +507,7 @@ namespace Insight.Base.Services
         {
             const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
             var verify = new Compare(action);
-            var result = verify.Result;
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
             var data = GetMemberList();
@@ -528,20 +524,19 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult GetOtherUser(string id)
         {
-            var result = new JsonResult();
-            Guid uid;
-            if (!Guid.TryParse(id, out uid))
+            const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
+            var verify = new Compare(action);
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            if (!result.Successful) return result;
+
+            var uid = new GuidParse(id).Result;
+            if (!uid.HasValue)
             {
-                result.InvalidGuid();
+                result.BadRequest();
                 return result;
             }
 
-            const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
-            var verify = new Compare(action);
-            result = verify.Result;
-            if (!result.Successful) return result;
-
-            var data = GetOtherUser(uid);
+            var data = GetOtherUser(uid.Value);
             if (data.Any()) result.Success(data);
             else result.NoContent();
 

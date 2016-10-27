@@ -4,6 +4,8 @@ using System.ServiceModel;
 using System.Threading;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
+using Insight.Base.OAuth;
+using Insight.Utils.Common;
 
 namespace Insight.Base.Services
 {
@@ -64,17 +66,16 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         public JsonResult GetCode(string name, string id, string mark)
         {
-            var result = new JsonResult();
-            Guid bid;
-            if (!Guid.TryParse(id, out bid))
+            var verify = new Compare();
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            if (!result.Successful) return result;
+
+            var bid = new GuidParse(id).Result;
+            if (!bid.HasValue)
             {
                 result.InvalidGuid();
                 return result;
             }
-
-            var verify = new Compare();
-            result = verify.Result;
-            if (!result.Successful) return result;
 
             var session = verify.Basis;
             using (var context = new BaseEntities())
@@ -89,7 +90,7 @@ namespace Insight.Base.Services
                     return result;
                 }
 
-                var code = GetCode(scheme.ID, null, session.UserId, bid, null, mark);
+                var code = GetCode(scheme.ID, null, session.UserId, bid.Value, null, mark);
                 if (code == null) result.DataBaseError();
                 else result.Success(code);
 

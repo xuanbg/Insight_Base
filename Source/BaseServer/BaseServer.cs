@@ -76,9 +76,6 @@ namespace Insight.Base.Server
             {
                 Parameters.Rules = context.SYS_Logs_Rules.ToList();
             }
-
-            Parameters.CheckStamp = bool.Parse(Util.GetAppSetting("CheckStamp"));
-            Parameters.Expired = Convert.ToInt32(Util.GetAppSetting("Expired"));
         }
     }
 }

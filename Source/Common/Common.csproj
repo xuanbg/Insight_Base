@@ -55,7 +55,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Authority.cs" />
     <Compile Include="Entity\DataInfo.cs" />
     <Compile Include="Entity\Level.cs" />
     <Compile Include="Entity\Model.Context.cs">
@@ -88,7 +87,6 @@
     <Compile Include="Entity\RoleMemberUser.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
-    <Compile Include="Entity\Session.cs" />
     <Compile Include="Entity\SYS_Allot_Record.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
@@ -160,9 +158,7 @@
     <Compile Include="Entity\JsonResult.cs" />
     <Compile Include="Entity\VerifyRecord.cs" />
     <Compile Include="DataAccess.cs" />
-    <Compile Include="SessionManage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Compare.cs" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

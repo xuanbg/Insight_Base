@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logs", "Services\LogServer\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Security", "Services\Security\Security.csproj", "{B18DFF40-4EB9-4777-B63E-756F36D5C5E2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OAuth", "OAuth\OAuth.csproj", "{0A33F95F-4934-4860-BD25-2E75D4A1A68F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -108,6 +110,12 @@ Global
 		{B18DFF40-4EB9-4777-B63E-756F36D5C5E2}.Develop|Any CPU.Build.0 = Debug|Any CPU
 		{B18DFF40-4EB9-4777-B63E-756F36D5C5E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B18DFF40-4EB9-4777-B63E-756F36D5C5E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A33F95F-4934-4860-BD25-2E75D4A1A68F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A33F95F-4934-4860-BD25-2E75D4A1A68F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A33F95F-4934-4860-BD25-2E75D4A1A68F}.Develop|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A33F95F-4934-4860-BD25-2E75D4A1A68F}.Develop|Any CPU.Build.0 = Debug|Any CPU
+		{0A33F95F-4934-4860-BD25-2E75D4A1A68F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A33F95F-4934-4860-BD25-2E75D4A1A68F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
