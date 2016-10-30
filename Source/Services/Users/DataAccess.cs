@@ -65,9 +65,15 @@ namespace Insight.Base.Services
                 if (user.Password == password) return true;
 
                 user.Password = password;
-                if (!context.ChangeTracker.HasChanges()) return true;
-
-                return context.SaveChanges() > 0;
+                try
+                {
+                    context.SaveChanges();
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
             }
         }
 
@@ -87,9 +93,15 @@ namespace Insight.Base.Services
                 user.Name = obj.Name;
                 user.Description = obj.Description;
                 user.Type = obj.Type;
-                if (!context.ChangeTracker.HasChanges()) return true;
-
-                return context.SaveChanges() > 0;
+                try
+                {
+                    context.SaveChanges();
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
             }
         }
 
@@ -109,9 +121,15 @@ namespace Insight.Base.Services
                 if (user.Validity == validity) return true;
 
                 user.Validity = validity;
-                if (!context.ChangeTracker.HasChanges()) return true;
-
-                return context.SaveChanges() > 0;
+                try
+                {
+                    context.SaveChanges();
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
             }
         }
 

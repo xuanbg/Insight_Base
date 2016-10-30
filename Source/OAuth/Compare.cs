@@ -59,6 +59,26 @@ namespace Insight.Base.OAuth
         }
 
         /// <summary>
+        /// 构造方法，用于获取Code
+        /// </summary>
+        /// <param name="token">传入参数</param>
+        public Compare(AccessToken token)
+        {
+            var time = CallManage.LimitCall(3);
+            if (time > 0)
+            {
+                Result.TooFrequent(time);
+                return;
+            }
+
+            _Token = token;
+            if (!FindBasis()) return;
+
+            var obj = new {Basis.ID, Basis.Stamp};
+            Result.Success(obj);
+        }
+
+        /// <summary>
         /// 构造方法，用于获取AccessToken
         /// </summary>
         /// <param name="token">传入参数</param>
@@ -181,7 +201,7 @@ namespace Insight.Base.OAuth
             }
 
             // 检查是否验证签名失败超过5次
-            if (!Basis.Ckeck(_Token.Stamp)) return true;
+            if (!Basis.Ckeck()) return true;
 
             Result.AccountIsBlocked();
             return false;
@@ -214,17 +234,8 @@ namespace Insight.Base.OAuth
                 return;
             }
 
-            // 验证设备特征码
-            if (Common.CheckStamp && Basis.Stamp != _Token.Stamp)
-            {
-                Result.SignInOther();
-                return;
-            }
-
-            if (Basis.Stamp == _Token.Stamp) Result.Success();
-            else Result.Multiple();
-
             // 如action为空，立即返回；否则进行鉴权
+            Result.Success();
             if (action == null) return;
 
             Guid aid;

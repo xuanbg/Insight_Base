@@ -20,24 +20,9 @@ namespace Insight.Base.OAuth
         public static int MaxAuth { get; } = 999999999;
 
         /// <summary>
-        /// 是否验证用户特征码
-        /// </summary>
-        public static bool CheckStamp { get; } = bool.Parse(Util.GetAppSetting("CheckStamp"));
-
-        /// <summary>
         /// Token过期时间（小时）
         /// </summary>
         public static int Expired { get; } = int.Parse(Util.GetAppSetting("Expired"));
-
-        /// <summary>
-        /// 获取指定类型的所有在线用户
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public static List<Session> GetOnlineUsers(int type)
-        {
-            return _Sessions.Where(s => s.UserType == type && s.OnlineStatus).ToList();
-        }
 
         /// <summary>
         /// 根据登录账号在缓存中查找Session

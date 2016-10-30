@@ -49,6 +49,11 @@ namespace Insight.Base.OAuth
         public bool OnlineStatus { get; private set; }
 
         /// <summary>
+        /// 随机码
+        /// </summary>
+        public string Stamp { get; private set; }
+
+        /// <summary>
         /// 用户类型
         /// </summary>
         public int UserType { get; set; }
@@ -83,24 +88,22 @@ namespace Insight.Base.OAuth
                 UserName = user.Name;
                 Validity = user.Validity;
                 Stamp = Guid.NewGuid().ToString("N");
-
-                Sign(user.Password);
+                _Signature = user.Password;
             }
         }
 
         /// <summary>
         /// 检验是否已经连续错误5次
         /// </summary>
-        /// <param name="stamp">用户特征码</param>
         /// <returns>bool 是否已经连续错误5次</returns>
-        public bool Ckeck(string stamp)
+        public bool Ckeck()
         {
             var now = DateTime.Now;
             var span = now - _LastConnect;
             if (span.TotalMinutes > 15) _FailureCount = 0;
 
             _LastConnect = now;
-            return _FailureCount >= 5 && Stamp != stamp;
+            return _FailureCount >= 5;
         }
 
         /// <summary>
@@ -121,7 +124,8 @@ namespace Insight.Base.OAuth
                     str = _RefreshKey;
                     break;
                 case 3:
-                    str = _Signature;
+                    str = Util.Hash(_Signature + Stamp);
+                    Stamp = Guid.NewGuid().ToString("N");
                     break;
             }
             if (str == key) return true;
@@ -188,8 +192,8 @@ namespace Insight.Base.OAuth
         {
             var obj = new
             {
-                AccessToken = Util.Base64(new {ID, Account, UserName, Stamp, Secret}),
-                RefreshToken = Util.Base64(new {ID, Account, Stamp, Secret = _RefreshKey}),
+                AccessToken = Util.Base64(new {ID, Account, UserName, Secret}),
+                RefreshToken = Util.Base64(new {ID, Account, Secret = _RefreshKey}),
                 ExpiryTime,
                 FailureTime
             };

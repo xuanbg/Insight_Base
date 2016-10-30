@@ -58,15 +58,6 @@ namespace Insight.Base.Services
         JsonResult GetUsers();
 
         /// <summary>
-        /// 获取全部在线用户
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "users/online?type={type}", ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        JsonResult GetOnlineUsers(string type);
-
-        /// <summary>
         /// 根据对象实体数据注册一个用户
         /// </summary>
         /// <param name="account">登录账号</param>

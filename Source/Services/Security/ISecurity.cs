@@ -18,15 +18,25 @@ namespace Insight.Base.Services
         void ResponseOptions();
 
         /// <summary>
+        /// 获取指定账户的Code
+        /// </summary>
+        /// <param name="account">用户账号</param>
+        /// <returns>JsonResult</returns>
+        [WebGet(UriTemplate = "codes?account={account}", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        JsonResult GetCode(string account);
+
+        /// <summary>
         /// 获取指定账户的AccessToken
         /// </summary>
+        /// <param name="id">SessionID</param>
         /// <param name="account">用户账号</param>
         /// <param name="signature">用户签名</param>
         /// <param name="deptid">登录部门ID（可为空）</param>
         /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "tokens?account={account}&signature={signature}&deptid={deptid}", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "tokens?id={id}&account={account}&signature={signature}&deptid={deptid}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        JsonResult GetToken(string account, string signature, string deptid);
+        JsonResult GetToken(int id, string account, string signature, string deptid);
 
         /// <summary>
         /// 移除指定账户的AccessToken
@@ -106,19 +116,6 @@ namespace Insight.Base.Services
         [WebGet(UriTemplate = "smscodes/{id}/compare?code={code}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         JsonResult VerifyPicCode(string id, string code);
-
-        #endregion
-
-        #region Session
-
-        /// <summary>
-        /// 获取当前在线状态的全部内部用户的Session
-        /// </summary>
-        /// <param name="type">用户类型</param>
-        /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "sessions?type={type}", ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        JsonResult GetSessions(string type);
 
         #endregion
 

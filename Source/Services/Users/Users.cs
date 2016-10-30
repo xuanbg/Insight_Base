@@ -161,25 +161,6 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 获取全部在线用户
-        /// </summary>
-        /// <param name="type">用户类型</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult GetOnlineUsers(string type)
-        {
-            const string action = "331BF752-CDB7-44DE-9631-DF2605BB527E";
-            var verify = new Compare(action);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
-            if (!result.Successful) return result;
-
-            var list = OAuth.Common.GetOnlineUsers(Convert.ToInt32(type));
-            if (list.Any()) result.Success(list);
-            else result.NoContent();
-
-            return result;
-        }
-
-        /// <summary>
         /// 根据对象实体数据注册一个用户
         /// </summary>
         /// <param name="account">登录账号</param>

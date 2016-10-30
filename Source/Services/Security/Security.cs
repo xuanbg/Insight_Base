@@ -35,15 +35,30 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
+        /// 获取指定账户的Code
+        /// </summary>
+        /// <param name="account">用户账号</param>
+        /// <returns>JsonResult</returns>
+        public JsonResult GetCode(string account)
+        {
+            var token = new AccessToken { Account = account };
+            var verify = new Compare(token);
+            var result = Util.ConvertTo<JsonResult>(verify.Result);
+
+            return result;
+        }
+
+        /// <summary>
         /// 获取指定账户的AccessToken
         /// </summary>
+        /// <param name="id">SessionID</param>
         /// <param name="account">用户账号</param>
         /// <param name="signature">用户签名</param>
         /// <param name="deptid">登录部门ID（可为空）</param>
         /// <returns>JsonResult</returns>
-        public JsonResult GetToken(string account, string signature, string deptid)
+        public JsonResult GetToken(int id, string account, string signature, string deptid)
         {
-            var token = new AccessToken {Account = account};
+            var token = new AccessToken {ID = id, Account = account};
             var verify = new Compare(token, signature, deptid);
             var result = Util.ConvertTo<JsonResult>(verify.Result);
 
@@ -190,29 +205,6 @@ namespace Insight.Base.Services
         public JsonResult VerifyPicCode(string id, string code)
         {
             throw new NotImplementedException();
-        }
-
-        #endregion
-
-        #region Session
-
-        /// <summary>
-        /// 获取当前在线状态的全部内部用户的Session
-        /// </summary>
-        /// <param name="type">用户类型</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult GetSessions(string type)
-        {
-            const string action = "331BF752-CDB7-44DE-9631-DF2605BB527E";
-            var verify = new Compare(action);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
-            if (!result.Successful) return result;
-
-            var list = OAuth.Common.GetOnlineUsers(Convert.ToInt32(type));
-            if (list.Any()) result.Success(list);
-            else result.NoContent();
-
-            return result;
         }
 
         #endregion

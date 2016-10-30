@@ -54,7 +54,15 @@ namespace Insight.Base.Services
                 context.SYS_Role.Add(r);
                 context.SYS_Role_Action.AddRange(alist);
                 context.SYS_Role_Data.AddRange(dlist);
-                return context.SaveChanges() > 0;
+                try
+                {
+                    context.SaveChanges();
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
             }
         }
 
@@ -71,7 +79,15 @@ namespace Insight.Base.Services
                 if (role == null) return null;
 
                 context.SYS_Role.Remove(role);
-                return context.SaveChanges() > 0;
+                try
+                {
+                    context.SaveChanges();
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
             }
         }
 
@@ -156,7 +172,16 @@ namespace Insight.Base.Services
                         context.SYS_Role_Data.Remove(pd);
                     }
                 }
-                return context.SaveChanges() > 0;
+
+                try
+                {
+                    context.SaveChanges();
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
             }
         }
 
@@ -243,7 +268,15 @@ namespace Insight.Base.Services
                                CreateTime = DateTime.Now
                            };
                 context.SYS_Role_Member.AddRange(data);
-                return context.SaveChanges() > 0;
+                try
+                {
+                    context.SaveChanges();
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
             }
         }
 
@@ -265,15 +298,19 @@ namespace Insight.Base.Services
                 }
 
                 context.SYS_Role_Member.Remove(obj);
-                if (context.SaveChanges() <= 0)
+                try
+                {
+                    context.SaveChanges();
+                    var role = GetRole(obj.RoleId);
+                    result.Success(role);
+                    return result;
+                }
+                catch
                 {
                     result.DataBaseError();
                     return result;
                 }
 
-                var role = GetRole(obj.RoleId);
-                result.Success(role);
-                return result;
             }
         }
 
@@ -407,6 +444,5 @@ namespace Insight.Base.Services
                 return list;
             }
         }
-
     }
 }
