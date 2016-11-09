@@ -1,11 +1,9 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.ServiceProcess;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Utils.Common;
 using Insight.WCF;
-using Insight.WCF.Entity;
 
 namespace Insight.Base.Server
 {
@@ -14,7 +12,7 @@ namespace Insight.Base.Server
         /// <summary>
         /// 运行中的服务主机
         /// </summary>
-        private static Services Services;
+        private static Service Services;
 
         #region 构造函数
 
@@ -38,10 +36,10 @@ namespace Insight.Base.Server
         protected override void OnStart(string[] args)
         {
             var list = DataAccess.GetServiceList();
-            Services = new Services();
+            Services = new Service();
             foreach (var info in list)
             {
-                var service = new ServiceInfo
+                var service = new Service.Info
                 {
                     BaseAddress = Util.GetAppSetting("Address"),
                     Port = info.Port,
