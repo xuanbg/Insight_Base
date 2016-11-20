@@ -1,4 +1,6 @@
-﻿using Insight.Base.Common;
+﻿using System.Linq;
+using Insight.Base.Common;
+using Insight.Base.Common.Entity;
 using Insight.Utils.Common;
 using Insight.WCF;
 
@@ -10,6 +12,10 @@ namespace Test
 
         static void Main(string[] args)
         {
+            using (var context = new BaseEntities())
+            {
+                Parameters.Rules = context.SYS_Logs_Rules.ToList();
+            }
             var list = DataAccess.GetServiceList();
             Services = new Service();
             foreach (var info in list)
