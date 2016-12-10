@@ -20,6 +20,14 @@ namespace Insight.Base.Services
         /// <summary>
         /// 获取指定账户的Code
         /// </summary>
+        /// <returns>JsonResult</returns>
+        [WebGet(UriTemplate = "test", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        JsonResult Test();
+
+        /// <summary>
+        /// 获取指定账户的Code
+        /// </summary>
         /// <param name="account">用户账号</param>
         /// <returns>JsonResult</returns>
         [WebGet(UriTemplate = "codes?account={account}", ResponseFormat = WebMessageFormat.Json)]
