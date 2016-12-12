@@ -62,9 +62,10 @@ namespace Insight.Base.Services
                 var user = context.SYS_User.SingleOrDefault(u => u.LoginName == account);
                 if (user == null) return null;
 
-                if (user.Password == password) return true;
+                var sign = Util.Hash(account.ToUpper() + password);
+                if (user.Password == sign) return true;
 
-                user.Password = password;
+                user.Password = sign;
                 try
                 {
                     context.SaveChanges();

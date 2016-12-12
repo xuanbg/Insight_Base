@@ -37,6 +37,17 @@ namespace Insight.Base.Services
         /// <summary>
         /// 获取指定账户的Code
         /// </summary>
+        /// <returns>JsonResult</returns>
+        public JsonResult Test()
+        {
+            var result = new JsonResult();
+            result.Success();
+            return result;
+        }
+
+        /// <summary>
+        /// 获取指定账户的Code
+        /// </summary>
         /// <param name="account">用户账号</param>
         /// <returns>JsonResult</returns>
         public JsonResult GetCode(string account)
