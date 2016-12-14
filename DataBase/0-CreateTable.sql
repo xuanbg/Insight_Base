@@ -178,7 +178,7 @@ CREATE TABLE SYS_Module(
 [Index]            INT,                                                                                                                    --序号
 [Name]             NVARCHAR(16),                                                                                                           --模块名称
 [ProgramName]      VARCHAR(32) NOT NULL,                                                                                                   --程序集名称
-[MainFrom]         VARCHAR(128) NOT NULL,                                                                                                  --主窗体名称
+[NameSpace]        VARCHAR(128) NOT NULL,                                                                                                  --模块命名空间
 [ApplicationName]  NVARCHAR(16),                                                                                                           --应用名称
 [Location]         NVARCHAR(MAX),                                                                                                          --文件路径
 [Description]      NVARCHAR(MAX),                                                                                                          --描述

@@ -127,7 +127,7 @@
           <Property Name="Index" Type="int" />
           <Property Name="Name" Type="nvarchar" MaxLength="16" />
           <Property Name="ProgramName" Type="varchar" MaxLength="32" Nullable="false" />
-          <Property Name="MainFrom" Type="varchar" MaxLength="128" Nullable="false" />
+          <Property Name="NameSpace" Type="varchar" MaxLength="128" Nullable="false" />
           <Property Name="ApplicationName" Type="nvarchar" MaxLength="16" />
           <Property Name="Location" Type="nvarchar(max)" />
           <Property Name="Description" Type="nvarchar(max)" />
@@ -1224,7 +1224,7 @@
           <Property Name="Index" Type="Int32" />
           <Property Name="Name" Type="String" MaxLength="16" FixedLength="false" Unicode="true" />
           <Property Name="ProgramName" Type="String" MaxLength="32" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="MainFrom" Type="String" MaxLength="128" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="NameSpace" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="false" />
           <Property Name="ApplicationName" Type="String" MaxLength="16" FixedLength="false" Unicode="true" />
           <Property Name="Location" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
@@ -2289,6 +2289,7 @@
           <EntitySetMapping Name="SYS_Module">
             <EntityTypeMapping TypeName="BaseModel.SYS_Module">
               <MappingFragment StoreEntitySet="SYS_Module">
+                <ScalarProperty Name="NameSpace" ColumnName="NameSpace" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="SN" ColumnName="SN" />
                 <ScalarProperty Name="ModuleGroupId" ColumnName="ModuleGroupId" />
@@ -2296,7 +2297,6 @@
                 <ScalarProperty Name="Index" ColumnName="Index" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="ProgramName" ColumnName="ProgramName" />
-                <ScalarProperty Name="MainFrom" ColumnName="MainFrom" />
                 <ScalarProperty Name="ApplicationName" ColumnName="ApplicationName" />
                 <ScalarProperty Name="Location" ColumnName="Location" />
                 <ScalarProperty Name="Description" ColumnName="Description" />

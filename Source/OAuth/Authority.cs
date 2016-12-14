@@ -52,7 +52,7 @@ namespace Insight.Base.OAuth
             {
                 var mids = RoleModules().Select(m => m.ID).Distinct();
                 var list = from m in context.SYS_Module.Where(g => g.Validity && mids.Any(id => id == g.ID))
-                    select new {m.ID, m.ModuleGroupId, m.Index, m.ProgramName, m.MainFrom, m.ApplicationName, m.Location, m.Default, m.Icon};
+                    select new {m.ID, m.ModuleGroupId, m.Index, m.ProgramName, m.NameSpace, m.ApplicationName, m.Location, m.Default, m.Icon};
                 return list.OrderBy(m => m.Index).ToList();
 
             }

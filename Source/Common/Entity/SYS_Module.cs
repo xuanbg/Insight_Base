@@ -31,7 +31,7 @@ namespace Insight.Base.Common.Entity
         public Nullable<int> Index { get; set; }
         public string Name { get; set; }
         public string ProgramName { get; set; }
-        public string MainFrom { get; set; }
+        public string NameSpace { get; set; }
         public string ApplicationName { get; set; }
         public string Location { get; set; }
         public string Description { get; set; }
