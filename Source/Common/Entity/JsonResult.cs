@@ -72,7 +72,7 @@ namespace Insight.Base.Common.Entity
             Name = "EventCodeNotConfig";
             Message = "未配置的事件代码，请先为该代码配置日志规则";
         }
-        
+
         /// <summary>
         /// 事件代码错误（417）
         /// </summary>

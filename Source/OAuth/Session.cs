@@ -188,16 +188,15 @@ namespace Insight.Base.OAuth
         /// 生成Token
         /// </summary>
         /// <returns>string 序列化为Json的Token数据</returns>
-        public string CreatorKey()
+        public object CreatorKey()
         {
-            var obj = new
+            return new
             {
                 AccessToken = Util.Base64(new {ID, Account, UserName, Secret}),
                 RefreshToken = Util.Base64(new {ID, Account, Secret = _RefreshKey}),
                 ExpiryTime,
                 FailureTime
             };
-            return Util.Serialize(obj);
         }
 
         /// <summary>
