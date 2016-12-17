@@ -192,7 +192,17 @@ namespace Insight.Base.OAuth
         private bool FindBasis()
         {
             Basis = Common.GetSession(_Token);
-            if (Basis == null || Basis.ID > Common.MaxAuth) return false;
+            if (Basis == null)
+            {
+                Result.NotFound();
+                return false;
+            }
+
+            if (Basis.ID > Common.MaxAuth)
+            {
+                Result.InsufficientLicenses();
+                return false;
+            }
 
             if (!Basis.Validity)
             {
