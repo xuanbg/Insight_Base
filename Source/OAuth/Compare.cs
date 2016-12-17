@@ -144,7 +144,7 @@ namespace Insight.Base.OAuth
             // 验证用户签名
             if (!Basis.Verify(_Token.Secret, 2))
             {
-                Result.InvalidAuth();
+                Result.Failured();
                 return;
             }
 
