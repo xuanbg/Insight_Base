@@ -124,7 +124,7 @@ namespace Insight.Base.Services
                 return result;
             }
 
-            if (r < 20 || r > 100 || p < 1)
+            if (r > 500 || p < 1)
             {
                 result.BadRequest();
                 return result;
