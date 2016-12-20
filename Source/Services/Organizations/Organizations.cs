@@ -44,7 +44,7 @@ namespace Insight.Base.Services
             var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
-            var oid = new GuidParse(id).Result;
+            var oid = new GuidParse(id).Guid;
             if (!oid.HasValue)
             {
                 result.BadRequest();
@@ -87,7 +87,7 @@ namespace Insight.Base.Services
             var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
-            var oid = new GuidParse(id).Result;
+            var oid = new GuidParse(id).Guid;
             if (!oid.HasValue)
             {
                 result.BadRequest();
@@ -132,7 +132,7 @@ namespace Insight.Base.Services
             var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
-            var oid = new GuidParse(id).Result;
+            var oid = new GuidParse(id).Guid;
             if (!oid.HasValue)
             {
                 result.BadRequest();
@@ -176,7 +176,7 @@ namespace Insight.Base.Services
             var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
-            var oid = new GuidParse(id).Result;
+            var oid = new GuidParse(id).Guid;
             if (!oid.HasValue)
             {
                 result.BadRequest();
@@ -216,7 +216,7 @@ namespace Insight.Base.Services
             var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
-            var oid = new GuidParse(id).Result;
+            var oid = new GuidParse(id).Guid;
             if (!oid.HasValue)
             {
                 result.BadRequest();

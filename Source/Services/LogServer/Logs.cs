@@ -30,13 +30,13 @@ namespace Insight.Base.Services
             if (!result.Successful) return result;
 
             var gp = new GuidParse(userid);
-            if (!gp.Successful)
+            if (!gp.Result.Successful) 
             {
                 result.BadRequest();
                 return result;
             }
 
-            var logger = new Logger(code, message, source, action, key, gp.Result);
+            var logger = new Logger(code, message, source, action, key, gp.Guid);
             var succe = logger.Write();
             if (!succe.HasValue)
             {
@@ -110,7 +110,7 @@ namespace Insight.Base.Services
             var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
-            var rid = new GuidParse(id).Result;
+            var rid = new GuidParse(id).Guid;
             if (!rid.HasValue)
             {
                 result.InvalidGuid();
@@ -175,7 +175,7 @@ namespace Insight.Base.Services
             var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
-            var rid = new GuidParse(id).Result;
+            var rid = new GuidParse(id).Guid;
             if (!rid.HasValue)
             {
                 result.InvalidGuid();

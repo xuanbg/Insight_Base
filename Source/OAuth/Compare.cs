@@ -94,7 +94,7 @@ namespace Insight.Base.OAuth
             }
 
             var parse = new GuidParse(did);
-            if (!parse.Successful)
+            if (!parse.Result.Successful)
             {
                 Result.InvalidGuid();
                 return;
@@ -114,7 +114,7 @@ namespace Insight.Base.OAuth
 
             if (DateTime.Now > Basis.ExpiryTime) Basis.Refresh();
 
-            Basis.Online(parse.Result);
+            Basis.Online(parse.Guid);
             Result.Success(Basis.CreatorKey());
         }
 

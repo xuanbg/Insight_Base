@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Insight.Base.Common.Entity;
+using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
 {
@@ -202,7 +203,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="rows">每页行数</param>
         /// <param name="page">当前页</param>
-        /// <returns>角色信息结果集</returns>
+        /// <returns>角色信息结果集合</returns>
         private IEnumerable<object> GetRoles(int rows, int page)
         {
             using (var context = new BaseEntities())
@@ -213,7 +214,6 @@ namespace Insight.Base.Services
                            {
                                r.ID, r.Name, r.Description, r.BuiltIn,
                                Members = context.RoleMember.Where(m => m.RoleId == r.ID).OrderBy(m => m.ParentId),
-                               MemberUsers = context.RoleMemberUser.Where(u => u.RoleId == r.ID).OrderBy(m => m.Name),
                                Actions = context.RoleAction.Where(a => a.RoleId == r.ID).OrderBy(m => m.ParentId),
                                Datas = context.RoleData.Where(d => d.RoleId == r.ID).OrderBy(m => m.ParentId)
                            };
@@ -225,7 +225,7 @@ namespace Insight.Base.Services
         /// 根据ID获取角色信息
         /// </summary>
         /// <param name="id">角色ID</param>
-        /// <returns>object 角色对象</returns>
+        /// <returns>RoleInfo 角色对象</returns>
         private RoleInfo GetRole(Guid id)
         {
             using (var context = new BaseEntities())
@@ -238,11 +238,39 @@ namespace Insight.Base.Services
                     Name = role.Name,
                     Description = role.Description,
                     Members = context.RoleMember.Where(m => m.RoleId == id).OrderBy(m => m.ParentId).ToList(),
-                    MemberUsers = context.RoleMemberUser.Where(u => u.RoleId == id).OrderBy(m => m.Name).ToList(),
                     Actions = context.RoleAction.Where(a => a.RoleId == id).OrderBy(m => m.ParentId).ToList(),
                     Datas = context.RoleData.Where(d => d.RoleId == id).OrderBy(m => m.ParentId).ToList()
                 };
                 return obj;
+            }
+        }
+
+        /// <summary>
+        /// 获取角色成员用户总数
+        /// </summary>
+        /// <param name="id">角色ID</param>
+        /// <returns>int 成员用户总数</returns>
+        private int GetUsersCount(Guid id)
+        {
+            using (var context = new BaseEntities())
+            {
+                return context.RoleMemberUser.Count(u => u.RoleId == id);
+            }
+        }
+
+        /// <summary>
+        /// 获取角色成员用户集合
+        /// </summary>
+        /// <param name="id">角色ID</param>
+        /// <param name="rows">每页行数</param>
+        /// <param name="page">当前页</param>
+        /// <returns>角色成员用户集合</returns>
+        private List<RoleMemberUser> GetMemberUsers(Guid id, int rows, int page)
+        {
+            using (var context = new BaseEntities())
+            {
+                var skip = rows * (page - 1);
+                return context.RoleMemberUser.Where(u => u.RoleId == id).OrderBy(m => m.LoginName).Skip(skip).Take(rows).ToList();
             }
         }
 
@@ -284,12 +312,12 @@ namespace Insight.Base.Services
         /// 根据成员类型和ID删除角色成员
         /// </summary>
         /// <param name="id">角色成员ID</param>
-        /// <returns>bool 是否删除成功</returns>
-        private JsonResult DeleteRoleMember(Guid id)
+        /// <returns>Result</returns>
+        private Result DeleteRoleMember(Guid id)
         {
             using (var context = new BaseEntities())
             {
-                var result = new JsonResult();
+                var result = new Result();
                 var obj = context.SYS_Role_Member.SingleOrDefault(m => m.ID == id);
                 if (obj == null)
                 {

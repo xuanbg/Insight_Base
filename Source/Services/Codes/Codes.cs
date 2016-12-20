@@ -70,7 +70,7 @@ namespace Insight.Base.Services
             var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
-            var bid = new GuidParse(id).Result;
+            var bid = new GuidParse(id).Guid;
             if (!bid.HasValue)
             {
                 result.InvalidGuid();

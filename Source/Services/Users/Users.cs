@@ -61,7 +61,7 @@ namespace Insight.Base.Services
             var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
-            var uid = new GuidParse(id).Result;
+            var uid = new GuidParse(id).Guid;
             if (!uid.HasValue)
             {
                 result.BadRequest();
@@ -82,7 +82,7 @@ namespace Insight.Base.Services
         public JsonResult UpdateUserInfo(string id, SYS_User user)
         {
             var result = new JsonResult();
-            var uid = new GuidParse(id).Result;
+            var uid = new GuidParse(id).Guid;
             if (!uid.HasValue)
             {
                 result.BadRequest();
@@ -123,7 +123,7 @@ namespace Insight.Base.Services
         public JsonResult GetUser(string id)
         {
             var result = new JsonResult();
-            var uid = new GuidParse(id).Result;
+            var uid = new GuidParse(id).Guid;
             if (!uid.HasValue)
             {
                 result.BadRequest();
@@ -364,7 +364,7 @@ namespace Insight.Base.Services
             var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
-            var uid = new GuidParse(id).Result;
+            var uid = new GuidParse(id).Guid;
             if (!uid.HasValue)
             {
                 result.BadRequest();
@@ -406,7 +406,7 @@ namespace Insight.Base.Services
             var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
-            var uid = new GuidParse(id).Result;
+            var uid = new GuidParse(id).Guid;
             if (!uid.HasValue)
             {
                 result.BadRequest();
@@ -451,7 +451,7 @@ namespace Insight.Base.Services
             var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
-            var uid = new GuidParse(id).Result;
+            var uid = new GuidParse(id).Guid;
             if (!uid.HasValue)
             {
                 result.BadRequest();
@@ -510,7 +510,7 @@ namespace Insight.Base.Services
             var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
-            var uid = new GuidParse(id).Result;
+            var uid = new GuidParse(id).Guid;
             if (!uid.HasValue)
             {
                 result.BadRequest();

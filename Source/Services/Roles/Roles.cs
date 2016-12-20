@@ -4,6 +4,7 @@ using System.ServiceModel;
 using Insight.Base.Common.Entity;
 using Insight.Base.OAuth;
 using Insight.Utils.Common;
+using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
 {
@@ -14,12 +15,12 @@ namespace Insight.Base.Services
         /// 新增角色
         /// </summary>
         /// <param name="role">RoleInfo</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult AddRole(RoleInfo role)
+        /// <returns>Result</returns>
+        public Result AddRole(RoleInfo role)
         {
             const string action = "10B574A2-1A69-4273-87D9-06EDA77B80B6";
             var verify = new Compare(action);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
             if (!InsertData(verify.Basis.UserId, role))
@@ -36,22 +37,18 @@ namespace Insight.Base.Services
         /// 根据ID删除角色
         /// </summary>
         /// <param name="id">角色ID</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult RemoveRole(string id)
+        /// <returns>Result</returns>
+        public Result RemoveRole(string id)
         {
             const string action = "FBCEE515-8576-4B10-BA68-CF46743D2199";
             var verify = new Compare(action);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
-            var rid = new GuidParse(id).Result;
-            if (!rid.HasValue)
-            {
-                result.BadRequest();
-                return result;
-            }
+            var parse = new GuidParse(id);
+            if (!parse.Result.Successful) return parse.Result;
 
-            var del = DeleteRole(rid.Value);
+            var del = DeleteRole(parse.Value);
             if (!del.HasValue)
             {
                 result.NotFound();
@@ -68,20 +65,16 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">角色ID</param>
         /// <param name="role">RoleInfo</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult EditRole(string id, RoleInfo role)
+        /// <returns>Result</returns>
+        public Result EditRole(string id, RoleInfo role)
         {
             const string action = "4DC0141D-FE3D-4504-BE70-763028796808";
             var verify = new Compare(action);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
-            var rid = new GuidParse(id).Result;
-            if (!rid.HasValue || rid.Value != role.ID)
-            {
-                result.BadRequest();
-                return result;
-            }
+            var parse = new GuidParse(id);
+            if (!parse.Result.Successful) return parse.Result;
 
             var data = Update(verify.Basis.UserId, role);
             if (!data.HasValue)
@@ -92,7 +85,7 @@ namespace Insight.Base.Services
 
             if (!data.Value) result.DataBaseError();
 
-            role = GetRole(rid.Value);
+            role = GetRole(parse.Value);
             result.Success(role);
             return result;
         }
@@ -102,35 +95,27 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="rows">每页行数</param>
         /// <param name="page">当前页</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult GetAllRole(string rows, string page)
+        /// <returns>Result</returns>
+        public Result GetAllRole(string rows, string page)
         {
             const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
             var verify = new Compare(action);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
-            int r;
-            if (!int.TryParse(rows, out r))
+            var ipr = new IntParse(rows);
+            if (!ipr.Result.Successful) return ipr.Result;
+
+            var ipp = new IntParse(page);
+            if (!ipp.Result.Successful) return ipp.Result;
+
+            if (ipr.Value > 500 || ipp.Value < 1)
             {
                 result.BadRequest();
                 return result;
             }
 
-            int p;
-            if (!int.TryParse(page, out p))
-            {
-                result.BadRequest();
-                return result;
-            }
-
-            if (r > 500 || p < 1)
-            {
-                result.BadRequest();
-                return result;
-            }
-
-            var list = GetRoles(r, p);
+            var list = GetRoles(ipr.Value, ipp.Value);
             var count = GetRoleCount();
             if (list.Any()) result.Success(list, count);
             else result.NoContent();
@@ -143,24 +128,20 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">角色ID</param>
         /// <param name="members">成员对象集合</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult AddRoleMember(string id, List<RoleMember> members)
+        /// <returns>Result</returns>
+        public Result AddRoleMember(string id, List<RoleMember> members)
         {
             const string action = "13D93852-53EC-4A15-AAB2-46C9C48C313A";
             var verify = new Compare(action);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
-            var rid = new GuidParse(id).Result;
-            if (!members.Any() || !rid.HasValue)
-            {
-                result.BadRequest();
-                return result;
-            }
+            var parse = new GuidParse(id);
+            if (!parse.Result.Successful || !members.Any()) return parse.Result;
 
-            if (!AddRoleMember(rid.Value, members, verify.Basis.UserId)) result.DataBaseError();
+            if (!AddRoleMember(parse.Value, members, verify.Basis.UserId)) result.DataBaseError();
 
-            var role = GetRole(rid.Value);
+            var role = GetRole(parse.Value);
             result.Success(role);
             return result;
         }
@@ -169,18 +150,52 @@ namespace Insight.Base.Services
         /// 根据成员类型和ID删除角色成员
         /// </summary>
         /// <param name="id">角色成员ID</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult RemoveRoleMember(string id)
+        /// <returns>Result</returns>
+        public Result RemoveRoleMember(string id)
         {
             const string action = "2EF4D82B-4A75-4902-BD9E-B63153D093D2";
             var verify = new Compare(action);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
-            var mid = new GuidParse(id).Result;
-            if (mid.HasValue) return DeleteRoleMember(mid.Value);
+            var parse = new GuidParse(id);
+            return !parse.Result.Successful ? parse.Result : DeleteRoleMember(parse.Value);
+        }
 
-            result.BadRequest();
+        /// <summary>
+        /// 根据角色ID获取角色成员用户集合
+        /// </summary>
+        /// <param name="id">角色ID</param>
+        /// <param name="rows">每页行数</param>
+        /// <param name="page">当前页</param>
+        /// <returns>Result</returns>
+        public Result GetMemberUsers(string id, string rows, string page)
+        {
+            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
+
+            var parse = new GuidParse(id);
+            if (!parse.Result.Successful) return parse.Result;
+
+            var ipr = new IntParse(rows);
+            if (!ipr.Result.Successful) return ipr.Result;
+
+            var ipp = new IntParse(page);
+            if (!ipp.Result.Successful) return ipp.Result;
+
+            if (ipr.Value > 500 || ipp.Value < 1)
+            {
+                result.BadRequest();
+                return result;
+            }
+
+            var list = GetMemberUsers(parse.Value, ipr.Value, ipp.Value);
+            var count = GetUsersCount(parse.Value);
+            if (list.Any()) result.Success(list, count);
+            else result.NoContent();
+
             return result;
         }
 
@@ -188,22 +203,18 @@ namespace Insight.Base.Services
         /// 根据角色ID获取可用的组织机构列表
         /// </summary>
         /// <param name="id">角色ID</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult GetMemberOfTitle(string id)
+        /// <returns>Result</returns>
+        public Result GetMemberOfTitle(string id)
         {
             const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
             var verify = new Compare(action);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
-            var rid = new GuidParse(id).Result;
-            if (!rid.HasValue)
-            {
-                result.BadRequest();
-                return result;
-            }
+            var parse = new GuidParse(id);
+            if (!parse.Result.Successful) return parse.Result;
 
-            var list = GetOtherTitle(rid.Value);
+            var list = GetOtherTitle(parse.Value);
             if (list.Any()) result.Success(list);
             else result.NoContent();
 
@@ -214,22 +225,18 @@ namespace Insight.Base.Services
         /// 根据角色ID获取可用的用户组列表
         /// </summary>
         /// <param name="id">角色ID</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult GetMemberOfGroup(string id)
+        /// <returns>Result</returns>
+        public Result GetMemberOfGroup(string id)
         {
             const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
             var verify = new Compare(action);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
-            var rid = new GuidParse(id).Result;
-            if (!rid.HasValue)
-            {
-                result.BadRequest();
-                return result;
-            }
+            var parse = new GuidParse(id);
+            if (!parse.Result.Successful) return parse.Result;
 
-            var list = GetOtherGroup(rid.Value);
+            var list = GetOtherGroup(parse.Value);
             if (list.Any()) result.Success(list);
             else result.NoContent();
 
@@ -240,22 +247,18 @@ namespace Insight.Base.Services
         /// 根据角色ID获取可用的用户列表
         /// </summary>
         /// <param name="id">角色ID</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult GetMemberOfUser(string id)
+        /// <returns>Result</returns>
+        public Result GetMemberOfUser(string id)
         {
             const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
             var verify = new Compare(action);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
-            var rid = new GuidParse(id).Result;
-            if (!rid.HasValue)
-            {
-                result.BadRequest();
-                return result;
-            }
+            var parse = new GuidParse(id);
+            if (!parse.Result.Successful) return parse.Result;
 
-            var list = GetOtherUser(rid.Value);
+            var list = GetOtherUser(parse.Value);
             if (list.Any()) result.Success(list);
             else result.NoContent();
 
@@ -266,22 +269,18 @@ namespace Insight.Base.Services
         /// 获取可用的操作资源列表
         /// </summary>
         /// <param name="id">角色ID（可为空）</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult GetActions(string id)
+        /// <returns>Result</returns>
+        public Result GetActions(string id)
         {
             const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
             var verify = new Compare(action);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
-            var rid = new GuidParse(id).Result;
-            if (!rid.HasValue)
-            {
-                result.BadRequest();
-                return result;
-            }
+            var parse = new GuidParse(id);
+            if (!parse.Result.Successful) return parse.Result;
 
-            var list = GetAllActions(rid.Value);
+            var list = GetAllActions(parse.Value);
             if (list.Any()) result.Success(list);
             else result.NoContent();
 
@@ -292,22 +291,18 @@ namespace Insight.Base.Services
         /// 获取可用的数据资源列表
         /// </summary>
         /// <param name="id">角色ID（可为空）</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult GetDatas(string id)
+        /// <returns>Result</returns>
+        public Result GetDatas(string id)
         {
             const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
             var verify = new Compare(action);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
-            var rid = new GuidParse(id).Result;
-            if (!rid.HasValue)
-            {
-                result.BadRequest();
-                return result;
-            }
+            var parse = new GuidParse(id);
+            if (!parse.Result.Successful) return parse.Result;
 
-            var list = GetAllDatas(rid.Value);
+            var list = GetAllDatas(parse.Value);
             if (list.Any()) result.Success(list);
             else result.NoContent();
 
