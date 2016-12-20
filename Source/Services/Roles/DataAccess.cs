@@ -45,8 +45,9 @@ namespace Insight.Base.Services
                             ID = d.ID,
                             RoleId = r.ID,
                             ModuleId = (Guid)d.ParentId,
-                            Mode = (int)d.NodeType - 2,
+                            Mode = d.Mode,
                             ModeId = d.ModeId,
+                            Permission = d.Permit.Value,
                             CreatorUserId = uid,
                             CreateTime = now
                         };
