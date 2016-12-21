@@ -67,6 +67,24 @@ namespace Insight.Base.Services
         Result RemoveRoleMember(string id);
 
         /// <summary>
+        /// 根据角色ID获取角色权限集合
+        /// </summary>
+        /// <param name="id">角色ID</param>
+        /// <returns>Result</returns>
+        [WebGet(UriTemplate = "roles/{id}/permits", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        Result GetRolePermits(string id);
+
+        /// <summary>
+        /// 根据角色ID获取角色成员集合
+        /// </summary>
+        /// <param name="id">角色ID</param>
+        /// <returns>Result</returns>
+        [WebGet(UriTemplate = "roles/{id}/members", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        Result GetRoleMembers(string id);
+
+        /// <summary>
         /// 根据角色ID获取角色成员用户集合
         /// </summary>
         /// <param name="id">角色ID</param>

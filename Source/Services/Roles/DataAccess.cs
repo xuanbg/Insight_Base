@@ -205,19 +205,13 @@ namespace Insight.Base.Services
         /// <param name="rows">每页行数</param>
         /// <param name="page">当前页</param>
         /// <returns>角色信息结果集合</returns>
-        private IEnumerable<object> GetRoles(int rows, int page)
+        private List<RoleInfo> GetRoles(int rows, int page)
         {
             using (var context = new BaseEntities())
             {
                 var skip = rows*(page - 1);
                 var list = from r in context.SYS_Role.Where(r => r.Validity).OrderBy(r => r.SN).Skip(skip).Take(rows)
-                           select new
-                           {
-                               r.ID, r.Name, r.Description, r.BuiltIn,
-                               Members = context.RoleMember.Where(m => m.RoleId == r.ID).OrderBy(m => m.ParentId),
-                               Actions = context.RoleAction.Where(a => a.RoleId == r.ID).OrderBy(m => m.ParentId),
-                               Datas = context.RoleData.Where(d => d.RoleId == r.ID).OrderBy(m => m.ParentId)
-                           };
+                           select new RoleInfo{ID = r.ID, Name = r.Name, Description = r.Description, BuiltIn = r.BuiltIn};
                 return list.ToList();
             }
         }
@@ -238,9 +232,9 @@ namespace Insight.Base.Services
                     BuiltIn = role.BuiltIn,
                     Name = role.Name,
                     Description = role.Description,
-                    Members = context.RoleMember.Where(m => m.RoleId == id).OrderBy(m => m.ParentId).ToList(),
-                    Actions = context.RoleAction.Where(a => a.RoleId == id).OrderBy(m => m.ParentId).ToList(),
-                    Datas = context.RoleData.Where(d => d.RoleId == id).OrderBy(m => m.ParentId).ToList()
+                    Members = context.RoleMember.Where(m => m.RoleId == id).ToList(),
+                    Actions = context.RoleAction.Where(a => a.RoleId == id).ToList(),
+                    Datas = context.RoleData.Where(d => d.RoleId == id).ToList()
                 };
                 return obj;
             }
@@ -260,6 +254,34 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
+        /// 获取角色授权信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        private Dictionary<string, object> GetPerms(Guid id)
+        {
+            using (var context = new BaseEntities())
+            {
+                var actions = context.RoleAction.Where(a => a.RoleId == id);
+                var datas = context.RoleData.Where(d => d.RoleId == id);
+                return new Dictionary<string, object> {["Actions"] = actions, ["Datas"] = datas};
+            }
+        }
+
+        /// <summary>
+        /// 获取角色成员信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        private List<RoleMember> GetMembers(Guid id)
+        {
+            using (var context = new BaseEntities())
+            {
+                return context.RoleMember.Where(m => m.RoleId == id).ToList();
+            }
+        }
+
+        /// <summary>
         /// 获取角色成员用户集合
         /// </summary>
         /// <param name="id">角色ID</param>
@@ -270,7 +292,7 @@ namespace Insight.Base.Services
         {
             using (var context = new BaseEntities())
             {
-                var skip = rows * (page - 1);
+                var skip = rows*(page - 1);
                 return context.RoleMemberUser.Where(u => u.RoleId == id).OrderBy(m => m.LoginName).Skip(skip).Take(rows).ToList();
             }
         }

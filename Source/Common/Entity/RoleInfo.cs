@@ -34,11 +34,6 @@ namespace Insight.Base.Common.Entity
         public List<RoleMember> Members { get; set; }
 
         /// <summary>
-        /// 角色成员
-        /// </summary>
-        public List<RoleMemberUser> MemberUsers { get; set; }
-
-        /// <summary>
         /// 角色操作权限集合
         /// </summary>
         public List<RoleAction> Actions { get; set; }

@@ -115,10 +115,12 @@ namespace Insight.Base.Services
                 return result;
             }
 
-            var list = GetRoles(ipr.Value, ipp.Value);
-            var count = GetRoleCount();
-            if (list.Any()) result.Success(list, count);
-            else result.NoContent();
+            var list = new TabList<RoleInfo>
+            {
+                Total =GetRoleCount(),
+                Items = GetRoles(ipr.Value, ipp.Value)
+            };
+            result.Success(list);
 
             return result;
         }
@@ -163,6 +165,46 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
+        /// 根据角色ID获取角色权限集合
+        /// </summary>
+        /// <param name="id">角色ID</param>
+        /// <returns>Result</returns>
+        public Result GetRolePermits(string id)
+        {
+            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
+
+            var parse = new GuidParse(id);
+            if (!parse.Result.Successful) return parse.Result;
+
+            var dict = GetPerms(parse.Value);
+            result.Success(dict);
+            return result;
+        }
+
+        /// <summary>
+        /// 根据角色ID获取角色成员集合
+        /// </summary>
+        /// <param name="id">角色ID</param>
+        /// <returns>Result</returns>
+        public Result GetRoleMembers(string id)
+        {
+            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
+
+            var parse = new GuidParse(id);
+            if (!parse.Result.Successful) return parse.Result;
+
+            var list = GetMembers(parse.Value);
+            result.Success(list);
+            return result;
+        }
+
+        /// <summary>
         /// 根据角色ID获取角色成员用户集合
         /// </summary>
         /// <param name="id">角色ID</param>
@@ -191,10 +233,12 @@ namespace Insight.Base.Services
                 return result;
             }
 
-            var list = GetMemberUsers(parse.Value, ipr.Value, ipp.Value);
-            var count = GetUsersCount(parse.Value);
-            if (list.Any()) result.Success(list, count);
-            else result.NoContent();
+            var list = new TabList<RoleMemberUser>
+            {
+                Total = GetUsersCount(parse.Value),
+                Items = GetMemberUsers(parse.Value, ipr.Value, ipp.Value)
+            };
+            result.Success(list);
 
             return result;
         }
