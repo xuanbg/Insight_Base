@@ -148,15 +148,40 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 获取全部用户
+        /// 获取角色总数
         /// </summary>
-        /// <returns>DataTable 全部用户结果集</returns>
-        private IEnumerable<object> GetUserList()
+        /// <returns>int 角色总数</returns>
+        private int GetUserCount()
         {
             using (var context = new BaseEntities())
             {
-                var list = context.SYS_User.Where(u => u.Type > 0).OrderBy(u => u.SN).ToList();
-                return list.Select(u => new {u.ID, u.BuiltIn, u.Name, u.LoginName, u.Description, u.Type, u.Validity});
+                return context.SYS_User.Count(u => u.Type > 0);
+            }
+        }
+
+        /// <summary>
+        /// 获取全部用户
+        /// </summary>
+        /// <param name="rows"></param>
+        /// <param name="page"></param>
+        /// <returns>全部用户结果集</returns>
+        private List<UserInfo> GetUsers(int rows, int page)
+        {
+            using (var context = new BaseEntities())
+            {
+                var skip = rows * (page - 1);
+                var list = from u in context.SYS_User.Where(u => u.Type > 0).OrderBy(u => u.SN).Skip(skip).Take(rows)
+                           select new UserInfo
+                           {
+                               ID = u.ID,
+                               BuiltIn = u.BuiltIn,
+                               Name = u.Name,
+                               LoginName = u.LoginName,
+                               Description = u.Description,
+                               Type = u.Type,
+                               Validity = u.Validity
+                           };
+                return list.ToList();
             }
         }
 

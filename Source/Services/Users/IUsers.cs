@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using Insight.Base.Common.Entity;
+using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
 {
@@ -44,18 +45,38 @@ namespace Insight.Base.Services
         /// 根据ID获取用户对象实体
         /// </summary>
         /// <param name="id">用户ID</param>
-        /// <returns>JsonResult</returns>
+        /// <returns>Result</returns>
         [WebGet(UriTemplate = "users/{id}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        JsonResult GetUser(string id);
+        Result GetUser(string id);
+
+        /// <summary>
+        /// 获取用户操作权限
+        /// </summary>
+        /// <param name="id">用户ID</param>
+        /// <returns>Result</returns>
+        [WebGet(UriTemplate = "users/{id}/actions", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        Result GetUserActions(string id);
+
+        /// <summary>
+        /// 获取用户数据权限
+        /// </summary>
+        /// <param name="id">用户ID</param>
+        /// <returns>Result</returns>
+        [WebGet(UriTemplate = "users/{id}/datas", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        Result GetUserPermDatas(string id);
 
         /// <summary>
         /// 获取全部用户
         /// </summary>
-        /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "users", ResponseFormat = WebMessageFormat.Json)]
+        /// <param name="rows">每页行数</param>
+        /// <param name="page">当前页</param>
+        /// <returns>Result</returns>
+        [WebGet(UriTemplate = "users?rows={rows}&page={page}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        JsonResult GetUsers();
+        Result GetUsers(string rows, string page);
 
         /// <summary>
         /// 根据对象实体数据注册一个用户

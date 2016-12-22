@@ -119,23 +119,18 @@ namespace Insight.Base.Services
         /// 根据ID获取用户对象实体
         /// </summary>
         /// <param name="id">用户ID</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult GetUser(string id)
+        /// <returns>Result</returns>
+        public Result GetUser(string id)
         {
-            var result = new JsonResult();
-            var uid = new GuidParse(id).Guid;
-            if (!uid.HasValue)
-            {
-                result.BadRequest();
-                return result;
-            }
+            var parse = new GuidParse(id);
+            if (!parse.Result.Successful) return parse.Result;
 
             const string action = "3BC17B61-327D-4EAA-A0D7-7F825A6C71DB";
-            var verify = new Compare(action, 0, uid);
-            result = Util.ConvertTo<JsonResult>(verify.Result);
+            var verify = new Compare(action, 0, parse.Value);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
-            var user = GetUser(uid.Value);
+            var user = GetUser(parse.Value);
             if (user == null) result.NotFound();
             else result.Success(user);
 
@@ -143,19 +138,76 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 获取全部用户
+        /// 获取用户操作权限
         /// </summary>
-        /// <returns>JsonResult</returns>
-        public JsonResult GetUsers()
+        /// <param name="id">用户ID</param>
+        /// <returns>Result</returns>
+        public Result GetUserActions(string id)
         {
             const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
             var verify = new Compare(action);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
-            var list = GetUserList();
-            if (list.Any()) result.Success(list);
-            else result.NoContent();
+            var parse = new GuidParse(id);
+            if (!parse.Result.Successful) return parse.Result;
+
+            var actions = new Authority(parse.Value, null, true).GetUserActions();
+            result.Success(actions);
+            return result;
+        }
+
+        /// <summary>
+        /// 获取用户数据权限
+        /// </summary>
+        /// <param name="id">用户ID</param>
+        /// <returns>Result</returns>
+        public Result GetUserPermDatas(string id)
+        {
+            const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
+
+            var parse = new GuidParse(id);
+            if (!parse.Result.Successful) return parse.Result;
+
+            var datas = new Authority(parse.Value, null, true).GetUserDatas();
+            result.Success(datas);
+            return result;
+        }
+
+        /// <summary>
+        /// 获取全部用户
+        /// </summary>
+        /// <param name="rows">每页行数</param>
+        /// <param name="page">当前页</param>
+        /// <returns>Result</returns>
+        public Result GetUsers(string rows, string page)
+        {
+            const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
+
+            var ipr = new IntParse(rows);
+            if (!ipr.Result.Successful) return ipr.Result;
+
+            var ipp = new IntParse(page);
+            if (!ipp.Result.Successful) return ipp.Result;
+
+            if (ipr.Value > 500 || ipp.Value < 1)
+            {
+                result.BadRequest();
+                return result;
+            }
+
+            var list = new TabList<UserInfo>
+            {
+                Total = GetUserCount(),
+                Items = GetUsers(ipr.Value, ipp.Value)
+            };
+            result.Success(list);
 
             return result;
         }

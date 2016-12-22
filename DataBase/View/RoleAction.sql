@@ -23,7 +23,7 @@ Groups as (
   from SYS_ModuleGroup G
   join Modules M on M.ParentId = G.ID),
 Actions as (
-  select case when P.ID is null then newid() else P.ID end as ID, ModuleId as ParentId, M.RoleId, A.ID as ActionId, P.Action, null as Permit, A.[Index], 3 + isnull(P.Action, -1) as NodeType, A.Alias as Name,
+  select case when P.ID is null then newid() else P.ID end as ID, ModuleId as ParentId, M.RoleId, A.ID as ActionId, P.Action, null as Permit, A.[Index], 2 + isnull(P.Action, 2) as NodeType, A.Alias as Name,
   case P.Action when 0 then '拒绝' when 1 then '允许' else null end as Description
   from SYS_ModuleAction A
   join Modules M on M.ID = A.ModuleId
