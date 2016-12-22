@@ -254,17 +254,28 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 获取角色授权信息
+        /// 获取角色操作权限集合
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        private Dictionary<string, object> GetPerms(Guid id)
+        private List<RoleAction> GetActions(Guid id)
         {
             using (var context = new BaseEntities())
             {
-                var actions = context.RoleAction.Where(a => a.RoleId == id);
-                var datas = context.RoleData.Where(d => d.RoleId == id);
-                return new Dictionary<string, object> {["Actions"] = actions, ["Datas"] = datas};
+                return context.RoleAction.Where(a => a.RoleId == id).ToList();
+            }
+        }
+
+        /// <summary>
+        /// 获取角色数据权集合
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        private List<RoleData> GetPermDatas(Guid id)
+        {
+            using (var context = new BaseEntities())
+            {
+                return context.RoleData.Where(d => d.RoleId == id).ToList();
             }
         }
 
