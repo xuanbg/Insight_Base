@@ -13,6 +13,8 @@ namespace Insight.Base.OAuth
         private List<SYS_ModuleAction> _Actions;
         private List<SYS_Role_Action> _RoleActions;
         private List<SYS_Role_Data> _RoleDatas;
+        private List<SYS_Organization> _Orgs;
+        private List<SYS_User> _Users;
         private List<SYS_Data> _Datas;
         private List<ModuleInfo> _ActionModules;
         private List<ModuleInfo> _DataModules;
@@ -109,15 +111,16 @@ namespace Insight.Base.OAuth
             var actions = from m in modules
                           join a in _Actions on m.ID equals a.ModuleId
                           let allows = _RoleActions.Where(p => p.ActionId == a.ID).OrderBy(i => i.Action).FirstOrDefault()
+                          where allows != null
                           select new RoleAction
                           {
                               ID = a.ID,
                               ParentId = m.ID,
-                              Action = allows?.Action,
+                              Action = allows.Action,
                               Index = a.Index ?? 0,
-                              NodeType = 2 + (allows?.Action ?? 2),
+                              NodeType = allows.Action + 2,
                               Name = a.Alias,
-                              Description = allows == null ? null : (allows.Action < 1 ? "拒绝" : "允许")
+                              Description = allows.Action == 0 ? "拒绝" : "允许"
                           };
             return groups.Union(modules).Union(actions.OrderBy(a => a.Index)).ToList();
         }
@@ -137,9 +140,65 @@ namespace Insight.Base.OAuth
                           .OrderBy(m => m.Index).ToList();
             var datas = from m in modules
                         join p in _RoleDatas on m.ID equals p.ModuleId
+                        group p by new {p.ModuleId, p.Mode, p.ModeId} into g
+                        let mode = g.Key.Mode == 0 ? _Datas.Single(i => i.ID == g.Key.ModeId) : null
+                        let user = g.Key.Mode == 1 ? _Users.Single(i => i.ID == g.Key.ModeId).Name : null
+                        let org = g.Key.Mode == 2 ? _Orgs.Single(i => i.ID == g.Key.ModeId).FullName : null
+                        select new RoleData
+                        {
+                            ID = Guid.NewGuid(),
+                            ParentId = g.Key.ModuleId,
+                            Mode = g.Key.Mode,
+                            Permission = g.Min(i => i.Permission),
+                            Index = mode?.Type ?? g.Key.Mode + 5,
+                            NodeType = (mode?.Type ?? g.Key.Mode) + 2,
+                            Name = g.Key.Mode > 0 ? (g.Key.Mode > 1 ? org : user) : mode.Alias
+                        };
+            return groups.Union(modules).Union(datas.OrderBy(a => a.Index)).ToList();
+        }
+
+        /// <summary>
+        /// 获取角色全部可用功能权限
+        /// </summary>
+        /// <returns></returns>
+        public List<RoleAction> GetAllActions()
+        {
+            var modules = (from m in _Modules
+                           select new RoleAction { ID = m.ID, ParentId = m.ModuleGroupId, Index = m.Index ?? 0, NodeType = 1, Name = m.ApplicationName })
+                          .OrderBy(m => m.Index).ToList();
+            var groups = (from gid in modules.Select(m => m.ParentId).Distinct()
+                          join g in _Groups on gid equals g.ID
+                          select new RoleAction { ID = g.ID, Index = g.Index ?? 0, NodeType = 0, Name = g.Name }).OrderBy(g => g.Index);
+            var actions = from m in modules
+                          join a in _Actions on m.ID equals a.ModuleId
+                          let allows = _RoleActions.Where(p => p.ActionId == a.ID).OrderBy(i => i.Action).FirstOrDefault()
+                          select new RoleAction
+                          {
+                              ID = a.ID,
+                              ParentId = m.ID,
+                              Action = allows?.Action,
+                              Index = a.Index ?? 0,
+                              NodeType = 2 + (allows?.Action ?? 2),
+                              Name = a.Alias,
+                              Description = allows == null ? null : (allows.Action < 1 ? "拒绝" : "允许")
+                          };
+            return groups.Union(modules).Union(actions.OrderBy(a => a.Index)).ToList();
+        }
+
+
+        public List<RoleData> GetAllDatas()
+        {
+            var modules = (from m in _Modules.Where(i => i.Name != null)
+                           select new RoleData { ID = m.ID, ParentId = m.ModuleGroupId, Index = m.Index ?? 0, NodeType = 1, Name = m.ApplicationName })
+                          .OrderBy(m => m.Index).ToList();
+            var groups = (from gid in modules.Select(m => m.ParentId).Distinct()
+                          join g in _Groups on gid equals g.ID
+                          select new RoleData { ID = g.ID, Index = g.Index ?? 0, NodeType = 0, Name = g.Name }).OrderBy(g => g.Index);
+            var datas = from m in modules
+                        join p in _RoleDatas on m.ID equals p.ModuleId
                         join d in _Datas on p.ModeId equals d.ID
                         where p.Mode == 0
-                        group p by new {p.ModuleId, p.Mode, d.Type, d.Alias} into g
+                        group p by new { p.ModuleId, p.Mode, d.Type, d.Alias } into g
                         select new RoleData
                         {
                             ID = Guid.NewGuid(),
@@ -214,6 +273,8 @@ namespace Insight.Base.OAuth
                 if (type == InitType.Navigation) return;
 
                 // 读取数据授权模式原始记录，根据数据授权计算授权给用户的模块
+                _Users = context.SYS_User.Where(u => u.Type > 0).ToList();
+                _Orgs = context.SYS_Organization.Where(o => o.NodeType == 2).ToList();
                 _Datas = context.SYS_Data.ToList();
                 _DataModules = (from r in _RoleDatas
                                 join m in _Modules on r.ModuleId equals m.ID

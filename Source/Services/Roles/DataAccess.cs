@@ -424,7 +424,7 @@ namespace Insight.Base.Services
                 var ml = from m in context.SYS_Module.Where(m => m.Validity)
                          let perm = ids.Any(id => id == m.ID) ? (int?)1 : null
                          select new ActionInfo { ID = m.ID, ParentId = m.ModuleGroupId, Permit = perm, Index = m.Index, NodeType = 1, Name = m.ApplicationName };
-                var al = from a in context.SYS_ModuleAction.Where(a => a.Validity)
+                var al = from a in context.SYS_ModuleAction
                          join m in context.SYS_Module.Where(m => m.Validity) on a.ModuleId equals m.ID
                          let t = context.SYS_Role_Action.FirstOrDefault(r => r.RoleId == rid && r.ActionId == a.ID)
                          let perm = t == null ? null : (int?) t.Action
