@@ -51,8 +51,8 @@ namespace Insight.Base.OAuth
         /// <returns>模块组集合</returns>
         public IEnumerable<object> PermModuleGroups()
         {
-            var list = from g in _Groups
-                       join gid in _ActionModules.Select(m => m.GroupId).Distinct() on g.ID equals gid
+            var list = from gid in _ActionModules.Select(m => m.GroupId).Distinct()
+                       join g in _Groups on gid equals g.ID
                        select new {g.ID, g.Index, g.Name, g.Icon};
             return list.OrderBy(g => g.Index).ToList();
         }
@@ -63,8 +63,8 @@ namespace Insight.Base.OAuth
         /// <returns>模块集合</returns>
         public IEnumerable<object> PermModules()
         {
-            var list = from m in _Modules
-                       join mid in _ActionModules.Select(m => m.ID) on m.ID equals mid
+            var list = from mid in _ActionModules.Select(m => m.ID).Distinct()
+                       join m in _Modules on mid equals m.ID
                        select new
                        {
                            m.ID,
@@ -87,22 +87,21 @@ namespace Insight.Base.OAuth
         /// <returns>操作集合</returns>
         public IEnumerable<object> ModuleActions(Guid mid)
         {
-            var allows = _RoleActions.Where(a => a.SYS_ModuleAction.ModuleId == mid && _RoleList.Any(id => id == a.RoleId));
-            var perm = allows.GroupBy(a => new {a.ActionId, a.Action}).Select(p => new {ID = p.Key.ActionId, Action = p.Min(a => a.Action)});
-            var actions = _Actions.Where(a => a.ModuleId == mid);
-            var list = actions.Select(a => new
-            {
-                a.ID,
-                a.ModuleId,
-                a.Index,
-                a.Name,
-                a.Alias,
-                a.Icon,
-                a.ShowText,
-                a.BeginGroup,
-                Enable = perm.Any(p => p.ID == a.ID && p.Action > 0),
-                a.Validity
-            });
+            var list = from a in _Actions.Where(i => i.ModuleId == mid)
+                       let perm = _RoleActions.Where(p => p.ActionId == a.ID).OrderBy(i => i.Action).FirstOrDefault()
+                       select new
+                       {
+                           a.ID,
+                           a.ModuleId,
+                           a.Index,
+                           a.Name,
+                           a.Alias,
+                           a.Icon,
+                           a.ShowText,
+                           a.BeginGroup,
+                           Enable = (perm?.Action ?? 0) > 0,
+                           a.Validity
+                       };
             return list.OrderBy(a => a.Index).ToList();
         }
 
@@ -116,7 +115,7 @@ namespace Insight.Base.OAuth
             var groups = (from gid in _ActionModules.Select(m => m.GroupId).Distinct()
                           join g in _Groups on gid equals g.ID
                           select new RoleAction {ID = g.ID, Index = g.Index, NodeType = 0, Name = g.Name}).OrderBy(g => g.Index);
-            var modules = (from mid in _ActionModules.Select(m => m.GroupId)
+            var modules = (from mid in _ActionModules.Select(m => m.ID).Distinct()
                            join m in _Modules on mid equals m.ID
                            select new RoleAction {ID = m.ID, ParentId = m.ModuleGroupId, Index = m.Index, NodeType = 1, Name = m.ApplicationName})
                           .OrderBy(m => m.Index).ToList();
@@ -145,7 +144,7 @@ namespace Insight.Base.OAuth
             var groups = (from gid in _DataModules.Select(m => m.GroupId).Distinct()
                           join g in _Groups on gid equals g.ID
                           select new RoleData {ID = g.ID, Index = g.Index, NodeType = 0, Name = g.Name}).OrderBy(g => g.Index);
-            var modules = (from mid in _DataModules.Select(m => m.GroupId)
+            var modules = (from mid in _DataModules.Select(m => m.ID).Distinct()
                            join m in _Modules on mid equals m.ID
                            select new RoleData { ID = m.ID, ParentId = m.ModuleGroupId, Index = m.Index, NodeType = 1, Name = m.ApplicationName })
                           .OrderBy(m => m.Index).ToList();
