@@ -152,7 +152,7 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
-            var actions = new Authority(parse.Value, null, true).GetUserActions();
+            var actions = new Authority(parse.Value, null, InitType.Permission, true).GetUserActions();
             result.Success(actions);
             return result;
         }
@@ -172,7 +172,7 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
-            var datas = new Authority(parse.Value, null, true).GetUserDatas();
+            var datas = new Authority(parse.Value, null, InitType.Permission, true).GetUserDatas();
             result.Success(datas);
             return result;
         }

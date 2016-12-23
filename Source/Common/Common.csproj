@@ -55,6 +55,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entity\Enum.cs" />
+    <Compile Include="Entity\ModuleInfo.cs" />
     <Compile Include="Entity\DataInfo.cs" />
     <Compile Include="Entity\Level.cs" />
     <Compile Include="Entity\Model.Context.cs">

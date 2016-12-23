@@ -21,7 +21,7 @@ namespace Insight.Base.Services
             var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
-            var auth = new Authority(verify.Basis.UserId, verify.Basis.DeptId);
+            var auth = new Authority(verify.Basis.UserId, verify.Basis.DeptId, InitType.Navigation);
             var data = auth.PermModuleGroups();
             if (data.Any()) result.Success(data);
             else result.NoContent();
@@ -39,7 +39,7 @@ namespace Insight.Base.Services
             var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
-            var auth = new Authority(verify.Basis.UserId, verify.Basis.DeptId);
+            var auth = new Authority(verify.Basis.UserId, verify.Basis.DeptId, InitType.Navigation);
             var data = auth.PermModules();
             if (data.Any()) result.Success(data);
             else result.NoContent();
@@ -65,7 +65,7 @@ namespace Insight.Base.Services
                 return result;
             }
 
-            var auth = new Authority(verify.Basis.UserId, verify.Basis.DeptId);
+            var auth = new Authority(verify.Basis.UserId, verify.Basis.DeptId, InitType.ToolBar);
             var data = auth.ModuleActions(mid.Value);
             if (data.Any()) result.Success(data);
             else result.NoContent();
