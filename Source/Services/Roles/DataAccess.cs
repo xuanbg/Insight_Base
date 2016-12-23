@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Insight.Base.Common.Entity;
+using Insight.Base.OAuth;
 using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
@@ -226,6 +227,7 @@ namespace Insight.Base.Services
             using (var context = new BaseEntities())
             {
                 var role = context.SYS_Role.Single(r => r.ID == id);
+                var auth = new Authority(id);
                 var obj = new RoleInfo
                 {
                     ID = role.ID,
@@ -233,8 +235,8 @@ namespace Insight.Base.Services
                     Name = role.Name,
                     Description = role.Description,
                     Members = context.RoleMember.Where(m => m.RoleId == id).ToList(),
-                    Actions = context.RoleAction.Where(a => a.RoleId == id).ToList(),
-                    Datas = context.RoleData.Where(d => d.RoleId == id).ToList()
+                    Actions = auth.GetActions(),
+                    Datas = auth.GetDatas()
                 };
                 return obj;
             }
@@ -250,32 +252,6 @@ namespace Insight.Base.Services
             using (var context = new BaseEntities())
             {
                 return context.RoleMemberUser.Count(u => u.RoleId == id);
-            }
-        }
-
-        /// <summary>
-        /// 获取角色操作权限集合
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        private List<RoleAction> GetActions(Guid id)
-        {
-            using (var context = new BaseEntities())
-            {
-                return context.RoleAction.Where(a => a.RoleId == id).ToList();
-            }
-        }
-
-        /// <summary>
-        /// 获取角色数据权集合
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        private List<RoleData> GetPermDatas(Guid id)
-        {
-            using (var context = new BaseEntities())
-            {
-                return context.RoleData.Where(d => d.RoleId == id).ToList();
             }
         }
 

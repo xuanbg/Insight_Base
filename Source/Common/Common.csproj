@@ -75,12 +75,6 @@
       <DependentUpon>Model.edmx</DependentUpon>
     </Compile>
     <Compile Include="Entity\OrgInfo.cs" />
-    <Compile Include="Entity\RoleAction.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entity\RoleData.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
     <Compile Include="Entity\RoleInfo.cs" />
     <Compile Include="Entity\ActionInfo.cs" />
     <Compile Include="Entity\RoleMember.cs">

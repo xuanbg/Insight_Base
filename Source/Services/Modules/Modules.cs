@@ -23,7 +23,7 @@ namespace Insight.Base.Services
             if (!result.Successful) return result;
 
             var auth = new Authority(verify.Basis.UserId, verify.Basis.DeptId, InitType.Navigation);
-            var data = new {Groups = auth.PermModuleGroups(), Modules = auth.PermModules()};
+            var data = new {Groups = auth.GetModuleGroups(), Modules = auth.GetModules()};
             result.Success(data);
 
             return result;

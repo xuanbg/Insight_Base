@@ -18,7 +18,17 @@ namespace Insight.Base.OAuth
         private List<ModuleInfo> _DataModules;
 
         /// <summary>
-        /// 构造函数，根据初始化等级初始化数据
+        /// 构造函数，根据角色ID初始化数据
+        /// </summary>
+        /// <param name="rid">角色ID</param>
+        public Authority(Guid rid)
+        {
+            _RoleList = new List<Guid> {rid};
+            InitData(InitType.Permission);
+        }
+
+        /// <summary>
+        /// 构造函数，根据初始化类型初始化数据
         /// 默认只初始化用户对应角色集合
         /// </summary>
         /// <param name="uid">登录用户ID</param>
@@ -27,7 +37,8 @@ namespace Insight.Base.OAuth
         /// <param name="all">是否包含用户的全部角色（忽略登录部门）</param>
         public Authority(Guid uid, Guid? did, InitType type = 0, bool all = false)
         {
-            InitData(uid, did, type, all);
+            InitRoleActions(uid, did, all);
+            InitData(type);
         }
 
         /// <summary>
@@ -49,7 +60,7 @@ namespace Insight.Base.OAuth
         /// 登录用户被授权的模块组集合
         /// </summary>
         /// <returns>模块组集合</returns>
-        public IEnumerable<object> PermModuleGroups()
+        public IEnumerable<object> GetModuleGroups()
         {
             var list = from gid in _ActionModules.Select(m => m.GroupId).Distinct()
                        join g in _Groups on gid equals g.ID
@@ -61,7 +72,7 @@ namespace Insight.Base.OAuth
         /// 登录用户被授权的模块集合
         /// </summary>
         /// <returns>模块集合</returns>
-        public IEnumerable<object> PermModules()
+        public IEnumerable<object> GetModules()
         {
             var list = from mid in _ActionModules.Select(m => m.ID).Distinct()
                        join m in _Modules on mid equals m.ID
@@ -86,14 +97,14 @@ namespace Insight.Base.OAuth
         /// 获取用户操作权限
         /// </summary>
         /// <returns>操作权限集合</returns>
-        public IEnumerable<RoleAction> GetUserActions()
+        public List<RoleAction> GetActions()
         {
             var groups = (from gid in _ActionModules.Select(m => m.GroupId).Distinct()
                           join g in _Groups on gid equals g.ID
-                          select new RoleAction {ID = g.ID, Index = g.Index, NodeType = 0, Name = g.Name}).OrderBy(g => g.Index);
+                          select new RoleAction {ID = g.ID, Index = g.Index ?? 0, NodeType = 0, Name = g.Name}).OrderBy(g => g.Index);
             var modules = (from mid in _ActionModules.Select(m => m.ID).Distinct()
                            join m in _Modules on mid equals m.ID
-                           select new RoleAction {ID = m.ID, ParentId = m.ModuleGroupId, Index = m.Index, NodeType = 1, Name = m.ApplicationName})
+                           select new RoleAction {ID = m.ID, ParentId = m.ModuleGroupId, Index = m.Index ?? 0, NodeType = 1, Name = m.ApplicationName})
                           .OrderBy(m => m.Index).ToList();
             var actions = from m in modules
                           join a in _Actions on m.ID equals a.ModuleId
@@ -103,7 +114,7 @@ namespace Insight.Base.OAuth
                               ID = a.ID,
                               ParentId = m.ID,
                               Action = allows?.Action,
-                              Index = a.Index,
+                              Index = a.Index ?? 0,
                               NodeType = 2 + (allows?.Action ?? 2),
                               Name = a.Alias,
                               Description = allows == null ? null : (allows.Action < 1 ? "拒绝" : "允许")
@@ -115,14 +126,14 @@ namespace Insight.Base.OAuth
         /// 获取用户数据权限
         /// </summary>
         /// <returns>数据权限集合</returns>
-        public IEnumerable<RoleData> GetUserDatas()
+        public List<RoleData> GetDatas()
         {
             var groups = (from gid in _DataModules.Select(m => m.GroupId).Distinct()
                           join g in _Groups on gid equals g.ID
-                          select new RoleData {ID = g.ID, Index = g.Index, NodeType = 0, Name = g.Name}).OrderBy(g => g.Index);
+                          select new RoleData {ID = g.ID, Index = g.Index ?? 0, NodeType = 0, Name = g.Name}).OrderBy(g => g.Index);
             var modules = (from mid in _DataModules.Select(m => m.ID).Distinct()
                            join m in _Modules on mid equals m.ID
-                           select new RoleData { ID = m.ID, ParentId = m.ModuleGroupId, Index = m.Index, NodeType = 1, Name = m.ApplicationName })
+                           select new RoleData { ID = m.ID, ParentId = m.ModuleGroupId, Index = m.Index ?? 0, NodeType = 1, Name = m.ApplicationName })
                           .OrderBy(m => m.Index).ToList();
             var datas = from m in modules
                         join p in _RoleDatas on m.ID equals p.ModuleId
@@ -145,32 +156,43 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 获取用户的角色集合/授权操作集合/授权数据集合
         /// </summary>
-        private void InitData(Guid uid, Guid? did, InitType type, bool all)
+        private void InitRoleActions(Guid uid, Guid? did, bool all)
         {
             using (var context = new BaseEntities())
             {
-                // 读取指定用户对应的全部角色ID，及对应的功能授权原始记录
+                // 读取指定用户对应的全部角色ID
                 _RoleList = context.UserRole.Where(r => r.UserId == uid && (all || !r.DiptId.HasValue || r.DiptId == did)).Select(i => i.RoleId).Distinct().ToList();
+            }
+        }
+
+        /// <summary>
+        /// 获取用户的角色集合/授权操作集合/授权数据集合
+        /// </summary>
+        /// <param name="type">初始化类型</param>
+        private void InitData(InitType type)
+        {
+            using (var context = new BaseEntities())
+            {
+                // 读取全部角色对应的功能授权原始记录
                 _RoleActions = (from a in context.SYS_Role_Action
                                 join r in _RoleList on a.RoleId equals r
                                 select a).ToList();
 
                 switch (type)
                 {
-                    // 功能鉴权，立即返回
+                    // 如功能鉴权，立即返回
                     case InitType.ActionIdentify:
                         return;
 
-                    // 数据鉴权或获取授权信息，读取用户对应全部角色的数据授权原始记录
                     case InitType.DataIdentify:
                     case InitType.Permission:
+                        // 数据鉴权或获取授权信息，读取用户对应全部角色的数据授权原始记录
                         _RoleDatas = (from d in context.SYS_Role_Data
                                       join r in _RoleList on d.RoleId equals r
                                       select d).ToList();
 
                         // 如数据鉴权，立即返回
                         if (type == InitType.DataIdentify) return;
-
                         break;
                 }
 
@@ -185,7 +207,7 @@ namespace Insight.Base.OAuth
                                   join a in _Actions on r.ActionId equals a.ID
                                   join m in _Modules on a.ModuleId equals m.ID
                                   where m.Validity
-                                  group m by new ModuleInfo { ID = m.ID, GroupId = m.ModuleGroupId } into g
+                                  group m by new ModuleInfo {ID = m.ID, GroupId = m.ModuleGroupId} into g
                                   select g.Key).Distinct().ToList();
 
                 // 如获取导航信息，立即返回
@@ -196,7 +218,7 @@ namespace Insight.Base.OAuth
                 _DataModules = (from r in _RoleDatas
                                 join m in _Modules on r.ModuleId equals m.ID
                                 where m.Validity
-                                group m by new ModuleInfo { ID = m.ID, GroupId = m.ModuleGroupId } into g
+                                group m by new ModuleInfo {ID = m.ID, GroupId = m.ModuleGroupId} into g
                                 select g.Key).Distinct().ToList();
             }
         }

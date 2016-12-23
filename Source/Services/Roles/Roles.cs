@@ -165,11 +165,11 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 根据角色ID获取角色操作权限集合
+        /// 根据角色ID获取角色授权信息
         /// </summary>
         /// <param name="id">角色ID</param>
         /// <returns>Result</returns>
-        public Result GetRoleActions(string id)
+        public Result GetRolePermission(string id)
         {
             const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
             var verify = new Compare(action);
@@ -179,26 +179,9 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
-            result.Success(GetActions(parse.Value));
-            return result;
-        }
-
-        /// <summary>
-        /// 根据角色ID获取角色数据权限集合
-        /// </summary>
-        /// <param name="id">角色ID</param>
-        /// <returns>Result</returns>
-        public Result GetRoleDatas(string id)
-        {
-            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
-
-            var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
-
-            result.Success(GetPermDatas(parse.Value));
+            var auth = new Authority(parse.Value);
+            var role = new {Actions = auth.GetActions(), Datas = auth.GetDatas()};
+            result.Success(role);
             return result;
         }
 

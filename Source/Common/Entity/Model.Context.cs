@@ -48,8 +48,6 @@ namespace Insight.Base.Common.Entity
         public virtual DbSet<SYS_User> SYS_User { get; set; }
         public virtual DbSet<SYS_UserGroup> SYS_UserGroup { get; set; }
         public virtual DbSet<SYS_UserGroupMember> SYS_UserGroupMember { get; set; }
-        public virtual DbSet<RoleAction> RoleAction { get; set; }
-        public virtual DbSet<RoleData> RoleData { get; set; }
         public virtual DbSet<RoleMember> RoleMember { get; set; }
         public virtual DbSet<RoleMemberUser> RoleMemberUser { get; set; }
         public virtual DbSet<SYS_VerifyImage> SYS_VerifyImage { get; set; }

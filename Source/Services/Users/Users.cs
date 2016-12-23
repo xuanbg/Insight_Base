@@ -153,7 +153,7 @@ namespace Insight.Base.Services
             if (!parse.Result.Successful) return parse.Result;
 
             var auth = new Authority(parse.Value, null, InitType.Permission, true);
-            var user = new {Actions = auth.GetUserActions(), Datas = auth.GetUserDatas()};
+            var user = new {Actions = auth.GetActions(), Datas = auth.GetDatas()};
             result.Success(user);
             return result;
         }
