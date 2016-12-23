@@ -5,6 +5,7 @@ using System.ServiceModel;
 using Insight.Base.Common.Entity;
 using Insight.Base.OAuth;
 using Insight.Utils.Common;
+using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
 {
@@ -12,37 +13,18 @@ namespace Insight.Base.Services
     public partial class Modules:IModules
     {
         /// <summary>
-        /// 获取用户获得授权的所有模块的组信息
+        /// 获取登录用户的导航信息
         /// </summary>
-        /// <returns>JsonResult</returns>
-        public JsonResult GetModuleGroup()
+        /// <returns>Result</returns>
+        public Result GetNavigation()
         {
             var verify = new Compare();
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
             var auth = new Authority(verify.Basis.UserId, verify.Basis.DeptId, InitType.Navigation);
-            var data = auth.PermModuleGroups();
-            if (data.Any()) result.Success(data);
-            else result.NoContent();
-
-            return result;
-        }
-
-        /// <summary>
-        /// 获取用户获得授权的所有模块信息
-        /// </summary>
-        /// <returns>JsonResult</returns>
-        public JsonResult GetUserModule()
-        {
-            var verify = new Compare();
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
-            if (!result.Successful) return result;
-
-            var auth = new Authority(verify.Basis.UserId, verify.Basis.DeptId, InitType.Navigation);
-            var data = auth.PermModules();
-            if (data.Any()) result.Success(data);
-            else result.NoContent();
+            var data = new {Groups = auth.PermModuleGroups(), Modules = auth.PermModules()};
+            result.Success(data);
 
             return result;
         }
@@ -51,11 +33,11 @@ namespace Insight.Base.Services
         /// 获取用户启动模块的工具栏操作信息
         /// </summary>
         /// <param name="id">模块ID</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult GetAction(string id)
+        /// <returns>Result</returns>
+        public Result GetAction(string id)
         {
             var verify = new Compare();
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
             var mid = new GuidParse(id).Guid;

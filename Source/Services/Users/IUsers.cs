@@ -51,22 +51,13 @@ namespace Insight.Base.Services
         Result GetUser(string id);
 
         /// <summary>
-        /// 获取用户操作权限
+        /// 获取用户授权信息
         /// </summary>
         /// <param name="id">用户ID</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "users/{id}/actions", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "users/{id}/permission", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result GetUserActions(string id);
-
-        /// <summary>
-        /// 获取用户数据权限
-        /// </summary>
-        /// <param name="id">用户ID</param>
-        /// <returns>Result</returns>
-        [WebGet(UriTemplate = "users/{id}/datas", ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        Result GetUserPermDatas(string id);
+        Result GetUserPermission(string id);
 
         /// <summary>
         /// 获取全部用户

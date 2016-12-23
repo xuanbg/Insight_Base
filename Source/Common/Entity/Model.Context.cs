@@ -53,6 +53,7 @@ namespace Insight.Base.Common.Entity
         public virtual DbSet<RoleMember> RoleMember { get; set; }
         public virtual DbSet<RoleMemberUser> RoleMemberUser { get; set; }
         public virtual DbSet<SYS_VerifyImage> SYS_VerifyImage { get; set; }
+        public virtual DbSet<UserRole> UserRole { get; set; }
     
         public virtual int GetCode(Nullable<System.Guid> schemeId, Nullable<System.Guid> deptId, Nullable<System.Guid> userId, Nullable<System.Guid> businessId, Nullable<System.Guid> moduleId, string @char)
         {

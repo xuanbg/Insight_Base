@@ -138,11 +138,11 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 获取用户操作权限
+        /// 获取用户授权信息
         /// </summary>
         /// <param name="id">用户ID</param>
         /// <returns>Result</returns>
-        public Result GetUserActions(string id)
+        public Result GetUserPermission(string id)
         {
             const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
             var verify = new Compare(action);
@@ -152,28 +152,9 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
-            var actions = new Authority(parse.Value, null, InitType.Permission, true).GetUserActions();
-            result.Success(actions);
-            return result;
-        }
-
-        /// <summary>
-        /// 获取用户数据权限
-        /// </summary>
-        /// <param name="id">用户ID</param>
-        /// <returns>Result</returns>
-        public Result GetUserPermDatas(string id)
-        {
-            const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
-
-            var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
-
-            var datas = new Authority(parse.Value, null, InitType.Permission, true).GetUserDatas();
-            result.Success(datas);
+            var auth = new Authority(parse.Value, null, InitType.Permission, true);
+            var user = new {Actions = auth.GetUserActions(), Datas = auth.GetUserDatas()};
+            result.Success(user);
             return result;
         }
 

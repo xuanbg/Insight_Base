@@ -385,6 +385,17 @@
           <Property Name="Description" Type="nvarchar(max)" />
           <Property Name="Validity" Type="bit" Nullable="false" />
         </EntityType>
+        <!--生成过程中发现错误:
+警告 6002: 表/视图“Insight_Base.dbo.UserRole”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="UserRole">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="UserId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="DiptId" Type="uniqueidentifier" />
+        </EntityType>
         <Association Name="FK__SYS_Allot__Creat__02284B6B">
           <End Role="SYS_Organization" Type="Self.SYS_Organization" Multiplicity="0..1" />
           <End Role="SYS_Allot_Record" Type="Self.SYS_Allot_Record" Multiplicity="*" />
@@ -936,6 +947,14 @@
     [RoleMemberUser].[Description] AS [Description], 
     [RoleMemberUser].[Validity] AS [Validity]
     FROM [dbo].[RoleMemberUser] AS [RoleMemberUser]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="UserRole" EntityType="Self.UserRole" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [UserRole].[ID] AS [ID], 
+    [UserRole].[RoleId] AS [RoleId], 
+    [UserRole].[UserId] AS [UserId], 
+    [UserRole].[DiptId] AS [DiptId]
+    FROM [dbo].[UserRole] AS [UserRole]</DefiningQuery>
           </EntitySet>
           <AssociationSet Name="FK__SYS_Allot__Creat__02284B6B" Association="Self.FK__SYS_Allot__Creat__02284B6B">
             <End Role="SYS_Organization" EntitySet="SYS_Organization" />
@@ -2149,6 +2168,7 @@
             <Parameter Name="Char" Mode="In" Type="String" />
           </FunctionImport>
           <EntitySet Name="SYS_VerifyImage" EntityType="BaseModel.SYS_VerifyImage" />
+          <EntitySet Name="UserRole" EntityType="BaseModel.UserRole" />
         </EntityContainer>
         <EntityType Name="SYS_VerifyImage">
           <Key>
@@ -2160,6 +2180,15 @@
           <Property Name="Name" Type="String" Nullable="false" MaxLength="16" FixedLength="false" Unicode="true" />
           <Property Name="Path" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="false" />
           <Property Name="CreateTime" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="UserRole">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="RoleId" Type="Guid" Nullable="false" />
+          <Property Name="UserId" Type="Guid" Nullable="false" />
+          <Property Name="DiptId" Type="Guid" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -2549,6 +2578,16 @@
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="Type" ColumnName="Type" />
                 <ScalarProperty Name="SN" ColumnName="SN" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UserRole">
+            <EntityTypeMapping TypeName="BaseModel.UserRole">
+              <MappingFragment StoreEntitySet="UserRole">
+                <ScalarProperty Name="DiptId" ColumnName="DiptId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>

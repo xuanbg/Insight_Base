@@ -23,11 +23,11 @@ namespace Insight.Base.OAuth
         /// </summary>
         /// <param name="uid">登录用户ID</param>
         /// <param name="did">登录部门ID</param>
-        /// <param name="grade">初始化等级</param>
+        /// <param name="type">初始化等级</param>
         /// <param name="all">是否包含用户的全部角色（忽略登录部门）</param>
-        public Authority(Guid uid, Guid? did, InitType grade = 0, bool all = false)
+        public Authority(Guid uid, Guid? did, InitType type = 0, bool all = false)
         {
-            Init(uid, did, grade, all);
+            InitData(uid, did, type, all);
         }
 
         /// <summary>
@@ -65,18 +65,7 @@ namespace Insight.Base.OAuth
         {
             var list = from mid in _ActionModules.Select(m => m.ID).Distinct()
                        join m in _Modules on mid equals m.ID
-                       select new
-                       {
-                           m.ID,
-                           m.ModuleGroupId,
-                           m.Index,
-                           m.ProgramName,
-                           m.NameSpace,
-                           m.ApplicationName,
-                           m.Location,
-                           m.Default,
-                           m.Icon
-                       };
+                       select new {m.ID, m.ModuleGroupId, m.Index, m.ProgramName, m.NameSpace, m.ApplicationName, m.Location, m.Default, m.Icon};
             return list.OrderBy(m => m.Index).ToList();
         }
 
@@ -88,23 +77,10 @@ namespace Insight.Base.OAuth
         public IEnumerable<object> ModuleActions(Guid mid)
         {
             var list = from a in _Actions.Where(i => i.ModuleId == mid)
-                       let perm = _RoleActions.Where(p => p.ActionId == a.ID).OrderBy(i => i.Action).FirstOrDefault()
-                       select new
-                       {
-                           a.ID,
-                           a.ModuleId,
-                           a.Index,
-                           a.Name,
-                           a.Alias,
-                           a.Icon,
-                           a.ShowText,
-                           a.BeginGroup,
-                           Enable = (perm?.Action ?? 0) > 0,
-                           a.Validity
-                       };
+                       let action = _RoleActions.Where(p => p.ActionId == a.ID).OrderBy(i => i.Action).FirstOrDefault()?.Action ?? 0
+                       select new {a.ID, a.ModuleId, a.Index, a.Name, a.Alias, a.Icon, a.ShowText, a.BeginGroup, Enable = action > 0, a.Validity};
             return list.OrderBy(a => a.Index).ToList();
         }
-
 
         /// <summary>
         /// 获取用户操作权限
@@ -169,31 +145,17 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 获取用户的角色集合/授权操作集合/授权数据集合
         /// </summary>
-        private void Init(Guid uid, Guid? did, InitType grade, bool all)
+        private void InitData(Guid uid, Guid? did, InitType type, bool all)
         {
             using (var context = new BaseEntities())
             {
-                // 通过用户和角色关系，读取指定用户对应的全部角色ID
-                var rid_u = from r in context.SYS_Role_Member.Where(m => m.MemberId == uid)
-                            where r.Type == 1
-                            select r.RoleId;
-                var rid_g = from m in context.SYS_UserGroupMember.Where(u => u.UserId == uid)
-                            join r in context.SYS_Role_Member on m.GroupId equals r.MemberId
-                            where r.Type == 2
-                            select r.RoleId;
-                var rid_t = from m in context.SYS_OrgMember.Where(u => u.UserId == uid)
-                            join r in context.SYS_Role_Member on m.OrgId equals r.MemberId
-                            join o in context.SYS_Organization on m.OrgId equals o.ID
-                            where r.Type == 3 && (all || o.ParentId == did)
-                            select r.RoleId;
-                _RoleList = rid_u.Union(rid_g).Union(rid_t).ToList();
-
-                // 读取用户对应全部角色的功能授权原始记录
+                // 读取指定用户对应的全部角色ID，及对应的功能授权原始记录
+                _RoleList = context.UserRole.Where(r => r.UserId == uid && (all || !r.DiptId.HasValue || r.DiptId == did)).Select(i => i.RoleId).Distinct().ToList();
                 _RoleActions = (from a in context.SYS_Role_Action
                                 join r in _RoleList on a.RoleId equals r
                                 select a).ToList();
 
-                switch (grade)
+                switch (type)
                 {
                     // 功能鉴权，立即返回
                     case InitType.ActionIdentify:
@@ -207,17 +169,18 @@ namespace Insight.Base.OAuth
                                       select d).ToList();
 
                         // 如数据鉴权，立即返回
-                        if (grade == InitType.DataIdentify) return;
+                        if (type == InitType.DataIdentify) return;
 
                         break;
                 }
 
-                // 读取功能/模块/模块组原始记录
+                // 读取功能原始记录，如获取工具栏信息，立即返回
                 _Actions = context.SYS_ModuleAction.ToList();
+                if (type == InitType.ToolBar) return;
+
+                // 读取模块/模块组原始记录，根据功能授权计算授权给用户的模块
                 _Modules = context.SYS_Module.Where(m => m.Validity).ToList();
                 _Groups = context.SYS_ModuleGroup.ToList();
-
-                // 根据功能授权计算授权给用户的模块
                 _ActionModules = (from r in _RoleActions
                                   join a in _Actions on r.ActionId equals a.ID
                                   join m in _Modules on a.ModuleId equals m.ID
@@ -225,13 +188,11 @@ namespace Insight.Base.OAuth
                                   group m by new ModuleInfo { ID = m.ID, GroupId = m.ModuleGroupId } into g
                                   select g.Key).Distinct().ToList();
 
-                // 如获取导航信息或工具栏信息，立即返回
-                if (grade == InitType.Navigation || grade == InitType.ToolBar)return;
+                // 如获取导航信息，立即返回
+                if (type == InitType.Navigation) return;
 
-                // 读取数据授权模式原始记录
+                // 读取数据授权模式原始记录，根据数据授权计算授权给用户的模块
                 _Datas = context.SYS_Data.ToList();
-
-                // 根据数据授权计算授权给用户的模块
                 _DataModules = (from r in _RoleDatas
                                 join m in _Modules on r.ModuleId equals m.ID
                                 where m.Validity

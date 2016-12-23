@@ -2,6 +2,7 @@
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using Insight.Base.Common.Entity;
+using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
 {
@@ -9,29 +10,21 @@ namespace Insight.Base.Services
     interface IModules
     {
         /// <summary>
-        /// 获取用户获得授权的所有模块的组信息
+        /// 获取登录用户的导航信息
         /// </summary>
-        /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "groups", ResponseFormat = WebMessageFormat.Json)]
+        /// <returns>Result</returns>
+        [WebGet(UriTemplate = "navigations", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        JsonResult GetModuleGroup();
-
-        /// <summary>
-        /// 获取用户获得授权的所有模块信息
-        /// </summary>
-        /// <returns>JsonResult</returns>
-        [WebGet(UriTemplate = "modules", ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        JsonResult GetUserModule();
+        Result GetNavigation();
 
         /// <summary>
         /// 获取用户启动模块的工具栏操作信息
         /// </summary>
         /// <param name="id">模块ID</param>
-        /// <returns>JsonResult</returns>
+        /// <returns>Result</returns>
         [WebGet(UriTemplate = "modules/{id}/actions", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        JsonResult GetAction(string id);
+        Result GetAction(string id);
 
         /// <summary>
         /// 获取模块有效选项参数

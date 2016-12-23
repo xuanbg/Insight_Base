@@ -156,6 +156,9 @@
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="Entity\UserInfo.cs" />
+    <Compile Include="Entity\UserRole.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
     <Compile Include="Logger.cs" />
     <Compile Include="Parameters.cs" />
     <Compile Include="Entity\JsonResult.cs" />
