@@ -311,11 +311,11 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 获取可用的操作资源列表
+        /// 获取可用的权限资源列表
         /// </summary>
         /// <param name="id">角色ID（可为空）</param>
         /// <returns>Result</returns>
-        public Result GetActions(string id)
+        public Result GetAllPermission(string id)
         {
             const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
             var verify = new Compare(action);
@@ -325,32 +325,9 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
-            var list = GetAllActions(parse.Value);
-            if (list.Any()) result.Success(list);
-            else result.NoContent();
-
-            return result;
-        }
-
-        /// <summary>
-        /// 获取可用的数据资源列表
-        /// </summary>
-        /// <param name="id">角色ID（可为空）</param>
-        /// <returns>Result</returns>
-        public Result GetDatas(string id)
-        {
-            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
-
-            var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
-
-            var list = GetAllDatas(parse.Value);
-            if (list.Any()) result.Success(list);
-            else result.NoContent();
-
+            var auth = new Authority(parse.Value);
+            var role = new {Actions = auth.GetAllActions(), Datas = auth.GetAllDatas()};
+            result.Success(role);
             return result;
         }
     }

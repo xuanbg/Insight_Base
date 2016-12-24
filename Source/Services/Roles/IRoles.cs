@@ -123,21 +123,12 @@ namespace Insight.Base.Services
         Result GetMemberOfUser(string id);
 
         /// <summary>
-        /// 获取可用的操作资源列表
+        /// 获取可用的权限资源列表
         /// </summary>
         /// <param name="id">角色ID（可为空）</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "roles/actions?id={id}", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "roles/{id}/allperm", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result GetActions(string id);
-
-        /// <summary>
-        /// 获取可用的数据资源列表
-        /// </summary>
-        /// <param name="id">角色ID（可为空）</param>
-        /// <returns>Result</returns>
-        [WebGet(UriTemplate = "roles/datas?id={id}", ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        Result GetDatas(string id);
+        Result GetAllPermission(string id);
     }
 }
