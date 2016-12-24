@@ -163,8 +163,9 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="rows">每页行数</param>
         /// <param name="page">当前页</param>
+        /// <param name="key">关键词</param>
         /// <returns>Result</returns>
-        public Result GetUsers(string rows, string page)
+        public Result GetUsers(string rows, string page, string key)
         {
             const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
             var verify = new Compare(action);
@@ -183,13 +184,7 @@ namespace Insight.Base.Services
                 return result;
             }
 
-            var list = new TabList<UserInfo>
-            {
-                Total = GetUserCount(),
-                Items = GetUsers(ipr.Value, ipp.Value)
-            };
-            result.Success(list);
-
+            result.Success(GetUsers(ipr.Value, ipp.Value, key));
             return result;
         }
 

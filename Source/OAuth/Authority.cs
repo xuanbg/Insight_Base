@@ -120,7 +120,7 @@ namespace Insight.Base.OAuth
                               Index = a.Index ?? 0,
                               NodeType = allows.Action + 2,
                               Name = a.Alias,
-                              Description = allows.Action == 0 ? "拒绝" : "允许"
+                              Description = allows.Action > 0 ? "允许" : "拒绝"
                           };
             return groups.Union(modules).Union(actions.OrderBy(a => a.Index)).ToList();
         }
@@ -152,7 +152,8 @@ namespace Insight.Base.OAuth
                             Permission = g.Min(i => i.Permission),
                             Index = mode?.Type ?? g.Key.Mode + 5,
                             NodeType = (mode?.Type ?? g.Key.Mode) + 2,
-                            Name = g.Key.Mode > 0 ? (g.Key.Mode > 1 ? org : user) : mode.Alias
+                            Name = g.Key.Mode > 0 ? (g.Key.Mode > 1 ? org : user) : mode.Alias,
+                            Description = g.Min(i => i.Permission) > 0 ? "读写" : "只读"
                         };
             return groups.Union(modules).Union(datas.OrderBy(a => a.Index)).ToList();
         }
@@ -183,7 +184,7 @@ namespace Insight.Base.OAuth
                               Index = a.Index ?? 0,
                               NodeType = 2,
                               Name = a.Alias,
-                              Description = allows == null ? null : (allows.Action < 1 ? "拒绝" : "允许")
+                              Description = allows == null ? null : (allows.Action > 0 ? "允许" : "拒绝")
                           };
             return groups.Union(modules).Union(actions.OrderBy(a => a.Index)).ToList();
         }
@@ -215,7 +216,7 @@ namespace Insight.Base.OAuth
                             Index = d.Type,
                             NodeType = d.Type + 2,
                             Name = d.Alias,
-                            Description = perm == null ? null : (perm.Permission == 0 ? "只读" : "读写")
+                            Description = perm == null ? null : (perm.Permission > 0 ? "读写" : "只读")
                         };
             var users = from r in _RoleDatas.Where(i => i.Mode == 1)
                         join u in _Users on r.ModeId equals u.ID
@@ -230,7 +231,7 @@ namespace Insight.Base.OAuth
                             Index = r.Mode + 5,
                             NodeType = r.Mode + 2,
                             Name = $"{u.Name}({u.LoginName})",
-                            Description = r.Permission == 0 ? "只读" : "读写"
+                            Description = r.Permission > 0 ? "读写" : "只读"
                         };
             var orgs = from r in _RoleDatas.Where(i => i.Mode == 2)
                        join o in _Orgs on r.ModeId equals o.ID
@@ -245,7 +246,7 @@ namespace Insight.Base.OAuth
                            Index = r.Mode + 5,
                            NodeType = r.Mode + 2,
                            Name = o.FullName,
-                           Description = r.Permission == 0 ? "只读" : "读写"
+                           Description = r.Permission > 0 ? "读写" : "只读"
                        };
             return groups.Union(modules).Union(datas.OrderBy(a => a.Index)).Union(users).Union(orgs).ToList();
         }

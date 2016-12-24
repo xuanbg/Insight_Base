@@ -115,13 +115,7 @@ namespace Insight.Base.Services
                 return result;
             }
 
-            var list = new TabList<RoleInfo>
-            {
-                Total =GetRoleCount(),
-                Items = GetRoles(ipr.Value, ipp.Value)
-            };
-            result.Success(list);
-
+            result.Success(GetRoles(ipr.Value, ipp.Value));
             return result;
         }
 
@@ -234,13 +228,7 @@ namespace Insight.Base.Services
                 return result;
             }
 
-            var list = new TabList<RoleMemberUser>
-            {
-                Total = GetUsersCount(parse.Value),
-                Items = GetMemberUsers(parse.Value, ipr.Value, ipp.Value)
-            };
-            result.Success(list);
-
+            result.Success(GetMemberUsers(parse.Value, ipr.Value, ipp.Value));
             return result;
         }
 

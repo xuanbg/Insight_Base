@@ -64,10 +64,11 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="rows">每页行数</param>
         /// <param name="page">当前页</param>
+        /// <param name="key">关键词</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "users?rows={rows}&page={page}", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "users?rows={rows}&page={page}&key={key}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result GetUsers(string rows, string page);
+        Result GetUsers(string rows, string page, string key);
 
         /// <summary>
         /// 根据对象实体数据注册一个用户

@@ -189,31 +189,23 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 获取角色总数
-        /// </summary>
-        /// <returns>int 角色总数</returns>
-        private int GetRoleCount()
-        {
-            using (var context = new BaseEntities())
-            {
-                return context.SYS_Role.Count(r => r.Validity);
-            }
-        }
-
-        /// <summary>
         /// 获取所有角色
         /// </summary>
         /// <param name="rows">每页行数</param>
         /// <param name="page">当前页</param>
         /// <returns>角色信息结果集合</returns>
-        private List<RoleInfo> GetRoles(int rows, int page)
+        private TabList<RoleInfo> GetRoles(int rows, int page)
         {
             using (var context = new BaseEntities())
             {
-                var skip = rows*(page - 1);
-                var list = from r in context.SYS_Role.Where(r => r.Validity).OrderBy(r => r.SN).Skip(skip).Take(rows)
+                var list = from r in context.SYS_Role.Where(r => r.Validity).OrderBy(r => r.SN)
                            select new RoleInfo{ID = r.ID, Name = r.Name, Description = r.Description, BuiltIn = r.BuiltIn};
-                return list.ToList();
+                var skip = rows*(page - 1);
+                return new TabList<RoleInfo>
+                {
+                    Total = list.Count(),
+                    Items = list.Skip(skip).Take(rows).ToList()
+                };
             }
         }
 
@@ -243,19 +235,6 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 获取角色成员用户总数
-        /// </summary>
-        /// <param name="id">角色ID</param>
-        /// <returns>int 成员用户总数</returns>
-        private int GetUsersCount(Guid id)
-        {
-            using (var context = new BaseEntities())
-            {
-                return context.RoleMemberUser.Count(u => u.RoleId == id);
-            }
-        }
-
-        /// <summary>
         /// 获取角色成员信息
         /// </summary>
         /// <param name="id"></param>
@@ -275,12 +254,17 @@ namespace Insight.Base.Services
         /// <param name="rows">每页行数</param>
         /// <param name="page">当前页</param>
         /// <returns>角色成员用户集合</returns>
-        private List<RoleMemberUser> GetMemberUsers(Guid id, int rows, int page)
+        private TabList<RoleMemberUser> GetMemberUsers(Guid id, int rows, int page)
         {
             using (var context = new BaseEntities())
             {
                 var skip = rows*(page - 1);
-                return context.RoleMemberUser.Where(u => u.RoleId == id).OrderBy(m => m.LoginName).Skip(skip).Take(rows).ToList();
+                var list = context.RoleMemberUser.Where(u => u.RoleId == id).OrderBy(m => m.LoginName);
+                return new TabList<RoleMemberUser>
+                {
+                    Total = list.Count(),
+                    Items = list.Skip(skip).Take(rows).ToList()
+                };
             }
         }
 
