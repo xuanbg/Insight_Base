@@ -229,12 +229,12 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="account">登录账号</param>
         /// <param name="password">新密码</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult UpdateSignature(string account, string password)
+        /// <returns>Result</returns>
+        public Result UpdateSignature(string account, string password)
         {
             const string action = "26481E60-0917-49B4-BBAA-2265E71E7B3F";
             var verify = new Compare(action, account);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
             var session = Util.StringCompare(verify.Basis.Account, account)
@@ -312,12 +312,12 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="account">登录账号</param>
         /// <param name="validity">可用状态</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult SetUserStatus(string account, bool validity)
+        /// <returns>Result</returns>
+        public Result SetUserStatus(string account, bool validity)
         {
             var action = validity ? "369548E9-C8DB-439B-A604-4FDC07F3CCDD" : "0FA34D43-2C52-4968-BDDA-C9191D7FCE80";
             var verify = new Compare(action, account);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
             var reset = Update(account, validity);
@@ -343,12 +343,12 @@ namespace Insight.Base.Services
         /// 设置指定用户的登录状态为离线
         /// </summary>
         /// <param name="account">用户账号</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult UserSignOut(string account)
+        /// <returns>Result</returns>
+        public Result UserSignOut(string account)
         {
             const string action = "331BF752-CDB7-44DE-9631-DF2605BB527E";
             var verify = new Compare(action, account);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
             var session = OAuth.Common.GetSession(account);

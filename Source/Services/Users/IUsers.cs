@@ -85,10 +85,10 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="account">登录账号</param>
         /// <param name="password">新密码</param>
-        /// <returns>JsonResult</returns>
+        /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "users/{account}/signature", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult UpdateSignature(string account, string password);
+        Result UpdateSignature(string account, string password);
 
         /// <summary>
         /// 用户重置登录密码
@@ -106,19 +106,19 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="account">登录账号</param>
         /// <param name="validity">可用状态</param>
-        /// <returns>JsonResult</returns>
+        /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "users/{account}/validity", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult SetUserStatus(string account, bool validity);
+        Result SetUserStatus(string account, bool validity);
 
         /// <summary>
         /// 设置指定用户的登录状态为离线
         /// </summary>
         /// <param name="account">用户账号</param>
-        /// <returns>JsonResult</returns>
+        /// <returns>Result</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "users/{account}/token", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult UserSignOut(string account);
+        Result UserSignOut(string account);
 
         #endregion
 
