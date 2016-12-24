@@ -41,12 +41,30 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
+        /// 用户手机号
+        /// </summary>
+        public string Mobile
+        {
+            get { return _User.Mobile; }
+            set { _User.Mobile = value; }
+        }
+
+        /// <summary>
         /// 用户密码
         /// </summary>
         public string Password
         {
             get { return _User.Password; }
             set { _User.Password = value; }
+        }
+
+        /// <summary>
+        /// 支付密码
+        /// </summary>
+        public string PayPassword
+        {
+            get { return _User.PayPassword; }
+            set { _User.PayPassword = value; }
         }
 
         /// <summary>
@@ -106,8 +124,17 @@ namespace Insight.Base.Services
         /// <param name="user">用户实体</param>
         public User(SYS_User user)
         {
-            _User = user;
-            Result.Success();
+            using (var context = new BaseEntities())
+            {
+                _User = context.SYS_User.SingleOrDefault(u => u.LoginName == user.LoginName);
+                if (_User == null)
+                {
+                    _User = user;
+                    Result.Success();
+                }
+                else
+                    Result.AccountExists();
+            }
         }
 
         /// <summary>
@@ -119,7 +146,11 @@ namespace Insight.Base.Services
             using (var context = new BaseEntities())
             {
                 _User = context.SYS_User.SingleOrDefault(u => u.ID == id);
-                if (_User == null) Result.NotFound();
+                if (_User == null)
+                {
+                    _User = new SYS_User();
+                    Result.NotFound();
+                }
                 else Result.Success();
             }
         }
@@ -133,7 +164,11 @@ namespace Insight.Base.Services
             using (var context = new BaseEntities())
             {
                 _User = context.SYS_User.SingleOrDefault(u => u.LoginName == account);
-                if (_User == null) Result.NotFound();
+                if (_User == null)
+                {
+                    _User = new SYS_User();
+                    Result.NotFound();
+                }
                 else Result.Success();
             }
         }
@@ -145,7 +180,10 @@ namespace Insight.Base.Services
         public bool Add()
         {
             var result = DbHelper.Insert(_User);
-            if (!result) Result.DataBaseError();
+            if (result)
+                Result.Created();
+            else
+                Result.DataBaseError();
 
             return result;
         }

@@ -20,7 +20,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         [WebInvoke(Method = "POST", UriTemplate = "users", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult AddUser(SYS_User user);
+        Result AddUser(SYS_User user);
 
         /// <summary>
         /// 根据ID删除用户
@@ -29,7 +29,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "users/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult RemoveUser(string id);
+        Result RemoveUser(string id);
 
         /// <summary>
         /// 根据用户ID更新用户信息
@@ -39,7 +39,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "users/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult UpdateUserInfo(string id, SYS_User user);
+        Result UpdateUserInfo(string id, SYS_User user);
 
         /// <summary>
         /// 根据ID获取用户对象实体
@@ -75,10 +75,10 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="account">登录账号</param>
         /// <param name="user">用户对象</param>
-        /// <returns>JsonResult</returns>
+        /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "users/{account}/signup", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult SignUp(string account, SYS_User user);
+        Result SignUp(string account, SYS_User user);
 
         /// <summary>
         /// 更新指定用户Session的签名

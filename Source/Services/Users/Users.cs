@@ -21,56 +21,42 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="user">用户对象</param>
         /// <returns>JsonResult</returns>
-        public JsonResult AddUser(SYS_User user)
+        public Result AddUser(SYS_User user)
         {
             const string action = "60D5BE64-0102-4189-A999-96EDAD3DA1B5";
             var verify = new Compare(action);
             var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
-            using (var context = new BaseEntities())
-            {
-                var data = context.SYS_User.FirstOrDefault(u => u.LoginName == user.LoginName);
-                if (data != null)
-                {
-                    result.AccountExists();
-                    return result;
-                }
-            }
-            
             user.ID = Guid.NewGuid();
             user.Password = Util.Hash("123456");
             user.Type = 1;
             user.CreatorUserId = verify.Basis.UserId;
-            var id = InsertData(user);
-            if (id == null) result.DataBaseError();
-            else result.Created(id);
+            var u = new User(user);
+            if (!u.Result.Successful) return u.Result;
 
-            return result;
+            return !u.Add() ? u.Result : result;
         }
 
         /// <summary>
         /// 根据ID删除用户
         /// </summary>
         /// <param name="id">用户ID</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult RemoveUser(string id)
+        /// <returns>Result</returns>
+        public Result RemoveUser(string id)
         {
             const string action = "BE2DE9AB-C109-418D-8626-236DEF8E8504";
             var verify = new Compare(action);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
-            var uid = new GuidParse(id).Guid;
-            if (!uid.HasValue)
-            {
-                result.BadRequest();
-                return result;
-            }
+            var parse = new GuidParse(id);
+            if (!parse.Result.Successful) return parse.Result;
 
-            if (!DeleteUser(uid.Value)) result.DataBaseError();
+            var user = new User(parse.Value);
+            if (!user.Result.Successful) return user.Result;
 
-            return result;
+            return user.Delete() ? result : user.Result;
         }
 
         /// <summary>
@@ -79,33 +65,25 @@ namespace Insight.Base.Services
         /// <param name="id">用户ID</param>
         /// <param name="user">用户数据对象</param>
         /// <returns>JsonResult</returns>
-        public JsonResult UpdateUserInfo(string id, SYS_User user)
+        public Result UpdateUserInfo(string id, SYS_User user)
         {
-            var result = new JsonResult();
-            var uid = new GuidParse(id).Guid;
-            if (!uid.HasValue)
-            {
-                result.BadRequest();
-                return result;
-            }
+            var parse = new GuidParse(id);
+            if (!parse.Result.Successful) return parse.Result;
 
             const string action = "3BC17B61-327D-4EAA-A0D7-7F825A6C71DB";
-            var verify = new Compare(action, 0, uid);
-            result = Util.ConvertTo<JsonResult>(verify.Result);
+            var verify = new Compare(action, 0, parse.Value);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
-            var reset = Update(user);
-            if (!reset.HasValue)
+            var u = new User(parse.Value)
             {
-                result.NotFound();
-                return result;
-            }
+                Name = user.Name,
+                Description = user.Description,
+                Type = user.Type
+            };
+            if (!u.Result.Successful) return u.Result;
 
-            if (!reset.Value)
-            {
-                result.DataBaseError();
-                return result;
-            }
+            if (!u.Update()) return u.Result;
 
             var session = OAuth.Common.GetSession(user.LoginName);
             if (session == null) return result;
@@ -193,34 +171,23 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="account">登录账号</param>
         /// <param name="user">用户对象</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult SignUp(string account, SYS_User user)
+        /// <returns>Result</returns>
+        public Result SignUp(string account, SYS_User user)
         {
             var verify = new Compare();
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
-            using (var context = new BaseEntities())
-            {
-                var data = context.SYS_User.FirstOrDefault(u => u.LoginName == user.LoginName);
-                if (data != null)
-                {
-                    result.AccountExists();
-                    return result;
-                }
-            }
+            var u = new User(user);
+            if (!u.Result.Successful) return u.Result;
 
-            if (InsertData(user) == null)
-            {
-                verify.Result.DataBaseError();
-                return result;
-            }
+            if (!u.Add()) return u.Result;
 
             var token = new AccessToken {Account = account};
             var session = OAuth.Common.GetSession(token);
             session.InitSecret();
 
-            verify.Result.Success(session.CreatorKey());
+            verify.Result.Created(session.CreatorKey());
             return result;
         }
 
@@ -241,10 +208,9 @@ namespace Insight.Base.Services
                 ? verify.Basis
                 : OAuth.Common.GetSession(account);
 
-            var user = new User(account);
+            var user = new User(account) {Password = Util.Hash(account.ToUpper() + password)};
             if (!user.Result.Successful) return user.Result;
 
-            user.Password = Util.Hash(account.ToUpper() + password);
             if (!user.Update()) return user.Result;
 
             if (session == null) return result;
@@ -286,11 +252,9 @@ namespace Insight.Base.Services
 
             Parameters.SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == 2);
 
-            // 更新数据库
-            var user = new User(account);
+            var user = new User(account) {Password = Util.Hash(account.ToUpper() + password)};
             if (!user.Result.Successful) return user.Result;
 
-            user.Password = Util.Hash(account.ToUpper() + password);
             if (!user.Update()) return user.Result;
 
             session.Sign(password);
@@ -313,10 +277,9 @@ namespace Insight.Base.Services
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            var user = new User(account);
+            var user = new User(account) {Validity = validity};
             if (!user.Result.Successful) return user.Result;
 
-            user.Validity = validity;
             if (!user.Update()) return user.Result;
 
             var session = OAuth.Common.GetSession(account);
