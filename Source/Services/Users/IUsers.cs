@@ -96,10 +96,10 @@ namespace Insight.Base.Services
         /// <param name="account">登录账号</param>
         /// <param name="password">新密码</param>
         /// <param name="code">短信验证码</param>
-        /// <returns>JsonResult</returns>
+        /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "users/{account}/resetpw", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult ResetSignature(string account, string password, string code);
+        Result ResetSignature(string account, string password, string code);
 
         /// <summary>
         /// 根据用户ID设置用户状态

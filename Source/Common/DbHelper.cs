@@ -1,0 +1,82 @@
+﻿using System;
+using System.Data.Entity;
+using Insight.Base.Common.Entity;
+
+namespace Insight.Base.Common
+{
+    public class DbHelper
+    {
+        /// <summary>
+        /// 插入数据库记录
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="entry">数据实体</param>
+        /// <returns>bool 是否成功</returns>
+        public static bool Insert<T>(T entry) where T : class
+        {
+            using (var context = new BaseEntities())
+            {
+                var obj = context.Set<T>();
+                obj.Add(entry);
+                try
+                {
+                    context.SaveChanges();
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 删除数据库记录
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="entry">数据实体</param>
+        /// <returns>bool 是否成功</returns>
+        public static bool Delete<T>(T entry) where T : class
+        {
+            using (var context = new BaseEntities())
+            {
+                var obj = context.Set<T>();
+                obj.Remove(entry);
+                try
+                {
+                    context.SaveChanges();
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 更新数据库记录
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="entry">数据实体</param>
+        /// <returns>bool 是否成功</returns>
+        public static bool Update<T>(T entry) where T : class
+        {
+            using (var context = new BaseEntities())
+            {
+                var obj = context.Set<T>();
+                obj.Attach(entry);
+                context.Entry(entry).State = EntityState.Modified;
+                try
+                {
+                    context.SaveChanges();
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+        }
+    }
+}

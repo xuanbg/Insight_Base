@@ -240,18 +240,12 @@ namespace Insight.Base.Services
             var session = Util.StringCompare(verify.Basis.Account, account)
                 ? verify.Basis
                 : OAuth.Common.GetSession(account);
-            var reset = Update(account, password);
-            if (!reset.HasValue)
-            {
-                result.NotFound();
-                return result;
-            }
 
-            if (!reset.Value)
-            {
-                result.DataBaseError();
-                return result;
-            }
+            var user = new User(account);
+            if (!user.Result.Successful) return user.Result;
+
+            user.Password = Util.Hash(account.ToUpper() + password);
+            if (!user.Update()) return user.Result;
 
             if (session == null) return result;
 
@@ -265,8 +259,8 @@ namespace Insight.Base.Services
         /// <param name="account">登录账号</param>
         /// <param name="password">新密码</param>
         /// <param name="code">短信验证码</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult ResetSignature(string account, string password, string code)
+        /// <returns>Result</returns>
+        public Result ResetSignature(string account, string password, string code)
         {
             var verify = new Compare();
             var result = Util.ConvertTo<JsonResult>(verify.Result);
@@ -293,12 +287,11 @@ namespace Insight.Base.Services
             Parameters.SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == 2);
 
             // 更新数据库
-            var reset = Update(account, password);
-            if (reset == null || !reset.Value)
-            {
-                result.DataBaseError();
-                return result;
-            }
+            var user = new User(account);
+            if (!user.Result.Successful) return user.Result;
+
+            user.Password = Util.Hash(account.ToUpper() + password);
+            if (!user.Update()) return user.Result;
 
             session.Sign(password);
             session.InitSecret();
@@ -316,22 +309,15 @@ namespace Insight.Base.Services
         public Result SetUserStatus(string account, bool validity)
         {
             var action = validity ? "369548E9-C8DB-439B-A604-4FDC07F3CCDD" : "0FA34D43-2C52-4968-BDDA-C9191D7FCE80";
-            var verify = new Compare(action, account);
+            var verify = new Compare(action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            var reset = Update(account, validity);
-            if (!reset.HasValue)
-            {
-                result.NotFound();
-                return result;
-            }
+            var user = new User(account);
+            if (!user.Result.Successful) return user.Result;
 
-            if (!reset.Value)
-            {
-                result.DataBaseError();
-                return result;
-            }
+            user.Validity = validity;
+            if (!user.Update()) return user.Result;
 
             var session = OAuth.Common.GetSession(account);
             if (session != null) session.Validity = validity;
@@ -346,12 +332,11 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result UserSignOut(string account)
         {
-            const string action = "331BF752-CDB7-44DE-9631-DF2605BB527E";
-            var verify = new Compare(action, account);
+            var verify = new Compare();
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            var session = OAuth.Common.GetSession(account);
+            var session = verify.Basis;
             session?.SignOut();
 
             return result;

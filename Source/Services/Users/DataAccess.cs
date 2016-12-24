@@ -51,35 +51,6 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 更新用户登录密码
-        /// </summary>
-        /// <param name="account">登录账号</param>
-        /// <param name="password">登录密码</param>
-        /// <returns>bool 是否成功</returns>
-        private bool? Update(string account, string password)
-        {
-            using (var context = new BaseEntities())
-            {
-                var user = context.SYS_User.SingleOrDefault(u => u.LoginName == account);
-                if (user == null) return null;
-
-                var sign = Util.Hash(account.ToUpper() + password);
-                if (user.Password == sign) return true;
-
-                user.Password = sign;
-                try
-                {
-                    context.SaveChanges();
-                    return true;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-        }
-
-        /// <summary>
         /// 更新用户信息
         /// </summary>
         /// <param name="obj">用户数据对象</param>
@@ -95,34 +66,6 @@ namespace Insight.Base.Services
                 user.Name = obj.Name;
                 user.Description = obj.Description;
                 user.Type = obj.Type;
-                try
-                {
-                    context.SaveChanges();
-                    return true;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-        }
-
-        /// <summary>
-        /// 更新用户状态
-        /// </summary>
-        /// <param name="account">用户ID</param>
-        /// <param name="validity">是否有效</param>
-        /// <returns>bool 是否成功</returns>
-        private bool? Update(string account, bool validity)
-        {
-            using (var context = new BaseEntities())
-            {
-                var user = context.SYS_User.SingleOrDefault(u => u.LoginName == account);
-                if (user == null) return null;
-
-                if (user.Validity == validity) return true;
-
-                user.Validity = validity;
                 try
                 {
                     context.SaveChanges();
@@ -155,13 +98,13 @@ namespace Insight.Base.Services
         /// <param name="page">当前页</param>
         /// <param name="key">关键词</param>
         /// <returns>全部用户结果集</returns>
-        private TabList<UserInfo> GetUsers(int rows, int page, string key)
+        private TabList<User> GetUsers(int rows, int page, string key)
         {
             using (var context = new BaseEntities())
             {
                 var filter = !string.IsNullOrEmpty(key);
                 var list = from u in context.SYS_User.Where(u => u.Type > 0 && (!filter || u.Name.Contains(key) || u.LoginName.Contains(key))).OrderBy(u => u.SN)
-                           select new UserInfo
+                           select new User
                            {
                                ID = u.ID,
                                BuiltIn = u.BuiltIn,
@@ -172,7 +115,7 @@ namespace Insight.Base.Services
                                Validity = u.Validity
                            };
                 var skip = rows * (page - 1);
-                return new TabList<UserInfo>
+                return new TabList<User>
                 {
                     Total = list.Count(),
                     Items = list.Skip(skip).Take(rows).ToList()
