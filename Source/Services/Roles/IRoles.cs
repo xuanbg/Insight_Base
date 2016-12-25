@@ -16,7 +16,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "roles", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result AddRole(RoleInfo role);
+        Result AddRole(Role role);
 
         /// <summary>
         /// 根据ID删除角色
@@ -35,7 +35,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "roles/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result EditRole(string id, RoleInfo role);
+        Result EditRole(string id, Role role);
 
         /// <summary>
         /// 获取所有角色

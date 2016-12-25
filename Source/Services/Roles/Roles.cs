@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using Insight.Base.Common.Entity;
@@ -16,18 +17,17 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="role">RoleInfo</param>
         /// <returns>Result</returns>
-        public Result AddRole(RoleInfo role)
+        public Result AddRole(Role role)
         {
             const string action = "10B574A2-1A69-4273-87D9-06EDA77B80B6";
             var verify = new Compare(action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            if (!InsertData(verify.Basis.UserId, role))
-            {
-                result.DataBaseError();
-                return result;
-            }
+            role.CreatorUserId = verify.Basis.UserId;
+            role.CreateTime = DateTime.Now;
+            if (!role.Add()) return role.Result;
+
             var r = GetRole(role.ID);
             result.Created(r);
             return result;
@@ -48,16 +48,10 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
-            var del = DeleteRole(parse.Value);
-            if (!del.HasValue)
-            {
-                result.NotFound();
-                return result;
-            }
+            var role = new Role(parse.Value);
+            if (!role.Result.Successful) return role.Result;
 
-            if (!del.Value) result.DataBaseError();
-
-            return result;
+            return !role.Delete() ? role.Result : result;
         }
 
         /// <summary>
@@ -66,7 +60,7 @@ namespace Insight.Base.Services
         /// <param name="id">角色ID</param>
         /// <param name="role">RoleInfo</param>
         /// <returns>Result</returns>
-        public Result EditRole(string id, RoleInfo role)
+        public Result EditRole(string id, Role role)
         {
             const string action = "4DC0141D-FE3D-4504-BE70-763028796808";
             var verify = new Compare(action);
@@ -76,14 +70,7 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
-            var data = Update(verify.Basis.UserId, role);
-            if (!data.HasValue)
-            {
-                verify.Result.NotFound();
-                return result;
-            }
-
-            if (!data.Value) result.DataBaseError();
+            if (!role.Update()) return role.Result;
 
             role = GetRole(parse.Value);
             result.Success(role);

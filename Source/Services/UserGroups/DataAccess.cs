@@ -10,54 +10,8 @@ using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
 {
-    public partial class Users
+    public partial class UserGroups
     {
-
-        /// <summary>
-        /// 根据用户ID获取用户对象实体
-        /// </summary>
-        /// <param name="id">用户ID</param>
-        /// <returns>SYS_User 用户对象实体</returns>
-        private SYS_User GetUser(Guid id)
-        {
-            using (var context = new BaseEntities())
-            {
-                return context.SYS_User.SingleOrDefault(u => u.ID == id);
-            }
-        }
-
-        /// <summary>
-        /// 获取全部用户
-        /// </summary>
-        /// <param name="rows">每页行数</param>
-        /// <param name="page">当前页</param>
-        /// <param name="key">关键词</param>
-        /// <returns>全部用户结果集</returns>
-        private TabList<User> GetUsers(int rows, int page, string key)
-        {
-            using (var context = new BaseEntities())
-            {
-                var filter = !string.IsNullOrEmpty(key);
-                var list = from u in context.SYS_User.Where(u => u.Type > 0 && (!filter || u.Name.Contains(key) || u.LoginName.Contains(key))).OrderBy(u => u.SN)
-                           select new User
-                           {
-                               ID = u.ID,
-                               BuiltIn = u.BuiltIn,
-                               Name = u.Name,
-                               LoginName = u.LoginName,
-                               Description = u.Description,
-                               Type = u.Type,
-                               Validity = u.Validity
-                           };
-                var skip = rows * (page - 1);
-                return new TabList<User>
-                {
-                    Total = list.Count(),
-                    Items = list.Skip(skip).Take(rows).ToList()
-                };
-            }
-        }
-
         /// <summary>
         /// 根据对象实体数据新增一个用户组
         /// </summary>

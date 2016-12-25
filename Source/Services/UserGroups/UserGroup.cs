@@ -7,7 +7,7 @@ using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
 {
-    public class User
+    public class UserGroup
     {
         private readonly SYS_User _User;
 
@@ -97,29 +97,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 是否内置用户
         /// </summary>
-        public bool BuiltIn
-        {
-            get { return _User.BuiltIn; }
-            set { _User.BuiltIn = value; }
-        }
-
-        /// <summary>
-        /// 创建人ID
-        /// </summary>
-        public Guid CreatorUserId
-        {
-            get { return _User.CreatorUserId; }
-            set { _User.CreatorUserId = value; }
-        }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreateTime
-        {
-            get { return _User.CreateTime; }
-            set { _User.CreateTime = value; }
-        }
+        public bool BuiltIn { get; set; }
 
         /// <summary>
         /// 授予用户的功能权限
@@ -134,7 +112,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 构造函数，构造新的用户实体
         /// </summary>
-        public User()
+        public UserGroup()
         {
             _User = new SYS_User();
             Result.Success();
@@ -144,7 +122,7 @@ namespace Insight.Base.Services
         /// 构造函数，传入用户实体
         /// </summary>
         /// <param name="user">用户实体</param>
-        public User(SYS_User user)
+        public UserGroup(SYS_User user)
         {
             using (var context = new BaseEntities())
             {
@@ -163,7 +141,7 @@ namespace Insight.Base.Services
         /// 构造函数，根据ID读取用户实体
         /// </summary>
         /// <param name="id">用户ID</param>
-        public User(Guid id)
+        public UserGroup(Guid id)
         {
             using (var context = new BaseEntities())
             {
@@ -181,7 +159,7 @@ namespace Insight.Base.Services
         /// 构造函数，根据登录账号读取用户实体
         /// </summary>
         /// <param name="account">登录账号</param>
-        public User(string account)
+        public UserGroup(string account)
         {
             using (var context = new BaseEntities())
             {

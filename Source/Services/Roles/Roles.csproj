@@ -50,6 +50,7 @@
     <Compile Include="DataAccess.cs" />
     <Compile Include="IRoles.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Role.cs" />
     <Compile Include="Roles.cs" />
   </ItemGroup>
   <ItemGroup>

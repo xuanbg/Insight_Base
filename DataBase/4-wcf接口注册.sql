@@ -24,6 +24,7 @@ select '6200', 'security', 'v1.0', 'Insight.Base.Services', 'ISecurity', 'Securi
 select '6200', 'moduleapi', 'v1.0', 'Insight.Base.Services', 'IModules', 'Modules', 'Services\Modules.dll' union all
 select '6200', 'orgapi', 'v1.0', 'Insight.Base.Services', 'IOrganizations', 'Organizations', 'Services\Organizations.dll' union all
 select '6200', 'userapi', 'v1.0', 'Insight.Base.Services', 'IUsers', 'Users', 'Services\Users.dll' union all
+select '6200', 'groupapi', 'v1.0', 'Insight.Base.Services', 'IUserGroups', 'UserGroups', 'Services\UserGroups.dll' union all
 select '6200', 'roleapi', 'v1.0', 'Insight.Base.Services', 'IRoles', 'Roles', 'Services\Roles.dll' union all
 select '6200', 'codeapi', 'v1.0', 'Insight.Base.Services', 'ICodes', 'Codes', 'Services\Codes.dll' union all
 select '6200', 'logapi', 'v1.0', 'Insight.Base.Services', 'ILogs', 'Logs', 'Services\Logs.dll'

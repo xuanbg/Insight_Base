@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Insight.Base.Common.Entity;
-using Insight.Base.OAuth;
 using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
@@ -15,7 +14,7 @@ namespace Insight.Base.Services
         /// <param name="uid">用户ID</param>
         /// <param name="role">RoleInfo</param>
         /// <returns>bool 是否插入成功</returns>
-        private bool InsertData(Guid uid, RoleInfo role)
+        private bool InsertData(Guid uid, Role role)
         {
             var now = DateTime.Now;
             var r = new SYS_Role
@@ -100,7 +99,7 @@ namespace Insight.Base.Services
         /// <param name="uid">用户ID</param>
         /// <param name="role">RoleInfo</param>
         /// <returns>是否成功</returns>
-        private bool? Update(Guid uid, RoleInfo role)
+        private bool? Update(Guid uid, Role role)
         {
             using (var context = new BaseEntities())
             {
@@ -199,7 +198,7 @@ namespace Insight.Base.Services
             using (var context = new BaseEntities())
             {
                 var list = from r in context.SYS_Role.Where(r => r.Validity).OrderBy(r => r.SN)
-                           select new RoleInfo{ID = r.ID, Name = r.Name, Description = r.Description, BuiltIn = r.BuiltIn};
+                           select new RoleInfo{ID = r.ID, Name = r.Name, Description = r.Description, BuiltIn = r.BuiltIn, Validity = r.Validity, CreatorUserId = r.CreatorUserId, CreateTime = r.CreateTime};
                 var skip = rows*(page - 1);
                 return new TabList<RoleInfo>
                 {
@@ -214,24 +213,9 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">角色ID</param>
         /// <returns>RoleInfo 角色对象</returns>
-        private RoleInfo GetRole(Guid id)
+        private Role GetRole(Guid id)
         {
-            using (var context = new BaseEntities())
-            {
-                var role = context.SYS_Role.Single(r => r.ID == id);
-                var auth = new Authority(id);
-                var obj = new RoleInfo
-                {
-                    ID = role.ID,
-                    BuiltIn = role.BuiltIn,
-                    Name = role.Name,
-                    Description = role.Description,
-                    Members = context.RoleMember.Where(m => m.RoleId == id).ToList(),
-                    Actions = auth.GetActions(),
-                    Datas = auth.GetDatas()
-                };
-                return obj;
-            }
+            return new Role(id);
         }
 
         /// <summary>
