@@ -77,7 +77,7 @@
     <Compile Include="Entity\OrgInfo.cs" />
     <Compile Include="Entity\RoleAction.cs" />
     <Compile Include="Entity\RoleData.cs" />
-    <Compile Include="Entity\RoleInfo.cs" />
+    <Compile Include="Entity\RoleBase.cs" />
     <Compile Include="Entity\RoleMember.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>

@@ -45,7 +45,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "roles?rows={rows}&page={page}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result GetAllRole(string rows, string page);
+        Result GetRoles(string rows, string page);
 
         /// <summary>
         /// 根据参数组集合插入角色成员关系

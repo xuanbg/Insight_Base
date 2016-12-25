@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
+using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Base.OAuth;
 using Insight.Utils.Common;
@@ -10,7 +11,7 @@ using Insight.Utils.Entity;
 namespace Insight.Base.Services
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
-    public partial class Roles : IRoles
+    public class Roles : IRoles
     {
         /// <summary>
         /// 新增角色
@@ -28,8 +29,7 @@ namespace Insight.Base.Services
             role.CreateTime = DateTime.Now;
             if (!role.Add()) return role.Result;
 
-            var r = GetRole(role.ID);
-            result.Created(r);
+            result.Created(new Role(role.ID));
             return result;
         }
 
@@ -51,7 +51,7 @@ namespace Insight.Base.Services
             var role = new Role(parse.Value);
             if (!role.Result.Successful) return role.Result;
 
-            return !role.Delete() ? role.Result : result;
+            return role.Delete() ? result : role.Result;
         }
 
         /// <summary>
@@ -72,8 +72,7 @@ namespace Insight.Base.Services
 
             if (!role.Update()) return role.Result;
 
-            role = GetRole(parse.Value);
-            result.Success(role);
+            result.Success(new Role(parse.Value));
             return result;
         }
 
@@ -83,7 +82,7 @@ namespace Insight.Base.Services
         /// <param name="rows">每页行数</param>
         /// <param name="page">当前页</param>
         /// <returns>Result</returns>
-        public Result GetAllRole(string rows, string page)
+        public Result GetRoles(string rows, string page)
         {
             const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
             var verify = new Compare(action);
@@ -102,8 +101,19 @@ namespace Insight.Base.Services
                 return result;
             }
 
-            result.Success(GetRoles(ipr.Value, ipp.Value));
-            return result;
+            using (var context = new BaseEntities())
+            {
+                var list = from r in context.SYS_Role.Where(r => r.Validity).OrderBy(r => r.SN)
+                           select new {r.ID, r.Name, r.Description, r.BuiltIn, r.Validity, r.CreatorUserId, r.CreateTime};
+                var skip = ipr.Value*(ipp.Value - 1);
+                var roles = new 
+                {
+                    Total = list.Count(),
+                    Items = list.Skip(skip).Take(ipr.Value).ToList()
+                };
+                result.Success(roles);
+                return result;
+            }
         }
 
         /// <summary>
@@ -122,10 +132,31 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.Successful || !members.Any()) return parse.Result;
 
-            if (!AddRoleMember(parse.Value, members, verify.Basis.UserId)) result.DataBaseError();
+            using (var context = new BaseEntities())
+            {
+                var data = from m in members
+                           select new SYS_Role_Member
+                           {
+                               ID = m.ID,
+                               Type = m.NodeType,
+                               RoleId = parse.Value,
+                               MemberId = m.MemberId,
+                               CreatorUserId = verify.Basis.UserId,
+                               CreateTime = DateTime.Now
+                           };
+                context.SYS_Role_Member.AddRange(data);
+                try
+                {
+                    context.SaveChanges();
+                    var role = new Role(parse.Value);
+                    result.Success(role);
+                }
+                catch
+                {
+                    result.DataBaseError();
+                }
+            }
 
-            var role = GetRole(parse.Value);
-            result.Success(role);
             return result;
         }
 
@@ -142,7 +173,27 @@ namespace Insight.Base.Services
             if (!result.Successful) return result;
 
             var parse = new GuidParse(id);
-            return !parse.Result.Successful ? parse.Result : DeleteRoleMember(parse.Value);
+            if (!parse.Result.Successful) return parse.Result;
+
+            using (var context = new BaseEntities())
+            {
+                var obj = context.SYS_Role_Member.SingleOrDefault(m => m.ID == parse.Value);
+                if (obj == null)
+                {
+                    result.NotFound();
+                    return result;
+                }
+
+                if (!DbHelper.Delete(obj))
+                {
+                    result.DataBaseError();
+                    return result;
+                }
+
+                var role = new Role(obj.RoleId);
+                result.Success(role);
+                return result;
+            }
         }
 
         /// <summary>
@@ -181,9 +232,12 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
-            var list = GetMembers(parse.Value);
-            result.Success(list);
-            return result;
+            using (var context = new BaseEntities())
+            {
+                var list = context.RoleMember.Where(m => m.RoleId == parse.Value).ToList();
+                result.Success(list);
+                return result;
+            }
         }
 
         /// <summary>
@@ -215,8 +269,18 @@ namespace Insight.Base.Services
                 return result;
             }
 
-            result.Success(GetMemberUsers(parse.Value, ipr.Value, ipp.Value));
-            return result;
+            using (var context = new BaseEntities())
+            {
+                var skip = ipr.Value*(ipp.Value - 1);
+                var list = context.RoleMemberUser.Where(u => u.RoleId == parse.Value).OrderBy(m => m.LoginName);
+                var members = new
+                {
+                    Total = list.Count(),
+                    Items = list.Skip(skip).Take(ipr.Value).ToList()
+                };
+                result.Success(members);
+                return result;
+            }
         }
 
         /// <summary>
@@ -234,11 +298,18 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
-            var list = GetOtherTitle(parse.Value);
-            if (list.Any()) result.Success(list);
-            else result.NoContent();
+            using (var context = new BaseEntities())
+            {
+                var list = from o in context.SYS_Organization
+                           join r in context.SYS_Role_Member.Where(r => r.RoleId == parse.Value && r.Type == 3) on o.ID equals r.MemberId into temp
+                           from t in temp.DefaultIfEmpty()
+                           where t == null
+                           select new { o.ID, o.ParentId, o.Index, o.NodeType, o.Name };
+                if (list.Any()) result.Success(list.OrderBy(o => o.Index).ToList());
+                else result.NoContent();
 
-            return result;
+                return result;
+            }
         }
 
         /// <summary>
@@ -256,11 +327,18 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
-            var list = GetOtherGroup(parse.Value);
-            if (list.Any()) result.Success(list);
-            else result.NoContent();
+            using (var context = new BaseEntities())
+            {
+                var list = from g in context.SYS_UserGroup.OrderBy(g => g.SN)
+                           join r in context.SYS_Role_Member.Where(r => r.RoleId == parse.Value && r.Type == 2) on g.ID equals r.MemberId into temp
+                           from t in temp.DefaultIfEmpty()
+                           where g.Visible && t == null
+                           select new { g.ID, g.Name, g.Description };
+                if (list.Any()) result.Success(list.ToList());
+                else result.NoContent();
 
-            return result;
+                return result;
+            }
         }
 
         /// <summary>
@@ -278,11 +356,18 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
-            var list = GetOtherUser(parse.Value);
-            if (list.Any()) result.Success(list);
-            else result.NoContent();
+            using (var context = new BaseEntities())
+            {
+                var list = from u in context.SYS_User.OrderBy(g => g.SN)
+                           join r in context.SYS_Role_Member.Where(r => r.RoleId == parse.Value && r.Type == 1) on u.ID equals r.MemberId into temp
+                           from t in temp.DefaultIfEmpty()
+                           where u.Validity && u.Type > 0 && t == null
+                           select new { u.ID, u.Name, u.LoginName, u.Description };
+                if (list.Any()) result.Success(list.ToList());
+                else result.NoContent();
 
-            return result;
+                return result;
+            }
         }
 
         /// <summary>

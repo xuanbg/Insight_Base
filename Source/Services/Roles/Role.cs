@@ -9,9 +9,8 @@ using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
 {
-    public class Role
+    public class Role : RoleBase
     {
-        private readonly SYS_Role _Role;
         private readonly Authority _Authority;
         private IEnumerable<SYS_Role_Action> _AddActions;
         private IEnumerable<SYS_Role_Action> _UpActions;
@@ -19,72 +18,8 @@ namespace Insight.Base.Services
         private IEnumerable<SYS_Role_Data> _AddDatas;
         private IEnumerable<SYS_Role_Data> _UpDatas;
         private IEnumerable<SYS_Role_Data> _DelDatas;
-        private IEnumerable<RoleMember> _Members;
 
         public Result Result = new Result();
-
-        /// <summary>
-        /// ID
-        /// </summary>
-        public Guid ID
-        {
-            get { return _Role.ID; }
-            set { _Role.ID = value; }
-        }
-
-        /// <summary>
-        /// 角色名称
-        /// </summary>
-        public string Name
-        {
-            get { return _Role.Name; }
-            set { _Role.Name = value; }
-        }
-
-        /// <summary>
-        /// 角色描述
-        /// </summary>
-        public string Description
-        {
-            get { return _Role.Description; }
-            set { _Role.Description = value; }
-        }
-
-        /// <summary>
-        /// 是否内置
-        /// </summary>
-        public bool BuiltIn
-        {
-            get { return _Role.BuiltIn; }
-            set { _Role.BuiltIn = value; }
-        }
-
-        /// <summary>
-        /// 是否可用
-        /// </summary>
-        public bool Validity
-        {
-            get { return _Role.Validity; }
-            set { _Role.Validity = value; }
-        }
-
-        /// <summary>
-        /// 创建人ID
-        /// </summary>
-        public Guid CreatorUserId
-        {
-            get { return _Role.CreatorUserId; }
-            set { _Role.CreatorUserId = value; }
-        }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreateTime
-        {
-            get { return _Role.CreateTime; }
-            set { _Role.CreateTime = value; }
-        }
 
         /// <summary>
         /// 角色操作权限集合
@@ -110,15 +45,6 @@ namespace Insight.Base.Services
                 var list = value.Where(d => d.NodeType > 1 && d.Permit != d.Permission).ToList();
                 SetDatas(list);
             }
-        }
-
-        /// <summary>
-        /// 角色成员
-        /// </summary>
-        public List<RoleMember> Members
-        {
-            get { return GetMembers();}
-            set { _Members = value; }
         }
 
         /// <summary>
@@ -328,18 +254,6 @@ namespace Insight.Base.Services
                 _DelDatas = from d in datas.Where(i => i.Permission.HasValue && !i.Permit.HasValue)
                             join p in list on d.ID equals p.ID
                             select p;
-            }
-        }
-
-        /// <summary>
-        /// 获取角色成员集合
-        /// </summary>
-        /// <returns>角色成员集合</returns>
-        private List<RoleMember> GetMembers()
-        {
-            using (var context = new BaseEntities())
-            {
-                return context.RoleMember.Where(m => m.RoleId == ID).ToList();
             }
         }
     }
