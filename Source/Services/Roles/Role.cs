@@ -18,6 +18,8 @@ namespace Insight.Base.Services
         private IEnumerable<SYS_Role_Data> _AddDatas;
         private IEnumerable<SYS_Role_Data> _UpDatas;
         private IEnumerable<SYS_Role_Data> _DelDatas;
+        private List<RoleAction> _RoleActions;
+        private List<RoleData> _RoleDatas;
 
         public Result Result = new Result();
 
@@ -26,7 +28,7 @@ namespace Insight.Base.Services
         /// </summary>
         public List<RoleAction> Actions
         {
-            get { return _Authority?.GetActions(); }
+            get { return _RoleActions ?? _Authority?.GetActions(); }
             set
             {
                 var list = value.Where(a => a.NodeType > 1 && a.Permit != a.Action).ToList();
@@ -39,7 +41,7 @@ namespace Insight.Base.Services
         /// </summary>
         public List<RoleData> Datas
         {
-            get { return _Authority?.GetDatas(); }
+            get { return _RoleDatas ?? _Authority?.GetDatas(); }
             set
             {
                 var list = value.Where(d => d.NodeType > 1 && d.Permit != d.Permission).ToList();
@@ -57,28 +59,9 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 构造函数，传入角色实体
-        /// </summary>
-        /// <param name="role"></param>
-        public Role(SYS_Role role)
-        {
-            using (var context = new BaseEntities())
-            {
-                _Role = context.SYS_Role.SingleOrDefault(r => r.Name == role.Name);
-                if (_Role == null)
-                {
-                    _Role = role;
-                    Result.Success();
-                }
-                else
-                    Result.DataAlreadyExists();
-            }
-        }
-
-        /// <summary>
         /// 构造函数，根据ID读取角色实体
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">角色ID</param>
         public Role(Guid id)
         {
             using (var context = new BaseEntities())
@@ -179,6 +162,16 @@ namespace Insight.Base.Services
                     return false;
                 }
             }
+        }
+
+        /// <summary>
+        /// 获取角色可用权限资源
+        /// </summary>
+        /// <returns></returns>
+        public void GetAllPermission()
+        {
+            _RoleActions = _Authority.GetAllActions();
+            _RoleDatas = _Authority.GetAllDatas();
         }
 
         /// <summary>
