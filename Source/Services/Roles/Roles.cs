@@ -387,6 +387,7 @@ namespace Insight.Base.Services
             if (!parse.Result.Successful) return parse.Result;
 
             var role = new Role(parse.Value);
+            role.GetAllPermission();
             if (!role.Result.Successful) return role.Result;
 
             result.Success(role);
