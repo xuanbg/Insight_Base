@@ -17,22 +17,18 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="user">用户对象</param>
         /// <returns>JsonResult</returns>
-        public Result AddUser(SYS_User user)
+        public Result AddUser(User user)
         {
             const string action = "60D5BE64-0102-4189-A999-96EDAD3DA1B5";
             var verify = new Compare(action);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
-            user.ID = Guid.NewGuid();
             user.Password = Util.Hash("123456");
-            user.Type = 1;
             user.CreatorUserId = verify.Basis.UserId;
             user.CreateTime = DateTime.Now;
-            var u = new User(user);
-            if (!u.Result.Successful) return u.Result;
 
-            return !u.Add() ? u.Result : result;
+            return user.Add() ? result : user.Result;
         }
 
         /// <summary>
@@ -62,7 +58,7 @@ namespace Insight.Base.Services
         /// <param name="id">用户ID</param>
         /// <param name="user">用户数据对象</param>
         /// <returns>JsonResult</returns>
-        public Result UpdateUserInfo(string id, SYS_User user)
+        public Result UpdateUserInfo(string id, User user)
         {
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
@@ -72,15 +68,12 @@ namespace Insight.Base.Services
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            var u = new User(parse.Value)
-            {
-                Name = user.Name,
-                Description = user.Description,
-                Type = user.Type
-            };
-            if (!u.Result.Successful) return u.Result;
+            var up = new User(parse.Value);
+            if (!up.Result.Successful) return up.Result;
 
-            if (!u.Update()) return u.Result;
+            up.Name = user.Name;
+            up.Description = user.Description;
+            if (!up.Update()) return up.Result;
 
             var session = OAuth.Common.GetSession(user.LoginName);
             if (session == null) return result;
@@ -168,18 +161,9 @@ namespace Insight.Base.Services
             {
                 var filter = !string.IsNullOrEmpty(key);
                 var list = from u in context.SYS_User.Where(u => u.Type > 0 && (!filter || u.Name.Contains(key) || u.LoginName.Contains(key))).OrderBy(u => u.SN)
-                    select new User
-                    {
-                        ID = u.ID,
-                        BuiltIn = u.BuiltIn,
-                        Name = u.Name,
-                        LoginName = u.LoginName,
-                        Description = u.Description,
-                        Type = u.Type,
-                        Validity = u.Validity
-                    };
+                    select new {u.ID, u.Name, u.LoginName, u.Mobile, u.Description, u.BuiltIn, u.Validity};
                 var skip = ipr.Value*(ipp.Value - 1);
-                var users = new TabList<User>
+                var users = new
                 {
                     Total = list.Count(),
                     Items = list.Skip(skip).Take(ipr.Value).ToList()

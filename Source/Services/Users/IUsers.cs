@@ -15,7 +15,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         [WebInvoke(Method = "POST", UriTemplate = "users", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result AddUser(SYS_User user);
+        Result AddUser(User user);
 
         /// <summary>
         /// 根据ID删除用户
@@ -34,7 +34,7 @@ namespace Insight.Base.Services
         /// <returns>JsonResult</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "users/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result UpdateUserInfo(string id, SYS_User user);
+        Result UpdateUserInfo(string id, User user);
 
         /// <summary>
         /// 根据ID获取用户对象实体
