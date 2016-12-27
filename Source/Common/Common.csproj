@@ -57,6 +57,7 @@
   <ItemGroup>
     <Compile Include="DbHelper.cs" />
     <Compile Include="Entity\Enum.cs" />
+    <Compile Include="Entity\GroupBase.cs" />
     <Compile Include="Entity\ModuleInfo.cs" />
     <Compile Include="Entity\Level.cs" />
     <Compile Include="Entity\Model.Context.cs">
@@ -150,6 +151,7 @@
     <Compile Include="Entity\SYS_VerifyImage.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
+    <Compile Include="Entity\UserBase.cs" />
     <Compile Include="Entity\UserRole.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>

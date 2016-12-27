@@ -12,16 +12,16 @@ namespace Insight.Base.Services
         /// 根据对象实体数据新增一个用户
         /// </summary>
         /// <param name="user">用户对象</param>
-        /// <returns>JsonResult</returns>
+        /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "users", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result AddUser(User user);
+        Result AddUser(SYS_User user);
 
         /// <summary>
         /// 根据ID删除用户
         /// </summary>
         /// <param name="id">用户ID</param>
-        /// <returns>JsonResult</returns>
+        /// <returns>Result</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "users/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result RemoveUser(string id);
@@ -31,10 +31,10 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">用户ID</param>
         /// <param name="user">用户数据对象</param>
-        /// <returns>JsonResult</returns>
+        /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "users/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result UpdateUserInfo(string id, User user);
+        Result UpdateUserInfo(string id, UserBase user);
 
         /// <summary>
         /// 根据ID获取用户对象实体

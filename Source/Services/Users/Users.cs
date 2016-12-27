@@ -16,19 +16,22 @@ namespace Insight.Base.Services
         /// 根据对象实体数据新增一个用户
         /// </summary>
         /// <param name="user">用户对象</param>
-        /// <returns>JsonResult</returns>
-        public Result AddUser(User user)
+        /// <returns>Result</returns>
+        public Result AddUser(SYS_User user)
         {
             const string action = "60D5BE64-0102-4189-A999-96EDAD3DA1B5";
             var verify = new Compare(action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            user.Password = Util.Hash("123456");
-            user.CreatorUserId = verify.Basis.UserId;
-            user.CreateTime = DateTime.Now;
+            var data = new User(user);
+            if (!data.Result.Successful) return data.Result;
 
-            return user.Add() ? result : user.Result;
+            data.Password = Util.Hash("123456");
+            data.CreatorUserId = verify.Basis.UserId;
+            data.CreateTime = DateTime.Now;
+
+            return data.Add() ? result : data.Result;
         }
 
         /// <summary>
@@ -57,8 +60,8 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">用户ID</param>
         /// <param name="user">用户数据对象</param>
-        /// <returns>JsonResult</returns>
-        public Result UpdateUserInfo(string id, User user)
+        /// <returns>Result</returns>
+        public Result UpdateUserInfo(string id, UserBase user)
         {
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
@@ -68,12 +71,12 @@ namespace Insight.Base.Services
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            var up = new User(parse.Value);
-            if (!up.Result.Successful) return up.Result;
+            var data = new User(parse.Value);
+            if (!data.Result.Successful) return data.Result;
 
-            up.Name = user.Name;
-            up.Description = user.Description;
-            if (!up.Update()) return up.Result;
+            data.Name = user.Name;
+            data.Description = user.Description;
+            if (!data.Update()) return data.Result;
 
             var session = OAuth.Common.GetSession(user.LoginName);
             if (session == null) return result;
