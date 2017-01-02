@@ -339,6 +339,7 @@
             
           </Key>
           <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="SN" Type="bigint" Nullable="false" />
           <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="Name" Type="nvarchar" MaxLength="16" Nullable="false" />
           <Property Name="LoginName" Type="nvarchar" MaxLength="32" Nullable="false" />
@@ -874,6 +875,7 @@
           <EntitySet Name="RoleMemberUser" EntityType="Self.RoleMemberUser" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
     [RoleMemberUser].[ID] AS [ID], 
+    [RoleMemberUser].[SN] AS [SN], 
     [RoleMemberUser].[RoleId] AS [RoleId], 
     [RoleMemberUser].[Name] AS [Name], 
     [RoleMemberUser].[LoginName] AS [LoginName], 
@@ -1421,6 +1423,7 @@
             <PropertyRef Name="ID" />
           </Key>
           <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="SN" Type="Int64" Nullable="false" />
           <Property Name="RoleId" Type="Guid" Nullable="false" />
           <Property Name="Name" Type="String" MaxLength="16" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="LoginName" Type="String" MaxLength="32" FixedLength="false" Unicode="true" Nullable="false" />
@@ -2427,6 +2430,7 @@
           <EntitySetMapping Name="RoleMemberUser">
             <EntityTypeMapping TypeName="BaseModel.RoleMemberUser">
               <MappingFragment StoreEntitySet="RoleMemberUser">
+                <ScalarProperty Name="SN" ColumnName="SN" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="RoleId" ColumnName="RoleId" />
                 <ScalarProperty Name="Name" ColumnName="Name" />

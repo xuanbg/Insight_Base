@@ -12,6 +12,7 @@ CREATE VIEW RoleMemberUser
 AS
 
 select U.ID,
+       U.SN,
        M.RoleId,
        U.Name,
        U.LoginName,
@@ -22,6 +23,7 @@ join Sys_User U on U.ID = M.MemberId
 where M.Type = 1
 union
 select U.ID,
+       U.SN,
        M.RoleId,
        U.Name,
        U.LoginName,
@@ -33,6 +35,7 @@ join Sys_User U on U.ID = G.UserId
 where M.Type = 2
 union
 select U.ID,
+       U.SN,
        M.RoleId,
        U.Name,
        U.LoginName,

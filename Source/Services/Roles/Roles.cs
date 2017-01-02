@@ -251,7 +251,7 @@ namespace Insight.Base.Services
             using (var context = new BaseEntities())
             {
                 var skip = ipr.Value*(ipp.Value - 1);
-                var list = context.RoleMemberUser.Where(u => u.RoleId == parse.Value).OrderBy(m => m.LoginName);
+                var list = context.RoleMemberUser.Where(u => u.RoleId == parse.Value).OrderBy(m => m.SN);
                 var members = new
                 {
                     Total = list.Count(),

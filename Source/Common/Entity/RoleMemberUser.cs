@@ -15,6 +15,7 @@ namespace Insight.Base.Common.Entity
     public partial class RoleMemberUser
     {
         public System.Guid ID { get; set; }
+        public long SN { get; set; }
         public System.Guid RoleId { get; set; }
         public string Name { get; set; }
         public string LoginName { get; set; }
