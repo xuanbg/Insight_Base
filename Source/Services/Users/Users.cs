@@ -164,7 +164,7 @@ namespace Insight.Base.Services
             {
                 var filter = !string.IsNullOrEmpty(key);
                 var list = from u in context.SYS_User.Where(u => u.Type > 0 && (!filter || u.Name.Contains(key) || u.LoginName.Contains(key))).OrderBy(u => u.SN)
-                    select new {u.ID, u.Name, u.LoginName, u.Mobile, u.Description, u.BuiltIn, u.Validity};
+                    select new {u.ID, u.Name, u.LoginName, u.Mobile, u.Description, u.Type, u.BuiltIn, u.Validity, u.CreatorUserId, u.CreateTime};
                 var skip = ipr.Value*(ipp.Value - 1);
                 var users = new
                 {

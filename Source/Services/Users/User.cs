@@ -28,7 +28,6 @@ namespace Insight.Base.Services
         /// </summary>
         public User()
         {
-            _User = new SYS_User();
             Result.Success();
         }
 
