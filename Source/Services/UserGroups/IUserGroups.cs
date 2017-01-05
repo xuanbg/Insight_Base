@@ -50,10 +50,12 @@ namespace Insight.Base.Services
         /// <summary>
         /// 获取全部用户组
         /// </summary>
+        /// <param name="rows">每页行数</param>
+        /// <param name="page">当前页</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "groups", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "groups?rows={rows}&page={page}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result GetGroups();
+        Result GetGroups(string rows, string page);
 
         /// <summary>
         /// 根据参数组集合批量插入用户组成员关系

@@ -87,7 +87,7 @@ namespace Insight.Base.Services
         {
             const string action = "6910FD14-5654-4CF0-B159-8FE1DF68619F";
             var verify = new Compare(action);
-            var result = Util.ConvertTo<Result>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
             var parse = new GuidParse(id);
@@ -106,23 +106,41 @@ namespace Insight.Base.Services
         /// <summary>
         /// 获取全部用户组
         /// </summary>
+        /// <param name="rows">每页行数</param>
+        /// <param name="page">当前页</param>
         /// <returns>Result</returns>
-        public Result GetGroups()
+        public Result GetGroups(string rows, string page)
         {
             const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
             var verify = new Compare(action);
-            var result = Util.ConvertTo<Result>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
+
+            var ipr = new IntParse(rows);
+            if (!ipr.Result.Successful) return ipr.Result;
+
+            var ipp = new IntParse(page);
+            if (!ipp.Result.Successful) return ipp.Result;
+
+            if (ipr.Value > 500 || ipp.Value < 1)
+            {
+                result.BadRequest();
+                return result;
+            }
 
             using (var context = new BaseEntities())
             {
                 var list = from g in context.SYS_UserGroup
                            where g.Visible
                            orderby g.SN
-                           select new {g.ID, g.BuiltIn, g.Name, g.Description};
-                if (list.Any()) result.Success(list.ToList());
-                else result.NoContent();
-
+                           select new {g.ID, g.Name, g.Description, g.BuiltIn, g.CreatorUserId, g.CreateTime};
+                var skip = ipr.Value * (ipp.Value - 1);
+                var data = new
+                {
+                    Total = list.Count(),
+                    Items = list.Skip(skip).Take(ipr.Value).ToList()
+                };
+                result.Success(data);
                 return result;
             }
         }
@@ -137,7 +155,7 @@ namespace Insight.Base.Services
         {
             const string action = "6C41724C-E118-4BCD-82AD-6B13D05C7894";
             var verify = new Compare(action);
-            var result = Util.ConvertTo<Result>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
             var parse = new GuidParse(id);
@@ -176,7 +194,7 @@ namespace Insight.Base.Services
         {
             const string action = "686C115A-CE2E-4E84-8F25-B63C15AC173C";
             var verify = new Compare(action);
-            var result = Util.ConvertTo<Result>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
             using (var context = new BaseEntities())
@@ -205,7 +223,7 @@ namespace Insight.Base.Services
         {
             const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
             var verify = new Compare(action);
-            var result = Util.ConvertTo<Result>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
             var parse = new GuidParse(id);
@@ -234,7 +252,7 @@ namespace Insight.Base.Services
         {
             const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
             var verify = new Compare(action);
-            var result = Util.ConvertTo<Result>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
             var parse = new GuidParse(id);
