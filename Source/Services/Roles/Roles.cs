@@ -71,7 +71,7 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
-            if (!role.Update()) return role.Result;
+            if (role.Exists || !role.Update()) return role.Result;
 
             result.Success(role);
             return result;
@@ -129,7 +129,7 @@ namespace Insight.Base.Services
                 var list = from r in context.SYS_Role.Where(r => r.Validity).OrderBy(r => r.SN)
                            select new {r.ID, r.Name, r.Description, r.BuiltIn, r.Validity, r.CreatorUserId, r.CreateTime};
                 var skip = ipr.Value*(ipp.Value - 1);
-                var roles = new 
+                var roles = new
                 {
                     Total = list.Count(),
                     Items = list.Skip(skip).Take(ipr.Value).ToList()
@@ -283,8 +283,8 @@ namespace Insight.Base.Services
             using (var context = new BaseEntities())
             {
                 var list = from o in context.SYS_Organization
-                           join r in context.SYS_Role_Member.Where(r => r.RoleId == parse.Value && r.Type == 3) on o.ID equals r.MemberId into temp
-                           from t in temp.DefaultIfEmpty()
+                           join r in context.SYS_Role_Member.Where(r => r.RoleId == parse.Value && r.Type == 3)
+                           on o.ID equals r.MemberId into temp from t in temp.DefaultIfEmpty()
                            where t == null
                            select new { o.ID, o.ParentId, o.Index, o.NodeType, o.Name };
                 if (list.Any()) result.Success(list.OrderBy(o => o.Index).ToList());
@@ -312,8 +312,8 @@ namespace Insight.Base.Services
             using (var context = new BaseEntities())
             {
                 var list = from g in context.SYS_UserGroup.OrderBy(g => g.SN)
-                           join r in context.SYS_Role_Member.Where(r => r.RoleId == parse.Value && r.Type == 2) on g.ID equals r.MemberId into temp
-                           from t in temp.DefaultIfEmpty()
+                           join r in context.SYS_Role_Member.Where(r => r.RoleId == parse.Value && r.Type == 2)
+                           on g.ID equals r.MemberId into temp from t in temp.DefaultIfEmpty()
                            where g.Visible && t == null
                            select new { g.ID, g.Name, g.Description };
                 if (list.Any()) result.Success(list.ToList());
@@ -341,8 +341,8 @@ namespace Insight.Base.Services
             using (var context = new BaseEntities())
             {
                 var list = from u in context.SYS_User.OrderBy(g => g.SN)
-                           join r in context.SYS_Role_Member.Where(r => r.RoleId == parse.Value && r.Type == 1) on u.ID equals r.MemberId into temp
-                           from t in temp.DefaultIfEmpty()
+                           join r in context.SYS_Role_Member.Where(r => r.RoleId == parse.Value && r.Type == 1) 
+                           on u.ID equals r.MemberId into temp from t in temp.DefaultIfEmpty()
                            where u.Validity && u.Type > 0 && t == null
                            select new { u.ID, u.Name, u.LoginName, u.Description };
                 if (list.Any()) result.Success(list.ToList());

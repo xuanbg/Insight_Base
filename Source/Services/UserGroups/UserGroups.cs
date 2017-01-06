@@ -30,7 +30,10 @@ namespace Insight.Base.Services
             group.CreatorUserId = verify.Basis.UserId;
             group.CreateTime = DateTime.Now;
 
-            return group.Add() ? result : group.Result;
+            if (!group.Add()) return group.Result;
+
+            result.Created(group);
+            return result;
         }
 
         /// <summary>
@@ -60,7 +63,7 @@ namespace Insight.Base.Services
         /// <param name="id">用户组ID</param>
         /// <param name="group">用户组对象</param>
         /// <returns>Result</returns>
-        public Result UpdateGroup(string id, SYS_UserGroup group)
+        public Result UpdateGroup(string id, UserGroup group)
         {
             const string action = "6910FD14-5654-4CF0-B159-8FE1DF68619F";
             var verify = new Compare(action);
@@ -70,12 +73,10 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
-            var data = new UserGroup(parse.Value);
-            if (!data.Result.Successful) return data.Result;
+            if (group.Exists || !group.Update()) return group.Result;
 
-            data.Name = group.Name;
-            data.Description = group.Description;
-            return data.Update() ? result : data.Result;
+            result.Success(group);
+            return result;
         }
 
         /// <summary>

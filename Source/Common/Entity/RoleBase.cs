@@ -4,7 +4,7 @@ namespace Insight.Base.Common.Entity
 {
     public class RoleBase
     {
-        protected SYS_Role _Role;
+        protected SYS_Role _Role = new SYS_Role();
 
         /// <summary>
         /// 角色唯一ID

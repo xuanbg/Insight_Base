@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
+using Insight.Base.OAuth;
 using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
@@ -10,6 +11,7 @@ namespace Insight.Base.Services
     public class User : UserBase
     {
         public Result Result = new Result();
+        public Authority Authority;
 
         /// <summary>
         /// 用户是否已存在(按登录账号)
@@ -20,7 +22,7 @@ namespace Insight.Base.Services
             {
                 using (var context = new BaseEntities())
                 {
-                    var user = context.SYS_User.SingleOrDefault(u => u.Name == _User.LoginName);
+                    var user = context.SYS_User.SingleOrDefault(u => u.LoginName == _User.LoginName);
                     if (user != null) Result.AccountExists();
 
                     return user != null;
@@ -31,19 +33,18 @@ namespace Insight.Base.Services
         /// <summary>
         /// 授予用户的功能权限
         /// </summary>
-        public List<RoleAction> Actions { get; set; }
+        public List<RoleAction> Actions => Authority?.GetActions();
 
         /// <summary>
         /// 授予用户的数据权限
         /// </summary>
-        public List<RoleData> Datas { get; set; }
+        public List<RoleData> Datas => Authority?.GetDatas();
 
         /// <summary>
         /// 构造函数，构造新的用户实体
         /// </summary>
         public User()
         {
-            _User = new SYS_User();
             Result.Success();
         }
 
@@ -56,11 +57,7 @@ namespace Insight.Base.Services
             using (var context = new BaseEntities())
             {
                 _User = context.SYS_User.SingleOrDefault(u => u.ID == id);
-                if (_User == null)
-                {
-                    _User = new SYS_User();
-                    Result.NotFound();
-                }
+                if (_User == null) Result.NotFound();
                 else Result.Success();
             }
         }

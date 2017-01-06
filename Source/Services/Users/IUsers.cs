@@ -46,15 +46,6 @@ namespace Insight.Base.Services
         Result GetUser(string id);
 
         /// <summary>
-        /// 获取用户授权信息
-        /// </summary>
-        /// <param name="id">用户ID</param>
-        /// <returns>Result</returns>
-        [WebGet(UriTemplate = "users/{id}/permission", ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        Result GetUserPermission(string id);
-
-        /// <summary>
         /// 获取全部用户
         /// </summary>
         /// <param name="rows">每页行数</param>

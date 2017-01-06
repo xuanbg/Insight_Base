@@ -44,7 +44,6 @@ namespace Insight.Base.Services
         /// </summary>
         public UserGroup()
         {
-            _Group = new SYS_UserGroup();
             Result.Success();
         }
 
@@ -57,11 +56,7 @@ namespace Insight.Base.Services
             using (var context = new BaseEntities())
             {
                 _Group = context.SYS_UserGroup.SingleOrDefault(g => g.ID == id);
-                if (_Group == null)
-                {
-                    _Group = new SYS_UserGroup();
-                    Result.NotFound();
-                }
+                if (_Group == null) Result.NotFound();
                 else Result.Success();
             }
         }

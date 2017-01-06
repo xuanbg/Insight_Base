@@ -4,7 +4,7 @@ namespace Insight.Base.Common.Entity
 {
     public class GroupBase
     {
-        protected SYS_UserGroup _Group;
+        protected SYS_UserGroup _Group = new SYS_UserGroup();
 
         /// <summary>
         /// 用户组唯一ID

@@ -30,7 +30,10 @@ namespace Insight.Base.Services
             user.CreatorUserId = verify.Basis.UserId;
             user.CreateTime = DateTime.Now;
 
-            return user.Add() ? result : user.Result;
+            if (!user.Add()) return user.Result;
+
+            result.Created(user);
+            return result;
         }
 
         /// <summary>
@@ -77,6 +80,7 @@ namespace Insight.Base.Services
             data.Description = user.Description;
             if (!data.Update()) return data.Result;
 
+            result.Success(data);
             var session = OAuth.Common.GetSession(user.LoginName);
             if (session == null) return result;
 
@@ -95,7 +99,7 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
-            const string action = "3BC17B61-327D-4EAA-A0D7-7F825A6C71DB";
+            const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
             var verify = new Compare(action, 0, parse.Value);
             var result = verify.Result;
             if (!result.Successful) return result;
@@ -103,28 +107,8 @@ namespace Insight.Base.Services
             var data = new User(parse.Value);
             if (!data.Result.Successful) return data.Result;
 
+            data.Authority = new Authority(parse.Value, null, InitType.Permission, true);
             result.Success(data);
-            return result;
-        }
-
-        /// <summary>
-        /// 获取用户授权信息
-        /// </summary>
-        /// <param name="id">用户ID</param>
-        /// <returns>Result</returns>
-        public Result GetUserPermission(string id)
-        {
-            const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
-
-            var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
-
-            var auth = new Authority(parse.Value, null, InitType.Permission, true);
-            var user = new {Actions = auth.GetActions(), Datas = auth.GetDatas()};
-            result.Success(user);
             return result;
         }
 

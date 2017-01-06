@@ -36,7 +36,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "groups/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result UpdateGroup(string id, SYS_UserGroup group);
+        Result UpdateGroup(string id, UserGroup @group);
 
         /// <summary>
         /// 根据ID获取用户组对象实体

@@ -85,7 +85,6 @@ namespace Insight.Base.Services
         /// </summary>
         public Role()
         {
-            _Role = new SYS_Role();
             Result.Success();
         }
 
@@ -100,7 +99,6 @@ namespace Insight.Base.Services
                 _Role = context.SYS_Role.SingleOrDefault(r => r.ID == id);
                 if (_Role == null)
                 {
-                    _Role = new SYS_Role();
                     Result.NotFound();
                 }
                 else
