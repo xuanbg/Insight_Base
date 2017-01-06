@@ -77,15 +77,6 @@ namespace Insight.Base.Services
         Result RemoveMember(List<Guid> ids);
 
         /// <summary>
-        /// 获取用户组的所有成员信息
-        /// </summary>
-        /// <param name="id">用户组ID</param>
-        /// <returns>Result</returns>
-        [WebGet(UriTemplate = "groups/{id}/members", ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        Result GetGroupMembers(string id);
-
-        /// <summary>
         /// 根据ID获取组成员之外的全部用户
         /// </summary>
         /// <param name="id">用户组ID</param>

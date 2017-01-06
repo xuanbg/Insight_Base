@@ -16,18 +16,6 @@ namespace Insight.Base.Common.Entity
         public string FullName { get; set; }
         public string Alias { get; set; }
         public string Code { get; set; }
-        public List<OrgMember> Members { get; set; }
+        public List<MemberUser> Members { get; set; }
     }
-
-    /// <summary>
-    /// 岗位成员
-    /// </summary>
-    public class OrgMember
-    {
-        public Guid ID { get; set; }
-        public string Name { get; set; }
-        public string LoginName { get; set; }
-        public bool Validity { get; set; }
-    }
-
 }

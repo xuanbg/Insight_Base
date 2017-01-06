@@ -58,6 +58,7 @@
     <Compile Include="DbHelper.cs" />
     <Compile Include="Entity\Enum.cs" />
     <Compile Include="Entity\GroupBase.cs" />
+    <Compile Include="Entity\MemberUser.cs" />
     <Compile Include="Entity\ModuleInfo.cs" />
     <Compile Include="Entity\Level.cs" />
     <Compile Include="Entity\Model.Context.cs">

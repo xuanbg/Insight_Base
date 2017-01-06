@@ -85,7 +85,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result GetGroup(string id)
         {
-            const string action = "6910FD14-5654-4CF0-B159-8FE1DF68619F";
+            const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
             var verify = new Compare(action);
             var result = verify.Result;
             if (!result.Successful) return result;
@@ -93,14 +93,11 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
-            using (var context = new BaseEntities())
-            {
-                var group = context.SYS_UserGroup.SingleOrDefault(e => e.ID == parse.Value);
-                if (group == null) result.NotFound();
-                else result.Success(group);
+            var data = new UserGroup(parse.Value);
+            if (!data.Result.Successful) return data.Result;
 
-                return result;
-            }
+            result.Success(data);
+            return result;
         }
 
         /// <summary>
@@ -210,35 +207,6 @@ namespace Insight.Base.Services
                 {
                     result.DataBaseError();
                 }
-                return result;
-            }
-        }
-
-        /// <summary>
-        /// 获取用户组的所有成员信息
-        /// </summary>
-        /// <param name="id">用户组ID</param>
-        /// <returns>Result</returns>
-        public Result GetGroupMembers(string id)
-        {
-            const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
-
-            var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
-
-            using (var context = new BaseEntities())
-            {
-                var list = from m in context.SYS_UserGroupMember
-                           join u in context.SYS_User on m.UserId equals u.ID
-                           where m.GroupId == parse.Value && u.Validity
-                           orderby u.SN
-                           select new { m.ID, u.Name, u.LoginName, u.Description, u.Validity };
-                if (list.Any()) result.Success(list.ToList());
-                else result.NoContent();
-
                 return result;
             }
         }

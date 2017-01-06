@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
@@ -9,6 +10,14 @@ namespace Insight.Base.Services
     public class UserGroup : GroupBase
     {
         public Result Result = new Result();
+
+        private IEnumerable<SYS_UserGroupMember> _Members;
+
+        public List<MemberUser> Members
+        {
+            get { return GetMember(); }
+            set { SetMember(value); }
+        }
 
         /// <summary>
         /// 构造函数，构造新的用户组实体
@@ -93,6 +102,56 @@ namespace Insight.Base.Services
             if (!result) Result.DataBaseError();
 
             return result;
+        }
+
+        /// <summary>
+        /// 新增用户组成员
+        /// </summary>
+        /// <returns>bool 是否成功</returns>
+        public bool AddMember()
+        {
+            return DbHelper.Insert(_Members);
+        }
+
+        /// <summary>
+        /// 转换用户组成员为成员关系数据
+        /// </summary>
+        /// <param name="members"></param>
+        private void SetMember(IEnumerable<MemberUser> members)
+        {
+            _Members = from m in members
+                       select new SYS_UserGroupMember
+                       {
+                           ID = m.ID,
+                           GroupId = _Group.ID,
+                           UserId = m.UserId,
+                           CreatorUserId = m.CreatorUserId,
+                           CreateTime = DateTime.Now
+                       };
+        }
+
+        /// <summary>
+        /// 获取用户组成员
+        /// </summary>
+        /// <returns></returns>
+        private List<MemberUser> GetMember()
+        {
+            using (var context = new BaseEntities())
+            {
+                var list = from m in context.SYS_UserGroupMember
+                    join u in context.SYS_User on m.UserId equals u.ID
+                    where m.GroupId == _Group.ID
+                    orderby u.SN
+                    select new MemberUser
+                    {
+                        ID = m.ID,
+                        Name = u.Name,
+                        LoginName = u.LoginName,
+                        Description = u.Description,
+                        Validity = u.Validity
+                    };
+                return list.ToList();
+            }
         }
     }
 }

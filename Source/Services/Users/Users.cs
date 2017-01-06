@@ -101,16 +101,11 @@ namespace Insight.Base.Services
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            using (var context = new BaseEntities())
-            {
-                var user = context.SYS_User.SingleOrDefault(u => u.ID == parse.Value);
-                if (user == null)
-                    result.NotFound();
-                else
-                    result.Success(user);
+            var data = new User(parse.Value);
+            if (!data.Result.Successful) return data.Result;
 
-                return result;
-            }
+            result.Success(data);
+            return result;
         }
 
         /// <summary>
