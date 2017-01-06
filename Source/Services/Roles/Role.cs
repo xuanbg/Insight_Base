@@ -11,7 +11,7 @@ namespace Insight.Base.Services
 {
     public class Role : RoleBase
     {
-        private readonly Authority _Authority;
+        private Authority _Authority;
         private IEnumerable<SYS_Role_Action> _AddActions;
         private IEnumerable<SYS_Role_Action> _UpActions;
         private IEnumerable<SYS_Role_Action> _DelActions;
@@ -24,6 +24,37 @@ namespace Insight.Base.Services
         public Result Result = new Result();
 
         /// <summary>
+        /// 角色是否已存在(按名称)
+        /// </summary>
+        public bool Exists
+        {
+            get
+            {
+                using (var context = new BaseEntities())
+                {
+                    var role = context.SYS_Role.SingleOrDefault(r => r.Name == _Role.Name);
+                    if (role != null) Result.DataAlreadyExists();
+
+                    return role != null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 角色成员
+        /// </summary>
+        public List<RoleMember> Members
+        {
+            get
+            {
+                using (var context = new BaseEntities())
+                {
+                    return context.RoleMember.Where(m => m.RoleId == ID).ToList();
+                }
+            }
+        }
+
+        /// <summary>
         /// 角色操作权限集合
         /// </summary>
         public List<RoleAction> Actions
@@ -31,8 +62,8 @@ namespace Insight.Base.Services
             get { return _RoleActions ?? _Authority?.GetActions(); }
             set
             {
-                var list = value.Where(a => a.NodeType > 1 && a.Permit != a.Action).ToList();
-                SetActions(list);
+                var list = value?.Where(a => a.NodeType > 1 && a.Permit != a.Action).ToList();
+                SetActions(list ?? new List<RoleAction>());
             }
         }
 
@@ -44,8 +75,8 @@ namespace Insight.Base.Services
             get { return _RoleDatas ?? _Authority?.GetDatas(); }
             set
             {
-                var list = value.Where(d => d.NodeType > 1 && d.Permit != d.Permission).ToList();
-                SetDatas(list);
+                var list = value?.Where(d => d.NodeType > 1 && d.Permit != d.Permission).ToList();
+                SetDatas(list ?? new List<RoleData>());
             }
         }
 
@@ -170,6 +201,7 @@ namespace Insight.Base.Services
         /// <returns></returns>
         public void GetAllPermission()
         {
+            _Authority = new Authority(ID);
             _RoleActions = _Authority.GetAllActions();
             _RoleDatas = _Authority.GetAllDatas();
         }

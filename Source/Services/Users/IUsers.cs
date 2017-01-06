@@ -15,7 +15,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "users", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result AddUser(SYS_User user);
+        Result AddUser(User user);
 
         /// <summary>
         /// 根据ID删除用户
@@ -73,7 +73,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "users/{account}/signup", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result SignUp(string account, SYS_User user);
+        Result SignUp(string account, User user);
 
         /// <summary>
         /// 更新指定用户Session的签名

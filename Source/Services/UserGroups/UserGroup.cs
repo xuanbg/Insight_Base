@@ -11,12 +11,32 @@ namespace Insight.Base.Services
     {
         public Result Result = new Result();
 
-        private IEnumerable<SYS_UserGroupMember> _Members;
+        private List<SYS_UserGroupMember> _Members;
 
+        /// <summary>
+        /// 用户组是否已存在(按名称)
+        /// </summary>
+        public bool Exists
+        {
+            get
+            {
+                using (var context = new BaseEntities())
+                {
+                    var group = context.SYS_UserGroup.SingleOrDefault(u => u.Name == _Group.Name);
+                    if (group != null) Result.DataAlreadyExists();
+
+                    return group != null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 用户组成员
+        /// </summary>
         public List<MemberUser> Members
         {
             get { return GetMember(); }
-            set { SetMember(value); }
+            set { SetMember(value ?? new List<MemberUser>()); }
         }
 
         /// <summary>
@@ -26,25 +46,6 @@ namespace Insight.Base.Services
         {
             _Group = new SYS_UserGroup();
             Result.Success();
-        }
-
-        /// <summary>
-        /// 构造函数，传入用户组实体
-        /// </summary>
-        /// <param name="group">用户组实体</param>
-        public UserGroup(SYS_UserGroup group)
-        {
-            using (var context = new BaseEntities())
-            {
-                _Group = context.SYS_UserGroup.SingleOrDefault(u => u.Name == group.Name);
-                if (_Group == null)
-                {
-                    _Group = group;
-                    Result.Success();
-                }
-                else
-                    Result.AccountExists();
-            }
         }
 
         /// <summary>
@@ -110,7 +111,19 @@ namespace Insight.Base.Services
         /// <returns>bool 是否成功</returns>
         public bool AddMember()
         {
-            return DbHelper.Insert(_Members);
+            if (DbHelper.Insert(_Members)) return true;
+
+            Result.DataBaseError();
+            return false;
+        }
+
+        /// <summary>
+        /// 设置创建人ID
+        /// </summary>
+        /// <param name="id">创建人ID</param>
+        public void SetCreatorUserId(Guid id)
+        {
+            _Members.ForEach(i => i.CreatorUserId = id);
         }
 
         /// <summary>
@@ -119,7 +132,7 @@ namespace Insight.Base.Services
         /// <param name="members"></param>
         private void SetMember(IEnumerable<MemberUser> members)
         {
-            _Members = from m in members
+            var list = from m in members
                        select new SYS_UserGroupMember
                        {
                            ID = m.ID,
@@ -128,6 +141,7 @@ namespace Insight.Base.Services
                            CreatorUserId = m.CreatorUserId,
                            CreateTime = DateTime.Now
                        };
+            _Members = list.ToList();
         }
 
         /// <summary>

@@ -38,6 +38,15 @@ namespace Insight.Base.Services
         Result EditRole(string id, Role role);
 
         /// <summary>
+        /// 获取指定角色
+        /// </summary>ID
+        /// <param name="id">角色</param>
+        /// <returns>Result</returns>
+        [WebGet(UriTemplate = "roles/{id}", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        Result GetRole(string id);
+
+        /// <summary>
         /// 获取所有角色
         /// </summary>
         /// <param name="rows">每页行数</param>
@@ -65,15 +74,6 @@ namespace Insight.Base.Services
         [WebInvoke(Method = "DELETE", UriTemplate = "roles/members/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result RemoveRoleMember(string id);
-
-        /// <summary>
-        /// 根据角色ID获取角色成员集合
-        /// </summary>
-        /// <param name="id">角色ID</param>
-        /// <returns>Result</returns>
-        [WebGet(UriTemplate = "roles/{id}/members", ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        Result GetRoleMembers(string id);
 
         /// <summary>
         /// 根据角色ID获取角色成员用户集合
@@ -112,15 +112,6 @@ namespace Insight.Base.Services
         [WebGet(UriTemplate = "roles/{id}/otherusers", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         Result GetMemberOfUser(string id);
-
-        /// <summary>
-        /// 根据角色ID获取角色授权信息
-        /// </summary>
-        /// <param name="id">角色ID</param>
-        /// <returns>Result</returns>
-        [WebGet(UriTemplate = "roles/{id}/permission", ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        Result GetRolePermission(string id);
 
         /// <summary>
         /// 获取可用的权限资源列表

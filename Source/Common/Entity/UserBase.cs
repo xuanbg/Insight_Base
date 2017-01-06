@@ -4,7 +4,7 @@ namespace Insight.Base.Common.Entity
 {
     public class UserBase
     {
-        protected SYS_User _User = new SYS_User();
+        protected SYS_User _User;
 
         /// <summary>
         /// 用户唯一ID

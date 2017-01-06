@@ -17,21 +17,20 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="user">用户对象</param>
         /// <returns>Result</returns>
-        public Result AddUser(SYS_User user)
+        public Result AddUser(User user)
         {
             const string action = "60D5BE64-0102-4189-A999-96EDAD3DA1B5";
             var verify = new Compare(action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            var data = new User(user);
-            if (!data.Result.Successful) return data.Result;
+            if (user.Exists) return user.Result;
 
-            data.Password = Util.Hash("123456");
-            data.CreatorUserId = verify.Basis.UserId;
-            data.CreateTime = DateTime.Now;
+            user.Password = Util.Hash("123456");
+            user.CreatorUserId = verify.Basis.UserId;
+            user.CreateTime = DateTime.Now;
 
-            return data.Add() ? result : data.Result;
+            return user.Add() ? result : user.Result;
         }
 
         /// <summary>
@@ -177,16 +176,16 @@ namespace Insight.Base.Services
         /// <param name="account">登录账号</param>
         /// <param name="user">用户对象</param>
         /// <returns>Result</returns>
-        public Result SignUp(string account, SYS_User user)
+        public Result SignUp(string account, User user)
         {
             var verify = new Compare();
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            var u = new User(user);
-            if (!u.Result.Successful) return u.Result;
+            if (user.Exists) return user.Result;
 
-            if (!u.Add()) return u.Result;
+            user.CreateTime = DateTime.Now;
+            if (!user.Add()) return user.Result;
 
             var token = new AccessToken {Account = account};
             var session = OAuth.Common.GetSession(token);

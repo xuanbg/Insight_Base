@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
-using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Base.OAuth;
 using Insight.Utils.Common;
@@ -25,11 +24,13 @@ namespace Insight.Base.Services
             var result = verify.Result;
             if (!result.Successful) return result;
 
+            if (role.Exists) return role.Result;
+
             role.CreatorUserId = verify.Basis.UserId;
             role.CreateTime = DateTime.Now;
             if (!role.Add()) return role.Result;
 
-            result.Created(new Role(role.ID));
+            result.Created(role);
             return result;
         }
 
@@ -72,7 +73,29 @@ namespace Insight.Base.Services
 
             if (!role.Update()) return role.Result;
 
-            result.Success(new Role(parse.Value));
+            result.Success(role);
+            return result;
+        }
+
+        /// <summary>
+        /// 获取指定角色
+        /// </summary>ID
+        /// <param name="id">角色</param>
+        /// <returns>Result</returns>
+        public Result GetRole(string id)
+        {
+            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
+
+            var parse = new GuidParse(id);
+            if (!parse.Result.Successful) return parse.Result;
+
+            var role = new Role(parse.Value);
+            if (!role.Result.Successful) return role.Result;
+
+            result.Success(role);
             return result;
         }
 
@@ -184,37 +207,17 @@ namespace Insight.Base.Services
                     return result;
                 }
 
-                if (!DbHelper.Delete(obj))
+                context.SYS_Role_Member.Remove(obj);
+                try
+                {
+                    context.SaveChanges();
+                }
+                catch (Exception)
                 {
                     result.DataBaseError();
-                    return result;
                 }
 
-                var role = new Role(obj.RoleId);
-                result.Success(role);
-                return result;
-            }
-        }
-
-        /// <summary>
-        /// 根据角色ID获取角色成员集合
-        /// </summary>
-        /// <param name="id">角色ID</param>
-        /// <returns>Result</returns>
-        public Result GetRoleMembers(string id)
-        {
-            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
-
-            var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
-
-            using (var context = new BaseEntities())
-            {
-                var list = context.RoleMember.Where(m => m.RoleId == parse.Value).ToList();
-                result.Success(list);
+                result.Success(new Role(obj.RoleId));
                 return result;
             }
         }
@@ -350,28 +353,6 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 根据角色ID获取角色授权信息
-        /// </summary>
-        /// <param name="id">角色ID</param>
-        /// <returns>Result</returns>
-        public Result GetRolePermission(string id)
-        {
-            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
-
-            var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
-
-            var role = new Role(parse.Value);
-            if (!role.Result.Successful) return role.Result;
-
-            result.Success(role);
-            return result;
-        }
-
-        /// <summary>
         /// 获取可用的权限资源列表
         /// </summary>
         /// <param name="id">角色ID（可为空）</param>
@@ -388,8 +369,6 @@ namespace Insight.Base.Services
 
             var role = new Role(parse.Value);
             role.GetAllPermission();
-            if (!role.Result.Successful) return role.Result;
-
             result.Success(role);
             return result;
         }

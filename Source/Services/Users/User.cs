@@ -9,9 +9,24 @@ namespace Insight.Base.Services
 {
     public class User : UserBase
     {
-
         public Result Result = new Result();
 
+        /// <summary>
+        /// 用户是否已存在(按登录账号)
+        /// </summary>
+        public bool Exists
+        {
+            get
+            {
+                using (var context = new BaseEntities())
+                {
+                    var user = context.SYS_User.SingleOrDefault(u => u.Name == _User.LoginName);
+                    if (user != null) Result.AccountExists();
+
+                    return user != null;
+                }
+            }
+        }
 
         /// <summary>
         /// 授予用户的功能权限
@@ -28,26 +43,8 @@ namespace Insight.Base.Services
         /// </summary>
         public User()
         {
+            _User = new SYS_User();
             Result.Success();
-        }
-
-        /// <summary>
-        /// 构造函数，传入用户实体
-        /// </summary>
-        /// <param name="user">用户实体</param>
-        public User(SYS_User user)
-        {
-            using (var context = new BaseEntities())
-            {
-                _User = context.SYS_User.SingleOrDefault(u => u.LoginName == user.LoginName);
-                if (_User == null)
-                {
-                    _User = user;
-                    Result.Success();
-                }
-                else
-                    Result.AccountExists();
-            }
         }
 
         /// <summary>

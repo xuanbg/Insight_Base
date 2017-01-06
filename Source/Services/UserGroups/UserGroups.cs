@@ -17,20 +17,20 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="group">用户组对象</param>
         /// <returns>Result</returns>
-        public Result AddGroup(SYS_UserGroup group)
+        public Result AddGroup(UserGroup group)
         {
             const string action = "6E80210E-6F80-4FF7-8520-B602934D635C";
             var verify = new Compare(action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            var data = new UserGroup(group);
-            if (!data.Result.Successful) return data.Result;
+            if (group.Exists) return group.Result;
 
-            data.CreatorUserId = verify.Basis.UserId;
-            data.CreateTime = DateTime.Now;
+            group.Validity = true;
+            group.CreatorUserId = verify.Basis.UserId;
+            group.CreateTime = DateTime.Now;
 
-            return data.Add() ? result : data.Result;
+            return group.Add() ? result : group.Result;
         }
 
         /// <summary>
@@ -146,11 +146,31 @@ namespace Insight.Base.Services
         /// 根据参数组集合批量插入用户组成员关系
         /// </summary>
         /// <param name="id">用户组ID</param>
-        /// <param name="uids">用户ID集合</param>
+        /// <param name="group">UserGroup</param>
         /// <returns>Result</returns>
-        public Result AddGroupMember(string id, List<Guid> uids)
+        public Result AddGroupMember(string id, UserGroup group)
         {
             const string action = "6C41724C-E118-4BCD-82AD-6B13D05C7894";
+            var verify = new Compare(action);
+            var result = verify.Result;
+            if (!result.Successful) return result;
+
+            group.SetCreatorUserId(verify.Basis.UserId);
+            if (!group.AddMember()) return group.Result;
+
+            result.Success(group);
+            return result;
+        }
+
+        /// <summary>
+        /// 根据ID集合删除用户组成员关系
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="ids">户组成员关系ID集合</param>
+        /// <returns>Result</returns>
+        public Result RemoveMember(string id, List<Guid> ids)
+        {
+            const string action = "686C115A-CE2E-4E84-8F25-B63C15AC173C";
             var verify = new Compare(action);
             var result = verify.Result;
             if (!result.Successful) return result;
@@ -160,48 +180,16 @@ namespace Insight.Base.Services
 
             using (var context = new BaseEntities())
             {
-                var list = from u in uids
-                           select new SYS_UserGroupMember
-                           {
-                               ID = Guid.NewGuid(),
-                               GroupId = parse.Value,
-                               UserId = u,
-                               CreatorUserId = verify.Basis.UserId,
-                               CreateTime = DateTime.Now
-                           };
-                context.SYS_UserGroupMember.AddRange(list);
-                try
-                {
-                    context.SaveChanges();
-                }
-                catch
-                {
-                    result.DataBaseError();
-                }
-                return result;
-            }
-        }
-
-        /// <summary>
-        /// 根据ID集合删除用户组成员关系
-        /// </summary>
-        /// <param name="ids">户组成员关系ID集合</param>
-        /// <returns>Result</returns>
-        public Result RemoveMember(List<Guid> ids)
-        {
-            const string action = "686C115A-CE2E-4E84-8F25-B63C15AC173C";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
-
-            using (var context = new BaseEntities())
-            {
-                var list = from m in context.SYS_UserGroupMember.Where(i => ids.Any(id => id == i.ID))
+                var list = from m in context.SYS_UserGroupMember.Where(i => ids.Any(a => a == i.ID))
                            select m;
                 context.SYS_UserGroupMember.RemoveRange(list);
                 try
                 {
                     context.SaveChanges();
+                    var data = new UserGroup(parse.Value);
+                    if (!data.Result.Successful) return data.Result;
+
+                    result.Success(data);
                 }
                 catch
                 {
@@ -229,9 +217,11 @@ namespace Insight.Base.Services
             using (var context = new BaseEntities())
             {
                 var list = from u in context.SYS_User
-                           let m = context.SYS_UserGroupMember.Where(i => i.GroupId == parse.Value)
-                           where u.Validity && u.Type > 0 && m == null
-                           select new { u.ID, u.Name, u.LoginName };
+                           join m in context.SYS_UserGroupMember.Where(i => i.GroupId == parse.Value) on u.ID equals m.UserId
+                           into temp
+                           from t in temp.DefaultIfEmpty()
+                           where t == null && u.Validity && u.Type > 0
+                           select new {ID = Guid.NewGuid(), UserId = u.ID, u.Name, u.LoginName};
                 if (list.Any()) result.Success(list.ToList());
                 else result.NoContent();
 
