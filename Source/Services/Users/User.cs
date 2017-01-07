@@ -16,16 +16,17 @@ namespace Insight.Base.Services
         /// <summary>
         /// 用户是否已存在(按登录账号)
         /// </summary>
-        public bool Exists
+        public bool Existed
         {
             get
             {
                 using (var context = new BaseEntities())
                 {
                     var user = context.SYS_User.SingleOrDefault(u => u.LoginName == _User.LoginName);
-                    if (user != null) Result.AccountExists();
+                    var existed = user != null && user.ID != _User.ID;
+                    if (existed) Result.AccountExists();
 
-                    return user != null;
+                    return existed;
                 }
             }
         }

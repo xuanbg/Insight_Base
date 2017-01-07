@@ -24,7 +24,7 @@ namespace Insight.Base.Services
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            if (group.Exists) return group.Result;
+            if (group.Existed) return group.Result;
 
             group.Validity = true;
             group.CreatorUserId = verify.Basis.UserId;
@@ -73,7 +73,7 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
-            if (group.Exists || !group.Update()) return group.Result;
+            if (group.Existed || !group.Update()) return group.Result;
 
             result.Success(group);
             return result;

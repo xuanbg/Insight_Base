@@ -16,16 +16,17 @@ namespace Insight.Base.Services
         /// <summary>
         /// 用户组是否已存在(按名称)
         /// </summary>
-        public bool Exists
+        public bool Existed
         {
             get
             {
                 using (var context = new BaseEntities())
                 {
                     var group = context.SYS_UserGroup.SingleOrDefault(u => u.Name == _Group.Name);
-                    if (group != null) Result.DataAlreadyExists();
+                    var existed = group != null && group.ID != _Group.ID;
+                    if (existed) Result.DataAlreadyExists();
 
-                    return group != null;
+                    return existed;
                 }
             }
         }

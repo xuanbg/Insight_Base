@@ -24,7 +24,7 @@ namespace Insight.Base.Services
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            if (user.Exists) return user.Result;
+            if (user.Existed) return user.Result;
 
             user.Password = Util.Hash("123456");
             user.CreatorUserId = verify.Basis.UserId;
@@ -166,7 +166,7 @@ namespace Insight.Base.Services
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            if (user.Exists) return user.Result;
+            if (user.Existed) return user.Result;
 
             user.CreateTime = DateTime.Now;
             if (!user.Add()) return user.Result;

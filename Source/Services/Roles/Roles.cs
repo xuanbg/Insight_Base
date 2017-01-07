@@ -24,7 +24,7 @@ namespace Insight.Base.Services
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            if (role.Exists) return role.Result;
+            if (role.Existed) return role.Result;
 
             role.CreatorUserId = verify.Basis.UserId;
             role.CreateTime = DateTime.Now;
@@ -71,7 +71,7 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
-            if (role.Exists || !role.Update()) return role.Result;
+            if (role.Existed || !role.Update()) return role.Result;
 
             result.Success(role);
             return result;

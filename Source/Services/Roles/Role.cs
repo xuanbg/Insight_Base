@@ -26,16 +26,17 @@ namespace Insight.Base.Services
         /// <summary>
         /// 角色是否已存在(按名称)
         /// </summary>
-        public bool Exists
+        public bool Existed
         {
             get
             {
                 using (var context = new BaseEntities())
                 {
                     var role = context.SYS_Role.SingleOrDefault(r => r.Name == _Role.Name);
-                    if (role != null) Result.DataAlreadyExists();
+                    var existed = role != null && role.ID != _Role.ID;
+                    if (existed) Result.DataAlreadyExists();
 
-                    return role != null;
+                    return existed;
                 }
             }
         }

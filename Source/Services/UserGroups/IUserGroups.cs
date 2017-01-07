@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ServiceModel;
 using System.ServiceModel.Web;
-using Insight.Base.Common.Entity;
 using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
