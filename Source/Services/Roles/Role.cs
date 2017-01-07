@@ -11,7 +11,9 @@ namespace Insight.Base.Services
 {
     public class Role : RoleBase
     {
-        private Authority _Authority;
+        public Result Result = new Result();
+        public Authority Authority;
+
         private IEnumerable<SYS_Role_Action> _AddActions;
         private IEnumerable<SYS_Role_Action> _UpActions;
         private IEnumerable<SYS_Role_Action> _DelActions;
@@ -20,8 +22,6 @@ namespace Insight.Base.Services
         private IEnumerable<SYS_Role_Data> _DelDatas;
         private List<RoleAction> _RoleActions;
         private List<RoleData> _RoleDatas;
-
-        public Result Result = new Result();
 
         /// <summary>
         /// 角色是否已存在(按名称)
@@ -60,7 +60,7 @@ namespace Insight.Base.Services
         /// </summary>
         public List<RoleAction> Actions
         {
-            get { return _RoleActions ?? _Authority?.GetActions(); }
+            get { return _RoleActions ?? Authority?.GetActions(); }
             set
             {
                 var list = value?.Where(a => a.NodeType > 1 && a.Permit != a.Action).ToList();
@@ -73,7 +73,7 @@ namespace Insight.Base.Services
         /// </summary>
         public List<RoleData> Datas
         {
-            get { return _RoleDatas ?? _Authority?.GetDatas(); }
+            get { return _RoleDatas ?? Authority?.GetDatas(); }
             set
             {
                 var list = value?.Where(d => d.NodeType > 1 && d.Permit != d.Permission).ToList();
@@ -100,11 +100,12 @@ namespace Insight.Base.Services
                 _Role = context.SYS_Role.SingleOrDefault(r => r.ID == id);
                 if (_Role == null)
                 {
+                    _Role = new SYS_Role();
                     Result.NotFound();
                 }
                 else
                 {
-                    _Authority = new Authority(id);
+                    Authority = new Authority(id);
                     Result.Success();
                 }
             }
@@ -200,9 +201,9 @@ namespace Insight.Base.Services
         /// <returns></returns>
         public void GetAllPermission()
         {
-            _Authority = new Authority(ID);
-            _RoleActions = _Authority.GetAllActions();
-            _RoleDatas = _Authority.GetAllDatas();
+            Authority = new Authority(ID);
+            _RoleActions = Authority.GetAllActions();
+            _RoleDatas = Authority.GetAllDatas();
         }
 
         /// <summary>

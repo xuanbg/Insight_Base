@@ -58,8 +58,15 @@ namespace Insight.Base.Services
             using (var context = new BaseEntities())
             {
                 _User = context.SYS_User.SingleOrDefault(u => u.ID == id);
-                if (_User == null) Result.NotFound();
-                else Result.Success();
+                if (_User == null)
+                {
+                    _User = new SYS_User();
+                    Result.NotFound();
+                }
+                else
+                {
+                    Result.Success();
+                }
             }
         }
 

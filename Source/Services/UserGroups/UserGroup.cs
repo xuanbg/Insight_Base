@@ -57,8 +57,15 @@ namespace Insight.Base.Services
             using (var context = new BaseEntities())
             {
                 _Group = context.SYS_UserGroup.SingleOrDefault(g => g.ID == id);
-                if (_Group == null) Result.NotFound();
-                else Result.Success();
+                if (_Group == null)
+                {
+                    _Group = new SYS_UserGroup();
+                    Result.NotFound();
+                }
+                else
+                {
+                    Result.Success();
+                }
             }
         }
 

@@ -73,6 +73,7 @@ namespace Insight.Base.Services
 
             if (role.Existed || !role.Update()) return role.Result;
 
+            role.Authority = new Authority(parse.Value);
             result.Success(role);
             return result;
         }
