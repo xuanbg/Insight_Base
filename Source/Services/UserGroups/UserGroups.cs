@@ -219,9 +219,9 @@ namespace Insight.Base.Services
             {
                 var list = from u in context.SYS_User
                            join m in context.SYS_UserGroupMember.Where(i => i.GroupId == parse.Value) on u.ID equals m.UserId
-                           into temp
-                           from t in temp.DefaultIfEmpty()
+                           into temp from t in temp.DefaultIfEmpty()
                            where t == null && u.Validity && u.Type > 0
+                           orderby u.SN
                            select new {ID = Guid.NewGuid(), UserId = u.ID, u.Name, u.LoginName};
                 if (list.Any()) result.Success(list.ToList());
                 else result.NoContent();

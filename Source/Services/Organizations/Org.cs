@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
@@ -13,24 +14,6 @@ namespace Insight.Base.Services
 
         private readonly SYS_Organization _Org;
         private List<SYS_OrgMember> _Members;
-
-        /// <summary>
-        /// 组织机构是否已存在(按全称)
-        /// </summary>
-        public bool Existed
-        {
-            get
-            {
-                using (var context = new BaseEntities())
-                {
-                    var org = context.SYS_Organization.SingleOrDefault(u => u.FullName == _Org.FullName);
-                    var existed = org != null && org.ID != _Org.ID;
-                    if (existed) Result.DataAlreadyExists();
-
-                    return existed;
-                }
-            }
-        }
 
         /// <summary>
         /// 组织机构唯一ID
@@ -69,12 +52,30 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
+        /// 组织机构编码
+        /// </summary>
+        public string Code
+        {
+            get { return _Org.Code; }
+            set { _Org.Code = value; }
+        }
+
+        /// <summary>
         /// 组织机构名称
         /// </summary>
         public string Name
         {
             get { return _Org.Name; }
             set { _Org.Name = value; }
+        }
+
+        /// <summary>
+        /// 组织机构简称
+        /// </summary>
+        public string Alias
+        {
+            get { return _Org.Alias; }
+            set { _Org.Alias = value; }
         }
 
         /// <summary>
@@ -87,21 +88,21 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 组织机构别名
+        /// 岗位ID
         /// </summary>
-        public string Alias
+        public Guid? PositionId
         {
-            get { return _Org.Alias; }
-            set { _Org.Alias = value; }
+            get { return _Org.PositionId; }
+            set { _Org.ParentId = value; }
         }
 
         /// <summary>
-        /// 组织机构编码
+        /// 是否有效
         /// </summary>
-        public string Code
+        public bool Validity
         {
-            get { return _Org.Code; }
-            set { _Org.Code = value; }
+            get { return _Org.Validity; }
+            set { _Org.Validity = value; }
         }
 
         /// <summary>
@@ -129,6 +130,24 @@ namespace Insight.Base.Services
         {
             get { return GetMember(); }
             set { SetMember(value ?? new List<MemberUser>()); }
+        }
+
+        /// <summary>
+        /// 组织机构是否已存在(按全称)
+        /// </summary>
+        public bool Existed
+        {
+            get
+            {
+                using (var context = new BaseEntities())
+                {
+                    var org = context.SYS_Organization.SingleOrDefault(u => u.FullName == FullName);
+                    var existed = org != null && org.ID != ID;
+                    if (existed) Result.DataAlreadyExists();
+
+                    return existed;
+                }
+            }
         }
 
         /// <summary>
@@ -166,13 +185,21 @@ namespace Insight.Base.Services
         /// <returns>bool 是否成功</returns>
         public bool Add()
         {
-            var result = DbHelper.Insert(_Org);
-            if (result)
-                Result.Created();
-            else
-                Result.DataBaseError();
-
-            return result;
+            using (var context = new BaseEntities())
+            {
+                context.SYS_Organization.Where(i => i.ParentId == ParentId && i.Index >= Index).ToList().ForEach(i => i.Index ++);
+                context.SYS_Organization.Add(_Org);
+                try
+                {
+                    context.SaveChanges();
+                    return true;
+                }
+                catch
+                {
+                    Result.DataBaseError();
+                    return false;
+                }
+            }
         }
 
         /// <summary>
@@ -181,10 +208,21 @@ namespace Insight.Base.Services
         /// <returns>bool 是否成功</returns>
         public bool Delete()
         {
-            var result = DbHelper.Delete(_Org);
-            if (!result) Result.DataBaseError();
-
-            return result;
+            using (var context = new BaseEntities())
+            {
+                context.SYS_Organization.Where(i => i.ParentId == ParentId && i.Index > Index).ToList().ForEach(i => i.Index--);
+                context.SYS_Organization.Remove(_Org);
+                try
+                {
+                    context.SaveChanges();
+                    return true;
+                }
+                catch
+                {
+                    Result.DataBaseError();
+                    return false;
+                }
+            }
         }
 
         /// <summary>
@@ -193,10 +231,53 @@ namespace Insight.Base.Services
         /// <returns>bool 是否成功</returns>
         public bool Update()
         {
-            var result = DbHelper.Update(_Org);
-            if (!result) Result.DataBaseError();
+            using (var context = new BaseEntities())
+            {
+                var org = context.SYS_Organization.Single(i => i.ID == ID);
+                if (org.ParentId != ParentId)
+                {
+                    context.SYS_Organization
+                        .Where(i => i.ParentId == ParentId && i.Index >= Index)
+                        .ToList().ForEach(i => i.Index++);
+                    context.SYS_Organization
+                        .Where(i => i.ParentId == org.ParentId && i.Index > Index)
+                        .ToList().ForEach(i => i.Index--);
+                }
+                else if (org.Index > Index)
+                {
+                    context.SYS_Organization
+                        .Where(i => i.ParentId == ParentId && i.Index < org.Index && i.Index >= Index)
+                        .ToList().ForEach(i => i.Index++);
+                }
+                else if (org.Index < Index)
+                {
+                    context.SYS_Organization
+                        .Where(i => i.ParentId == ParentId && i.Index > org.Index && i.Index <= Index)
+                        .ToList().ForEach(i => i.Index--);
+                }
 
-            return result;
+                context.SYS_Organization.Attach(_Org);
+                context.Entry(_Org).State = EntityState.Modified;
+                try
+                {
+                    context.SaveChanges();
+                    return true;
+                }
+                catch
+                {
+                    Result.DataBaseError();
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 设置职位成员创建人ID
+        /// </summary>
+        /// <param name="id">创建人ID</param>
+        public void SetCreatorUserId(Guid id)
+        {
+            _Members.ForEach(i => i.CreatorUserId = id);
         }
 
         /// <summary>
@@ -212,12 +293,25 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 设置职位成员创建人ID
+        /// 移除职位成员
         /// </summary>
-        /// <param name="id">创建人ID</param>
-        public void SetCreatorUserId(Guid id)
+        /// <returns>bool 是否成功</returns>
+        public bool RemoveMembers()
         {
-            _Members.ForEach(i => i.CreatorUserId = id);
+            using (var context = new BaseEntities())
+            {
+                context.SYS_OrgMember.RemoveRange(_Members);
+                try
+                {
+                    context.SaveChanges();
+                    return true;
+                }
+                catch
+                {
+                    Result.DataBaseError();
+                    return false;
+                }
+            }
         }
 
         /// <summary>
@@ -226,13 +320,13 @@ namespace Insight.Base.Services
         /// <returns></returns>
         private List<MemberUser> GetMember()
         {
-            if (_Org.NodeType < 3) return null;
+            if (NodeType < 3) return null;
 
             using (var context = new BaseEntities())
             {
                 var list = from m in context.SYS_OrgMember
                            join u in context.SYS_User on m.UserId equals u.ID
-                           where m.OrgId == _Org.ID
+                           where m.OrgId == ID
                            orderby u.SN
                            select new MemberUser
                            {
@@ -252,16 +346,16 @@ namespace Insight.Base.Services
         /// <param name="members"></param>
         private void SetMember(IEnumerable<MemberUser> members)
         {
-            if (_Org.NodeType < 3) return;
+            if (NodeType < 3) return;
 
             var list = from m in members
                        select new SYS_OrgMember
                        {
                            ID = m.ID,
-                           OrgId = _Org.ID,
+                           OrgId = ID,
                            UserId = m.UserId,
                            CreatorUserId = m.CreatorUserId,
-                           CreateTime = DateTime.Now
+                           CreateTime = m.CreateTime
                        };
             _Members = list.ToList();
         }
