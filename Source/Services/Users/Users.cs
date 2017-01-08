@@ -63,7 +63,7 @@ namespace Insight.Base.Services
         /// <param name="id">用户ID</param>
         /// <param name="user">用户数据对象</param>
         /// <returns>Result</returns>
-        public Result UpdateUserInfo(string id, UserBase user)
+        public Result UpdateUserInfo(string id, User user)
         {
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;

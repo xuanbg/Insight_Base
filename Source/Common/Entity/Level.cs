@@ -1,4 +1,4 @@
-﻿namespace Insight.WS.Log.Entity
+﻿namespace Insight.Base.Common.Entity
 {
     /// <summary>
     /// 日志等级

@@ -7,15 +7,15 @@ using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
 {
-    public class UserGroup
+    public class Org
     {
         public Result Result = new Result();
 
-        private readonly SYS_UserGroup _Group;
-        private List<SYS_UserGroupMember> _Members;
+        private readonly SYS_Organization _Org;
+        private List<SYS_OrgMember> _Members;
 
         /// <summary>
-        /// 用户组是否已存在(按名称)
+        /// 组织机构是否已存在(按全称)
         /// </summary>
         public bool Existed
         {
@@ -23,8 +23,8 @@ namespace Insight.Base.Services
             {
                 using (var context = new BaseEntities())
                 {
-                    var group = context.SYS_UserGroup.SingleOrDefault(u => u.Name == _Group.Name);
-                    var existed = group != null && group.ID != _Group.ID;
+                    var org = context.SYS_Organization.SingleOrDefault(u => u.FullName == _Org.FullName);
+                    var existed = org != null && org.ID != _Org.ID;
                     if (existed) Result.DataAlreadyExists();
 
                     return existed;
@@ -33,48 +33,75 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 用户组唯一ID
+        /// 组织机构唯一ID
         /// </summary>
         public Guid ID
         {
-            get { return _Group.ID; }
-            set { _Group.ID = value; }
+            get { return _Org.ID; }
+            set { _Org.ID = value; }
         }
 
         /// <summary>
-        /// 用户组名称
+        /// 父节点ID
+        /// </summary>
+        public Guid? ParentId
+        {
+            get { return _Org.ParentId; }
+            set { _Org.ParentId = value; }
+        }
+
+        /// <summary>
+        /// 节点类型
+        /// </summary>
+        public int NodeType
+        {
+            get { return _Org.NodeType; }
+            set { _Org.NodeType = value; }
+        }
+
+        /// <summary>
+        /// 节点排序索引
+        /// </summary>
+        public int Index
+        {
+            get { return _Org.Index; }
+            set { _Org.Index = value; }
+        }
+
+        /// <summary>
+        /// 组织机构名称
         /// </summary>
         public string Name
         {
-            get { return _Group.Name; }
-            set { _Group.Name = value; }
+            get { return _Org.Name; }
+            set { _Org.Name = value; }
         }
 
         /// <summary>
-        /// 用户组描述
+        /// 组织机构全称
         /// </summary>
-        public string Description
+        public string FullName
         {
-            get { return _Group.Description; }
-            set { _Group.Description = value; }
+            get { return _Org.FullName; }
+            set { _Org.FullName = value; }
         }
 
         /// <summary>
-        /// 是否内置用户组
+        /// 组织机构别名
         /// </summary>
-        public bool BuiltIn
+        public string Alias
         {
-            get { return _Group.BuiltIn; }
-            set { _Group.BuiltIn = value; }
+            get { return _Org.Alias; }
+            set { _Org.Alias = value; }
         }
 
         /// <summary>
-        /// 是否可见
+        /// 组织机构编码
         /// </summary>
-        public bool Validity
+        public string Code
         {
-            get { return _Group.Visible; }
-            set { _Group.Visible = value; }
+            get { return _Org.Code; }
+            set { _Org.Code = value; }
         }
 
         /// <summary>
@@ -82,8 +109,8 @@ namespace Insight.Base.Services
         /// </summary>
         public Guid CreatorUserId
         {
-            get { return _Group.CreatorUserId; }
-            set { _Group.CreatorUserId = value; }
+            get { return _Org.CreatorUserId; }
+            set { _Org.CreatorUserId = value; }
         }
 
         /// <summary>
@@ -91,12 +118,12 @@ namespace Insight.Base.Services
         /// </summary>
         public DateTime CreateTime
         {
-            get { return _Group.CreateTime; }
-            set { _Group.CreateTime = value; }
+            get { return _Org.CreateTime; }
+            set { _Org.CreateTime = value; }
         }
 
         /// <summary>
-        /// 用户组成员
+        /// 职位成员
         /// </summary>
         public List<MemberUser> Members
         {
@@ -105,26 +132,26 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 构造函数，构造新的用户组实体
+        /// 构造函数
         /// </summary>
-        public UserGroup()
+        public Org()
         {
-            _Group = new SYS_UserGroup();
+            _Org = new SYS_Organization();
             Result.Success();
         }
 
         /// <summary>
-        /// 构造函数，根据ID读取用户组实体
+        /// 构造函数，根据ID读取组织机构实体
         /// </summary>
-        /// <param name="id">用户组ID</param>
-        public UserGroup(Guid id)
+        /// <param name="id">组织机构ID</param>
+        public Org(Guid id)
         {
             using (var context = new BaseEntities())
             {
-                _Group = context.SYS_UserGroup.SingleOrDefault(g => g.ID == id);
-                if (_Group == null)
+                _Org = context.SYS_Organization.SingleOrDefault(i => i.ID == id);
+                if (_Org == null)
                 {
-                    _Group = new SYS_UserGroup();
+                    _Org = new SYS_Organization();
                     Result.NotFound();
                 }
                 else
@@ -133,14 +160,13 @@ namespace Insight.Base.Services
                 }
             }
         }
-
         /// <summary>
-        /// 新增用户组
+        /// 新增组织机构节点
         /// </summary>
         /// <returns>bool 是否成功</returns>
         public bool Add()
         {
-            var result = DbHelper.Insert(_Group);
+            var result = DbHelper.Insert(_Org);
             if (result)
                 Result.Created();
             else
@@ -150,31 +176,31 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 删除用户组
+        /// 删除组织机构节点
         /// </summary>
         /// <returns>bool 是否成功</returns>
         public bool Delete()
         {
-            var result = DbHelper.Delete(_Group);
+            var result = DbHelper.Delete(_Org);
             if (!result) Result.DataBaseError();
 
             return result;
         }
 
         /// <summary>
-        /// 更新用户组
+        /// 更新组织机构节点
         /// </summary>
         /// <returns>bool 是否成功</returns>
         public bool Update()
         {
-            var result = DbHelper.Update(_Group);
+            var result = DbHelper.Update(_Org);
             if (!result) Result.DataBaseError();
 
             return result;
         }
 
         /// <summary>
-        /// 新增用户组成员
+        /// 新增职位成员
         /// </summary>
         /// <returns>bool 是否成功</returns>
         public bool AddMember()
@@ -186,7 +212,7 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 设置用户组创建人ID
+        /// 设置职位成员创建人ID
         /// </summary>
         /// <param name="id">创建人ID</param>
         public void SetCreatorUserId(Guid id)
@@ -195,16 +221,18 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 获取用户组成员
+        /// 获取职位成员
         /// </summary>
         /// <returns></returns>
         private List<MemberUser> GetMember()
         {
+            if (_Org.NodeType < 3) return null;
+
             using (var context = new BaseEntities())
             {
-                var list = from m in context.SYS_UserGroupMember
+                var list = from m in context.SYS_OrgMember
                            join u in context.SYS_User on m.UserId equals u.ID
-                           where m.GroupId == _Group.ID
+                           where m.OrgId == _Org.ID
                            orderby u.SN
                            select new MemberUser
                            {
@@ -219,16 +247,18 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 转换用户组成员为成员关系数据
+        /// 转换职位成员为成员关系数据
         /// </summary>
         /// <param name="members"></param>
         private void SetMember(IEnumerable<MemberUser> members)
         {
+            if (_Org.NodeType < 3) return;
+
             var list = from m in members
-                       select new SYS_UserGroupMember
+                       select new SYS_OrgMember
                        {
                            ID = m.ID,
-                           GroupId = _Group.ID,
+                           OrgId = _Org.ID,
                            UserId = m.UserId,
                            CreatorUserId = m.CreatorUserId,
                            CreateTime = DateTime.Now

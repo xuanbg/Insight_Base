@@ -57,9 +57,7 @@
   <ItemGroup>
     <Compile Include="DbHelper.cs" />
     <Compile Include="Entity\Enum.cs" />
-    <Compile Include="Entity\GroupBase.cs" />
     <Compile Include="Entity\MemberUser.cs" />
-    <Compile Include="Entity\ModuleInfo.cs" />
     <Compile Include="Entity\Level.cs" />
     <Compile Include="Entity\Model.Context.cs">
       <AutoGen>True</AutoGen>
@@ -79,7 +77,6 @@
     <Compile Include="Entity\OrgInfo.cs" />
     <Compile Include="Entity\RoleAction.cs" />
     <Compile Include="Entity\RoleData.cs" />
-    <Compile Include="Entity\RoleBase.cs" />
     <Compile Include="Entity\RoleMember.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
@@ -152,7 +149,6 @@
     <Compile Include="Entity\SYS_VerifyImage.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
-    <Compile Include="Entity\UserBase.cs" />
     <Compile Include="Entity\UserRole.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>

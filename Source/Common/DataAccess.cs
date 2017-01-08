@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using Insight.Base.Common.Entity;
 using Insight.Utils.Common;
-using Insight.WS.Log.Entity;
 using static Insight.Base.Common.Parameters;
 
 namespace Insight.Base.Common

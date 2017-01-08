@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="DataAccess.cs" />
     <Compile Include="IOrganizations.cs" />
+    <Compile Include="Org.cs" />
     <Compile Include="Organizations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

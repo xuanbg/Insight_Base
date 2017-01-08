@@ -34,7 +34,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "users/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result UpdateUserInfo(string id, UserBase user);
+        Result UpdateUserInfo(string id, User user);
 
         /// <summary>
         /// 根据ID获取用户对象实体

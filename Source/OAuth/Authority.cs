@@ -16,8 +16,8 @@ namespace Insight.Base.OAuth
         private List<SYS_Organization> _Orgs;
         private List<SYS_User> _Users;
         private List<SYS_Data> _Datas;
-        private List<ModuleInfo> _ActionModules;
-        private List<ModuleInfo> _DataModules;
+        private List<ModuleId> _ActionModules;
+        private List<ModuleId> _DataModules;
 
         /// <summary>
         /// 构造函数，根据角色ID初始化数据
@@ -305,7 +305,7 @@ namespace Insight.Base.OAuth
                                   join a in _Actions on r.ActionId equals a.ID
                                   join m in _Modules on a.ModuleId equals m.ID
                                   where m.Validity
-                                  group m by new ModuleInfo {ID = m.ID, GroupId = m.ModuleGroupId} into g
+                                  group m by new ModuleId {ID = m.ID, GroupId = m.ModuleGroupId} into g
                                   select g.Key).Distinct().ToList();
 
                 // 如获取导航信息，立即返回
@@ -318,9 +318,22 @@ namespace Insight.Base.OAuth
                 _DataModules = (from r in _RoleDatas
                                 join m in _Modules on r.ModuleId equals m.ID
                                 where m.Validity
-                                group m by new ModuleInfo {ID = m.ID, GroupId = m.ModuleGroupId} into g
+                                group m by new ModuleId {ID = m.ID, GroupId = m.ModuleGroupId} into g
                                 select g.Key).Distinct().ToList();
             }
         }
+    }
+
+    public class ModuleId
+    {
+        /// <summary>
+        /// 业务模块ID
+        /// </summary>
+        public Guid ID { get; set; }
+
+        /// <summary>
+        /// 模块组ID
+        /// </summary>
+        public Guid GroupId { get; set; }
     }
 }
