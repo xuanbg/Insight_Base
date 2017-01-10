@@ -86,12 +86,16 @@ namespace Insight.Base.Common
         /// <typeparam name="T">实体类型</typeparam>
         /// <param name="entrys">数据实体集合</param>
         /// <returns>bool 是否成功</returns>
-        public static bool Delete<T>(IEnumerable<T> entrys) where T : class
+        public static bool Delete<T>(List<T> entrys) where T : class
         {
             using (var context = new BaseEntities())
             {
-                var obj = context.Set<T>();
-                obj.RemoveRange(entrys);
+                entrys.ForEach(i =>
+                {
+                    var obj = context.Set<T>();
+                    obj.Attach(i);
+                    context.Entry(i).State = EntityState.Deleted;
+                });
                 try
                 {
                     context.SaveChanges();

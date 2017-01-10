@@ -93,7 +93,7 @@ namespace Insight.Base.Services
         public Guid? PositionId
         {
             get { return _Org.PositionId; }
-            set { _Org.ParentId = value; }
+            set { _Org.PositionId = value; }
         }
 
         /// <summary>
@@ -139,6 +139,8 @@ namespace Insight.Base.Services
         {
             get
             {
+                if (string.IsNullOrEmpty(FullName)) return false;
+
                 using (var context = new BaseEntities())
                 {
                     var org = context.SYS_Organization.SingleOrDefault(u => u.FullName == FullName);
@@ -211,7 +213,8 @@ namespace Insight.Base.Services
             using (var context = new BaseEntities())
             {
                 context.SYS_Organization.Where(i => i.ParentId == ParentId && i.Index > Index).ToList().ForEach(i => i.Index--);
-                context.SYS_Organization.Remove(_Org);
+                context.SYS_Organization.Attach(_Org);
+                context.Entry(_Org).State = EntityState.Deleted;
                 try
                 {
                     context.SaveChanges();
@@ -256,8 +259,14 @@ namespace Insight.Base.Services
                         .ToList().ForEach(i => i.Index--);
                 }
 
-                context.SYS_Organization.Attach(_Org);
-                context.Entry(_Org).State = EntityState.Modified;
+                org.ParentId = ParentId;
+                org.NodeType = NodeType;
+                org.Index = Index;
+                org.Name = Name;
+                org.Alias = Alias;
+                org.FullName = FullName;
+                org.Code = Code;
+                org.PositionId = PositionId;
                 try
                 {
                     context.SaveChanges();
@@ -272,12 +281,16 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 设置职位成员创建人ID
+        /// 设置职位成员创建信息
         /// </summary>
         /// <param name="id">创建人ID</param>
-        public void SetCreatorUserId(Guid id)
+        public void SetCreatorInfo(Guid id)
         {
-            _Members.ForEach(i => i.CreatorUserId = id);
+            _Members.ForEach(i => 
+            {
+                i.CreatorUserId = id;
+                i.CreateTime = DateTime.Now;
+            });
         }
 
         /// <summary>
@@ -298,20 +311,10 @@ namespace Insight.Base.Services
         /// <returns>bool 是否成功</returns>
         public bool RemoveMembers()
         {
-            using (var context = new BaseEntities())
-            {
-                context.SYS_OrgMember.RemoveRange(_Members);
-                try
-                {
-                    context.SaveChanges();
-                    return true;
-                }
-                catch
-                {
-                    Result.DataBaseError();
-                    return false;
-                }
-            }
+            if (DbHelper.Delete(_Members)) return true;
+
+            Result.DataBaseError();
+            return false;
         }
 
         /// <summary>

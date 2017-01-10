@@ -24,6 +24,7 @@ namespace Insight.Base.Services
             if (!result.Successful) return result;
 
             org.CreatorUserId = verify.Basis.UserId;
+            org.CreateTime = DateTime.Now;
             if (org.Existed || !org.Add()) return org.Result;
 
             result.Created(org);
@@ -153,6 +154,7 @@ namespace Insight.Base.Services
             var result = verify.Result;
             if (!result.Successful) return result;
 
+            org.SetCreatorInfo(verify.Basis.UserId);
             if (!org.AddMember()) return org.Result;
 
             result.Success(org);
@@ -162,9 +164,10 @@ namespace Insight.Base.Services
         /// <summary>
         /// 删除职位成员关系
         /// </summary>
+        /// <param name="id">节点ID</param>
         /// <param name="org">组织节点对象</param>
         /// <returns>Result</returns>
-        public Result RemoveOrgMember(Org org)
+        public Result RemoveOrgMember(string id, Org org)
         {
             const string action = "70AC8EEB-F920-468D-8C8F-2DBA049ADAE9";
             var verify = new Compare(action);

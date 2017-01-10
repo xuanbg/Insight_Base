@@ -75,11 +75,12 @@ namespace Insight.Base.Services
         /// <summary>
         /// 根删除职位成员关系
         /// </summary>
+        /// <param name="id">节点ID</param>
         /// <param name="org">组织节点对象</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "DELETE", UriTemplate = "orgs/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "DELETE", UriTemplate = "orgs/{id}/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result RemoveOrgMember(Org org);
+        Result RemoveOrgMember(string id, Org org);
 
         /// <summary>
         /// 获取职位成员之外的所有用户
