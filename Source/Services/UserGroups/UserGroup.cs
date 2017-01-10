@@ -174,6 +174,19 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
+        /// 设置用户组创建信息
+        /// </summary>
+        /// <param name="id">创建人ID</param>
+        public void SetCreatorInfo(Guid id)
+        {
+            _Members.ForEach(i =>
+            {
+                i.CreatorUserId = id;
+                i.CreateTime = DateTime.Now;
+            });
+        }
+
+        /// <summary>
         /// 新增用户组成员
         /// </summary>
         /// <returns>bool 是否成功</returns>
@@ -186,12 +199,15 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 设置用户组创建人ID
+        /// 移除用户组成员
         /// </summary>
-        /// <param name="id">创建人ID</param>
-        public void SetCreatorUserId(Guid id)
+        /// <returns>bool 是否成功</returns>
+        public bool RemoveMembers()
         {
-            _Members.ForEach(i => i.CreatorUserId = id);
+            if (DbHelper.Delete(_Members)) return true;
+
+            Result.DataBaseError();
+            return false;
         }
 
         /// <summary>
@@ -228,10 +244,10 @@ namespace Insight.Base.Services
                        select new SYS_UserGroupMember
                        {
                            ID = m.ID,
-                           GroupId = _Group.ID,
+                           GroupId = ID,
                            UserId = m.UserId,
                            CreatorUserId = m.CreatorUserId,
-                           CreateTime = DateTime.Now
+                           CreateTime = m.CreateTime
                        };
             _Members = list.ToList();
         }

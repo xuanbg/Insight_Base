@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using Insight.Base.Common.Entity;
@@ -156,7 +155,7 @@ namespace Insight.Base.Services
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            group.SetCreatorUserId(verify.Basis.UserId);
+            group.SetCreatorInfo(verify.Basis.UserId);
             if (!group.AddMember()) return group.Result;
 
             result.Success(group);
@@ -167,37 +166,19 @@ namespace Insight.Base.Services
         /// 根据ID集合删除用户组成员关系
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="ids">户组成员关系ID集合</param>
+        /// <param name="group">UserGroup</param>
         /// <returns>Result</returns>
-        public Result RemoveMember(string id, List<Guid> ids)
+        public Result RemoveMember(string id, UserGroup group)
         {
             const string action = "686C115A-CE2E-4E84-8F25-B63C15AC173C";
             var verify = new Compare(action);
             var result = verify.Result;
             if (!result.Successful) return result;
 
-            var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
+            if (!group.RemoveMembers()) return group.Result;
 
-            using (var context = new BaseEntities())
-            {
-                var list = from m in context.SYS_UserGroupMember.Where(i => ids.Any(a => a == i.ID))
-                           select m;
-                context.SYS_UserGroupMember.RemoveRange(list);
-                try
-                {
-                    context.SaveChanges();
-                    var data = new UserGroup(parse.Value);
-                    if (!data.Result.Successful) return data.Result;
-
-                    result.Success(data);
-                }
-                catch
-                {
-                    result.DataBaseError();
-                }
-                return result;
-            }
+            result.Success(group);
+            return result;
         }
 
         /// <summary>
