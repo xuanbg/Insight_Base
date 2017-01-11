@@ -12,11 +12,9 @@ namespace Insight.Base.OAuth
 {
     public class Compare
     {
-        // 当前Web操作上下文
         private readonly WebOperationContext _Context = WebOperationContext.Current;
-
-        // 用于验证的目标对象
         private AccessToken _Token;
+        private Session _Basis;
 
         /// <summary>
         /// 验证结果
@@ -26,7 +24,7 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 用于验证的基准对象
         /// </summary>
-        public Session Basis { get; private set; }
+        public Session Basis => _Basis ?? (_Basis = Common.GetSession(_Token));
 
         /// <summary>
         /// 构造方法，如Action不为空，则同时进行鉴权
@@ -72,7 +70,7 @@ namespace Insight.Base.OAuth
             }
 
             _Token = token;
-            if (!FindBasis()) return;
+            if (!CheckBasis()) return;
 
             var obj = new {Basis.ID, Basis.Stamp};
             Result.Success(obj);
@@ -101,7 +99,7 @@ namespace Insight.Base.OAuth
             }
 
             _Token = token;
-            if (!FindBasis()) return;
+            if (!CheckBasis()) return;
 
             // 验证用户签名
             if (!Basis.Verify(signature, 3))
@@ -173,7 +171,7 @@ namespace Insight.Base.OAuth
                 var json = Encoding.UTF8.GetString(buffer);
                 _Token = Util.Deserialize<AccessToken>(json);
 
-                return FindBasis();
+                return CheckBasis();
             }
             catch (Exception ex)
             {
@@ -186,12 +184,11 @@ namespace Insight.Base.OAuth
         }
 
         /// <summary>
-        /// 找到Token对应的Session并检查是否正常(正常授权、未封禁、未锁定)
+        /// 检查Session是否正常(正常授权、未封禁、未锁定)
         /// </summary>
         /// <returns>bool Session是否正常</returns>
-        private bool FindBasis()
+        private bool CheckBasis()
         {
-            Basis = Common.GetSession(_Token);
             if (Basis == null)
             {
                 Result.NotFound();

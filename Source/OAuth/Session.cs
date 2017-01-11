@@ -24,16 +24,6 @@ namespace Insight.Base.OAuth
         private DateTime _LastConnect;
 
         /// <summary>
-        /// 登录用户ID
-        /// </summary>
-        public Guid UserId { get; private set; }
-
-        /// <summary>
-        /// 登录部门ID
-        /// </summary>
-        public Guid? DeptId { get; private set; }
-
-        /// <summary>
         /// Secret过期时间
         /// </summary>
         public DateTime ExpiryTime { get; private set; }
