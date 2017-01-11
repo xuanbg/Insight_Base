@@ -484,3 +484,49 @@ where TI.Type > 0
 
 END
 GO
+
+/*****触发器：自动删除角色成员用户*****/
+
+CREATE TRIGGER SYS_User_Delete ON SYS_User AFTER DELETE AS
+
+BEGIN
+SET NOCOUNT ON
+
+DELETE M
+from SYS_Role_Member M
+join deleted D on D.ID = M.MemberId
+where M.Type = 1
+
+END
+GO
+
+/*****触发器：自动删除角色成员用户组*****/
+
+CREATE TRIGGER SYS_UserGroup_Delete ON SYS_UserGroup AFTER DELETE AS
+
+BEGIN
+SET NOCOUNT ON
+
+DELETE M
+from SYS_Role_Member M
+join deleted D on D.ID = M.MemberId
+where M.Type = 2
+
+END
+GO
+
+/*****触发器：自动删除角色成员职位*****/
+
+CREATE TRIGGER SYS_Organization_Delete ON SYS_Organization AFTER DELETE AS
+
+BEGIN
+SET NOCOUNT ON
+
+DELETE M
+from SYS_Role_Member M
+join deleted D on D.ID = M.MemberId
+and D.NodeType = 3
+where M.Type = 3
+
+END
+GO
