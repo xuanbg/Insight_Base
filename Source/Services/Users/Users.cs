@@ -292,5 +292,28 @@ namespace Insight.Base.Services
 
             return result;
         }
+
+        /// <summary>
+        /// 根据ID获取用户对象实体
+        /// </summary>
+        /// <param name="id">用户ID</param>
+        /// <param name="deptid">登录部门ID</param>
+        /// <returns>Result</returns>
+        public Result GetUserRoles(string id, string deptid)
+        {
+            var verify = new Compare();
+            var result = verify.Result;
+            if (!result.Successful) return result;
+
+            var parse = new GuidParse(id);
+            if (!parse.Result.Successful) return parse.Result;
+
+            var dept = new GuidParse(deptid);
+            if (!parse.Result.Successful) return parse.Result;
+
+            var auth = new Authority(parse.Value, dept.Guid);
+            result.Success(auth.RoleList);
+            return result;
+        }
     }
 }

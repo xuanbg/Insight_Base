@@ -104,5 +104,15 @@ namespace Insight.Base.Services
         [WebInvoke(Method = "DELETE", UriTemplate = "users/{account}/token", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result UserSignOut(string account);
+
+        /// <summary>
+        /// 根据ID获取用户对象实体
+        /// </summary>
+        /// <param name="id">用户ID</param>
+        /// <param name="deptid">登录部门ID</param>
+        /// <returns>Result</returns>
+        [WebGet(UriTemplate = "users/{id}/roles?deptid={deptid}", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        Result GetUserRoles(string id, string deptid);
     }
 }

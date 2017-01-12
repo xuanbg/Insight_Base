@@ -20,6 +20,11 @@ namespace Insight.Base.OAuth
         private List<ModuleId> _DataModules;
 
         /// <summary>
+        /// 角色集合
+        /// </summary>
+        public List<Guid> RoleList => _RoleList;
+
+        /// <summary>
         /// 构造函数，根据角色ID初始化数据
         /// </summary>
         /// <param name="rid">角色ID</param>
@@ -39,7 +44,7 @@ namespace Insight.Base.OAuth
         /// <param name="all">是否包含用户的全部角色（忽略登录部门）</param>
         public Authority(Guid uid, Guid? did, InitType type = 0, bool all = false)
         {
-            InitRoleActions(uid, did, all);
+            InitRoleList(uid, did, all);
             InitData(type);
         }
 
@@ -252,9 +257,9 @@ namespace Insight.Base.OAuth
         }
 
         /// <summary>
-        /// 获取用户的角色集合/授权操作集合/授权数据集合
+        /// 获取用户的角色集合
         /// </summary>
-        private void InitRoleActions(Guid uid, Guid? did, bool all)
+        private void InitRoleList(Guid uid, Guid? did, bool all)
         {
             using (var context = new BaseEntities())
             {
