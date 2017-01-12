@@ -91,7 +91,7 @@ namespace Insight.Base.OAuth
                 return;
             }
 
-            var parse = new GuidParse(did);
+            var parse = new GuidParse(did, true);
             if (!parse.Result.Successful)
             {
                 Result.InvalidGuid();

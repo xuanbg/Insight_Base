@@ -1,6 +1,7 @@
 ﻿using System.ServiceModel;
 using System.ServiceModel.Web;
 using Insight.Base.Common.Entity;
+using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
 {
@@ -34,10 +35,10 @@ namespace Insight.Base.Services
         /// 删除日志规则
         /// </summary>
         /// <param name="id">日志规则ID</param>
-        /// <returns>JsonResult</returns>
+        /// <returns>Result</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "rules/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult RemoveRule(string id);
+        Result RemoveRule(string id);
 
         /// <summary>
         /// 编辑日志规则
@@ -52,10 +53,10 @@ namespace Insight.Base.Services
         /// 获取日志规则
         /// </summary>
         /// <param name="id">日志规则ID</param>
-        /// <returns>JsonResult</returns>
+        /// <returns>Result</returns>
         [WebGet(UriTemplate = "rules/{id}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        JsonResult GetRule(string id);
+        Result GetRule(string id);
 
         /// <summary>
         /// 获取全部日志规则

@@ -6,6 +6,7 @@ using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Base.OAuth;
 using Insight.Utils.Common;
+using Insight.Utils.Entity;
 using static Insight.Base.Common.Parameters;
 
 namespace Insight.Base.Services
@@ -29,7 +30,7 @@ namespace Insight.Base.Services
             var result = Util.ConvertTo<JsonResult>(verify.Result);
             if (!result.Successful) return result;
 
-            var gp = new GuidParse(userid);
+            var gp = new GuidParse(userid, true);
             if (!gp.Result.Successful) 
             {
                 result.BadRequest();
@@ -102,22 +103,18 @@ namespace Insight.Base.Services
         /// 删除日志规则
         /// </summary>
         /// <param name="id">日志规则ID</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult RemoveRule(string id)
+        /// <returns>Result</returns>
+        public Result RemoveRule(string id)
         {
             const string action = "BBC43098-A030-46CA-A681-0C3D1ECC15AB";
             var verify = new Compare(action);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
-            var rid = new GuidParse(id).Guid;
-            if (!rid.HasValue)
-            {
-                result.InvalidGuid();
-                return result;
-            }
+            var parse = new GuidParse(id);
+            if (!parse.Result.Successful) return parse.Result;
 
-            if (!DeleteRule(rid.Value))
+            if (!DeleteRule(parse.Value))
             {
                 result.DataBaseError();
                 return result;
@@ -167,22 +164,18 @@ namespace Insight.Base.Services
         /// 获取日志规则
         /// </summary>
         /// <param name="id">日志规则ID</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult GetRule(string id)
+        /// <returns>Result</returns>
+        public Result GetRule(string id)
         {
             const string action = "E3CFC5AA-CD7D-4A3C-8900-8132ADB7099F";
             var verify = new Compare(action);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
-            var rid = new GuidParse(id).Guid;
-            if (!rid.HasValue)
-            {
-                result.InvalidGuid();
-                return result;
-            }
+            var parse = new GuidParse(id);
+            if (!parse.Result.Successful) return parse.Result;
 
-            var rule = Rules.SingleOrDefault(r => r.ID == rid);
+            var rule = Rules.SingleOrDefault(r => r.ID == parse.Value);
             if (rule == null) result.NotFound();
             else result.Success(rule);
 
