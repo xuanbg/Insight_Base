@@ -43,9 +43,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Web" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IOrganizations.cs" />
@@ -67,6 +64,7 @@
     <ProjectReference Include="..\..\OAuth\OAuth.csproj">
       <Project>{0A33F95F-4934-4860-BD25-2E75D4A1A68F}</Project>
       <Name>OAuth</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

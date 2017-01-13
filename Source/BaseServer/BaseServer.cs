@@ -1,7 +1,5 @@
-﻿using System.Linq;
-using System.ServiceProcess;
+﻿using System.ServiceProcess;
 using Insight.Base.Common;
-using Insight.Base.Common.Entity;
 using Insight.Utils.Common;
 using Insight.WCF;
 
@@ -9,25 +7,15 @@ namespace Insight.Base.Server
 {
     public partial class BaseServer : ServiceBase
     {
-        /// <summary>
-        /// 运行中的服务主机
-        /// </summary>
-        private static Service Services;
-
-        #region 构造函数
+        private static readonly Service _Services = new Service();
 
         /// <summary>
-        /// 构造方法，初始化服务控件
+        /// 构造方法
         /// </summary>
         public BaseServer()
         {
             InitializeComponent();
-            InitSeting();
         }
-
-        #endregion
-
-        #region 服务行为
 
         /// <summary>
         /// 启动服务
@@ -36,7 +24,6 @@ namespace Insight.Base.Server
         protected override void OnStart(string[] args)
         {
             var list = DataAccess.GetServiceList();
-            Services = new Service();
             foreach (var info in list)
             {
                 var service = new Service.Info
@@ -50,9 +37,9 @@ namespace Insight.Base.Server
                     ComplyType = info.Service,
                     ServiceFile = info.ServiceFile
                 };
-                Services.CreateHost(service);
+                _Services.CreateHost(service);
             }
-            Services.StartService();
+            _Services.StartService();
         }
 
         /// <summary>
@@ -60,20 +47,7 @@ namespace Insight.Base.Server
         /// </summary>
         protected override void OnStop()
         {
-            Services.StopService();
-        }
-
-        #endregion
-
-        /// <summary>
-        /// 初始化环境变量
-        /// </summary>
-        private static void InitSeting()
-        {
-            using (var context = new BaseEntities())
-            {
-                Parameters.Rules = context.SYS_Logs_Rules.ToList();
-            }
+            _Services.StopService();
         }
     }
 }

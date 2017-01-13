@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Insight.Base.Common.Entity;
 
@@ -7,6 +8,7 @@ namespace Insight.Base.Common
 {
     public static class Parameters
     {
+        private static List<SYS_Logs_Rules> _Rules;
         /// <summary>
         /// 进程同步基元
         /// </summary>
@@ -15,7 +17,19 @@ namespace Insight.Base.Common
         /// <summary>
         /// 规则缓存
         /// </summary>
-        public static List<SYS_Logs_Rules> Rules;
+        public static List<SYS_Logs_Rules> Rules
+        {
+            get
+            {
+                if (_Rules != null) return _Rules;
+
+                using (var context = new BaseEntities())
+                {
+                    _Rules = context.SYS_Logs_Rules.ToList();
+                }
+                return _Rules;
+            }
+        }
 
         /// <summary>
         /// 短信验证码的缓存列表
