@@ -35,7 +35,7 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 获取指定账户的Code
+        /// 联通性测试接口
         /// </summary>
         /// <returns>JsonResult</returns>
         public JsonResult Test()
