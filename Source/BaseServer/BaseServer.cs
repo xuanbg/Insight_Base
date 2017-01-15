@@ -23,8 +23,7 @@ namespace Insight.Base.Server
         /// <param name="args"></param>
         protected override void OnStart(string[] args)
         {
-            var list = DataAccess.GetServiceList();
-            foreach (var info in list)
+            foreach (var info in Parameters.Services)
             {
                 var service = new Service.Info
                 {

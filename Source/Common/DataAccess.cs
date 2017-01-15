@@ -12,18 +12,6 @@ namespace Insight.Base.Common
     public class DataAccess
     {
         /// <summary>
-        /// 获取服务列表
-        /// </summary>
-        /// <returns>服务列表</returns>
-        public static List<SYS_Interface> GetServiceList()
-        {
-            using (var context = new BaseEntities())
-            {
-                return context.SYS_Interface.ToList();
-            }
-        }
-
-        /// <summary>
         /// 根据用户登录名获取用户对象实体
         /// </summary>
         /// <param name="str">用户登录名</param>

@@ -12,9 +12,8 @@ namespace Test
 
         static void Main(string[] args)
         {
-            var list = DataAccess.GetServiceList();
             Services = new Service();
-            foreach (var info in list)
+            foreach (var info in Parameters.Services)
             {
                 var service = new Service.Info
                 {
