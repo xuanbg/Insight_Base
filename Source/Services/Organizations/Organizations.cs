@@ -18,17 +18,14 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result AddOrg(Org org)
         {
-            const string action = "88AC97EF-52A3-4F7F-8121-4C311206535F";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("88AC97EF-52A3-4F7F-8121-4C311206535F")) return _Result;
 
-            org.CreatorUserId = verify.Basis.UserId;
+            org.CreatorUserId = _UserId;
             org.CreateTime = DateTime.Now;
             if (org.Existed || !org.Add()) return org.Result;
 
-            result.Created(org);
-            return result;
+            _Result.Created(org);
+            return _Result;
         }
 
         /// <summary>
@@ -38,10 +35,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result RemoveOrg(string id)
         {
-            const string action = "71803766-97FE-4E6E-82DB-D5C90D2B7004";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("71803766-97FE-4E6E-82DB-D5C90D2B7004")) return _Result;
 
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
@@ -49,7 +43,7 @@ namespace Insight.Base.Services
             var org = new Org(parse.Value);
             if (!org.Result.Successful) return org.Result;
 
-            return org.Delete() ? result : org.Result;
+            return org.Delete() ? _Result : org.Result;
         }
 
         /// <summary>
@@ -60,15 +54,12 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result UpdateOrg(string id, Org org)
         {
-            const string action = "542D5E28-8102-40C6-9C01-190D13DBF6C6";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("542D5E28-8102-40C6-9C01-190D13DBF6C6")) return _Result;
 
             if (org.Existed || !org.Update()) return org.Result;
 
-            result.Success(org);
-            return result;
+            _Result.Success(org);
+            return _Result;
         }
 
         /// <summary>
@@ -78,10 +69,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result GetOrg(string id)
         {
-            const string action = "928C7527-A2F7-49A3-A548-12B3834D8822";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("928C7527-A2F7-49A3-A548-12B3834D8822")) return _Result;
 
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
@@ -89,8 +77,8 @@ namespace Insight.Base.Services
             var org = new Org(parse.Value);
             if (!org.Result.Successful) return org.Result;
 
-            result.Success(org);
-            return result;
+            _Result.Success(org);
+            return _Result;
         }
 
         /// <summary>
@@ -99,20 +87,17 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result GetOrgs()
         {
-            const string action = "928C7527-A2F7-49A3-A548-12B3834D8822";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("928C7527-A2F7-49A3-A548-12B3834D8822")) return _Result;
 
             using (var context = new BaseEntities())
             {
                 var list = from o in context.SYS_Organization
                            select new {o.ID, o.ParentId, o.NodeType, o.Index, o.Code, o.Name, o.FullName, o.Alias, o.Validity, o.CreatorUserId, o.CreateTime};
 
-                if (list.Any()) result.Success(list.ToList());
-                else result.NoContent();
+                if (list.Any()) _Result.Success(list.ToList());
+                else _Result.NoContent();
 
-                return result;
+                return _Result;
             }
         }
 
@@ -124,21 +109,13 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result OrgMerger(string id, Org org)
         {
-            const string action = "DAE7F2C5-E379-4F74-8043-EB616D4A5F8B";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("DAE7F2C5-E379-4F74-8043-EB616D4A5F8B")) return _Result;
 
-            var oid = new GuidParse(id).Guid;
-            if (!oid.HasValue)
-            {
-                result.BadRequest();
-                return result;
-            }
+            var parse = new GuidParse(id);
+            if (!parse.Result.Successful) return parse.Result;
 
-            org.CreatorUserId = verify.Basis.UserId;
-
-            return result;
+            org.CreatorUserId = _UserId;
+            return _Result;
         }
 
         /// <summary>
@@ -149,16 +126,13 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result AddOrgMember(string id, Org org)
         {
-            const string action = "1F29DDEA-A4D7-4EF9-8136-0D4AFE88CB08";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("1F29DDEA-A4D7-4EF9-8136-0D4AFE88CB08")) return _Result;
 
-            org.SetCreatorInfo(verify.Basis.UserId);
+            org.SetCreatorInfo(_UserId);
             if (!org.AddMember()) return org.Result;
 
-            result.Success(org);
-            return result;
+            _Result.Success(org);
+            return _Result;
         }
 
         /// <summary>
@@ -169,15 +143,12 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result RemoveOrgMember(string id, Org org)
         {
-            const string action = "70AC8EEB-F920-468D-8C8F-2DBA049ADAE9";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("70AC8EEB-F920-468D-8C8F-2DBA049ADAE9")) return _Result;
 
             if (!org.RemoveMembers()) return org.Result;
 
-            result.Success(org);
-            return result;
+            _Result.Success(org);
+            return _Result;
         }
 
         /// <summary>
@@ -186,10 +157,7 @@ namespace Insight.Base.Services
         /// <param name="id">节点ID</param>
         public Result GetOtherOrgMember(string id)
         {
-            const string action = "928C7527-A2F7-49A3-A548-12B3834D8822";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("928C7527-A2F7-49A3-A548-12B3834D8822")) return _Result;
 
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
@@ -202,10 +170,10 @@ namespace Insight.Base.Services
                            where t == null && u.Validity && u.Type > 0
                            orderby u.SN
                            select new {ID = Guid.NewGuid(), UserId = u.ID, u.Name, u.LoginName};
-                if (list.Any()) result.Success(list.ToList());
-                else result.NoContent();
+                if (list.Any()) _Result.Success(list.ToList());
+                else _Result.NoContent();
 
-                return result;
+                return _Result;
             }
         }
 
@@ -216,28 +184,43 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result GetLoginDepts(string account)
         {
-            var verify = new Compare();
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify()) return _Result;
 
             using (var context = new BaseEntities())
             {
                 var user = context.SYS_User.SingleOrDefault(u => u.LoginName == account);
                 if (user == null)
                 {
-                    result.NotFound();
-                    return result;
+                    _Result.NotFound();
+                    return _Result;
                 }
 
                 var list = from m in context.SYS_OrgMember.Where(m => m.UserId == user.ID)
                            join t in context.SYS_Organization on m.OrgId equals t.ID
                            join d in context.SYS_Organization on t.ParentId equals d.ID
                            select new { d.ID, d.FullName };
-                if (list.Any()) result.Success(list.ToList());
-                else result.NoContent();
+                if (list.Any()) _Result.Success(list.ToList());
+                else _Result.NoContent();
 
-                return result;
+                return _Result;
             }
+        }
+
+        private Result _Result = new Result();
+        private Guid _UserId;
+
+        /// <summary>
+        /// 会话合法性验证
+        /// </summary>
+        /// <param name="action">操作权限代码，默认为空，即不进行鉴权</param>
+        /// <returns>bool 身份是否通过验证</returns>
+        private bool Verify(string action = null)
+        {
+            var verify = new Compare(action);
+            _UserId = verify.Basis.UserId;
+            _Result = verify.Result;
+
+            return _Result.Successful;
         }
     }
 }

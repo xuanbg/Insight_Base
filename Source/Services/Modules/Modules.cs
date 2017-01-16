@@ -18,15 +18,13 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result GetNavigation()
         {
-            var verify = new Compare();
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify()) return _Result;
 
-            var auth = new Authority(verify.Basis.UserId, verify.Basis.DeptId, InitType.Navigation);
+            var auth = new Authority(_UserId, _DeptId, InitType.Navigation);
             var data = new {Groups = auth.GetModuleGroups(), Modules = auth.GetModules()};
-            result.Success(data);
+            _Result.Success(data);
 
-            return result;
+            return _Result;
         }
 
         /// <summary>
@@ -36,23 +34,17 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result GetAction(string id)
         {
-            var verify = new Compare();
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify()) return _Result;
 
-            var mid = new GuidParse(id).Guid;
-            if (!mid.HasValue)
-            {
-                result.BadRequest();
-                return result;
-            }
+            var parse = new GuidParse(id);
+            if (!parse.Result.Successful) return parse.Result;
 
-            var auth = new Authority(verify.Basis.UserId, verify.Basis.DeptId, InitType.ToolBar);
-            var data = auth.ModuleActions(mid.Value);
-            if (data.Any()) result.Success(data);
-            else result.NoContent();
+            var auth = new Authority(_UserId, _DeptId, InitType.ToolBar);
+            var data = auth.ModuleActions(parse.Value);
+            if (data.Any()) _Result.Success(data);
+            else _Result.NoContent();
 
-            return result;
+            return _Result;
         }
 
         public JsonResult GetModuleParam(string id)
@@ -73,6 +65,25 @@ namespace Insight.Base.Services
         public JsonResult SaveModuleParam(string id, List<SYS_ModuleParam> apl, List<SYS_ModuleParam> upl)
         {
             throw new NotImplementedException();
+        }
+
+        private Result _Result = new Result();
+        private Guid _UserId;
+        private Guid? _DeptId;
+
+        /// <summary>
+        /// 会话合法性验证
+        /// </summary>
+        /// <param name="action">操作权限代码，默认为空，即不进行鉴权</param>
+        /// <returns>bool 身份是否通过验证</returns>
+        private bool Verify(string action = null)
+        {
+            var verify = new Compare(action);
+            _UserId = verify.Basis.UserId;
+            _DeptId = verify.Basis.DeptId;
+            _Result = verify.Result;
+
+            return _Result.Successful;
         }
     }
 }

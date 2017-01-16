@@ -18,21 +18,17 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result AddGroup(UserGroup group)
         {
-            const string action = "6E80210E-6F80-4FF7-8520-B602934D635C";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
-
+            if (!Verify("6E80210E-6F80-4FF7-8520-B602934D635C")) return _Result;
             if (group.Existed) return group.Result;
 
             group.Validity = true;
-            group.CreatorUserId = verify.Basis.UserId;
+            group.CreatorUserId = _UserId;
             group.CreateTime = DateTime.Now;
 
             if (!group.Add()) return group.Result;
 
-            result.Created(group);
-            return result;
+            _Result.Created(group);
+            return _Result;
         }
 
         /// <summary>
@@ -42,10 +38,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result RemoveGroup(string id)
         {
-            const string action = "E46B7A1C-A8B0-49B5-8494-BF1B09F43452";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("E46B7A1C-A8B0-49B5-8494-BF1B09F43452")) return _Result;
 
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
@@ -53,7 +46,7 @@ namespace Insight.Base.Services
             var group = new UserGroup(parse.Value);
             if (!group.Result.Successful) return group.Result;
 
-            return group.Delete() ? result : group.Result;
+            return group.Delete() ? _Result : group.Result;
         }
 
         /// <summary>
@@ -64,18 +57,15 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result UpdateGroup(string id, UserGroup group)
         {
-            const string action = "6910FD14-5654-4CF0-B159-8FE1DF68619F";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("6910FD14-5654-4CF0-B159-8FE1DF68619F")) return _Result;
 
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
             if (group.Existed || !group.Update()) return group.Result;
 
-            result.Success(group);
-            return result;
+            _Result.Success(group);
+            return _Result;
         }
 
         /// <summary>
@@ -85,10 +75,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result GetGroup(string id)
         {
-            const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("B5992AA3-4AD3-4795-A641-2ED37AC6425C")) return _Result;
 
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
@@ -96,8 +83,8 @@ namespace Insight.Base.Services
             var data = new UserGroup(parse.Value);
             if (!data.Result.Successful) return data.Result;
 
-            result.Success(data);
-            return result;
+            _Result.Success(data);
+            return _Result;
         }
 
         /// <summary>
@@ -108,10 +95,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result GetGroups(string rows, string page)
         {
-            const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("B5992AA3-4AD3-4795-A641-2ED37AC6425C")) return _Result;
 
             var ipr = new IntParse(rows);
             if (!ipr.Result.Successful) return ipr.Result;
@@ -121,8 +105,8 @@ namespace Insight.Base.Services
 
             if (ipr.Value > 500 || ipp.Value < 1)
             {
-                result.BadRequest();
-                return result;
+                _Result.BadRequest();
+                return _Result;
             }
 
             using (var context = new BaseEntities())
@@ -137,8 +121,8 @@ namespace Insight.Base.Services
                     Total = list.Count(),
                     Items = list.Skip(skip).Take(ipr.Value).ToList()
                 };
-                result.Success(data);
-                return result;
+                _Result.Success(data);
+                return _Result;
             }
         }
 
@@ -150,16 +134,13 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result AddGroupMember(string id, UserGroup group)
         {
-            const string action = "6C41724C-E118-4BCD-82AD-6B13D05C7894";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("6C41724C-E118-4BCD-82AD-6B13D05C7894")) return _Result;
 
-            group.SetCreatorInfo(verify.Basis.UserId);
+            group.SetCreatorInfo(_UserId);
             if (!group.AddMember()) return group.Result;
 
-            result.Success(group);
-            return result;
+            _Result.Success(group);
+            return _Result;
         }
 
         /// <summary>
@@ -170,15 +151,12 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result RemoveMember(string id, UserGroup group)
         {
-            const string action = "686C115A-CE2E-4E84-8F25-B63C15AC173C";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("686C115A-CE2E-4E84-8F25-B63C15AC173C")) return _Result;
 
             if (!group.RemoveMembers()) return group.Result;
 
-            result.Success(group);
-            return result;
+            _Result.Success(group);
+            return _Result;
         }
 
         /// <summary>
@@ -188,10 +166,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result GetOtherUser(string id)
         {
-            const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("B5992AA3-4AD3-4795-A641-2ED37AC6425C")) return _Result;
 
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
@@ -204,11 +179,28 @@ namespace Insight.Base.Services
                            where t == null && u.Validity && u.Type > 0
                            orderby u.SN
                            select new {ID = Guid.NewGuid(), UserId = u.ID, u.Name, u.LoginName};
-                if (list.Any()) result.Success(list.ToList());
-                else result.NoContent();
+                if (list.Any()) _Result.Success(list.ToList());
+                else _Result.NoContent();
 
-                return result;
+                return _Result;
             }
+        }
+
+        private Result _Result = new Result();
+        private Guid _UserId;
+
+        /// <summary>
+        /// 会话合法性验证
+        /// </summary>
+        /// <param name="action">操作权限代码，默认为空，即不进行鉴权</param>
+        /// <returns>bool 身份是否通过验证</returns>
+        private bool Verify(string action = null)
+        {
+            var verify = new Compare(action);
+            _UserId = verify.Basis.UserId;
+            _Result = verify.Result;
+
+            return _Result.Successful;
         }
     }
 }

@@ -243,7 +243,7 @@ namespace Insight.Base.OAuth
 
             // 如action为空，立即返回；否则进行鉴权
             Result.Success();
-            if (action == null) return;
+            if (string.IsNullOrEmpty(action)) return;
 
             Guid aid;
             if (!Guid.TryParse(action, out aid))

@@ -19,21 +19,18 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result AddUser(User user)
         {
-            const string action = "60D5BE64-0102-4189-A999-96EDAD3DA1B5";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("60D5BE64-0102-4189-A999-96EDAD3DA1B5")) return _Result;
 
             if (user.Existed) return user.Result;
 
             user.Password = Util.Hash("123456");
-            user.CreatorUserId = verify.Basis.UserId;
+            user.CreatorUserId = _UserId;
             user.CreateTime = DateTime.Now;
 
             if (!user.Add()) return user.Result;
 
-            result.Created(user);
-            return result;
+            _Result.Created(user);
+            return _Result;
         }
 
         /// <summary>
@@ -43,10 +40,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result RemoveUser(string id)
         {
-            const string action = "BE2DE9AB-C109-418D-8626-236DEF8E8504";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("BE2DE9AB-C109-418D-8626-236DEF8E8504")) return _Result;
 
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
@@ -54,7 +48,7 @@ namespace Insight.Base.Services
             var user = new User(parse.Value);
             if (!user.Result.Successful) return user.Result;
 
-            return user.Delete() ? result : user.Result;
+            return user.Delete() ? _Result : user.Result;
         }
 
         /// <summary>
@@ -68,10 +62,7 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
-            const string action = "3BC17B61-327D-4EAA-A0D7-7F825A6C71DB";
-            var verify = new Compare(action, 0, parse.Value);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("3BC17B61-327D-4EAA-A0D7-7F825A6C71DB", 0, parse.Value)) return _Result;
 
             var data = new User(parse.Value);
             if (!data.Result.Successful) return data.Result;
@@ -80,13 +71,13 @@ namespace Insight.Base.Services
             data.Description = user.Description;
             if (!data.Update()) return data.Result;
 
-            result.Success(data);
+            _Result.Success(data);
             var session = OAuth.Common.GetSession(user.LoginName);
-            if (session == null) return result;
+            if (session == null) return _Result;
 
             session.UserName = user.Name;
             session.UserType = user.Type;
-            return result;
+            return _Result;
         }
 
         /// <summary>
@@ -99,17 +90,14 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
-            const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
-            var verify = new Compare(action, 0, parse.Value);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("B5992AA3-4AD3-4795-A641-2ED37AC6425C", 0, parse.Value)) return _Result;
 
             var data = new User(parse.Value);
             if (!data.Result.Successful) return data.Result;
 
             data.Authority = new Authority(parse.Value, null, InitType.Permission, true);
-            result.Success(data);
-            return result;
+            _Result.Success(data);
+            return _Result;
         }
 
         /// <summary>
@@ -121,10 +109,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result GetUsers(string rows, string page, string key)
         {
-            const string action = "B5992AA3-4AD3-4795-A641-2ED37AC6425C";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("B5992AA3-4AD3-4795-A641-2ED37AC6425C")) return _Result;
 
             var ipr = new IntParse(rows);
             if (!ipr.Result.Successful) return ipr.Result;
@@ -134,8 +119,8 @@ namespace Insight.Base.Services
 
             if (ipr.Value > 500 || ipp.Value < 1)
             {
-                result.BadRequest();
-                return result;
+                _Result.BadRequest();
+                return _Result;
             }
 
             using (var context = new BaseEntities())
@@ -149,8 +134,8 @@ namespace Insight.Base.Services
                     Total = list.Count(),
                     Items = list.Skip(skip).Take(ipr.Value).ToList()
                 };
-                result.Success(users);
-                return result;
+                _Result.Success(users);
+                return _Result;
             }
         }
 
@@ -162,9 +147,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result SignUp(string account, User user)
         {
-            var verify = new Compare();
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify()) return _Result;
 
             if (user.Existed) return user.Result;
 
@@ -175,8 +158,8 @@ namespace Insight.Base.Services
             var session = OAuth.Common.GetSession(token);
             session.InitSecret();
 
-            verify.Result.Created(session.CreatorKey());
-            return result;
+            _Result.Created(session.CreatorKey());
+            return _Result;
         }
 
         /// <summary>
@@ -189,8 +172,8 @@ namespace Insight.Base.Services
         {
             const string action = "26481E60-0917-49B4-BBAA-2265E71E7B3F";
             var verify = new Compare(action, account);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            _Result = verify.Result;
+            if (!_Result.Successful) return _Result;
 
             var session = Util.StringCompare(verify.Basis.Account, account)
                 ? verify.Basis
@@ -201,10 +184,10 @@ namespace Insight.Base.Services
 
             if (!user.Update()) return user.Result;
 
-            if (session == null) return result;
+            if (session == null) return _Result;
 
             session.Sign(password);
-            return result;
+            return _Result;
         }
 
         /// <summary>
@@ -216,16 +199,14 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result ResetSignature(string account, string password, string code)
         {
-            var verify = new Compare();
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
-            if (!result.Successful) return result;
+            if (!Verify()) return _Result;
 
             var token = new AccessToken {Account = account};
             var session = OAuth.Common.GetSession(token);
             if (session == null)
             {
-                result.NotFound();
-                return result;
+                _Result.NotFound();
+                return _Result;
             }
 
             // 验证短信验证码
@@ -234,6 +215,7 @@ namespace Insight.Base.Services
             var record = Parameters.SmsCodes.FirstOrDefault(c => c.Mobile == mobile && c.Code == code && c.Type == 2);
             if (record == null)
             {
+                var result = new JsonResult();
                 result.SMSCodeError();
                 return result;
             }
@@ -248,8 +230,8 @@ namespace Insight.Base.Services
             session.Sign(password);
             session.InitSecret();
 
-            result.Success(session.CreatorKey());
-            return result;
+            _Result.Success(session.CreatorKey());
+            return _Result;
         }
 
         /// <summary>
@@ -261,9 +243,7 @@ namespace Insight.Base.Services
         public Result SetUserStatus(string account, bool validity)
         {
             var action = validity ? "369548E9-C8DB-439B-A604-4FDC07F3CCDD" : "0FA34D43-2C52-4968-BDDA-C9191D7FCE80";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify(action)) return _Result;
 
             var user = new User(account) {Validity = validity};
             if (!user.Result.Successful) return user.Result;
@@ -273,7 +253,7 @@ namespace Insight.Base.Services
             var session = OAuth.Common.GetSession(account);
             if (session != null) session.Validity = validity;
 
-            return result;
+            return _Result;
         }
 
         /// <summary>
@@ -283,14 +263,10 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result UserSignOut(string account)
         {
-            var verify = new Compare();
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify()) return _Result;
 
-            var session = verify.Basis;
-            session?.SignOut();
-
-            return result;
+            _Session.SignOut();
+            return _Result;
         }
 
         /// <summary>
@@ -301,9 +277,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result GetUserRoles(string id, string deptid)
         {
-            var verify = new Compare();
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify()) return _Result;
 
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
@@ -312,8 +286,29 @@ namespace Insight.Base.Services
             if (!parse.Result.Successful) return parse.Result;
 
             var auth = new Authority(parse.Value, dept.Guid);
-            result.Success(auth.RoleList);
-            return result;
+            _Result.Success(auth.RoleList);
+            return _Result;
+        }
+
+        private Result _Result = new Result();
+        private Session _Session;
+        private Guid _UserId;
+
+        /// <summary>
+        /// 会话合法性验证
+        /// </summary>
+        /// <param name="action">操作权限代码，默认为空，即不进行鉴权</param>
+        /// <param name="limit"></param>
+        /// <param name="userid"></param>
+        /// <returns>bool 身份是否通过验证</returns>
+        private bool Verify(string action = null, int limit = 0, Guid? userid = null)
+        {
+            var verify = new Compare(action, limit, userid);
+            _Session = verify.Basis;
+            _UserId = verify.Basis.UserId;
+            _Result = verify.Result;
+
+            return _Result.Successful;
         }
     }
 }

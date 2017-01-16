@@ -19,19 +19,16 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result AddRole(Role role)
         {
-            const string action = "10B574A2-1A69-4273-87D9-06EDA77B80B6";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("10B574A2-1A69-4273-87D9-06EDA77B80B6")) return _Result;
 
             if (role.Existed) return role.Result;
 
-            role.CreatorUserId = verify.Basis.UserId;
+            role.CreatorUserId = _UserId;
             role.CreateTime = DateTime.Now;
             if (!role.Add()) return role.Result;
 
-            result.Created(role);
-            return result;
+            _Result.Created(role);
+            return _Result;
         }
 
         /// <summary>
@@ -41,10 +38,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result RemoveRole(string id)
         {
-            const string action = "FBCEE515-8576-4B10-BA68-CF46743D2199";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("FBCEE515-8576-4B10-BA68-CF46743D2199")) return _Result;
 
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
@@ -52,7 +46,7 @@ namespace Insight.Base.Services
             var role = new Role(parse.Value);
             if (!role.Result.Successful) return role.Result;
 
-            return role.Delete() ? result : role.Result;
+            return role.Delete() ? _Result : role.Result;
         }
 
         /// <summary>
@@ -63,10 +57,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result EditRole(string id, Role role)
         {
-            const string action = "4DC0141D-FE3D-4504-BE70-763028796808";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("4DC0141D-FE3D-4504-BE70-763028796808")) return _Result;
 
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
@@ -74,8 +65,8 @@ namespace Insight.Base.Services
             if (role.Existed || !role.Update()) return role.Result;
 
             role.Authority = new Authority(parse.Value);
-            result.Success(role);
-            return result;
+            _Result.Success(role);
+            return _Result;
         }
 
         /// <summary>
@@ -85,10 +76,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result GetRole(string id)
         {
-            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
 
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
@@ -96,8 +84,8 @@ namespace Insight.Base.Services
             var role = new Role(parse.Value);
             if (!role.Result.Successful) return role.Result;
 
-            result.Success(role);
-            return result;
+            _Result.Success(role);
+            return _Result;
         }
 
         /// <summary>
@@ -108,10 +96,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result GetRoles(string rows, string page)
         {
-            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
 
             var ipr = new IntParse(rows);
             if (!ipr.Result.Successful) return ipr.Result;
@@ -121,8 +106,8 @@ namespace Insight.Base.Services
 
             if (ipr.Value > 500 || ipp.Value < 1)
             {
-                result.BadRequest();
-                return result;
+                _Result.BadRequest();
+                return _Result;
             }
 
             using (var context = new BaseEntities())
@@ -135,8 +120,8 @@ namespace Insight.Base.Services
                     Total = list.Count(),
                     Items = list.Skip(skip).Take(ipr.Value).ToList()
                 };
-                result.Success(roles);
-                return result;
+                _Result.Success(roles);
+                return _Result;
             }
         }
 
@@ -148,10 +133,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result AddRoleMember(string id, List<RoleMember> members)
         {
-            const string action = "13D93852-53EC-4A15-AAB2-46C9C48C313A";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("13D93852-53EC-4A15-AAB2-46C9C48C313A")) return _Result;
 
             var parse = new GuidParse(id);
             if (!parse.Result.Successful || !members.Any()) return parse.Result;
@@ -165,7 +147,7 @@ namespace Insight.Base.Services
                                Type = m.NodeType,
                                RoleId = parse.Value,
                                MemberId = m.MemberId,
-                               CreatorUserId = verify.Basis.UserId,
+                               CreatorUserId = _UserId,
                                CreateTime = DateTime.Now
                            };
                 context.SYS_Role_Member.AddRange(data);
@@ -173,15 +155,15 @@ namespace Insight.Base.Services
                 {
                     context.SaveChanges();
                     var role = new Role(parse.Value);
-                    result.Success(role);
+                    _Result.Success(role);
                 }
                 catch
                 {
-                    result.DataBaseError();
+                    _Result.DataBaseError();
                 }
             }
 
-            return result;
+            return _Result;
         }
 
         /// <summary>
@@ -191,10 +173,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result RemoveRoleMember(string id)
         {
-            const string action = "2EF4D82B-4A75-4902-BD9E-B63153D093D2";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("2EF4D82B-4A75-4902-BD9E-B63153D093D2")) return _Result;
 
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
@@ -204,8 +183,8 @@ namespace Insight.Base.Services
                 var obj = context.SYS_Role_Member.SingleOrDefault(m => m.ID == parse.Value);
                 if (obj == null)
                 {
-                    result.NotFound();
-                    return result;
+                    _Result.NotFound();
+                    return _Result;
                 }
 
                 context.SYS_Role_Member.Remove(obj);
@@ -215,11 +194,11 @@ namespace Insight.Base.Services
                 }
                 catch (Exception)
                 {
-                    result.DataBaseError();
+                    _Result.DataBaseError();
                 }
 
-                result.Success(new Role(obj.RoleId));
-                return result;
+                _Result.Success(new Role(obj.RoleId));
+                return _Result;
             }
         }
 
@@ -232,10 +211,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result GetMemberUsers(string id, string rows, string page)
         {
-            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
 
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
@@ -248,8 +224,8 @@ namespace Insight.Base.Services
 
             if (ipr.Value > 500 || ipp.Value < 1)
             {
-                result.BadRequest();
-                return result;
+                _Result.BadRequest();
+                return _Result;
             }
 
             using (var context = new BaseEntities())
@@ -261,8 +237,8 @@ namespace Insight.Base.Services
                     Total = list.Count(),
                     Items = list.Skip(skip).Take(ipr.Value).ToList()
                 };
-                result.Success(members);
-                return result;
+                _Result.Success(members);
+                return _Result;
             }
         }
 
@@ -273,10 +249,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result GetMemberOfTitle(string id)
         {
-            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
 
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
@@ -288,10 +261,10 @@ namespace Insight.Base.Services
                            on o.ID equals r.MemberId into temp from t in temp.DefaultIfEmpty()
                            where t == null
                            select new { o.ID, o.ParentId, o.Index, o.NodeType, o.Name };
-                if (list.Any()) result.Success(list.OrderBy(o => o.Index).ToList());
-                else result.NoContent();
+                if (list.Any()) _Result.Success(list.OrderBy(o => o.Index).ToList());
+                else _Result.NoContent();
 
-                return result;
+                return _Result;
             }
         }
 
@@ -302,11 +275,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result GetMemberOfGroup(string id)
         {
-            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
-
+            if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
@@ -317,10 +286,10 @@ namespace Insight.Base.Services
                            on g.ID equals r.MemberId into temp from t in temp.DefaultIfEmpty()
                            where g.Visible && t == null
                            select new { g.ID, g.Name, g.Description };
-                if (list.Any()) result.Success(list.ToList());
-                else result.NoContent();
+                if (list.Any()) _Result.Success(list.ToList());
+                else _Result.NoContent();
 
-                return result;
+                return _Result;
             }
         }
 
@@ -331,10 +300,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result GetMemberOfUser(string id)
         {
-            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
 
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
@@ -346,10 +312,10 @@ namespace Insight.Base.Services
                            on u.ID equals r.MemberId into temp from t in temp.DefaultIfEmpty()
                            where u.Validity && u.Type > 0 && t == null
                            select new { u.ID, u.Name, u.LoginName, u.Description };
-                if (list.Any()) result.Success(list.ToList());
-                else result.NoContent();
+                if (list.Any()) _Result.Success(list.ToList());
+                else _Result.NoContent();
 
-                return result;
+                return _Result;
             }
         }
 
@@ -360,18 +326,32 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result GetAllPermission(string id)
         {
-            const string action = "3BC74B61-6FA7-4827-A4EE-E1317BF97388";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
 
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
             var role = new Role(parse.Value);
             role.GetAllPermission();
-            result.Success(role);
-            return result;
+            _Result.Success(role);
+            return _Result;
+        }
+
+        private Result _Result = new Result();
+        private Guid _UserId;
+
+        /// <summary>
+        /// 会话合法性验证
+        /// </summary>
+        /// <param name="action">操作权限代码，默认为空，即不进行鉴权</param>
+        /// <returns>bool 身份是否通过验证</returns>
+        private bool Verify(string action = null)
+        {
+            var verify = new Compare(action);
+            _UserId = verify.Basis.UserId;
+            _Result = verify.Result;
+
+            return _Result.Successful;
         }
     }
 }

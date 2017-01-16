@@ -7,7 +7,6 @@ using System.Threading;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Base.OAuth;
-using Insight.Utils.Common;
 using Insight.Utils.Entity;
 using static Insight.Base.Common.Parameters;
 
@@ -16,9 +15,6 @@ namespace Insight.Base.Services
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
     public class Security : ISecurity
     {
-
-        #region Verify
-
         /// <summary>
         /// 为跨域请求设置响应头信息
         /// </summary>
@@ -37,10 +33,10 @@ namespace Insight.Base.Services
         /// <summary>
         /// 联通性测试接口
         /// </summary>
-        /// <returns>JsonResult</returns>
-        public JsonResult Test()
+        /// <returns>Result</returns>
+        public Result Test()
         {
-            var result = new JsonResult();
+            var result = new Result();
             result.Success();
             return result;
         }
@@ -49,12 +45,12 @@ namespace Insight.Base.Services
         /// 获取指定账户的Code
         /// </summary>
         /// <param name="account">用户账号</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult GetCode(string account)
+        /// <returns>Result</returns>
+        public Result GetCode(string account)
         {
             var token = new AccessToken { Account = account };
             var verify = new Compare(token);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
 
             return result;
         }
@@ -66,12 +62,12 @@ namespace Insight.Base.Services
         /// <param name="account">用户账号</param>
         /// <param name="signature">用户签名</param>
         /// <param name="deptid">登录部门ID（可为空）</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult GetToken(int id, string account, string signature, string deptid)
+        /// <returns>Result</returns>
+        public Result GetToken(int id, string account, string signature, string deptid)
         {
             var token = new AccessToken {ID = id, Account = account};
             var verify = new Compare(token, signature, deptid);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
 
             return result;
         }
@@ -79,11 +75,11 @@ namespace Insight.Base.Services
         /// <summary>
         /// 移除指定账户的AccessToken
         /// </summary>
-        /// <returns>JsonResult</returns>
-        public JsonResult RemoveToken()
+        /// <returns>Result</returns>
+        public Result RemoveToken()
         {
             var verify = new Compare();
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
             if (!result.Successful) return result;
 
             verify.Basis.SignOut();
@@ -93,23 +89,11 @@ namespace Insight.Base.Services
         /// <summary>
         /// 刷新AccessToken，延长过期时间
         /// </summary>
-        /// <returns>JsonResult</returns>
-        public JsonResult RefreshToken()
+        /// <returns>Result</returns>
+        public Result RefreshToken()
         {
             var verify = new Compare(60);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
-
-            return result;
-        }
-
-        /// <summary>
-        /// 会话合法性验证
-        /// </summary>
-        /// <returns>JsonResult</returns>
-        public JsonResult Verification()
-        {
-            var verify = new Compare();
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
 
             return result;
         }
@@ -118,18 +102,14 @@ namespace Insight.Base.Services
         /// 带鉴权的会话合法性验证
         /// </summary>
         /// <param name="action">需要鉴权的操作ID</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult Authorization(string action)
+        /// <returns>Result</returns>
+        public Result Verification(string action)
         {
             var verify = new Compare(action);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = verify.Result;
 
             return result;
         }
-
-        #endregion
-
-        #region SMSCode
 
         /// <summary>
         /// 生成验证码
@@ -137,16 +117,15 @@ namespace Insight.Base.Services
         /// <param name="mobile">手机号</param>
         /// <param name="type">验证类型</param>
         /// <param name="time">过期时间（分钟）</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult NewCode(string mobile, int type, int time)
+        /// <returns>Result</returns>
+        public Result NewCode(string mobile, int type, int time)
         {
-            var verify = new Compare();
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
-            if (!result.Successful) return result;
+            if (!Verify()) return _Result;
 
             var record = SmsCodes.OrderByDescending(r => r.CreateTime).FirstOrDefault(r => r.Mobile == mobile && r.Type == type);
             if (record != null && (DateTime.Now - record.CreateTime).TotalSeconds < 60)
             {
+                var result = new JsonResult();
                 result.TimeTooShort();
                 return result;
             }
@@ -166,8 +145,8 @@ namespace Insight.Base.Services
             var ts = new ThreadStart(() => new Logger("700501", msg).Write());
             new Thread(ts).Start();
 
-            result.Success(code);
-            return result;
+            _Result.Success(code);
+            return _Result;
         }
 
         /// <summary>
@@ -177,33 +156,35 @@ namespace Insight.Base.Services
         /// <param name="code">验证码</param>
         /// <param name="type">验证码类型</param>
         /// <param name="remove">是否验证成功后删除记录</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult VerifyCode(string mobile, string code, int type, bool remove = true)
+        /// <returns>Result</returns>
+        public Result VerifyCode(string mobile, string code, int type, bool remove = true)
         {
-            var verify = new Compare();
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
-            if (!result.Successful) return result;
+            if (!Verify()) return _Result;
 
             SmsCodes.RemoveAll(c => c.FailureTime < DateTime.Now);
             var record = SmsCodes.FirstOrDefault(c => c.Mobile == mobile && c.Code == code && c.Type == type);
             if (record == null)
             {
+                var result = new JsonResult();
                 result.SMSCodeError();
+                return result;
             }
 
-            if (!remove) return result;
+            if (!remove) return _Result;
 
             SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == type);
-            return result;
+            return _Result;
         }
 
         /// <summary>
         /// 生成图形验证码
         /// </summary>
         /// <param name="id">验证图形ID</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult GetPicCode(string id)
+        /// <returns>Result</returns>
+        public Result GetPicCode(string id)
         {
+            if (!Verify()) return _Result;
+
             throw new NotImplementedException();
         }
 
@@ -212,14 +193,28 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">验证图形ID</param>
         /// <param name="code">验证码</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult VerifyPicCode(string id, string code)
+        /// <returns>Result</returns>
+        public Result VerifyPicCode(string id, string code)
         {
+            if (!Verify()) return _Result;
+
             throw new NotImplementedException();
         }
 
-        #endregion
+        private Result _Result = new Result();
 
+        /// <summary>
+        /// 会话合法性验证
+        /// </summary>
+        /// <param name="action">操作权限代码，默认为空，即不进行鉴权</param>
+        /// <returns>bool 身份是否通过验证</returns>
+        private bool Verify(string action = null)
+        {
+            var verify = new Compare(action);
+            _Result = verify.Result;
+
+            return _Result.Successful;
+        }
     }
 
     public class Puzzle

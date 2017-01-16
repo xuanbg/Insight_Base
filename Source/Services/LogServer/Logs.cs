@@ -23,45 +23,38 @@ namespace Insight.Base.Services
         /// <param name="action">操作（可为空）</param>
         /// <param name="key">查询用的关键字段</param>
         /// <param name="userid">事件源用户ID（可为空）</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult WriteToLog(string code, string message, string source, string action, string key, string userid)
+        /// <returns>Result</returns>
+        public Result WriteToLog(string code, string message, string source, string action, string key, string userid)
         {
-            var verify = new Compare();
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
-            if (!result.Successful) return result;
+            if (!Verify()) return _Result;
 
-            var gp = new GuidParse(userid, true);
-            if (!gp.Result.Successful) 
-            {
-                result.BadRequest();
-                return result;
-            }
+            var parse = new GuidParse(userid, true);
+            if (!parse.Result.Successful) return parse.Result;
 
-            var logger = new Logger(code, message, source, action, key, gp.Guid);
+            var logger = new Logger(code, message, source, action, key, parse.Guid);
             var succe = logger.Write();
             if (!succe.HasValue)
             {
+                var result = new JsonResult();
                 result.InvalidEventCode();
                 return result;
             }
 
-            if (!succe.Value) result.DataBaseError();
+            if (!succe.Value) _Result.DataBaseError();
 
-            return result;
+            return _Result;
         }
 
         /// <summary>
         /// 新增日志规则
         /// </summary>
         /// <param name="rule">日志规则数据对象</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult AddRule(SYS_Logs_Rules rule)
+        /// <returns>Result</returns>
+        public Result AddRule(SYS_Logs_Rules rule)
         {
-            const string action = "60A97A33-0E6E-4856-BB2B-322FEEEFD96A";
-            var verify = new Compare(action);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
-            if (!result.Successful) return result;
+            if (!Verify("60A97A33-0E6E-4856-BB2B-322FEEEFD96A")) return _Result;
 
+            var result = new JsonResult();
             if (string.IsNullOrEmpty(rule.Code) || !Regex.IsMatch(rule.Code, @"^\d{6}$"))
             {
                 result.InvalidEventCode();
@@ -81,22 +74,21 @@ namespace Insight.Base.Services
                 return result;
             }
 
-            var session = verify.Basis;
-            rule.CreatorUserId = session.UserId;
+            rule.CreatorUserId = _UserId;
             if (!Insert(rule))
             {
-                result.DataBaseError();
-                return result;
+                _Result.DataBaseError();
+                return _Result;
             }
 
             var log = new
             {
-                UserID = session.UserId,
-                Message = $"事件代码【{rule.Code}】已由{session.UserName}创建和配置为：{Util.Serialize(rule)}"
+                UserID = _UserId,
+                Message = $"事件代码【{rule.Code}】已由{_UserName}创建和配置为：{Util.Serialize(rule)}"
             };
             var logger = new Logger("600601", Util.Serialize(log));
             logger.Write();
-            return result;
+            return _Result;
         }
 
         /// <summary>
@@ -106,58 +98,50 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result RemoveRule(string id)
         {
-            const string action = "BBC43098-A030-46CA-A681-0C3D1ECC15AB";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("BBC43098-A030-46CA-A681-0C3D1ECC15AB")) return _Result;
 
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
             if (!DeleteRule(parse.Value))
             {
-                result.DataBaseError();
-                return result;
+                _Result.DataBaseError();
+                return _Result;
             }
 
-            var session = verify.Basis;
             var log = new
             {
-                UserID = session.UserId,
-                Message = $"事件配置【{id}】已被{session.UserName}删除"
+                UserID = _UserId,
+                Message = $"事件配置【{id}】已被{_UserName}删除"
             };
             var logger = new Logger("600602", Util.Serialize(log));
             logger.Write();
-            return result;
+            return _Result;
         }
 
         /// <summary>
         /// 编辑日志规则
         /// </summary>
         /// <param name="rule">日志规则数据对象</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult EditRule(SYS_Logs_Rules rule)
+        /// <returns>Result</returns>
+        public Result EditRule(SYS_Logs_Rules rule)
         {
-            const string action = "9FF1547D-2E3F-4552-963F-5EA790D586EA";
-            var verify = new Compare(action);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
-            if (!result.Successful) return result;
+            if (!Verify("9FF1547D-2E3F-4552-963F-5EA790D586EA")) return _Result;
 
             if (!Update(rule))
             {
-                result.DataBaseError();
-                return result;
+                _Result.DataBaseError();
+                return _Result;
             }
 
-            var session = verify.Basis;
             var log = new
             {
-                UserID = session.UserId,
-                Message = $"事件代码【{rule.Code}】已被{session.UserName}修改为：{Util.Serialize(rule)}"
+                UserID = _UserId,
+                Message = $"事件代码【{rule.Code}】已被{_UserName}修改为：{Util.Serialize(rule)}"
             };
             var logger = new Logger("600603", Util.Serialize(log));
             logger.Write();
-            return result;
+            return _Result;
         }
 
         /// <summary>
@@ -167,36 +151,49 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result GetRule(string id)
         {
-            const string action = "E3CFC5AA-CD7D-4A3C-8900-8132ADB7099F";
-            var verify = new Compare(action);
-            var result = verify.Result;
-            if (!result.Successful) return result;
+            if (!Verify("E3CFC5AA-CD7D-4A3C-8900-8132ADB7099F")) return _Result;
 
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
             var rule = Rules.SingleOrDefault(r => r.ID == parse.Value);
-            if (rule == null) result.NotFound();
-            else result.Success(rule);
+            if (rule == null) _Result.NotFound();
+            else _Result.Success(rule);
 
-            return result;
+            return _Result;
         }
 
         /// <summary>
         /// 获取全部日志规则
         /// </summary>
-        /// <returns>JsonResult</returns>
-        public JsonResult GetRules()
+        /// <returns>Result</returns>
+        public Result GetRules()
         {
-            const string action = "E3CFC5AA-CD7D-4A3C-8900-8132ADB7099F";
+            if (!Verify("E3CFC5AA-CD7D-4A3C-8900-8132ADB7099F")) return _Result;
+
+            if (Rules.Any()) _Result.Success(Rules);
+            else _Result.NoContent();
+
+            return _Result;
+        }
+
+        private Result _Result = new Result();
+        private Guid _UserId;
+        private string _UserName;
+
+        /// <summary>
+        /// 会话合法性验证
+        /// </summary>
+        /// <param name="action">操作权限代码，默认为空，即不进行鉴权</param>
+        /// <returns>bool 身份是否通过验证</returns>
+        private bool Verify(string action = null)
+        {
             var verify = new Compare(action);
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
-            if (!result.Successful) return result;
+            _UserId = verify.Basis.UserId;
+            _UserName = verify.Basis.UserName;
+            _Result = verify.Result;
 
-            if (Rules.Any()) result.Success(Rules);
-            else result.NoContent();
-
-            return result;
+            return _Result.Successful;
         }
     }
 }
