@@ -10,10 +10,9 @@ namespace Insight.Base.Services
 {
     public class User
     {
-        public Result Result = new Result();
-        public Authority Authority;
-
         private readonly SYS_User _User;
+        internal Result Result = new Result();
+        internal Authority Authority;
 
         /// <summary>
         /// 用户是否已存在(按登录账号)

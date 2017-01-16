@@ -8,12 +8,11 @@ using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
 {
-    public class Org
+    public class Organization
     {
-        public Result Result = new Result();
-
         private readonly SYS_Organization _Org;
         private List<SYS_OrgMember> _Members;
+        internal Result Result = new Result();
 
         /// <summary>
         /// 组织机构唯一ID
@@ -155,7 +154,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 构造函数
         /// </summary>
-        public Org()
+        public Organization()
         {
             _Org = new SYS_Organization();
             Result.Success();
@@ -165,7 +164,7 @@ namespace Insight.Base.Services
         /// 构造函数，根据ID读取组织机构实体
         /// </summary>
         /// <param name="id">组织机构ID</param>
-        public Org(Guid id)
+        public Organization(Guid id)
         {
             using (var context = new BaseEntities())
             {

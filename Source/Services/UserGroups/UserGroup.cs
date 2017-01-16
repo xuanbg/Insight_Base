@@ -9,10 +9,9 @@ namespace Insight.Base.Services
 {
     public class UserGroup
     {
-        public Result Result = new Result();
-
         private readonly SYS_UserGroup _Group;
         private List<SYS_UserGroupMember> _Members;
+        internal Result Result = new Result();
 
         /// <summary>
         /// 用户组是否已存在(按名称)

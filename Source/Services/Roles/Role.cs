@@ -11,9 +11,6 @@ namespace Insight.Base.Services
 {
     public class Role
     {
-        public Result Result = new Result();
-        public Authority Authority;
-
         private readonly SYS_Role _Role;
         private IEnumerable<SYS_Role_Action> _AddActions;
         private IEnumerable<SYS_Role_Action> _UpActions;
@@ -23,6 +20,8 @@ namespace Insight.Base.Services
         private IEnumerable<SYS_Role_Data> _DelDatas;
         private List<RoleAction> _RoleActions;
         private List<RoleData> _RoleDatas;
+        internal Result Result = new Result();
+        internal Authority Authority;
 
         /// <summary>
         /// 角色是否已存在(按名称)

@@ -14,7 +14,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "orgs", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result AddOrg(Org org);
+        Result AddOrg(Organization org);
 
         /// <summary>
         /// 根据ID删除组织机构节点
@@ -33,7 +33,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "orgs/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result UpdateOrg(string id, Org org);
+        Result UpdateOrg(string id, Organization org);
 
         /// <summary>
         /// 根据ID获取机构对象实体
@@ -60,7 +60,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "orgs/{id}/merger", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result OrgMerger(string id, Org org);
+        Result OrgMerger(string id, Organization org);
 
         /// <summary>
         /// 新增职位成员关系
@@ -70,7 +70,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "orgs/{id}/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result AddOrgMember(string id, Org org);
+        Result AddOrgMember(string id, Organization org);
 
         /// <summary>
         /// 根删除职位成员关系
@@ -80,7 +80,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "orgs/{id}/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result RemoveOrgMember(string id, Org org);
+        Result RemoveOrgMember(string id, Organization org);
 
         /// <summary>
         /// 获取职位成员之外的所有用户

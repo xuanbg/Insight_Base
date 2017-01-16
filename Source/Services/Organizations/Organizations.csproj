@@ -46,7 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IOrganizations.cs" />
-    <Compile Include="Org.cs" />
+    <Compile Include="Organization.cs" />
     <Compile Include="Organizations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -16,7 +16,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="org">组织节点对象</param>
         /// <returns>Result</returns>
-        public Result AddOrg(Org org)
+        public Result AddOrg(Organization org)
         {
             if (!Verify("88AC97EF-52A3-4F7F-8121-4C311206535F")) return _Result;
 
@@ -40,7 +40,7 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
-            var org = new Org(parse.Value);
+            var org = new Organization(parse.Value);
             if (!org.Result.Successful) return org.Result;
 
             return org.Delete() ? _Result : org.Result;
@@ -52,7 +52,7 @@ namespace Insight.Base.Services
         /// <param name="id">节点ID</param>
         /// <param name="org">组织节点对象</param>
         /// <returns>Result</returns>
-        public Result UpdateOrg(string id, Org org)
+        public Result UpdateOrg(string id, Organization org)
         {
             if (!Verify("542D5E28-8102-40C6-9C01-190D13DBF6C6")) return _Result;
 
@@ -74,7 +74,7 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
-            var org = new Org(parse.Value);
+            var org = new Organization(parse.Value);
             if (!org.Result.Successful) return org.Result;
 
             _Result.Success(org);
@@ -107,7 +107,7 @@ namespace Insight.Base.Services
         /// <param name="id">合并目标ID</param>
         /// <param name="org">组织节点对象（被合并节点）</param>
         /// <returns>Result</returns>
-        public Result OrgMerger(string id, Org org)
+        public Result OrgMerger(string id, Organization org)
         {
             if (!Verify("DAE7F2C5-E379-4F74-8043-EB616D4A5F8B")) return _Result;
 
@@ -124,7 +124,7 @@ namespace Insight.Base.Services
         /// <param name="id">节点ID</param>
         /// <param name="org">组织节点对象</param>
         /// <returns>Result</returns>
-        public Result AddOrgMember(string id, Org org)
+        public Result AddOrgMember(string id, Organization org)
         {
             if (!Verify("1F29DDEA-A4D7-4EF9-8136-0D4AFE88CB08")) return _Result;
 
@@ -141,7 +141,7 @@ namespace Insight.Base.Services
         /// <param name="id">节点ID</param>
         /// <param name="org">组织节点对象</param>
         /// <returns>Result</returns>
-        public Result RemoveOrgMember(string id, Org org)
+        public Result RemoveOrgMember(string id, Organization org)
         {
             if (!Verify("70AC8EEB-F920-468D-8C8F-2DBA049ADAE9")) return _Result;
 
