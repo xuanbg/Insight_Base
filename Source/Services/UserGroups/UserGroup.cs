@@ -155,6 +155,12 @@ namespace Insight.Base.Services
         /// <returns>bool 是否成功</returns>
         public bool Delete()
         {
+            if (BuiltIn)
+            {
+                Result.NotBeDeleted();
+                return false;
+            }
+
             var result = DbHelper.Delete(_Group);
             if (!result) Result.DataBaseError();
 
