@@ -25,10 +25,7 @@ namespace Insight.Base.Services
             group.CreatorUserId = _UserId;
             group.CreateTime = DateTime.Now;
 
-            if (!group.Add()) return group.Result;
-
-            _Result.Created(group);
-            return _Result;
+            return group.Add() ? _Result.Created(group) : group.Result;
         }
 
         /// <summary>
@@ -44,9 +41,7 @@ namespace Insight.Base.Services
             if (!parse.Result.Successful) return parse.Result;
 
             var group = new UserGroup(parse.Value);
-            if (!group.Result.Successful) return group.Result;
-
-            return group.Delete() ? _Result : group.Result;
+            return group.Result.Successful && group.Delete() ? _Result : group.Result;
         }
 
         /// <summary>
@@ -62,10 +57,7 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
-            if (group.Existed || !group.Update()) return group.Result;
-
-            _Result.Success(group);
-            return _Result;
+            return group.Existed || !group.Update() ? group.Result : _Result.Success(group);
         }
 
         /// <summary>
@@ -81,10 +73,7 @@ namespace Insight.Base.Services
             if (!parse.Result.Successful) return parse.Result;
 
             var data = new UserGroup(parse.Value);
-            if (!data.Result.Successful) return data.Result;
-
-            _Result.Success(data);
-            return _Result;
+            return data.Result.Successful ? _Result.Success(data) : data.Result;
         }
 
         /// <summary>
@@ -103,11 +92,7 @@ namespace Insight.Base.Services
             var ipp = new IntParse(page);
             if (!ipp.Result.Successful) return ipp.Result;
 
-            if (ipr.Value > 500 || ipp.Value < 1)
-            {
-                _Result.BadRequest();
-                return _Result;
-            }
+            if (ipr.Value > 500 || ipp.Value < 1) return _Result.BadRequest();
 
             using (var context = new BaseEntities())
             {
@@ -121,8 +106,8 @@ namespace Insight.Base.Services
                     Total = list.Count(),
                     Items = list.Skip(skip).Take(ipr.Value).ToList()
                 };
-                _Result.Success(data);
-                return _Result;
+
+                return _Result.Success(data);
             }
         }
 
@@ -137,10 +122,7 @@ namespace Insight.Base.Services
             if (!Verify("6C41724C-E118-4BCD-82AD-6B13D05C7894")) return _Result;
 
             group.SetCreatorInfo(_UserId);
-            if (!group.AddMember()) return group.Result;
-
-            _Result.Success(group);
-            return _Result;
+            return group.AddMember() ? _Result.Success(group) : group.Result;
         }
 
         /// <summary>
@@ -153,10 +135,7 @@ namespace Insight.Base.Services
         {
             if (!Verify("686C115A-CE2E-4E84-8F25-B63C15AC173C")) return _Result;
 
-            if (!group.RemoveMembers()) return group.Result;
-
-            _Result.Success(group);
-            return _Result;
+            return group.RemoveMembers() ? _Result.Success(group) : group.Result;
         }
 
         /// <summary>
@@ -179,10 +158,7 @@ namespace Insight.Base.Services
                            where t == null && u.Validity && u.Type > 0
                            orderby u.SN
                            select new {ID = Guid.NewGuid(), UserId = u.ID, u.Name, u.LoginName};
-                if (list.Any()) _Result.Success(list.ToList());
-                else _Result.NoContent();
-
-                return _Result;
+                return list.Any() ? _Result.Success(list.ToList()) : _Result.NoContent();
             }
         }
 

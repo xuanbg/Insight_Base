@@ -25,10 +25,7 @@ namespace Insight.Base.Services
 
             role.CreatorUserId = _UserId;
             role.CreateTime = DateTime.Now;
-            if (!role.Add()) return role.Result;
-
-            _Result.Created(role);
-            return _Result;
+            return role.Add() ? _Result.Created(role) : role.Result;
         }
 
         /// <summary>
@@ -44,9 +41,7 @@ namespace Insight.Base.Services
             if (!parse.Result.Successful) return parse.Result;
 
             var role = new Role(parse.Value);
-            if (!role.Result.Successful) return role.Result;
-
-            return role.Delete() ? _Result : role.Result;
+            return role.Result.Successful && role.Delete() ? _Result : role.Result;
         }
 
         /// <summary>
@@ -65,8 +60,7 @@ namespace Insight.Base.Services
             if (role.Existed || !role.Update()) return role.Result;
 
             role.Authority = new Authority(parse.Value);
-            _Result.Success(role);
-            return _Result;
+            return _Result.Success(role);
         }
 
         /// <summary>
@@ -82,10 +76,7 @@ namespace Insight.Base.Services
             if (!parse.Result.Successful) return parse.Result;
 
             var role = new Role(parse.Value);
-            if (!role.Result.Successful) return role.Result;
-
-            _Result.Success(role);
-            return _Result;
+            return role.Result.Successful ? _Result.Success(role) : role.Result;
         }
 
         /// <summary>
@@ -104,11 +95,7 @@ namespace Insight.Base.Services
             var ipp = new IntParse(page);
             if (!ipp.Result.Successful) return ipp.Result;
 
-            if (ipr.Value > 500 || ipp.Value < 1)
-            {
-                _Result.BadRequest();
-                return _Result;
-            }
+            if (ipr.Value > 500 || ipp.Value < 1) return _Result.BadRequest();
 
             using (var context = new BaseEntities())
             {
@@ -120,8 +107,8 @@ namespace Insight.Base.Services
                     Total = list.Count(),
                     Items = list.Skip(skip).Take(ipr.Value).ToList()
                 };
-                _Result.Success(roles);
-                return _Result;
+
+                return _Result.Success(roles);
             }
         }
 
@@ -155,15 +142,13 @@ namespace Insight.Base.Services
                 {
                     context.SaveChanges();
                     var role = new Role(parse.Value);
-                    _Result.Success(role);
+                    return _Result.Success(role);
                 }
                 catch
                 {
-                    _Result.DataBaseError();
+                    return _Result.DataBaseError();
                 }
             }
-
-            return _Result;
         }
 
         /// <summary>
@@ -181,24 +166,18 @@ namespace Insight.Base.Services
             using (var context = new BaseEntities())
             {
                 var obj = context.SYS_Role_Member.SingleOrDefault(m => m.ID == parse.Value);
-                if (obj == null)
-                {
-                    _Result.NotFound();
-                    return _Result;
-                }
+                if (obj == null) return _Result.NotFound();
 
                 context.SYS_Role_Member.Remove(obj);
                 try
                 {
                     context.SaveChanges();
+                    return _Result.Success(new Role(obj.RoleId));
                 }
                 catch (Exception)
                 {
-                    _Result.DataBaseError();
+                    return _Result.DataBaseError();
                 }
-
-                _Result.Success(new Role(obj.RoleId));
-                return _Result;
             }
         }
 
@@ -222,11 +201,7 @@ namespace Insight.Base.Services
             var ipp = new IntParse(page);
             if (!ipp.Result.Successful) return ipp.Result;
 
-            if (ipr.Value > 500 || ipp.Value < 1)
-            {
-                _Result.BadRequest();
-                return _Result;
-            }
+            if (ipr.Value > 500 || ipp.Value < 1) return _Result.BadRequest();
 
             using (var context = new BaseEntities())
             {
@@ -237,8 +212,8 @@ namespace Insight.Base.Services
                     Total = list.Count(),
                     Items = list.Skip(skip).Take(ipr.Value).ToList()
                 };
-                _Result.Success(members);
-                return _Result;
+
+                return _Result.Success(members);
             }
         }
 
@@ -261,10 +236,7 @@ namespace Insight.Base.Services
                            on o.ID equals r.MemberId into temp from t in temp.DefaultIfEmpty()
                            where t == null
                            select new { o.ID, o.ParentId, o.Index, o.NodeType, o.Name };
-                if (list.Any()) _Result.Success(list.OrderBy(o => o.Index).ToList());
-                else _Result.NoContent();
-
-                return _Result;
+                return list.Any() ? _Result.Success(list.OrderBy(o => o.Index).ToList()) : _Result.NoContent();
             }
         }
 
@@ -286,10 +258,7 @@ namespace Insight.Base.Services
                            on g.ID equals r.MemberId into temp from t in temp.DefaultIfEmpty()
                            where g.Visible && t == null
                            select new { g.ID, g.Name, g.Description };
-                if (list.Any()) _Result.Success(list.ToList());
-                else _Result.NoContent();
-
-                return _Result;
+                return list.Any() ? _Result.Success(list.ToList()) : _Result.NoContent();
             }
         }
 
@@ -312,10 +281,7 @@ namespace Insight.Base.Services
                            on u.ID equals r.MemberId into temp from t in temp.DefaultIfEmpty()
                            where u.Validity && u.Type > 0 && t == null
                            select new { u.ID, u.Name, u.LoginName, u.Description };
-                if (list.Any()) _Result.Success(list.ToList());
-                else _Result.NoContent();
-
-                return _Result;
+                return list.Any() ? _Result.Success(list.ToList()) : _Result.NoContent();
             }
         }
 
@@ -333,8 +299,8 @@ namespace Insight.Base.Services
 
             var role = new Role(parse.Value);
             role.GetAllPermission();
-            _Result.Success(role);
-            return _Result;
+
+            return _Result.Success(role);
         }
 
         private Result _Result = new Result();

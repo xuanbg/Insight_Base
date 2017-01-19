@@ -24,8 +24,7 @@ namespace Insight.Base.Services
             org.CreateTime = DateTime.Now;
             if (org.Existed || !org.Add()) return org.Result;
 
-            _Result.Created(org);
-            return _Result;
+            return _Result.Created(org);
         }
 
         /// <summary>
@@ -41,9 +40,7 @@ namespace Insight.Base.Services
             if (!parse.Result.Successful) return parse.Result;
 
             var org = new Organization(parse.Value);
-            if (!org.Result.Successful) return org.Result;
-
-            return org.Delete() ? _Result : org.Result;
+            return org.Result.Successful && org.Delete() ? _Result : org.Result;
         }
 
         /// <summary>
@@ -56,10 +53,7 @@ namespace Insight.Base.Services
         {
             if (!Verify("542D5E28-8102-40C6-9C01-190D13DBF6C6")) return _Result;
 
-            if (org.Existed || !org.Update()) return org.Result;
-
-            _Result.Success(org);
-            return _Result;
+            return org.Existed || !org.Update() ? org.Result : _Result.Success(org);
         }
 
         /// <summary>
@@ -75,10 +69,7 @@ namespace Insight.Base.Services
             if (!parse.Result.Successful) return parse.Result;
 
             var org = new Organization(parse.Value);
-            if (!org.Result.Successful) return org.Result;
-
-            _Result.Success(org);
-            return _Result;
+            return org.Result.Successful ? _Result.Success(org) : org.Result;
         }
 
         /// <summary>
@@ -94,10 +85,7 @@ namespace Insight.Base.Services
                 var list = from o in context.SYS_Organization
                            select new {o.ID, o.ParentId, o.NodeType, o.Index, o.Code, o.Name, o.FullName, o.Alias, o.Validity, o.CreatorUserId, o.CreateTime};
 
-                if (list.Any()) _Result.Success(list.ToList());
-                else _Result.NoContent();
-
-                return _Result;
+                return list.Any() ? _Result.Success(list.ToList()) : _Result.NoContent();
             }
         }
 
@@ -129,10 +117,7 @@ namespace Insight.Base.Services
             if (!Verify("1F29DDEA-A4D7-4EF9-8136-0D4AFE88CB08")) return _Result;
 
             org.SetCreatorInfo(_UserId);
-            if (!org.AddMember()) return org.Result;
-
-            _Result.Success(org);
-            return _Result;
+            return org.AddMember() ? _Result.Success(org) : org.Result;
         }
 
         /// <summary>
@@ -145,10 +130,7 @@ namespace Insight.Base.Services
         {
             if (!Verify("70AC8EEB-F920-468D-8C8F-2DBA049ADAE9")) return _Result;
 
-            if (!org.RemoveMembers()) return org.Result;
-
-            _Result.Success(org);
-            return _Result;
+            return org.RemoveMembers() ? _Result.Success(org) : org.Result;
         }
 
         /// <summary>
@@ -170,10 +152,7 @@ namespace Insight.Base.Services
                            where t == null && u.Validity && u.Type > 0
                            orderby u.SN
                            select new {ID = Guid.NewGuid(), UserId = u.ID, u.Name, u.LoginName};
-                if (list.Any()) _Result.Success(list.ToList());
-                else _Result.NoContent();
-
-                return _Result;
+                return list.Any() ? _Result.Success(list.ToList()) : _Result.NoContent();
             }
         }
 
@@ -189,20 +168,13 @@ namespace Insight.Base.Services
             using (var context = new BaseEntities())
             {
                 var user = context.SYS_User.SingleOrDefault(u => u.LoginName == account);
-                if (user == null)
-                {
-                    _Result.NotFound();
-                    return _Result;
-                }
+                if (user == null) return _Result.NotFound();
 
                 var list = from m in context.SYS_OrgMember.Where(m => m.UserId == user.ID)
                            join t in context.SYS_Organization on m.OrgId equals t.ID
                            join d in context.SYS_Organization on t.ParentId equals d.ID
                            select new { d.ID, d.FullName };
-                if (list.Any()) _Result.Success(list.ToList());
-                else _Result.NoContent();
-
-                return _Result;
+                return list.Any() ? _Result.Success(list.ToList()) : _Result.NoContent();
             }
         }
 

@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Linq;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
+using Insight.Utils.Common;
 using Insight.Utils.Entity;
 
 namespace Insight.Base.Services

@@ -6,53 +6,54 @@ using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Base.OAuth;
 using Insight.Utils.Common;
+using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
     public partial class Codes : ICodes
     {
-        public JsonResult AddScheme(SYS_Code_Scheme obj)
+        public Result AddScheme(SYS_Code_Scheme obj)
         {
             throw new NotImplementedException();
         }
 
-        public JsonResult DeleteScheme(string id)
+        public Result DeleteScheme(string id)
         {
             throw new NotImplementedException();
         }
 
-        public JsonResult UpdateScheme(string id, SYS_Code_Scheme scheme)
+        public Result UpdateScheme(string id, SYS_Code_Scheme scheme)
         {
             throw new NotImplementedException();
         }
 
-        public JsonResult EnableScheme(string id)
+        public Result EnableScheme(string id)
         {
             throw new NotImplementedException();
         }
 
-        public JsonResult GetScheme(string id)
+        public Result GetScheme(string id)
         {
             throw new NotImplementedException();
         }
 
-        public JsonResult GetSchemes()
+        public Result GetSchemes()
         {
             throw new NotImplementedException();
         }
 
-        public JsonResult GetSerialRecord()
+        public Result GetSerialRecord()
         {
             throw new NotImplementedException();
         }
 
-        public JsonResult GetAllotRecord()
+        public Result GetAllotRecord()
         {
             throw new NotImplementedException();
         }
 
-        public JsonResult GetCodePreview(string id, string code, string mark)
+        public Result GetCodePreview(string id, string code, string mark)
         {
             throw new NotImplementedException();
         }
@@ -63,11 +64,11 @@ namespace Insight.Base.Services
         /// <param name="name">编码方案名称</param>
         /// <param name="id">业务记录ID</param>
         /// <param name="mark">标识符</param>
-        /// <returns>JsonResult</returns>
-        public JsonResult GetCode(string name, string id, string mark)
+        /// <returns>Result</returns>
+        public Result GetCode(string name, string id, string mark)
         {
             var verify = new Compare();
-            var result = Util.ConvertTo<JsonResult>(verify.Result);
+            var result = Util.ConvertTo<Result>(verify.Result);
             if (!result.Successful) return result;
 
             var bid = new GuidParse(id).Guid;

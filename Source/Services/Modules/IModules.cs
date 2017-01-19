@@ -30,28 +30,28 @@ namespace Insight.Base.Services
         /// 获取模块有效选项参数
         /// </summary>
         /// <param name="id"></param>
-        /// <returns>JsonResult</returns>
+        /// <returns>Result</returns>
         [WebGet(UriTemplate = "modules/{id}/params", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        JsonResult GetModuleParam(string id);
+        Result GetModuleParam(string id);
 
         /// <summary>
         /// 获取模块个人选项参数
         /// </summary>
         /// <param name="id">模块ID</param>
-        /// <returns>JsonResult</returns>
+        /// <returns>Result</returns>
         [WebGet(UriTemplate = "modules/{id}/params/user", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        JsonResult GetModuleUserParam(string id);
+        Result GetModuleUserParam(string id);
 
         /// <summary>
         /// 获取模块部门选项参数
         /// </summary>
         /// <param name="id">模块ID</param>
-        /// <returns>JsonResult</returns>
+        /// <returns>Result</returns>
         [WebGet(UriTemplate = "modules/{id}/params/dept", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        JsonResult GetModuleDeptParam(string id);
+        Result GetModuleDeptParam(string id);
 
         /// <summary>
         /// 保存模块选项参数
@@ -59,10 +59,10 @@ namespace Insight.Base.Services
         /// <param name="id"></param>
         /// <param name="apl">新增参数集合</param>
         /// <param name="upl">更新参数集合</param>
-        /// <returns>JsonResult</returns>
+        /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "modules/{id}/params", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        JsonResult SaveModuleParam(string id, List<SYS_ModuleParam> apl, List<SYS_ModuleParam> upl);
+        Result SaveModuleParam(string id, List<SYS_ModuleParam> apl, List<SYS_ModuleParam> upl);
 
     }
 }

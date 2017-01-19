@@ -33,16 +33,9 @@ namespace Insight.Base.Services
 
             var logger = new Logger(code, message, source, action, key, parse.Guid);
             var succe = logger.Write();
-            if (!succe.HasValue)
-            {
-                var result = new JsonResult();
-                result.InvalidEventCode();
-                return result;
-            }
+            if (!succe.HasValue) return _Result.InvalidEventCode();
 
-            if (!succe.Value) _Result.DataBaseError();
-
-            return _Result;
+            return succe.Value ? _Result : _Result.DataBaseError();
         }
 
         /// <summary>
@@ -54,32 +47,15 @@ namespace Insight.Base.Services
         {
             if (!Verify("60A97A33-0E6E-4856-BB2B-322FEEEFD96A")) return _Result;
 
-            var result = new JsonResult();
-            if (string.IsNullOrEmpty(rule.Code) || !Regex.IsMatch(rule.Code, @"^\d{6}$"))
-            {
-                result.InvalidEventCode();
-                return result;
-            }
+            if (string.IsNullOrEmpty(rule.Code) || !Regex.IsMatch(rule.Code, @"^\d{6}$")) return _Result.InvalidEventCode();
 
             var level = Convert.ToInt32(rule.Code.Substring(0, 1));
-            if (level <= 1 || level == 7)
-            {
-                result.EventWithoutConfig();
-                return result;
-            }
+            if (level <= 1 || level == 7) return _Result.EventWithoutConfig();
 
-            if (Rules.Any(r => r.Code == rule.Code))
-            {
-                result.EventCodeUsed();
-                return result;
-            }
+            if (Rules.Any(r => r.Code == rule.Code)) return _Result.EventCodeUsed();
 
             rule.CreatorUserId = _UserId;
-            if (!Insert(rule))
-            {
-                _Result.DataBaseError();
-                return _Result;
-            }
+            if (!Insert(rule)) return _Result.DataBaseError();
 
             var log = new
             {
@@ -103,11 +79,7 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.Successful) return parse.Result;
 
-            if (!DeleteRule(parse.Value))
-            {
-                _Result.DataBaseError();
-                return _Result;
-            }
+            if (!DeleteRule(parse.Value)) return _Result.DataBaseError();
 
             var log = new
             {
@@ -128,11 +100,7 @@ namespace Insight.Base.Services
         {
             if (!Verify("9FF1547D-2E3F-4552-963F-5EA790D586EA")) return _Result;
 
-            if (!Update(rule))
-            {
-                _Result.DataBaseError();
-                return _Result;
-            }
+            if (!Update(rule)) return _Result.DataBaseError();
 
             var log = new
             {
@@ -157,10 +125,7 @@ namespace Insight.Base.Services
             if (!parse.Result.Successful) return parse.Result;
 
             var rule = Rules.SingleOrDefault(r => r.ID == parse.Value);
-            if (rule == null) _Result.NotFound();
-            else _Result.Success(rule);
-
-            return _Result;
+            return rule == null ? _Result.NotFound() : _Result.Success(rule);
         }
 
         /// <summary>
@@ -171,10 +136,7 @@ namespace Insight.Base.Services
         {
             if (!Verify("E3CFC5AA-CD7D-4A3C-8900-8132ADB7099F")) return _Result;
 
-            if (Rules.Any()) _Result.Success(Rules);
-            else _Result.NoContent();
-
-            return _Result;
+            return Rules.Any() ? _Result.Success(Rules) : _Result.NoContent();
         }
 
         private Result _Result = new Result();

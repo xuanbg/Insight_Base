@@ -27,10 +27,7 @@ namespace Insight.Base.Services
             user.CreatorUserId = _UserId;
             user.CreateTime = DateTime.Now;
 
-            if (!user.Add()) return user.Result;
-
-            _Result.Created(user);
-            return _Result;
+            return user.Add() ? _Result.Created(user) : user.Result;
         }
 
         /// <summary>
@@ -46,9 +43,7 @@ namespace Insight.Base.Services
             if (!parse.Result.Successful) return parse.Result;
 
             var user = new User(parse.Value);
-            if (!user.Result.Successful) return user.Result;
-
-            return user.Delete() ? _Result : user.Result;
+            return user.Result.Successful && user.Delete() ? _Result : user.Result;
         }
 
         /// <summary>
@@ -96,8 +91,7 @@ namespace Insight.Base.Services
             if (!data.Result.Successful) return data.Result;
 
             data.Authority = new Authority(parse.Value, null, InitType.Permission, true);
-            _Result.Success(data);
-            return _Result;
+            return _Result.Success(data);
         }
 
         /// <summary>
@@ -117,11 +111,7 @@ namespace Insight.Base.Services
             var ipp = new IntParse(page);
             if (!ipp.Result.Successful) return ipp.Result;
 
-            if (ipr.Value > 500 || ipp.Value < 1)
-            {
-                _Result.BadRequest();
-                return _Result;
-            }
+            if (ipr.Value > 500 || ipp.Value < 1) return _Result.BadRequest();
 
             using (var context = new BaseEntities())
             {
@@ -134,8 +124,8 @@ namespace Insight.Base.Services
                     Total = list.Count(),
                     Items = list.Skip(skip).Take(ipr.Value).ToList()
                 };
-                _Result.Success(users);
-                return _Result;
+
+                return _Result.Success(users);
             }
         }
 
@@ -158,8 +148,7 @@ namespace Insight.Base.Services
             var session = OAuth.Common.GetSession(token);
             session.InitSecret();
 
-            _Result.Created(session.CreatorKey());
-            return _Result;
+            return _Result.Created(session.CreatorKey());
         }
 
         /// <summary>
@@ -180,9 +169,7 @@ namespace Insight.Base.Services
                 : OAuth.Common.GetSession(account);
 
             var user = new User(account) {Password = Util.Hash(account.ToUpper() + password)};
-            if (!user.Result.Successful) return user.Result;
-
-            if (!user.Update()) return user.Result;
+            if (!user.Result.Successful || !user.Update()) return user.Result;
 
             if (session == null) return _Result;
 
@@ -203,35 +190,23 @@ namespace Insight.Base.Services
 
             var token = new AccessToken {Account = account};
             var session = OAuth.Common.GetSession(token);
-            if (session == null)
-            {
-                _Result.NotFound();
-                return _Result;
-            }
+            if (session == null) return _Result.NotFound();
 
             // 验证短信验证码
             var mobile = session.Mobile;
             Parameters.SmsCodes.RemoveAll(c => c.FailureTime < DateTime.Now);
             var record = Parameters.SmsCodes.FirstOrDefault(c => c.Mobile == mobile && c.Code == code && c.Type == 2);
-            if (record == null)
-            {
-                var result = new JsonResult();
-                result.SMSCodeError();
-                return result;
-            }
+            if (record == null) return _Result.SMSCodeError();
 
             Parameters.SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == 2);
 
             var user = new User(account) {Password = Util.Hash(account.ToUpper() + password)};
-            if (!user.Result.Successful) return user.Result;
-
-            if (!user.Update()) return user.Result;
+            if (!user.Result.Successful || !user.Update()) return user.Result;
 
             session.Sign(password);
             session.InitSecret();
 
-            _Result.Success(session.CreatorKey());
-            return _Result;
+            return _Result.Success(session.CreatorKey());
         }
 
         /// <summary>
@@ -246,9 +221,7 @@ namespace Insight.Base.Services
             if (!Verify(action)) return _Result;
 
             var user = new User(account) {Validity = validity};
-            if (!user.Result.Successful) return user.Result;
-
-            if (!user.Update()) return user.Result;
+            if (!user.Result.Successful || !user.Update()) return user.Result;
 
             var session = OAuth.Common.GetSession(account);
             if (session != null) session.Validity = validity;
@@ -286,8 +259,7 @@ namespace Insight.Base.Services
             if (!parse.Result.Successful) return parse.Result;
 
             var auth = new Authority(parse.Value, dept.Guid);
-            _Result.Success(auth.RoleList);
-            return _Result;
+            return _Result.Success(auth.RoleList);
         }
 
         private Result _Result = new Result();

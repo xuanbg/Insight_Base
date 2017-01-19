@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using System.ServiceModel.Web;
-using System.Threading;
+using System.Threading.Tasks;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Base.OAuth;
+using Insight.Utils.Common;
 using Insight.Utils.Entity;
 using static Insight.Base.Common.Parameters;
 
@@ -36,9 +37,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result Test()
         {
-            var result = new Result();
-            result.Success();
-            return result;
+            return new Result().Success();
         }
 
         /// <summary>
@@ -49,10 +48,7 @@ namespace Insight.Base.Services
         public Result GetCode(string account)
         {
             var token = new AccessToken { Account = account };
-            var verify = new Compare(token);
-            var result = verify.Result;
-
-            return result;
+            return new Compare(token).Result;
         }
 
         /// <summary>
@@ -66,10 +62,7 @@ namespace Insight.Base.Services
         public Result GetToken(int id, string account, string signature, string deptid)
         {
             var token = new AccessToken {ID = id, Account = account};
-            var verify = new Compare(token, signature, deptid);
-            var result = verify.Result;
-
-            return result;
+            return new Compare(token, signature, deptid).Result;
         }
 
         /// <summary>
@@ -92,10 +85,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result RefreshToken()
         {
-            var verify = new Compare(60);
-            var result = verify.Result;
-
-            return result;
+            return new Compare(60).Result;
         }
 
         /// <summary>
@@ -105,10 +95,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result Verification(string action)
         {
-            var verify = new Compare(action);
-            var result = verify.Result;
-
-            return result;
+            return new Compare(action).Result;
         }
 
         /// <summary>
@@ -123,12 +110,7 @@ namespace Insight.Base.Services
             if (!Verify()) return _Result;
 
             var record = SmsCodes.OrderByDescending(r => r.CreateTime).FirstOrDefault(r => r.Mobile == mobile && r.Type == type);
-            if (record != null && (DateTime.Now - record.CreateTime).TotalSeconds < 60)
-            {
-                var result = new JsonResult();
-                result.TimeTooShort();
-                return result;
-            }
+            if (record != null && (DateTime.Now - record.CreateTime).TotalSeconds < 60) return _Result.TimeTooShort();
 
             var code = Parameters.Random.Next(100000, 999999).ToString();
             record = new VerifyRecord
@@ -142,11 +124,9 @@ namespace Insight.Base.Services
             SmsCodes.Add(record);
 
             var msg = $"已经为手机号【{mobile}】的用户生成了类型为【{type}】的短信验证码：【{code}】。此验证码将于{record.FailureTime}失效。";
-            var ts = new ThreadStart(() => new Logger("700501", msg).Write());
-            new Thread(ts).Start();
+            Task.Run(() => new Logger("700501", msg).Write());
 
-            _Result.Success(code);
-            return _Result;
+            return _Result.Created(code);
         }
 
         /// <summary>
@@ -163,12 +143,7 @@ namespace Insight.Base.Services
 
             SmsCodes.RemoveAll(c => c.FailureTime < DateTime.Now);
             var record = SmsCodes.FirstOrDefault(c => c.Mobile == mobile && c.Code == code && c.Type == type);
-            if (record == null)
-            {
-                var result = new JsonResult();
-                result.SMSCodeError();
-                return result;
-            }
+            if (record == null) return _Result.SMSCodeError();
 
             if (!remove) return _Result;
 

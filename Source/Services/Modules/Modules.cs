@@ -22,9 +22,8 @@ namespace Insight.Base.Services
 
             var auth = new Authority(_UserId, _DeptId, InitType.Navigation);
             var data = new {Groups = auth.GetModuleGroups(), Modules = auth.GetModules()};
-            _Result.Success(data);
 
-            return _Result;
+            return _Result.Success(data);
         }
 
         /// <summary>
@@ -41,28 +40,25 @@ namespace Insight.Base.Services
 
             var auth = new Authority(_UserId, _DeptId, InitType.ToolBar);
             var data = auth.ModuleActions(parse.Value);
-            if (data.Any()) _Result.Success(data);
-            else _Result.NoContent();
-
-            return _Result;
+            return data.Any() ? _Result.Success(data) : _Result.NoContent();
         }
 
-        public JsonResult GetModuleParam(string id)
+        public Result GetModuleParam(string id)
         {
             throw new NotImplementedException();
         }
 
-        public JsonResult GetModuleUserParam(string id)
+        public Result GetModuleUserParam(string id)
         {
             throw new NotImplementedException();
         }
 
-        public JsonResult GetModuleDeptParam(string id)
+        public Result GetModuleDeptParam(string id)
         {
             throw new NotImplementedException();
         }
 
-        public JsonResult SaveModuleParam(string id, List<SYS_ModuleParam> apl, List<SYS_ModuleParam> upl)
+        public Result SaveModuleParam(string id, List<SYS_ModuleParam> apl, List<SYS_ModuleParam> upl)
         {
             throw new NotImplementedException();
         }

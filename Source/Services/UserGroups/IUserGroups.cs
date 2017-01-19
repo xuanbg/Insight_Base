@@ -33,7 +33,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "groups/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result UpdateGroup(string id, UserGroup @group);
+        Result UpdateGroup(string id, UserGroup group);
 
         /// <summary>
         /// 根据ID获取用户组对象实体
@@ -72,7 +72,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "groups/{id}/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result RemoveMember(string id, UserGroup @group);
+        Result RemoveMember(string id, UserGroup group);
 
         /// <summary>
         /// 根据ID获取组成员之外的全部用户
