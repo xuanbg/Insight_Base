@@ -173,7 +173,7 @@ namespace Insight.Base.Services
                 var list = from m in context.SYS_OrgMember.Where(m => m.UserId == user.ID)
                            join t in context.SYS_Organization on m.OrgId equals t.ID
                            join d in context.SYS_Organization on t.ParentId equals d.ID
-                           select new { d.ID, d.FullName };
+                           select new {d.ID, Name = d.FullName, Description = d.Code};
                 return list.Any() ? _Result.Success(list.ToList()) : _Result.NoContent();
             }
         }
