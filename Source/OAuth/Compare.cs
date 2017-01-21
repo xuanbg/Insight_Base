@@ -81,20 +81,12 @@ namespace Insight.Base.OAuth
         /// </summary>
         /// <param name="token">传入参数</param>
         /// <param name="signature">用户签名</param>
-        /// <param name="did">登录部门ID（可为空）</param>
-        public Compare(AccessToken token, string signature, string did)
+        public Compare(AccessToken token, string signature)
         {
             var time = CallManage.LimitCall(3);
             if (time > 0)
             {
                 Result.TooFrequent(time);
-                return;
-            }
-
-            var parse = new GuidParse(did, true);
-            if (!parse.Result.Successful)
-            {
-                Result.InvalidGuid();
                 return;
             }
 
@@ -112,7 +104,7 @@ namespace Insight.Base.OAuth
 
             if (DateTime.Now > Basis.ExpiryTime) Basis.Refresh();
 
-            Basis.Online(parse.Guid);
+            Basis.Online(token.DeptId);
             Result.Success(Basis.CreatorKey());
         }
 

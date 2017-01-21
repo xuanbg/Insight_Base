@@ -182,7 +182,7 @@ namespace Insight.Base.OAuth
         {
             return new
             {
-                AccessToken = Util.Base64(new {ID, Account, UserName, Secret}),
+                AccessToken = Util.Base64(new {ID, UserId, DeptId, Account, UserName, Secret}),
                 RefreshToken = Util.Base64(new {ID, Account, Secret = _RefreshKey}),
                 ExpiryTime,
                 FailureTime

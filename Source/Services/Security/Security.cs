@@ -61,8 +61,11 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result GetToken(int id, string account, string signature, string deptid)
         {
-            var token = new AccessToken {ID = id, Account = account};
-            return new Compare(token, signature, deptid).Result;
+            var parse = new GuidParse(deptid, true);
+            if (!parse.Result.Successful) return parse.Result;
+
+            var token = new AccessToken {ID = id, Account = account, DeptId = parse.Guid};
+            return new Compare(token, signature).Result;
         }
 
         /// <summary>
