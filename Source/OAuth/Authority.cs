@@ -7,7 +7,11 @@ namespace Insight.Base.OAuth
 {
     public class Authority
     {
+        private Guid _UserId;
+        private Guid? _DeptId;
         private List<Guid> _RoleList;
+        private readonly List<Guid> _OrgList = new List<Guid>();
+        private readonly List<Guid> _UserList = new List<Guid>();
         private List<SYS_ModuleGroup> _Groups;
         private List<SYS_Module> _Modules;
         private List<SYS_ModuleAction> _Actions;
@@ -44,6 +48,8 @@ namespace Insight.Base.OAuth
         /// <param name="all">是否包含用户的全部角色（忽略登录部门）</param>
         public Authority(Guid uid, Guid? did, InitType type = 0, bool all = false)
         {
+            _UserId = uid;
+            _DeptId = did;
             InitRoleList(uid, did, all);
             InitData(type);
         }
@@ -61,6 +67,36 @@ namespace Insight.Base.OAuth
                           orderby a.Action
                           select a).FirstOrDefault();
             return (action?.Action ?? 0) > 0;
+        }
+
+        /// <summary>
+        /// 根据传入的创建部门ID或创建人ID返回数据鉴权结果
+        /// </summary>
+        /// <param name="id">业务模块ID</param>
+        /// <param name="cdid">创建部门ID</param>
+        /// <param name="cuid">创建人ID</param>
+        /// <returns></returns>
+        public bool Identify(Guid id, Guid? cdid, Guid? cuid)
+        {
+            if (!cdid.HasValue && !cuid.HasValue) return false;
+
+            var acls = _RoleDatas.Where(i => i.ModuleId == id && i.Permission == 1);
+            foreach (var acl in acls)
+            {
+                switch (acl.Mode)
+                {
+                    case 0:
+                        GetOrgIds(acl.ModeId);
+                        break;
+                    case 1:
+                        _UserList.Add(acl.ModeId);
+                        break;
+                    case 2:
+                        _OrgList.Add(acl.ModeId);
+                        break;
+                }
+            }
+            return _OrgList.Any(i => i == cdid) || _UserList.Any(i => i == cuid);
         }
 
         /// <summary>
@@ -325,6 +361,27 @@ namespace Insight.Base.OAuth
                                 where m.Validity
                                 group m by new ModuleId {ID = m.ID, GroupId = m.ModuleGroupId} into g
                                 select g.Key).Distinct().ToList();
+            }
+        }
+
+        /// <summary>
+        /// 获取用户的数据授权
+        /// </summary>
+        /// <param name="id"></param>
+        private void GetOrgIds(Guid id)
+        {
+            using (var context = new BaseEntities())
+            {
+                var mod = context.SYS_Data.Single(i => i.ID == id);
+                switch (mod.Type)
+                {
+                    case 0:
+                        _UserList.Add(Guid.Empty);
+                        break;
+                    case 1:
+                        _UserList.Add(_UserId);
+                        break;
+                }
             }
         }
     }

@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("日志服务器")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Insight Software Ltd.")]
-[assembly: AssemblyProduct("Insight Workstation 3")]
+[assembly: AssemblyProduct("WCF Service")]
 [assembly: AssemblyCopyright("Copyright © 2014 Insight Software Ltd.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

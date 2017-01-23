@@ -32,11 +32,6 @@ namespace Insight.Base.Common
         }
 
         /// <summary>
-        /// 可用服务列表
-        /// </summary>
-        public static List<SYS_Interface> Services => GetServiceList();
-
-        /// <summary>
         /// 短信验证码的缓存列表
         /// </summary>
         public static readonly List<VerifyRecord> SmsCodes = new List<VerifyRecord>();
@@ -55,18 +50,5 @@ namespace Insight.Base.Common
         /// 数据库连结字符串
         /// </summary>
         public static string Database = new BaseEntities().Database.Connection.ConnectionString;
-
-
-        /// <summary>
-        /// 获取服务列表
-        /// </summary>
-        /// <returns>服务列表</returns>
-        private static List<SYS_Interface> GetServiceList()
-        {
-            using (var context = new BaseEntities())
-            {
-                return context.SYS_Interface.ToList();
-            }
-        }
     }
 }
