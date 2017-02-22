@@ -1,6 +1,5 @@
 ﻿using System.ServiceModel;
 using System.ServiceModel.Web;
-using Insight.Base.Common.Entity;
 using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
@@ -38,14 +37,13 @@ namespace Insight.Base.Services
         /// <summary>
         /// 获取指定账户的AccessToken
         /// </summary>
-        /// <param name="id">SessionID</param>
         /// <param name="account">用户账号</param>
         /// <param name="signature">用户签名</param>
         /// <param name="deptid">登录部门ID（可为空）</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "tokens?id={id}&account={account}&signature={signature}&deptid={deptid}", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "tokens?account={account}&signature={signature}&deptid={deptid}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result GetToken(int id, string account, string signature, string deptid);
+        Result GetToken(string account, string signature, string deptid);
 
         /// <summary>
         /// 移除指定账户的AccessToken

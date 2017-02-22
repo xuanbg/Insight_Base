@@ -54,17 +54,16 @@ namespace Insight.Base.Services
         /// <summary>
         /// 获取指定账户的AccessToken
         /// </summary>
-        /// <param name="id">SessionID</param>
         /// <param name="account">用户账号</param>
         /// <param name="signature">用户签名</param>
         /// <param name="deptid">登录部门ID（可为空）</param>
         /// <returns>Result</returns>
-        public Result GetToken(int id, string account, string signature, string deptid)
+        public Result GetToken(string account, string signature, string deptid)
         {
             var parse = new GuidParse(deptid, true);
             if (!parse.Result.Successful) return parse.Result;
 
-            var token = new AccessToken {ID = id, Account = account, DeptId = parse.Guid};
+            var token = new AccessToken {Account = account, DeptId = parse.Guid};
             return new Compare(token, signature).Result;
         }
 

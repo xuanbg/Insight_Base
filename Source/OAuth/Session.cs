@@ -62,15 +62,13 @@ namespace Insight.Base.OAuth
         /// 构造方法，根据用户账号和索引构建对象
         /// </summary>
         /// <param name="account">用户账号</param>
-        /// <param name="id">Session.ID</param>
-        public Session(string account, int id)
+        public Session(string account)
         {
             using (var context = new BaseEntities())
             {
                 var user = context.SYS_User.SingleOrDefault(s => s.LoginName == account);
                 if (user == null) return;
 
-                ID = id;
                 UserType = user.Type;
                 Account = user.LoginName;
                 Mobile = user.Mobile;
@@ -182,8 +180,8 @@ namespace Insight.Base.OAuth
         {
             return new
             {
-                AccessToken = Util.Base64(new {ID, UserId, DeptId, Account, UserName, Secret}),
-                RefreshToken = Util.Base64(new {ID, Account, Secret = _RefreshKey}),
+                AccessToken = Util.Base64(new {UserId, DeptId, Account, UserName, Secret}),
+                RefreshToken = Util.Base64(new {Account, Secret = _RefreshKey}),
                 ExpiryTime,
                 FailureTime
             };

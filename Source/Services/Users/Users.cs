@@ -144,8 +144,7 @@ namespace Insight.Base.Services
             user.CreateTime = DateTime.Now;
             if (!user.Add()) return user.Result;
 
-            var token = new AccessToken {Account = account};
-            var session = OAuth.Common.GetSession(token);
+            var session = OAuth.Common.GetSession(account);
             session.InitSecret();
 
             return _Result.Created(session.CreatorKey());
@@ -188,8 +187,7 @@ namespace Insight.Base.Services
         {
             if (!Verify()) return _Result;
 
-            var token = new AccessToken {Account = account};
-            var session = OAuth.Common.GetSession(token);
+            var session = OAuth.Common.GetSession(account);
             if (session == null) return _Result.NotFound();
 
             // 验证短信验证码

@@ -24,7 +24,7 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 用于验证的基准对象
         /// </summary>
-        public Session Basis => _Basis ?? (_Basis = Common.GetSession(_Token));
+        public Session Basis => _Basis ?? (_Basis = Common.GetSession(_Token.Account));
 
         /// <summary>
         /// 构造方法，如Action不为空，则同时进行鉴权
@@ -72,8 +72,7 @@ namespace Insight.Base.OAuth
             _Token = token;
             if (!CheckBasis()) return;
 
-            var obj = new {Basis.ID, Basis.Stamp};
-            Result.Success(obj);
+            Result.Success(Basis.Stamp);
         }
 
         /// <summary>
@@ -184,12 +183,6 @@ namespace Insight.Base.OAuth
             if (Basis == null)
             {
                 Result.NotFound();
-                return false;
-            }
-
-            if (Basis.ID > Common.MaxAuth)
-            {
-                Result.InsufficientLicenses();
                 return false;
             }
 

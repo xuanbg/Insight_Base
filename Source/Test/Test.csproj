@@ -15,7 +15,7 @@
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -72,6 +72,10 @@
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{C4F26DD1-DE5A-4773-A789-7823E96EA166}</Project>
       <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OAuth\OAuth.csproj">
+      <Project>{0a33f95f-4934-4860-bd25-2e75d4a1a68f}</Project>
+      <Name>OAuth</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
