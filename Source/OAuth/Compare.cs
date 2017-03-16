@@ -24,7 +24,7 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 用于验证的基准对象
         /// </summary>
-        public Session Basis => _Basis ?? (_Basis = Common.GetSession(_Token.Account));
+        public Session Basis => _Basis ?? (_Basis = Common.GetSession(_Token.account));
 
         /// <summary>
         /// 构造方法，如Action不为空，则同时进行鉴权
@@ -36,7 +36,7 @@ namespace Insight.Base.OAuth
         {
             if (!InitVerify(limit)) return;
 
-            if (Basis.UserId == userid) action = null;
+            if (Basis.userId == userid) action = null;
 
             Verify(action);
         }
@@ -62,17 +62,17 @@ namespace Insight.Base.OAuth
         /// <param name="token">传入参数</param>
         public Compare(AccessToken token)
         {
-            var time = CallManage.LimitCall(3);
+            _Token = token;
+            var time = CallManage.LimitCall(GetKey(), 3);
             if (time > 0)
             {
                 Result.TooFrequent(time);
                 return;
             }
 
-            _Token = token;
             if (!CheckBasis()) return;
 
-            Result.Success(Basis.Stamp);
+            Result.Success(Basis.id.ToString("N"));
         }
 
         /// <summary>
@@ -82,17 +82,17 @@ namespace Insight.Base.OAuth
         /// <param name="signature">用户签名</param>
         public Compare(AccessToken token, string signature)
         {
-            var time = CallManage.LimitCall(3);
+            _Token = token;
+            var time = CallManage.LimitCall(GetKey(), 3);
             if (time > 0)
             {
                 Result.TooFrequent(time);
                 return;
             }
 
-            _Token = token;
             if (!CheckBasis()) return;
 
-            // 验证用户签名
+            // 更新SessionID，验证用户签名
             if (!Basis.Verify(signature, 3))
             {
                 Result.InvalidAuth();
@@ -103,7 +103,7 @@ namespace Insight.Base.OAuth
 
             if (DateTime.Now > Basis.ExpiryTime) Basis.Refresh();
 
-            Basis.Online(token.DeptId);
+            Basis.Online(token.deptId);
             Result.Success(Basis.CreatorKey());
         }
 
@@ -131,7 +131,7 @@ namespace Insight.Base.OAuth
             }
 
             // 验证用户签名
-            if (!Basis.Verify(_Token.Secret, 2))
+            if (!Basis.Verify(_Token.secret, 2))
             {
                 Result.Failured();
                 return;
@@ -147,13 +147,6 @@ namespace Insight.Base.OAuth
         /// <param name="limit">限制访问秒数</param>
         private bool InitVerify(int limit)
         {
-            var time = CallManage.LimitCall(limit);
-            if (time > 0)
-            {
-                Result.TooFrequent(time);
-                return false;
-            }
-
             try
             {
                 var headers = _Context.IncomingRequest.Headers;
@@ -162,7 +155,11 @@ namespace Insight.Base.OAuth
                 var json = Encoding.UTF8.GetString(buffer);
                 _Token = Util.Deserialize<AccessToken>(json);
 
-                return CheckBasis();
+                var time = CallManage.LimitCall(GetKey(), limit);
+                if (time <= 0) return CheckBasis();
+
+                Result.TooFrequent(time);
+                return false;
             }
             catch (Exception ex)
             {
@@ -192,8 +189,8 @@ namespace Insight.Base.OAuth
                 return false;
             }
 
-            // 检查是否验证签名失败超过5次
-            if (!Basis.Ckeck()) return true;
+            // 检查Session是否正常
+            if (Basis.Ckeck(_Token.id)) return true;
 
             Result.AccountIsBlocked();
             return false;
@@ -220,7 +217,7 @@ namespace Insight.Base.OAuth
             }
 
             // 验证Secret
-            if (!Basis.Verify(_Token.Secret, 1))
+            if (!Basis.Verify(_Token.secret, 1))
             {
                 Result.InvalidAuth();
                 return;
@@ -238,10 +235,20 @@ namespace Insight.Base.OAuth
             }
 
             // 根据传入的操作码进行鉴权
-            var auth = new Authority(Basis.UserId, Basis.DeptId);
+            var auth = new Authority(Basis.userId, Basis.deptId);
             if (auth.Identify(aid)) return;
 
             Result.Forbidden();
+        }
+
+        /// <summary>
+        /// 获取用于鉴别访问来源的Key
+        /// </summary>
+        /// <returns>string Key</returns>
+        private string GetKey()
+        {
+            var uri = _Context.IncomingRequest.UriTemplateMatch;
+            return Util.Hash(_Token.id.ToString() + uri.Data);
         }
     }
 }

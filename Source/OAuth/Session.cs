@@ -21,7 +21,10 @@ namespace Insight.Base.OAuth
         private int _FailureCount;
 
         // 上次连接时间
-        private DateTime _LastConnect;
+        private DateTime _LastConnectTime;
+
+        // 最后一次验证通过的TokenId
+        private Guid _LastConnectId;
 
         /// <summary>
         /// Secret过期时间
@@ -37,11 +40,6 @@ namespace Insight.Base.OAuth
         /// 用户在线状态
         /// </summary>
         public bool OnlineStatus { get; private set; }
-
-        /// <summary>
-        /// 随机码
-        /// </summary>
-        public string Stamp { get; private set; }
 
         /// <summary>
         /// 用户类型
@@ -61,21 +59,21 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 构造方法，根据用户账号和索引构建对象
         /// </summary>
-        /// <param name="account">用户账号</param>
-        public Session(string account)
+        /// <param name="loginName">用户账号</param>
+        public Session(string loginName)
         {
             using (var context = new BaseEntities())
             {
-                var user = context.SYS_User.SingleOrDefault(s => s.LoginName == account);
+                var user = context.SYS_User.SingleOrDefault(s => s.LoginName == loginName);
                 if (user == null) return;
 
+                id = Guid.NewGuid();
                 UserType = user.Type;
-                Account = user.LoginName;
+                account = user.LoginName;
                 Mobile = user.Mobile;
-                UserId = user.ID;
-                UserName = user.Name;
+                userId = user.ID;
+                userName = user.Name;
                 Validity = user.Validity;
-                Stamp = Guid.NewGuid().ToString("N");
                 _Signature = user.Password;
             }
         }
@@ -83,15 +81,21 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 检验是否已经连续错误5次
         /// </summary>
+        /// <param name="tokenId">TokenId</param>
         /// <returns>bool 是否已经连续错误5次</returns>
-        public bool Ckeck()
+        public bool Ckeck(Guid tokenId)
         {
+            if (tokenId == _LastConnectId) return true;
+
             var now = DateTime.Now;
-            var span = now - _LastConnect;
+            var span = now - _LastConnectTime;
             if (span.TotalMinutes > 15) _FailureCount = 0;
 
-            _LastConnect = now;
-            return _FailureCount >= 5;
+            _LastConnectTime = now;
+            if (_FailureCount >= 5) return false;
+
+            _LastConnectId = tokenId;
+            return true;
         }
 
         /// <summary>
@@ -106,16 +110,17 @@ namespace Insight.Base.OAuth
             switch (type)
             {
                 case 1:
-                    str = Secret;
+                    str = secret;
                     break;
                 case 2:
                     str = _RefreshKey;
                     break;
                 case 3:
-                    str = Util.Hash(_Signature + Stamp);
-                    Stamp = Guid.NewGuid().ToString("N");
+                    str = Util.Hash(_Signature + id.ToString("N"));
+                    id = Guid.NewGuid();
                     break;
             }
+
             if (str == key) return true;
 
             _FailureCount++;
@@ -128,8 +133,8 @@ namespace Insight.Base.OAuth
         public void InitSecret()
         {
             var now = DateTime.Now;
-            Secret = Util.Hash(Guid.NewGuid() + _Signature + now);
-            _RefreshKey = Util.Hash(Guid.NewGuid() + Secret);
+            secret = Util.Hash(Guid.NewGuid() + _Signature + now);
+            _RefreshKey = Util.Hash(Guid.NewGuid() + secret);
             ExpiryTime = now.AddHours(2);
             FailureTime = now.AddHours(Common.Expired);
         }
@@ -148,7 +153,7 @@ namespace Insight.Base.OAuth
         /// <param name="did">用户登录部门ID</param>
         public void Online(Guid? did)
         {
-            DeptId = did;
+            deptId = did;
             OnlineStatus = true;
             _FailureCount = 0;
         }
@@ -169,7 +174,7 @@ namespace Insight.Base.OAuth
         /// <param name="password">用户密码</param>
         public void Sign(string password)
         {
-            _Signature = Util.Hash(Account.ToUpper() + password);
+            _Signature = Util.Hash(account.ToUpper() + password);
         }
 
         /// <summary>
@@ -178,23 +183,25 @@ namespace Insight.Base.OAuth
         /// <returns>string 序列化为Json的Token数据</returns>
         public object CreatorKey()
         {
-            return new
+            var token = new
             {
-                AccessToken = Util.Base64(new {UserId, DeptId, Account, UserName, Secret}),
-                RefreshToken = Util.Base64(new {Account, Secret = _RefreshKey}),
-                ExpiryTime,
-                FailureTime
+                accessToken = Util.Base64(new {id, userId, deptId, account, userName, secret}),
+                refreshToken = Util.Base64(new {id, account, Secret = _RefreshKey}),
+                expiryTime = ExpiryTime,
+                failureTime = FailureTime
             };
+
+            return token;
         }
 
         /// <summary>
         /// 根据Account判断用户是否相同
         /// </summary>
-        /// <param name="account">用户账号</param>
+        /// <param name="loginName">用户账号</param>
         /// <returns>bool 用户是否相同</returns>
-        public bool UserIsSame(string account)
+        public bool UserIsSame(string loginName)
         {
-            return Util.StringCompare(Account, account);
+            return Util.StringCompare(account, loginName);
         }
     }
 }

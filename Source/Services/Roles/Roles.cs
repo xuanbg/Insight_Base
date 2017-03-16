@@ -38,10 +38,10 @@ namespace Insight.Base.Services
             if (!Verify("FBCEE515-8576-4B10-BA68-CF46743D2199")) return _Result;
 
             var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
+            if (!parse.Result.successful) return parse.Result;
 
             var role = new Role(parse.Value);
-            return role.Result.Successful && role.Delete() ? _Result : role.Result;
+            return role.Result.successful && role.Delete() ? _Result : role.Result;
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Insight.Base.Services
             if (!Verify("4DC0141D-FE3D-4504-BE70-763028796808")) return _Result;
 
             var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
+            if (!parse.Result.successful) return parse.Result;
 
             if (role.Existed || !role.Update()) return role.Result;
 
@@ -73,10 +73,10 @@ namespace Insight.Base.Services
             if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
 
             var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
+            if (!parse.Result.successful) return parse.Result;
 
             var role = new Role(parse.Value);
-            return role.Result.Successful ? _Result.Success(role) : role.Result;
+            return role.Result.successful ? _Result.Success(role) : role.Result;
         }
 
         /// <summary>
@@ -90,10 +90,10 @@ namespace Insight.Base.Services
             if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
 
             var ipr = new IntParse(rows);
-            if (!ipr.Result.Successful) return ipr.Result;
+            if (!ipr.Result.successful) return ipr.Result;
 
             var ipp = new IntParse(page);
-            if (!ipp.Result.Successful) return ipp.Result;
+            if (!ipp.Result.successful) return ipp.Result;
 
             if (ipr.Value > 500 || ipp.Value < 1) return _Result.BadRequest();
 
@@ -123,7 +123,7 @@ namespace Insight.Base.Services
             if (!Verify("13D93852-53EC-4A15-AAB2-46C9C48C313A")) return _Result;
 
             var parse = new GuidParse(id);
-            if (!parse.Result.Successful || !members.Any()) return parse.Result;
+            if (!parse.Result.successful || !members.Any()) return parse.Result;
 
             using (var context = new BaseEntities())
             {
@@ -161,7 +161,7 @@ namespace Insight.Base.Services
             if (!Verify("2EF4D82B-4A75-4902-BD9E-B63153D093D2")) return _Result;
 
             var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
+            if (!parse.Result.successful) return parse.Result;
 
             using (var context = new BaseEntities())
             {
@@ -193,13 +193,13 @@ namespace Insight.Base.Services
             if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
 
             var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
+            if (!parse.Result.successful) return parse.Result;
 
             var ipr = new IntParse(rows);
-            if (!ipr.Result.Successful) return ipr.Result;
+            if (!ipr.Result.successful) return ipr.Result;
 
             var ipp = new IntParse(page);
-            if (!ipp.Result.Successful) return ipp.Result;
+            if (!ipp.Result.successful) return ipp.Result;
 
             if (ipr.Value > 500 || ipp.Value < 1) return _Result.BadRequest();
 
@@ -227,7 +227,7 @@ namespace Insight.Base.Services
             if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
 
             var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
+            if (!parse.Result.successful) return parse.Result;
 
             using (var context = new BaseEntities())
             {
@@ -249,7 +249,7 @@ namespace Insight.Base.Services
         {
             if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
             var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
+            if (!parse.Result.successful) return parse.Result;
 
             using (var context = new BaseEntities())
             {
@@ -272,7 +272,7 @@ namespace Insight.Base.Services
             if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
 
             var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
+            if (!parse.Result.successful) return parse.Result;
 
             using (var context = new BaseEntities())
             {
@@ -295,7 +295,7 @@ namespace Insight.Base.Services
             if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
 
             var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
+            if (!parse.Result.successful) return parse.Result;
 
             var role = new Role(parse.Value);
             role.GetAllPermission();
@@ -314,10 +314,10 @@ namespace Insight.Base.Services
         private bool Verify(string action = null)
         {
             var verify = new Compare(action);
-            _UserId = verify.Basis.UserId;
+            _UserId = verify.Basis.userId;
             _Result = verify.Result;
 
-            return _Result.Successful;
+            return _Result.successful;
         }
     }
 }

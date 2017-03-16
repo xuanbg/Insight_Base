@@ -41,7 +41,7 @@ namespace Insight.Base.Services
             List<SYS_ModuleParam> mps;
             using (var context = new BaseEntities())
             {
-                mps = context.SYS_ModuleParam.Where(p => p.ModuleId == mid && ((p.OrgId == null && p.UserId == null) || p.OrgId == session.DeptId || p.UserId == session.UserId)).ToList();
+                mps = context.SYS_ModuleParam.Where(p => p.ModuleId == mid && ((p.OrgId == null && p.UserId == null) || p.OrgId == session.deptId || p.UserId == session.userId)).ToList();
             }
             foreach (var pam in mps)
             {
@@ -70,7 +70,7 @@ namespace Insight.Base.Services
         {
             using (var context = new BaseEntities())
             {
-                return context.SYS_ModuleParam.Where(p => p.ModuleId == mid && p.UserId == session.UserId).ToList();
+                return context.SYS_ModuleParam.Where(p => p.ModuleId == mid && p.UserId == session.userId).ToList();
             }
         }
 
@@ -84,7 +84,7 @@ namespace Insight.Base.Services
         {
             using (var context = new BaseEntities())
             {
-                return context.SYS_ModuleParam.Where(p => p.ModuleId == mid && p.OrgId == session.DeptId && p.UserId == null).ToList();
+                return context.SYS_ModuleParam.Where(p => p.ModuleId == mid && p.OrgId == session.deptId && p.UserId == null).ToList();
             }
         }
 

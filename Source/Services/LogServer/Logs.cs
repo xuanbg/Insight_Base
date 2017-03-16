@@ -29,7 +29,7 @@ namespace Insight.Base.Services
             if (!Verify()) return _Result;
 
             var parse = new GuidParse(userid, true);
-            if (!parse.Result.Successful) return parse.Result;
+            if (!parse.Result.successful) return parse.Result;
 
             var logger = new Logger(code, message, source, action, key, parse.Guid);
             var succe = logger.Write();
@@ -77,7 +77,7 @@ namespace Insight.Base.Services
             if (!Verify("BBC43098-A030-46CA-A681-0C3D1ECC15AB")) return _Result;
 
             var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
+            if (!parse.Result.successful) return parse.Result;
 
             if (!DeleteRule(parse.Value)) return _Result.DataBaseError();
 
@@ -122,7 +122,7 @@ namespace Insight.Base.Services
             if (!Verify("E3CFC5AA-CD7D-4A3C-8900-8132ADB7099F")) return _Result;
 
             var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
+            if (!parse.Result.successful) return parse.Result;
 
             var rule = Rules.SingleOrDefault(r => r.ID == parse.Value);
             return rule == null ? _Result.NotFound() : _Result.Success(rule);
@@ -151,11 +151,11 @@ namespace Insight.Base.Services
         private bool Verify(string action = null)
         {
             var verify = new Compare(action);
-            _UserId = verify.Basis.UserId;
-            _UserName = verify.Basis.UserName;
+            _UserId = verify.Basis.userId;
+            _UserName = verify.Basis.userName;
             _Result = verify.Result;
 
-            return _Result.Successful;
+            return _Result.successful;
         }
     }
 }

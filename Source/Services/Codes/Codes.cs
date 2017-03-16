@@ -69,7 +69,7 @@ namespace Insight.Base.Services
         {
             var verify = new Compare();
             var result = Util.ConvertTo<Result>(verify.Result);
-            if (!result.Successful) return result;
+            if (!result.successful) return result;
 
             var bid = new GuidParse(id).Guid;
             if (!bid.HasValue)
@@ -91,7 +91,7 @@ namespace Insight.Base.Services
                     return result;
                 }
 
-                var code = GetCode(scheme.ID, null, session.UserId, bid.Value, null, mark);
+                var code = GetCode(scheme.ID, null, session.userId, bid.Value, null, mark);
                 if (code == null) result.DataBaseError();
                 else result.Success(code);
 

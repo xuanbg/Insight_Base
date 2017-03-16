@@ -36,7 +36,7 @@ namespace Insight.Base.Services
             if (!Verify()) return _Result;
 
             var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
+            if (!parse.Result.successful) return parse.Result;
 
             var auth = new Authority(_UserId, _DeptId, InitType.ToolBar);
             var data = auth.ModuleActions(parse.Value);
@@ -75,11 +75,11 @@ namespace Insight.Base.Services
         private bool Verify(string action = null)
         {
             var verify = new Compare(action);
-            _UserId = verify.Basis.UserId;
-            _DeptId = verify.Basis.DeptId;
+            _UserId = verify.Basis.userId;
+            _DeptId = verify.Basis.deptId;
             _Result = verify.Result;
 
-            return _Result.Successful;
+            return _Result.successful;
         }
     }
 }

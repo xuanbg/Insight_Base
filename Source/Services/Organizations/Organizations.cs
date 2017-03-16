@@ -37,10 +37,10 @@ namespace Insight.Base.Services
             if (!Verify("71803766-97FE-4E6E-82DB-D5C90D2B7004")) return _Result;
 
             var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
+            if (!parse.Result.successful) return parse.Result;
 
             var org = new Organization(parse.Value);
-            return org.Result.Successful && org.Delete() ? _Result : org.Result;
+            return org.Result.successful && org.Delete() ? _Result : org.Result;
         }
 
         /// <summary>
@@ -66,10 +66,10 @@ namespace Insight.Base.Services
             if (!Verify("928C7527-A2F7-49A3-A548-12B3834D8822")) return _Result;
 
             var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
+            if (!parse.Result.successful) return parse.Result;
 
             var org = new Organization(parse.Value);
-            return org.Result.Successful ? _Result.Success(org) : org.Result;
+            return org.Result.successful ? _Result.Success(org) : org.Result;
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace Insight.Base.Services
             if (!Verify("DAE7F2C5-E379-4F74-8043-EB616D4A5F8B")) return _Result;
 
             var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
+            if (!parse.Result.successful) return parse.Result;
 
             org.CreatorUserId = _UserId;
             return _Result;
@@ -142,7 +142,7 @@ namespace Insight.Base.Services
             if (!Verify("928C7527-A2F7-49A3-A548-12B3834D8822")) return _Result;
 
             var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
+            if (!parse.Result.successful) return parse.Result;
 
             using (var context = new BaseEntities())
             {
@@ -189,10 +189,10 @@ namespace Insight.Base.Services
         private bool Verify(string action = null)
         {
             var verify = new Compare(action);
-            _UserId = verify.Basis.UserId;
+            _UserId = verify.Basis.userId;
             _Result = verify.Result;
 
-            return _Result.Successful;
+            return _Result.successful;
         }
     }
 }

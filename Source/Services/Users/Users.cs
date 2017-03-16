@@ -40,10 +40,10 @@ namespace Insight.Base.Services
             if (!Verify("BE2DE9AB-C109-418D-8626-236DEF8E8504")) return _Result;
 
             var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
+            if (!parse.Result.successful) return parse.Result;
 
             var user = new User(parse.Value);
-            return user.Result.Successful && user.Delete() ? _Result : user.Result;
+            return user.Result.successful && user.Delete() ? _Result : user.Result;
         }
 
         /// <summary>
@@ -55,12 +55,12 @@ namespace Insight.Base.Services
         public Result UpdateUserInfo(string id, User user)
         {
             var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
+            if (!parse.Result.successful) return parse.Result;
 
             if (!Verify("3BC17B61-327D-4EAA-A0D7-7F825A6C71DB", 0, parse.Value)) return _Result;
 
             var data = new User(parse.Value);
-            if (!data.Result.Successful) return data.Result;
+            if (!data.Result.successful) return data.Result;
 
             data.Name = user.Name;
             data.Description = user.Description;
@@ -70,7 +70,7 @@ namespace Insight.Base.Services
             var session = OAuth.Common.GetSession(user.LoginName);
             if (session == null) return _Result;
 
-            session.UserName = user.Name;
+            session.userName = user.Name;
             session.UserType = user.Type;
             return _Result;
         }
@@ -83,12 +83,12 @@ namespace Insight.Base.Services
         public Result GetUser(string id)
         {
             var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
+            if (!parse.Result.successful) return parse.Result;
 
             if (!Verify("B5992AA3-4AD3-4795-A641-2ED37AC6425C", 0, parse.Value)) return _Result;
 
             var data = new User(parse.Value);
-            if (!data.Result.Successful) return data.Result;
+            if (!data.Result.successful) return data.Result;
 
             data.Authority = new Authority(parse.Value, null, InitType.Permission, true);
             return _Result.Success(data);
@@ -106,10 +106,10 @@ namespace Insight.Base.Services
             if (!Verify("B5992AA3-4AD3-4795-A641-2ED37AC6425C")) return _Result;
 
             var ipr = new IntParse(rows);
-            if (!ipr.Result.Successful) return ipr.Result;
+            if (!ipr.Result.successful) return ipr.Result;
 
             var ipp = new IntParse(page);
-            if (!ipp.Result.Successful) return ipp.Result;
+            if (!ipp.Result.successful) return ipp.Result;
 
             if (ipr.Value > 500 || ipp.Value < 1) return _Result.BadRequest();
 
@@ -161,14 +161,14 @@ namespace Insight.Base.Services
             const string action = "26481E60-0917-49B4-BBAA-2265E71E7B3F";
             var verify = new Compare(action, account);
             _Result = verify.Result;
-            if (!_Result.Successful) return _Result;
+            if (!_Result.successful) return _Result;
 
-            var session = Util.StringCompare(verify.Basis.Account, account)
+            var session = Util.StringCompare(verify.Basis.account, account)
                 ? verify.Basis
                 : OAuth.Common.GetSession(account);
 
             var user = new User(account) {Password = Util.Hash(account.ToUpper() + password)};
-            if (!user.Result.Successful || !user.Update()) return user.Result;
+            if (!user.Result.successful || !user.Update()) return user.Result;
 
             if (session == null) return _Result;
 
@@ -199,7 +199,7 @@ namespace Insight.Base.Services
             Parameters.SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == 2);
 
             var user = new User(account) {Password = Util.Hash(account.ToUpper() + password)};
-            if (!user.Result.Successful || !user.Update()) return user.Result;
+            if (!user.Result.successful || !user.Update()) return user.Result;
 
             session.Sign(password);
             session.InitSecret();
@@ -219,7 +219,7 @@ namespace Insight.Base.Services
             if (!Verify(action)) return _Result;
 
             var user = new User(account) {Validity = validity};
-            if (!user.Result.Successful || !user.Update()) return user.Result;
+            if (!user.Result.successful || !user.Update()) return user.Result;
 
             var session = OAuth.Common.GetSession(account);
             if (session != null) session.Validity = validity;
@@ -251,10 +251,10 @@ namespace Insight.Base.Services
             if (!Verify()) return _Result;
 
             var parse = new GuidParse(id);
-            if (!parse.Result.Successful) return parse.Result;
+            if (!parse.Result.successful) return parse.Result;
 
             var dept = new GuidParse(deptid, true);
-            if (!parse.Result.Successful) return parse.Result;
+            if (!parse.Result.successful) return parse.Result;
 
             var auth = new Authority(parse.Value, dept.Guid);
             return _Result.Success(auth.RoleList);
@@ -275,10 +275,10 @@ namespace Insight.Base.Services
         {
             var verify = new Compare(action, limit, userid);
             _Session = verify.Basis;
-            _UserId = verify.Basis.UserId;
+            _UserId = verify.Basis.userId;
             _Result = verify.Result;
 
-            return _Result.Successful;
+            return _Result.successful;
         }
     }
 }

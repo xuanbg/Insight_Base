@@ -7,7 +7,7 @@ namespace Insight.Base.OAuth
 {
     public class Authority
     {
-        private Guid _UserId;
+        private readonly Guid _UserId;
         private Guid? _DeptId;
         private List<Guid> _RoleList;
         private readonly List<Guid> _OrgList = new List<Guid>();

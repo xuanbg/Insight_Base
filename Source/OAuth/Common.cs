@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using Insight.Utils.Common;
 
@@ -33,7 +34,7 @@ namespace Insight.Base.OAuth
             {
                 _Mutex.WaitOne();
                 var session = new Session(key);
-                if (session.Stamp == null) return null;
+                if (session.id == Guid.Empty) return null;
 
                 _Sessions.Add(key, session);
                 _Mutex.ReleaseMutex();
