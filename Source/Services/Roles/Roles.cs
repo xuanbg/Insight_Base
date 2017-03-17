@@ -13,6 +13,13 @@ namespace Insight.Base.Services
     public class Roles : IRoles
     {
         /// <summary>
+        /// 为跨域请求设置响应头信息
+        /// </summary>
+        public void ResponseOptions()
+        {
+        }
+
+        /// <summary>
         /// 新增角色
         /// </summary>
         /// <param name="role">RoleInfo</param>

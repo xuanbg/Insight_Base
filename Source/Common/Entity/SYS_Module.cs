@@ -38,6 +38,7 @@ namespace Insight.Base.Common.Entity
         public Nullable<System.DateTime> RegisterTime { get; set; }
         public bool Default { get; set; }
         public bool Validity { get; set; }
+        public string IconUrl { get; set; }
         public byte[] Icon { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

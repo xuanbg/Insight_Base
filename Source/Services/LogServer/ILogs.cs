@@ -9,6 +9,13 @@ namespace Insight.Base.Services
     interface ILogs
     {
         /// <summary>
+        /// 为跨域请求设置响应头信息
+        /// </summary>
+        [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [OperationContract]
+        void ResponseOptions();
+
+        /// <summary>
         /// 写入日志
         /// </summary>
         /// <param name="code">事件代码（必须有）</param>

@@ -13,6 +13,13 @@ namespace Insight.Base.Services
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
     public partial class Codes : ICodes
     {
+        /// <summary>
+        /// 为跨域请求设置响应头信息
+        /// </summary>
+        public void ResponseOptions()
+        {
+        }
+
         public Result AddScheme(SYS_Code_Scheme obj)
         {
             throw new NotImplementedException();

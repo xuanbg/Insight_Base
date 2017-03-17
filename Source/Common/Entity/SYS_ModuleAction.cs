@@ -30,6 +30,7 @@ namespace Insight.Base.Common.Entity
         public string Alias { get; set; }
         public string Description { get; set; }
         public bool Validity { get; set; }
+        public string IconUrl { get; set; }
         public byte[] Icon { get; set; }
     
         public virtual SYS_Module SYS_Module { get; set; }

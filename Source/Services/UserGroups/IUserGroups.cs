@@ -8,6 +8,13 @@ namespace Insight.Base.Services
     public interface IUserGroups
     {
         /// <summary>
+        /// 为跨域请求设置响应头信息
+        /// </summary>
+        [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [OperationContract]
+        void ResponseOptions();
+
+        /// <summary>
         /// 根据对象实体数据新增一个用户组
         /// </summary>
         /// <param name="group">用户组对象</param>

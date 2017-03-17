@@ -10,7 +10,6 @@
         <EntityTypeShape EntityType="BaseModel.SYS_Code_Record" Width="1.5" PointX="7.5" PointY="41.5" IsExpanded="true" />
         <EntityTypeShape EntityType="BaseModel.SYS_Code_Scheme" Width="1.5" PointX="5.25" PointY="32.875" IsExpanded="true" />
         <EntityTypeShape EntityType="BaseModel.SYS_Data" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="BaseModel.SYS_Interface" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="BaseModel.SYS_Logs" Width="1.5" PointX="4.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="BaseModel.SYS_Logs_Rules" Width="1.5" PointX="6.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="BaseModel.SYS_Module" Width="1.5" PointX="3" PointY="27.25" IsExpanded="true" />

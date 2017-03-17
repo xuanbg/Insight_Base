@@ -88,9 +88,6 @@
     <Compile Include="Entity\SYS_Data.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
-    <Compile Include="Entity\SYS_Interface.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
     <Compile Include="Entity\SYS_Logs.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>

@@ -32,7 +32,6 @@ namespace Insight.Base.Common.Entity
         public virtual DbSet<SYS_Code_Record> SYS_Code_Record { get; set; }
         public virtual DbSet<SYS_Code_Scheme> SYS_Code_Scheme { get; set; }
         public virtual DbSet<SYS_Data> SYS_Data { get; set; }
-        public virtual DbSet<SYS_Interface> SYS_Interface { get; set; }
         public virtual DbSet<SYS_Logs> SYS_Logs { get; set; }
         public virtual DbSet<SYS_Logs_Rules> SYS_Logs_Rules { get; set; }
         public virtual DbSet<SYS_Module> SYS_Module { get; set; }

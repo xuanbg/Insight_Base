@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
-using System.ServiceModel.Web;
 using System.Threading.Tasks;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
@@ -21,14 +20,6 @@ namespace Insight.Base.Services
         /// </summary>
         public void ResponseOptions()
         {
-            var context = WebOperationContext.Current;
-            if (context == null) return;
-
-            var response = context.OutgoingResponse;
-            response.Headers.Add("Access-Control-Allow-Credentials", "true");
-            response.Headers.Add("Access-Control-Allow-Headers", "Accept, Content-Type, Authorization");
-            response.Headers.Add("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
-            response.Headers.Add("Access-Control-Allow-Origin", "*");
         }
 
         /// <summary>

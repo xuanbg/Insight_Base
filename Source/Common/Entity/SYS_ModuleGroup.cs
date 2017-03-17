@@ -25,6 +25,7 @@ namespace Insight.Base.Common.Entity
         public Nullable<int> Index { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+        public string IconUrl { get; set; }
         public byte[] Icon { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

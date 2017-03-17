@@ -107,7 +107,7 @@ namespace Insight.Base.OAuth
         {
             var list = from gid in _ActionModules.Select(m => m.GroupId).Distinct()
                        join g in _Groups on gid equals g.ID
-                       select new {g.ID, g.Index, g.Name, g.Icon};
+                       select new {g.ID, g.Index, g.Name, g.IconUrl, g.Icon};
             return list.OrderBy(g => g.Index).ToList();
         }
 
@@ -119,7 +119,7 @@ namespace Insight.Base.OAuth
         {
             var list = from mid in _ActionModules.Select(m => m.ID).Distinct()
                        join m in _Modules on mid equals m.ID
-                       select new {m.ID, m.ModuleGroupId, m.Index, m.ProgramName, m.NameSpace, m.ApplicationName, m.Location, m.Default, m.Icon};
+                       select new {m.ID, m.ModuleGroupId, m.Index, m.ProgramName, m.NameSpace, m.ApplicationName, m.Location, m.Default, m.IconUrl, m.Icon};
             return list.OrderBy(m => m.Index).ToList();
         }
 
@@ -132,7 +132,7 @@ namespace Insight.Base.OAuth
         {
             var list = from a in _Actions.Where(i => i.ModuleId == mid)
                        let action = _RoleActions.Where(p => p.ActionId == a.ID).OrderBy(i => i.Action).FirstOrDefault()?.Action ?? 0
-                       select new {a.ID, a.ModuleId, a.Index, a.Name, a.Alias, a.Icon, a.ShowText, a.BeginGroup, Enable = action > 0, a.Validity};
+                       select new {a.ID, a.ModuleId, a.Index, a.Name, a.Alias, a.IconUrl, a.Icon, a.ShowText, a.BeginGroup, Enable = action > 0, a.Validity};
             return list.OrderBy(a => a.Index).ToList();
         }
 

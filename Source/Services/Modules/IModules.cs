@@ -10,6 +10,13 @@ namespace Insight.Base.Services
     interface IModules
     {
         /// <summary>
+        /// 为跨域请求设置响应头信息
+        /// </summary>
+        [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [OperationContract]
+        void ResponseOptions();
+
+        /// <summary>
         /// 获取登录用户的导航信息
         /// </summary>
         /// <returns>Result</returns>

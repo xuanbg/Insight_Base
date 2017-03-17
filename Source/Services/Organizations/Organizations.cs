@@ -12,6 +12,13 @@ namespace Insight.Base.Services
     public class Organizations : IOrganizations
     {
         /// <summary>
+        /// 为跨域请求设置响应头信息
+        /// </summary>
+        public void ResponseOptions()
+        {
+        }
+
+        /// <summary>
         /// 根据对象实体数据新增一个组织机构节点
         /// </summary>
         /// <param name="org">组织节点对象</param>

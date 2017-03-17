@@ -13,6 +13,13 @@ namespace Insight.Base.Services
     public partial class Modules:IModules
     {
         /// <summary>
+        /// 为跨域请求设置响应头信息
+        /// </summary>
+        public void ResponseOptions()
+        {
+        }
+
+        /// <summary>
         /// 获取登录用户的导航信息
         /// </summary>
         /// <returns>Result</returns>
