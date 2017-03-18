@@ -50,5 +50,24 @@ namespace Insight.Base.Common
         /// 数据库连结字符串
         /// </summary>
         public static string Database = new BaseEntities().Database.Connection.ConnectionString;
+
+        /// <summary>
+        /// 验证验证码是否正确
+        /// </summary>
+        /// <param name="mobile">手机号</param>
+        /// <param name="code">验证码</param>
+        /// <param name="type">验证码类型</param>
+        /// <param name="remove">是否验证成功后删除记录</param>
+        /// <returns>bool 验证码是否正确</returns>
+        public static bool VerifySmsCode(string mobile, string code, int type, bool remove = true)
+        {
+            SmsCodes.RemoveAll(c => c.FailureTime < DateTime.Now);
+            var record = SmsCodes.FirstOrDefault(c => c.Mobile == mobile && c.Code == code && c.Type == type);
+            if (record == null) return false;
+
+            if (remove) SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == type);
+
+            return true;
+        }
     }
 }

@@ -65,12 +65,12 @@ namespace Insight.Base.Services
         /// <summary>
         /// 根据对象实体数据注册一个用户
         /// </summary>
-        /// <param name="account">登录账号</param>
+        /// <param name="code">验证码</param>
         /// <param name="user">用户对象</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "users/{account}/signup", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "users/signup?code={code}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result SignUp(string account, User user);
+        Result SignUp(string code, User user);
 
         /// <summary>
         /// 更新指定用户Session的签名

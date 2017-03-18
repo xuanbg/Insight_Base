@@ -99,9 +99,8 @@ namespace Insight.Base.OAuth
                 return;
             }
 
+            // 如Token失效，则重新生成随机码、过期时间和失效时间
             if (DateTime.Now > Basis.FailureTime) Basis.InitSecret();
-
-            if (DateTime.Now > Basis.ExpiryTime) Basis.Refresh();
 
             Basis.Online(token.deptId);
             Result.Success(Basis.CreatorKey());
@@ -138,7 +137,7 @@ namespace Insight.Base.OAuth
             }
 
             Basis.Refresh();
-            Result.Success(Basis.CreatorKey());
+            Result.Success();
         }
 
         /// <summary>

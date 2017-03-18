@@ -28,11 +28,11 @@ namespace Insight.Base.Services
         {
             if (!Verify("60D5BE64-0102-4189-A999-96EDAD3DA1B5")) return _Result;
 
-            if (user.Existed) return user.Result;
+            if (user.existed) return user.Result;
 
-            user.Password = Util.Hash("123456");
-            user.CreatorUserId = _UserId;
-            user.CreateTime = DateTime.Now;
+            user.password = Util.Hash("123456");
+            user.creatorUserId = _UserId;
+            user.createTime = DateTime.Now;
 
             return user.Add() ? _Result.Created(user) : user.Result;
         }
@@ -69,16 +69,16 @@ namespace Insight.Base.Services
             var data = new User(parse.Value);
             if (!data.Result.successful) return data.Result;
 
-            data.Name = user.Name;
-            data.Description = user.Description;
+            data.name = user.name;
+            data.description = user.description;
             if (!data.Update()) return data.Result;
 
             _Result.Success(data);
-            var session = OAuth.Common.GetSession(user.LoginName);
+            var session = OAuth.Common.GetSession(user.loginName);
             if (session == null) return _Result;
 
-            session.userName = user.Name;
-            session.UserType = user.Type;
+            session.userName = user.name;
+            session.UserType = user.type;
             return _Result;
         }
 
@@ -139,19 +139,21 @@ namespace Insight.Base.Services
         /// <summary>
         /// 根据对象实体数据注册一个用户
         /// </summary>
-        /// <param name="account">登录账号</param>
+        /// <param name="code">验证码</param>
         /// <param name="user">用户对象</param>
         /// <returns>Result</returns>
-        public Result SignUp(string account, User user)
+        public Result SignUp(string code, User user)
         {
             if (!Verify()) return _Result;
 
-            if (user.Existed) return user.Result;
+            if (!Parameters.VerifySmsCode(user.mobile, code, 1)) return _Result.SMSCodeError();
 
-            user.CreateTime = DateTime.Now;
+            if (user.existed) return user.Result;
+
+            user.createTime = DateTime.Now;
             if (!user.Add()) return user.Result;
 
-            var session = OAuth.Common.GetSession(account);
+            var session = OAuth.Common.GetSession(user.loginName);
             session.InitSecret();
 
             return _Result.Created(session.CreatorKey());
@@ -174,7 +176,7 @@ namespace Insight.Base.Services
                 ? verify.Basis
                 : OAuth.Common.GetSession(account);
 
-            var user = new User(account) {Password = Util.Hash(account.ToUpper() + password)};
+            var user = new User(account) {password = Util.Hash(account.ToUpper() + password)};
             if (!user.Result.successful || !user.Update()) return user.Result;
 
             if (session == null) return _Result;
@@ -205,7 +207,7 @@ namespace Insight.Base.Services
 
             Parameters.SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == 2);
 
-            var user = new User(account) {Password = Util.Hash(account.ToUpper() + password)};
+            var user = new User(account) {password = Util.Hash(account.ToUpper() + password)};
             if (!user.Result.successful || !user.Update()) return user.Result;
 
             session.Sign(password);
@@ -225,7 +227,7 @@ namespace Insight.Base.Services
             var action = validity ? "369548E9-C8DB-439B-A604-4FDC07F3CCDD" : "0FA34D43-2C52-4968-BDDA-C9191D7FCE80";
             if (!Verify(action)) return _Result;
 
-            var user = new User(account) {Validity = validity};
+            var user = new User(account) {validity = validity};
             if (!user.Result.successful || !user.Update()) return user.Result;
 
             var session = OAuth.Common.GetSession(account);

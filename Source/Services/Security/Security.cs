@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
 using System.Threading.Tasks;
 using Insight.Base.Common;
@@ -100,13 +99,10 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result NewCode(string mobile, int type, int time)
         {
-            if (!Verify()) return _Result;
-
-            var record = SmsCodes.OrderByDescending(r => r.CreateTime).FirstOrDefault(r => r.Mobile == mobile && r.Type == type);
-            if (record != null && (DateTime.Now - record.CreateTime).TotalSeconds < 60) return _Result.TimeTooShort();
+            if (!Verify(null, 60)) return _Result;
 
             var code = Parameters.Random.Next(100000, 999999).ToString();
-            record = new VerifyRecord
+            var record = new VerifyRecord
             {
                 Type = type,
                 Mobile = mobile,
@@ -134,14 +130,7 @@ namespace Insight.Base.Services
         {
             if (!Verify()) return _Result;
 
-            SmsCodes.RemoveAll(c => c.FailureTime < DateTime.Now);
-            var record = SmsCodes.FirstOrDefault(c => c.Mobile == mobile && c.Code == code && c.Type == type);
-            if (record == null) return _Result.SMSCodeError();
-
-            if (!remove) return _Result;
-
-            SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == type);
-            return _Result;
+            return VerifySmsCode(mobile, code, type, remove) ? _Result : _Result.SMSCodeError();
         }
 
         /// <summary>
@@ -175,10 +164,11 @@ namespace Insight.Base.Services
         /// 会话合法性验证
         /// </summary>
         /// <param name="action">操作权限代码，默认为空，即不进行鉴权</param>
+        /// <param name="limit">单位时间(秒)内限制调用，0：不限制</param>
         /// <returns>bool 身份是否通过验证</returns>
-        private bool Verify(string action = null)
+        private bool Verify(string action = null, int limit = 0)
         {
-            var verify = new Compare(action);
+            var verify = new Compare(action, limit);
             _Result = verify.Result;
 
             return _Result.successful;

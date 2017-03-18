@@ -18,17 +18,17 @@ namespace Insight.Base.Services
         /// <summary>
         /// 用户是否已存在(按登录账号)
         /// </summary>
-        public bool Existed
+        public bool existed
         {
             get
             {
                 using (var context = new BaseEntities())
                 {
                     var user = context.SYS_User.SingleOrDefault(u => u.LoginName == _User.LoginName);
-                    var existed = user != null && user.ID != _User.ID;
-                    if (existed) Result.AccountExists();
+                    var isExisted = user != null && user.ID != _User.ID;
+                    if (isExisted) Result.AccountExists();
 
-                    return existed;
+                    return isExisted;
                 }
             }
         }
@@ -36,7 +36,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 用户唯一ID
         /// </summary>
-        public Guid ID
+        public Guid id
         {
             get { return _User.ID; }
             set { _User.ID = value; }
@@ -45,7 +45,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 用户姓名
         /// </summary>
-        public string Name
+        public string name
         {
             get { return _User.Name; }
             set { _User.Name = value; }
@@ -54,7 +54,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 用户登录账号
         /// </summary>
-        public string LoginName
+        public string loginName
         {
             get { return _User.LoginName; }
             set { _User.LoginName = value; }
@@ -63,7 +63,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 用户手机号
         /// </summary>
-        public string Mobile
+        public string mobile
         {
             get { return _User.Mobile; }
             set { _User.Mobile = value; }
@@ -72,7 +72,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 用户密码
         /// </summary>
-        public string Password
+        public string password
         {
             get { return _User.Password; }
             set { _User.Password = value; }
@@ -81,7 +81,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 支付密码
         /// </summary>
-        public string PayPassword
+        public string payPassword
         {
             get { return _User.PayPassword; }
             set { _User.PayPassword = value; }
@@ -90,7 +90,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 用户描述
         /// </summary>
-        public string Description
+        public string description
         {
             get { return _User.Description; }
             set { _User.Description = value; }
@@ -99,7 +99,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 用户类型
         /// </summary>
-        public int Type
+        public int type
         {
             get { return _User.Type; }
             set { _User.Type = value; }
@@ -108,7 +108,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 是否可用
         /// </summary>
-        public bool Validity
+        public bool validity
         {
             get { return _User.Validity; }
             set { _User.Validity = value; }
@@ -117,7 +117,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 是否内置用户
         /// </summary>
-        public bool BuiltIn
+        public bool builtIn
         {
             get { return _User.BuiltIn; }
             set { _User.BuiltIn = value; }
@@ -126,7 +126,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 创建人ID
         /// </summary>
-        public Guid CreatorUserId
+        public Guid creatorUserId
         {
             get { return _User.CreatorUserId; }
             set { _User.CreatorUserId = value; }
@@ -135,7 +135,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 创建时间
         /// </summary>
-        public DateTime CreateTime
+        public DateTime createTime
         {
             get { return _User.CreateTime; }
             set { _User.CreateTime = value; }
@@ -220,7 +220,7 @@ namespace Insight.Base.Services
         /// <returns>bool 是否成功</returns>
         public bool Delete()
         {
-            if (BuiltIn)
+            if (builtIn)
             {
                 Result.NotBeDeleted();
                 return false;
