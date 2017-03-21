@@ -30,7 +30,7 @@ namespace Insight.Base.Services
 
             if (user.existed) return user.Result;
 
-            user.password = Util.Hash("123456");
+            user.password = Util.Hash(user.loginName.ToUpper() + Util.Hash("123456"));
             user.creatorUserId = _UserId;
             user.createTime = DateTime.Now;
 
