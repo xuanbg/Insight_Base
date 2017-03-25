@@ -137,7 +137,7 @@ namespace Insight.Base.OAuth
             }
 
             Basis.Refresh();
-            Result.Success();
+            Result.Success(Basis.ExpiryTime);
         }
 
         /// <summary>
