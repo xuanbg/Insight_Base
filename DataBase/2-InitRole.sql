@@ -55,7 +55,7 @@ DECLARE @ID1 UNIQUEIDENTIFIER
 DECLARE @ID5 UNIQUEIDENTIFIER
 select @ID0 = ID from SYS_Data where Type = 0
 select @ID1 = ID from SYS_Data where Type = 1
-select @ID5 = ID from SYS_Data where Type = 5
+select @ID5 = ID from SYS_Data where Type = 4
 insert SYS_Role_Data (RoleId, ModuleId, Mode, ModeId, Permission, CreatorUserId)
 select @RoleId, M.ID, 0, @ID0, 1, '00000000-0000-0000-0000-000000000000'
 from SYS_Module M

@@ -436,8 +436,7 @@ select 0, '无归属' union all
 select 1, '本人' union all
 select 2, '本部门' union all
 select 3, '部门所有' union all
-select 4, '机构所有' union all
-select 5, '根域所有'
+select 4, '机构所有'
 GO
 
 /*****初始化日志规则*****/

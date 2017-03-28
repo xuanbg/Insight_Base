@@ -215,6 +215,6 @@ GO
 select newid(), '', 1, 0, 1, 'Refresh', '刷新', NULL, NULL, NULL, 1, NULL, 0x union all
 GO
 select newid()
-SELECT * FROM OPENROWSET(BULK N'C:\3.png', SINGLE_BLOB) AS photo
+SELECT * FROM OPENROWSET(BULK N'C:\5.png', SINGLE_BLOB) AS photo
 *****/
 
