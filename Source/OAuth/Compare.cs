@@ -102,6 +102,9 @@ namespace Insight.Base.OAuth
             // 如Token失效，则重新生成随机码、过期时间和失效时间
             if (DateTime.Now > Basis.FailureTime) Basis.InitSecret();
 
+            // 如Token过期，自动刷新
+            if (DateTime.Now > Basis.ExpiryTime) Basis.Refresh();
+
             Basis.Online(token.deptId);
             Result.Success(Basis.CreatorKey());
         }
@@ -112,15 +115,8 @@ namespace Insight.Base.OAuth
         /// <param name="limit">限制访问秒数</param>
         public Compare(int limit)
         {
-            if (!InitVerify(limit)) return;
-
-            // 未超时
             var now = DateTime.Now;
-            if (now < Basis.ExpiryTime)
-            {
-                Result.WithoutRefresh();
-                return;
-            }
+            if (!InitVerify(limit)) return;
 
             // 已失效
             if (now > Basis.FailureTime)
@@ -136,7 +132,8 @@ namespace Insight.Base.OAuth
                 return;
             }
 
-            Basis.Refresh();
+            if (now > Basis.ExpiryTime) Basis.Refresh();
+
             Result.Success(Basis.ExpiryTime);
         }
 
