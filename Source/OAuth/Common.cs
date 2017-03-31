@@ -34,7 +34,11 @@ namespace Insight.Base.OAuth
             {
                 _Mutex.WaitOne();
                 var session = new Session(key);
-                if (session.id == Guid.Empty) return null;
+                if (session.id == Guid.Empty)
+                {
+                    _Mutex.ReleaseMutex();
+                    return null;
+                }
 
                 _Sessions.Add(key, session);
                 _Mutex.ReleaseMutex();

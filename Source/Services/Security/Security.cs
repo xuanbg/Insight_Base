@@ -11,7 +11,7 @@ using static Insight.Base.Common.Parameters;
 
 namespace Insight.Base.Services
 {
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall, IncludeExceptionDetailInFaults = true)]
     public class Security : ISecurity
     {
         /// <summary>
