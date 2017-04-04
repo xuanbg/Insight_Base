@@ -19,9 +19,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Organizations", "Services\O
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules", "Services\Modules\Modules.csproj", "{06751A2C-C718-4F53-A9F8-61401BA119D6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utils", "..\..\Utils\Utils\Utils.csproj", "{0C3F2F08-6816-49FD-BB13-8526E43ACCC6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utils", "..\..\Utility\Utils\Utils.csproj", "{0C3F2F08-6816-49FD-BB13-8526E43ACCC6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WCF", "..\..\Utils\WCF\WCF.csproj", "{4BB72AF9-EADB-418A-9764-18DC29BE749D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WCF", "..\..\Utility\WCF\WCF.csproj", "{4BB72AF9-EADB-418A-9764-18DC29BE749D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logs", "Services\LogServer\Logs.csproj", "{C8EE59AD-2499-4C28-A4CF-7C726210D94D}"
 EndProject
