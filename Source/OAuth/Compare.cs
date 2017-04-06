@@ -186,7 +186,7 @@ namespace Insight.Base.OAuth
             }
 
             // 检查Session是否正常
-            if (Basis.Ckeck(_Token.id)) return true;
+            if (!Parameters.LockAccount || Basis.Ckeck(_Token.id)) return true;
 
             Result.AccountIsBlocked();
             return false;

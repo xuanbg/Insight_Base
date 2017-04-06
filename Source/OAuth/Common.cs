@@ -26,24 +26,19 @@ namespace Insight.Base.OAuth
         public static Session GetSession(string account)
         {
             var key = account.ToUpper();
-            try
-            {
-                return _Sessions[key];
-            }
-            catch
-            {
-                _Mutex.WaitOne();
-                var session = new Session(key);
-                if (session.id == Guid.Empty)
-                {
-                    _Mutex.ReleaseMutex();
-                    return null;
-                }
+            if (_Sessions.ContainsKey(key)) return _Sessions[key];
 
-                _Sessions.Add(key, session);
+            _Mutex.WaitOne();
+            var session = new Session(key);
+            if (session.id == Guid.Empty)
+            {
                 _Mutex.ReleaseMutex();
-                return session;
+                return null;
             }
+
+            _Sessions.Add(key, session);
+            _Mutex.ReleaseMutex();
+            return session;
         }
     }
 }

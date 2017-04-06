@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Insight.Base.Common.Entity;
+using Insight.Utils.Common;
 
 namespace Insight.Base.Common
 {
     public static class Parameters
     {
         private static List<SYS_Logs_Rules> _Rules;
+        public static bool LockAccount = bool.Parse(Util.GetAppSetting("LockAccount"));
+
         /// <summary>
         /// 进程同步基元
         /// </summary>
