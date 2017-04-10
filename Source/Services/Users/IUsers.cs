@@ -88,10 +88,11 @@ namespace Insight.Base.Services
         /// <param name="account">登录账号</param>
         /// <param name="password">新密码</param>
         /// <param name="code">短信验证码</param>
+        /// <param name="mobile">手机号，默认为空。如为空，则使用account</param>
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "users/{account}/resetpw", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result ResetSignature(string account, string password, string code);
+        Result ResetSignature(string account, string password, string code, string mobile = null);
 
         /// <summary>
         /// 根据用户ID设置用户状态

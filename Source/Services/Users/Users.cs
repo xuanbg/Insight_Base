@@ -193,8 +193,9 @@ namespace Insight.Base.Services
         /// <param name="account">登录账号</param>
         /// <param name="password">新密码</param>
         /// <param name="code">短信验证码</param>
+        /// <param name="mobile">手机号，默认为空。如为空，则使用account</param>
         /// <returns>Result</returns>
-        public Result ResetSignature(string account, string password, string code)
+        public Result ResetSignature(string account, string password, string code, string mobile = null)
         {
             if (!Verify()) return _Result;
 
@@ -202,12 +203,7 @@ namespace Insight.Base.Services
             if (session == null) return _Result.NotFound();
 
             // 验证短信验证码
-            var mobile = session.Mobile;
-            Parameters.SmsCodes.RemoveAll(c => c.FailureTime < DateTime.Now);
-            var record = Parameters.SmsCodes.FirstOrDefault(c => c.Mobile == mobile && c.Code == code && c.Type == 2);
-            if (record == null) return _Result.SMSCodeError();
-
-            Parameters.SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == 2);
+            if (!Parameters.VerifySmsCode(mobile ?? account, code, 2)) return _Result.SMSCodeError();
 
             var user = new User(account) {password = Util.Hash(account.ToUpper() + password)};
             if (!user.Result.successful || !user.Update()) return user.Result;

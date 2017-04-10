@@ -63,13 +63,6 @@ namespace Insight.Base.OAuth
         public Compare(AccessToken token)
         {
             _Token = token;
-            var time = CallManage.LimitCall(GetKey(), 3);
-            if (time > 0)
-            {
-                Result.TooFrequent(time);
-                return;
-            }
-
             if (!CheckBasis()) return;
 
             Result.Success(Basis.id.ToString("N"));
@@ -83,13 +76,6 @@ namespace Insight.Base.OAuth
         public Compare(AccessToken token, string signature)
         {
             _Token = token;
-            var time = CallManage.LimitCall(GetKey(), 3);
-            if (time > 0)
-            {
-                Result.TooFrequent(time);
-                return;
-            }
-
             if (!CheckBasis()) return;
 
             // 更新SessionID，验证用户签名
@@ -175,7 +161,7 @@ namespace Insight.Base.OAuth
         {
             if (Basis == null)
             {
-                Result.NotFound();
+                Result.NotFound("该账号不存在！");
                 return false;
             }
 
