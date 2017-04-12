@@ -129,10 +129,10 @@ namespace Insight.Base.OAuth
         /// <param name="limit">限制访问秒数</param>
         private bool InitVerify(int limit)
         {
+            var headers = _Context.IncomingRequest.Headers;
+            var auth = headers[HttpRequestHeader.Authorization];
             try
             {
-                var headers = _Context.IncomingRequest.Headers;
-                var auth = headers[HttpRequestHeader.Authorization];
                 var buffer = Convert.FromBase64String(auth);
                 var json = Encoding.UTF8.GetString(buffer);
                 _Token = Util.Deserialize<AccessToken>(json);
@@ -146,7 +146,7 @@ namespace Insight.Base.OAuth
             catch (Exception ex)
             {
                 _Context.OutgoingResponse.StatusCode = HttpStatusCode.Unauthorized;
-                var msg = $"提取验证信息失败。\r\nException:{ex}";
+                var msg = $"提取验证信息失败。Token is:{auth}\r\nException:{ex}";
                 var ts = new ThreadStart(() => new Logger("500101", msg).Write());
                 new Thread(ts).Start();
                 return false;

@@ -118,7 +118,8 @@ namespace Insight.Base.OAuth
                     break;
                 case 3:
                     str = Util.Hash(_Signature + id.ToString("N"));
-                    id = Guid.NewGuid();
+                    if (UserType != 0) id = Guid.NewGuid();
+
                     break;
             }
 

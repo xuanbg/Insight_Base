@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using Insight.Base.Common;
 using Insight.Utils.Common;
 
 namespace Insight.Base.OAuth
@@ -28,17 +29,32 @@ namespace Insight.Base.OAuth
             var key = account.ToUpper();
             if (_Sessions.ContainsKey(key)) return _Sessions[key];
 
-            _Mutex.WaitOne();
-            var session = new Session(key);
-            if (session.id == Guid.Empty)
+            try
             {
+                _Mutex.WaitOne();
+                if (_Sessions.ContainsKey(key))
+                {
+                    _Mutex.ReleaseMutex();
+                    return _Sessions[key];
+                }
+
+                var session = new Session(key);
+                if (session.id == Guid.Empty)
+                {
+                    _Mutex.ReleaseMutex();
+                    return null;
+                }
+
+                _Sessions.Add(key, session);
+                _Mutex.ReleaseMutex();
+                return session;
+            }
+            catch (Exception ex)
+            {
+                new Logger("000000", $"Account is {account}, Exception:{ex.Message}", "OAuth", "GetSession").Write();
                 _Mutex.ReleaseMutex();
                 return null;
             }
-
-            _Sessions.Add(key, session);
-            _Mutex.ReleaseMutex();
-            return session;
         }
     }
 }
