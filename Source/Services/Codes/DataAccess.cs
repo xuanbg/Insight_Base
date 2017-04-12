@@ -31,7 +31,7 @@ namespace Insight.Base.Services
                 new SqlParameter("@ModuleId", SqlDbType.UniqueIdentifier) {Value = mid},
                 new SqlParameter("@Char", mark)
             };
-            var helper = new SqlHelper(Parameters.Database);
+            var helper = new SqlHelper(Params.Database);
             return helper.SqlScalar(sql, parm);
         }
 

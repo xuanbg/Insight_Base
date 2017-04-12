@@ -7,7 +7,7 @@ using Insight.Base.Common.Entity;
 using Insight.Base.OAuth;
 using Insight.Utils.Common;
 using Insight.Utils.Entity;
-using static Insight.Base.Common.Parameters;
+using static Insight.Base.Common.Params;
 
 namespace Insight.Base.Services
 {
@@ -101,7 +101,7 @@ namespace Insight.Base.Services
         {
             if (!Verify(null, 60)) return _Result;
 
-            var code = Parameters.Random.Next(100000, 999999).ToString();
+            var code = Params.Random.Next(100000, 999999).ToString();
             var record = new VerifyRecord
             {
                 Type = type,

@@ -97,7 +97,7 @@ namespace Insight.Base.Services
         /// <returns>bool 是否保存成功</returns>
         public bool SaveModuleParam(AccessToken us, List<SYS_ModuleParam> apl, List<SYS_ModuleParam> upl)
         {
-            var helper = new SqlHelper(Parameters.Database);
+            var helper = new SqlHelper(Params.Database);
             const string sql = "insert SYS_ModuleParam (ModuleId, ParamId, Name, Value, OrgId, UserId, Description) select @ModuleId, @ParamId, @Name, @Value, @OrgId, @UserId, @Description";
             var cmds = apl.Select(p => new[]
             {

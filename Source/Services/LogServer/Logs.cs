@@ -7,7 +7,7 @@ using Insight.Base.Common.Entity;
 using Insight.Base.OAuth;
 using Insight.Utils.Common;
 using Insight.Utils.Entity;
-using static Insight.Base.Common.Parameters;
+using static Insight.Base.Common.Params;
 
 namespace Insight.Base.Services
 {

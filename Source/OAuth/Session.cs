@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Utils.Common;
 using Insight.Utils.Entity;
@@ -163,8 +164,11 @@ namespace Insight.Base.OAuth
         /// </summary>
         public void SignOut()
         {
+            if (!Params.SignOut) return;
+
             ExpiryTime = DateTime.Now;
             FailureTime = DateTime.Now;
+            secret = Guid.NewGuid().ToString();
             OnlineStatus = false;
         }
 

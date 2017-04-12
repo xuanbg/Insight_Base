@@ -66,7 +66,7 @@ namespace Insight.Base.Common
             if (string.IsNullOrEmpty(Code) || !Regex.IsMatch(Code, @"^\d{6}$")) return null;
 
             var level = Convert.ToInt32(Code.Substring(0, 1));
-            var rule = Parameters.Rules.SingleOrDefault(r => r.Code == Code);
+            var rule = Params.Rules.SingleOrDefault(r => r.Code == Code);
             if (level > 1 && level < 7 && rule == null) return null;
 
             var log = new SYS_Logs

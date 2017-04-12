@@ -147,7 +147,7 @@ namespace Insight.Base.Services
         {
             if (!Verify()) return _Result;
 
-            if (!Parameters.VerifySmsCode(user.mobile, code, 1)) return _Result.SMSCodeError();
+            if (!Params.VerifySmsCode(user.mobile, code, 1)) return _Result.SMSCodeError();
 
             if (user.existed) return user.Result;
 
@@ -203,7 +203,7 @@ namespace Insight.Base.Services
             if (session == null) return _Result.NotFound();
 
             // 验证短信验证码
-            if (!Parameters.VerifySmsCode(mobile ?? account, code, 2)) return _Result.SMSCodeError();
+            if (!Params.VerifySmsCode(mobile ?? account, code, 2)) return _Result.SMSCodeError();
 
             var user = new User(account) {password = Util.Hash(account.ToUpper() + password)};
             if (!user.Result.successful || !user.Update()) return user.Result;

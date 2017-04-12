@@ -7,10 +7,11 @@ using Insight.Utils.Common;
 
 namespace Insight.Base.Common
 {
-    public static class Parameters
+    public static class Params
     {
         private static List<SYS_Logs_Rules> _Rules;
         public static bool LockAccount = bool.Parse(Util.GetAppSetting("LockAccount"));
+        public static bool SignOut = bool.Parse(Util.GetAppSetting("SignOut"));
 
         /// <summary>
         /// 进程同步基元

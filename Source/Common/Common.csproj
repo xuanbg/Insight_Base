@@ -140,7 +140,7 @@
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="Logger.cs" />
-    <Compile Include="Parameters.cs" />
+    <Compile Include="Params.cs" />
     <Compile Include="Entity\JsonResult.cs" />
     <Compile Include="Entity\VerifyRecord.cs" />
     <Compile Include="DataAccess.cs" />

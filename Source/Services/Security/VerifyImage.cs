@@ -11,10 +11,10 @@ namespace Insight.Base.Services
     public class VerifyImage
     {
         // 背景图编号
-        private readonly int Number = Parameters.Random.Next(0, 9);
+        private readonly int Number = Params.Random.Next(0, 9);
 
         // 碎片编号
-        private readonly int Index = Parameters.Random.Next(0, 8);
+        private readonly int Index = Params.Random.Next(0, 8);
 
         // 背景图
         private readonly Image Background;
