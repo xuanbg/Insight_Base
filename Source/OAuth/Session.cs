@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
@@ -26,6 +27,9 @@ namespace Insight.Base.OAuth
 
         // 最后一次验证通过的TokenId
         private Guid _LastConnectId;
+
+        // 有效Code集合
+        public Dictionary<string, Guid> Codes { get; } = new Dictionary<string, Guid>();
 
         /// <summary>
         /// Secret过期时间
@@ -80,6 +84,19 @@ namespace Insight.Base.OAuth
         }
 
         /// <summary>
+        /// 产生Code
+        /// </summary>
+        /// <returns>string Code</returns>
+        public string GenerateCode()
+        {
+            var code = id.ToString("N");
+            var sign = Util.Hash(_Signature + code);
+            Codes.Add(sign, id);
+            id = Guid.NewGuid();
+            return code;
+        }
+
+        /// <summary>
         /// 检验是否已经连续错误5次
         /// </summary>
         /// <param name="tokenId">TokenId</param>
@@ -103,27 +120,11 @@ namespace Insight.Base.OAuth
         /// 验证Token合法性
         /// </summary>
         /// <param name="key">密钥</param>
-        /// <param name="type">类型：1、验证Secret；2、验证RefreshKey；3、验证Signature</param>
+        /// <param name="type">类型：1、验证Secret；2、验证RefreshKey</param>
         /// <returns>bool 是否通过验证</returns>
         public bool Verify(string key, int type)
         {
-            var str = "";
-            switch (type)
-            {
-                case 1:
-                    str = secret;
-                    break;
-                case 2:
-                    str = _RefreshKey;
-                    break;
-                case 3:
-                    str = Util.Hash(_Signature + id.ToString("N"));
-                    if (UserType != 0) id = Guid.NewGuid();
-
-                    break;
-            }
-
-            if (str == key) return true;
+            if (type == 1 && secret == key || type == 2 && _RefreshKey == key) return true;
 
             _FailureCount++;
             return false;
@@ -185,13 +186,16 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 生成Token
         /// </summary>
+        /// <param name="tid">TokenID</param>
         /// <returns>string 序列化为Json的Token数据</returns>
-        public object CreatorKey()
+        public object CreatorKey(Guid? tid = null)
         {
+            if (!tid.HasValue) tid = id;
+
             var token = new
             {
-                accessToken = Util.Base64(new {id, userId, deptId, account, userName, secret}),
-                refreshToken = Util.Base64(new {id, account, Secret = _RefreshKey}),
+                accessToken = Util.Base64(new {tid, userId, deptId, account, userName, secret}),
+                refreshToken = Util.Base64(new {tid, account, Secret = _RefreshKey}),
                 expiryTime = ExpiryTime,
                 failureTime = FailureTime
             };

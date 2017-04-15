@@ -65,7 +65,8 @@ namespace Insight.Base.OAuth
             _Token = token;
             if (!CheckBasis()) return;
 
-            Result.Success(Basis.id.ToString("N"));
+            var code = Basis.GenerateCode();
+            Result.Success(code);
         }
 
         /// <summary>
@@ -78,12 +79,15 @@ namespace Insight.Base.OAuth
             _Token = token;
             if (!CheckBasis()) return;
 
-            // 更新SessionID，验证用户签名
-            if (!Basis.Verify(signature, 3))
+            // 验证用户签名
+            if (!Basis.Codes.ContainsKey(signature))
             {
                 Result.InvalidAuth();
                 return;
             }
+
+            var code = Basis.Codes[signature];
+            Basis.Codes.Remove(signature);
 
             // 如Token失效，则重新生成随机码、过期时间和失效时间
             if (DateTime.Now > Basis.FailureTime) Basis.InitSecret();
@@ -92,7 +96,7 @@ namespace Insight.Base.OAuth
             if (DateTime.Now > Basis.ExpiryTime) Basis.Refresh();
 
             Basis.Online(token.deptId);
-            Result.Success(Basis.CreatorKey());
+            Result.Success(Basis.CreatorKey(code));
         }
 
         /// <summary>
