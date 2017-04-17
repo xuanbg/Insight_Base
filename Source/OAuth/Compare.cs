@@ -82,7 +82,7 @@ namespace Insight.Base.OAuth
             // 验证用户签名
             if (!Basis.Codes.ContainsKey(signature))
             {
-                Result.InvalidAuth();
+                Result.GetTokenFailured();
                 return;
             }
 
