@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Utils.Common;
@@ -13,6 +14,9 @@ namespace Insight.Base.OAuth
     /// </summary>
     public class Session:AccessToken
     {
+        // 进程同步基元
+        private static readonly Mutex _Mutex = new Mutex();
+
         // 用户签名
         private string _Signature;
 
@@ -89,10 +93,18 @@ namespace Insight.Base.OAuth
         /// <returns>string Code</returns>
         public string GenerateCode()
         {
-            var code = id.ToString("N");
-            var sign = Util.Hash(_Signature + code);
-            Codes.Add(sign, id);
+            _Mutex.WaitOne();
+            var tid = id;
             id = Guid.NewGuid();
+
+            var code = tid.ToString("N");
+            var sign = Util.Hash(_Signature + code);
+            lock (Codes)
+            {
+                Codes.Add(sign, tid);
+            }
+            _Mutex.ReleaseMutex();
+
             return code;
         }
 
@@ -194,8 +206,8 @@ namespace Insight.Base.OAuth
 
             var token = new
             {
-                accessToken = Util.Base64(new {tid, userId, deptId, account, userName, secret}),
-                refreshToken = Util.Base64(new {tid, account, Secret = _RefreshKey}),
+                accessToken = Util.Base64(new {id = tid, userId, deptId, account, userName, secret}),
+                refreshToken = Util.Base64(new {id = tid, account, Secret = _RefreshKey}),
                 expiryTime = ExpiryTime,
                 failureTime = FailureTime
             };

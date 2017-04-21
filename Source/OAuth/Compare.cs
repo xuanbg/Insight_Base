@@ -87,7 +87,10 @@ namespace Insight.Base.OAuth
             }
 
             var code = Basis.Codes[signature];
-            Basis.Codes.Remove(signature);
+            lock (Basis.Codes)
+            {
+                Basis.Codes.Remove(signature);
+            }
 
             // 如Token失效，则重新生成随机码、过期时间和失效时间
             if (DateTime.Now > Basis.FailureTime) Basis.InitSecret();
