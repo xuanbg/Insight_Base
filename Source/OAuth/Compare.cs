@@ -147,15 +147,14 @@ namespace Insight.Base.OAuth
                 var time = CallManage.LimitCall(GetKey(), limit);
                 if (time <= 0) return CheckBasis();
 
-                Result.TooFrequent(time);
+                Result.TooFrequent(time.ToString());
                 return false;
             }
             catch (Exception ex)
             {
-                _Context.OutgoingResponse.StatusCode = HttpStatusCode.Unauthorized;
-                var msg = $"提取验证信息失败。Token is:{auth}\r\nException:{ex}";
-                var ts = new ThreadStart(() => new Logger("500101", msg).Write());
-                new Thread(ts).Start();
+                Result.InvalidAuth();
+                var msg = $"提取验证信息失败。Token is:{auth ?? "null"}\r\nException:{ex}";
+                new Thread(() => new Logger("500101", msg).Write()).Start();
                 return false;
             }
         }
