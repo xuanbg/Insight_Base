@@ -38,8 +38,8 @@ namespace Insight.Base.Services
         /// </summary>
         public Guid id
         {
-            get { return _User.ID; }
-            set { _User.ID = value; }
+            get => _User.ID;
+            set => _User.ID = value;
         }
 
         /// <summary>
@@ -47,8 +47,8 @@ namespace Insight.Base.Services
         /// </summary>
         public string name
         {
-            get { return _User.Name; }
-            set { _User.Name = value; }
+            get => _User.Name;
+            set => _User.Name = value;
         }
 
         /// <summary>
@@ -56,8 +56,8 @@ namespace Insight.Base.Services
         /// </summary>
         public string loginName
         {
-            get { return _User.LoginName; }
-            set { _User.LoginName = value; }
+            get => _User.LoginName;
+            set => _User.LoginName = value;
         }
 
         /// <summary>
@@ -65,8 +65,8 @@ namespace Insight.Base.Services
         /// </summary>
         public string mobile
         {
-            get { return _User.Mobile; }
-            set { _User.Mobile = value; }
+            get => _User.Mobile;
+            set => _User.Mobile = value;
         }
 
         /// <summary>
@@ -74,8 +74,8 @@ namespace Insight.Base.Services
         /// </summary>
         public string password
         {
-            get { return _User.Password; }
-            set { _User.Password = value; }
+            get => _User.Password;
+            set => _User.Password = value;
         }
 
         /// <summary>
@@ -83,8 +83,8 @@ namespace Insight.Base.Services
         /// </summary>
         public string payPassword
         {
-            get { return _User.PayPassword; }
-            set { _User.PayPassword = value; }
+            get => _User.PayPassword;
+            set => _User.PayPassword = value;
         }
 
         /// <summary>
@@ -92,8 +92,8 @@ namespace Insight.Base.Services
         /// </summary>
         public string description
         {
-            get { return _User.Description; }
-            set { _User.Description = value; }
+            get => _User.Description;
+            set => _User.Description = value;
         }
 
         /// <summary>
@@ -101,8 +101,8 @@ namespace Insight.Base.Services
         /// </summary>
         public int type
         {
-            get { return _User.Type; }
-            set { _User.Type = value; }
+            get => _User.Type;
+            set => _User.Type = value;
         }
 
         /// <summary>
@@ -110,8 +110,8 @@ namespace Insight.Base.Services
         /// </summary>
         public bool validity
         {
-            get { return _User.Validity; }
-            set { _User.Validity = value; }
+            get => _User.Validity;
+            set => _User.Validity = value;
         }
 
         /// <summary>
@@ -119,8 +119,8 @@ namespace Insight.Base.Services
         /// </summary>
         public bool builtIn
         {
-            get { return _User.BuiltIn; }
-            set { _User.BuiltIn = value; }
+            get => _User.BuiltIn;
+            set => _User.BuiltIn = value;
         }
 
         /// <summary>
@@ -128,8 +128,8 @@ namespace Insight.Base.Services
         /// </summary>
         public Guid creatorUserId
         {
-            get { return _User.CreatorUserId; }
-            set { _User.CreatorUserId = value; }
+            get => _User.CreatorUserId;
+            set => _User.CreatorUserId = value;
         }
 
         /// <summary>
@@ -137,8 +137,8 @@ namespace Insight.Base.Services
         /// </summary>
         public DateTime createTime
         {
-            get { return _User.CreateTime; }
-            set { _User.CreateTime = value; }
+            get => _User.CreateTime;
+            set => _User.CreateTime = value;
         }
 
         /// <summary>

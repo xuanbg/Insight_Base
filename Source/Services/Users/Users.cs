@@ -124,8 +124,22 @@ namespace Insight.Base.Services
             using (var context = new BaseEntities())
             {
                 var filter = !string.IsNullOrEmpty(key);
-                var list = from u in context.SYS_User.Where(u => u.Type > 0 && (!filter || u.Name.Contains(key) || u.LoginName.Contains(key))).OrderBy(u => u.SN)
-                    select new {u.ID, u.Name, u.LoginName, u.Mobile, u.Description, u.Type, u.BuiltIn, u.Validity, u.CreatorUserId, u.CreateTime};
+                var list = from u in context.SYS_User
+                        .Where(u => u.Type > 0 && (!filter || u.Name.Contains(key) || u.LoginName.Contains(key)))
+                        .OrderBy(u => u.SN)
+                    select new
+                    {
+                        id = u.ID,
+                        name = u.Name,
+                        loginName = u.LoginName,
+                        mobile =u.Mobile,
+                        description = u.Description,
+                        type = u.Type,
+                        builtIn = u.BuiltIn,
+                        validity = u.Validity,
+                        creatorUserId = u.CreatorUserId,
+                        createTime = u.CreateTime
+                    };
                 var skip = ipr.Value*(ipp.Value - 1);
                 var users = new
                 {
