@@ -223,7 +223,7 @@ namespace Insight.Base.Services
             if (!user.Result.successful || !user.Update()) return user.Result;
 
             session.Sign(password);
-            session.InitSecret();
+            session.InitSecret(true);
 
             return _Result.Success(session.CreatorKey());
         }

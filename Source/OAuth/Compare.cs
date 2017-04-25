@@ -6,7 +6,6 @@ using System.Threading;
 using Insight.Base.Common;
 using Insight.Utils.Common;
 using Insight.Utils.Entity;
-using Insight.Utils.Server;
 
 namespace Insight.Base.OAuth
 {
@@ -92,12 +91,8 @@ namespace Insight.Base.OAuth
                 Basis.Codes.Remove(signature);
             }
 
-            // 如Token失效，则重新生成随机码、过期时间和失效时间
-            if (DateTime.Now > Basis.FailureTime) Basis.InitSecret();
-
-            // 如Token过期，自动刷新
-            if (DateTime.Now > Basis.ExpiryTime) Basis.Refresh();
-
+            Basis.InitSecret();
+            Basis.Refresh();
             Basis.Online(token.deptId);
             Result.Success(Basis.CreatorKey(code));
         }
@@ -125,8 +120,7 @@ namespace Insight.Base.OAuth
                 return;
             }
 
-            if (now > Basis.ExpiryTime) Basis.Refresh();
-
+            Basis.Refresh();
             Result.Success(Basis.ExpiryTime);
         }
 
@@ -144,7 +138,7 @@ namespace Insight.Base.OAuth
                 var json = Encoding.UTF8.GetString(buffer);
                 _Token = Util.Deserialize<AccessToken>(json);
 
-                var time = CallManage.LimitCall(GetKey(), limit);
+                var time = Params.CallManage.LimitCall(GetKey(), limit);
                 if (time <= 0) return CheckBasis();
 
                 Result.TooFrequent(time.ToString());

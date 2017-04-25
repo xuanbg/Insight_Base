@@ -43,6 +43,7 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
+    <Reference Include="System.IO.Compression" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DbHelper.cs" />
@@ -150,6 +151,10 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Utility\Server\Server.csproj">
+      <Project>{230c3e9f-83b2-4641-9c07-135e1962f424}</Project>
+      <Name>Server</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Utility\Utils\Utils.csproj">
       <Project>{0C3F2F08-6816-49FD-BB13-8526E43ACCC6}</Project>
       <Name>Utils</Name>

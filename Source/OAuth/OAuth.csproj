@@ -51,6 +51,11 @@
     <Compile Include="Common.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Utility\Server\Server.csproj">
+      <Project>{230C3E9F-83B2-4641-9C07-135E1962F424}</Project>
+      <Name>Server</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Utility\Utils\Utils.csproj">
       <Project>{0C3F2F08-6816-49FD-BB13-8526E43ACCC6}</Project>
       <Name>Utils</Name>

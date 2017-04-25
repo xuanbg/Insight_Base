@@ -15,7 +15,8 @@ namespace Insight.Base.OAuth
     public class Session:AccessToken
     {
         // 进程同步基元
-        private static readonly Mutex _Mutex = new Mutex();
+        private static readonly Mutex _CodeMutex = new Mutex();
+        private static readonly Mutex _SecretMutex = new Mutex();
 
         // 用户签名
         private string _Signature;
@@ -93,7 +94,7 @@ namespace Insight.Base.OAuth
         /// <returns>string Code</returns>
         public string GenerateCode()
         {
-            _Mutex.WaitOne();
+            _CodeMutex.WaitOne();
             var tid = id;
             id = Guid.NewGuid();
 
@@ -103,7 +104,7 @@ namespace Insight.Base.OAuth
             {
                 Codes.Add(sign, tid);
             }
-            _Mutex.ReleaseMutex();
+            _CodeMutex.ReleaseMutex();
 
             return code;
         }
@@ -145,13 +146,24 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 设置Secret及过期时间
         /// </summary>
-        public void InitSecret()
+        /// <param name="force">是否强制</param>
+        public void InitSecret(bool force = false)
         {
             var now = DateTime.Now;
+            if (!force && now < FailureTime) return;
+
+            _SecretMutex.WaitOne();
+            if (now < FailureTime)
+            {
+                _SecretMutex.ReleaseMutex();
+                return;
+            }
+
             secret = Util.Hash(Guid.NewGuid() + _Signature + now);
             _RefreshKey = Util.Hash(Guid.NewGuid() + secret);
             ExpiryTime = now.AddHours(2);
             FailureTime = now.AddHours(Common.Expired);
+            _SecretMutex.ReleaseMutex();
         }
 
         /// <summary>
@@ -159,7 +171,10 @@ namespace Insight.Base.OAuth
         /// </summary>
         public void Refresh()
         {
-            ExpiryTime = DateTime.Now.AddHours(2);
+            var now = DateTime.Now;
+            if (now < ExpiryTime) return;
+
+            ExpiryTime = now.AddHours(2);
         }
 
         /// <summary>

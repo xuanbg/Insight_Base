@@ -4,12 +4,14 @@ using System.Linq;
 using System.Threading;
 using Insight.Base.Common.Entity;
 using Insight.Utils.Common;
+using Insight.Utils.Server;
 
 namespace Insight.Base.Common
 {
     public static class Params
     {
         private static List<SYS_Logs_Rules> _Rules;
+        public static CallManage CallManage = new CallManage(Util.GetAppSetting("Redis"));
         public static bool LockAccount = bool.Parse(Util.GetAppSetting("LockAccount"));
         public static bool SignOut = bool.Parse(Util.GetAppSetting("SignOut"));
 
