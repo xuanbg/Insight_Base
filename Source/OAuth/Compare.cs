@@ -138,11 +138,17 @@ namespace Insight.Base.OAuth
                 var json = Encoding.UTF8.GetString(buffer);
                 _Token = Util.Deserialize<AccessToken>(json);
 
-                var time = Params.CallManage.LimitCall(GetKey(), limit);
-                if (time <= 0) return CheckBasis();
+                if (limit > 0)
+                {
+                    var time = Params.CallManage.LimitCall(GetKey(), limit);
+                    if (time > 0)
+                    {
+                        Result.TooFrequent(time.ToString());
+                        return false;
+                    }
+                }
 
-                Result.TooFrequent(time.ToString());
-                return false;
+                return CheckBasis();
             }
             catch (Exception ex)
             {
