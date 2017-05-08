@@ -156,7 +156,7 @@ namespace Insight.Base.OAuth
         {
             if (_PayPassword != null) return null;
 
-            return Util.Hash(id + password) == _PayPassword;
+            return Util.Hash(userId + password) == _PayPassword;
         }
 
         /// <summary>
@@ -233,7 +233,7 @@ namespace Insight.Base.OAuth
         /// <returns></returns>
         public bool SetPayPW(string password)
         {
-            var pw = Util.Hash(id + password);
+            var pw = Util.Hash(userId + password);
             if (pw == _PayPassword) return true;
 
             _PayPassword = pw;
