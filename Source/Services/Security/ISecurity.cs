@@ -30,7 +30,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="account">用户账号</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "codes?account={account}", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "tokens/codes?account={account}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         Result GetCode(string account);
 
@@ -69,6 +69,29 @@ namespace Insight.Base.Services
         [WebGet(UriTemplate = "tokens/verify?action={action}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         Result Verification(string action);
+
+        #endregion
+
+        #region PayPW
+
+        /// <summary>
+        /// 设置支付密码
+        /// </summary>
+        /// <param name="code">短信验证码</param>
+        /// <param name="password">支付密码</param>
+        /// <returns>Result</returns>
+        [WebInvoke(Method = "POST", UriTemplate = "paypws", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [OperationContract]
+        Result SetPayPW(string code, string password);
+
+        /// <summary>
+        /// 验证支付密码
+        /// </summary>
+        /// <param name="password">支付密码</param>
+        /// <returns>Result</returns>
+        [WebGet(UriTemplate = "paypws?pw={password}", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        Result VerifyPayPW(string password);
 
         #endregion
 

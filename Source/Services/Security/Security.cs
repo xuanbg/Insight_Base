@@ -14,6 +14,8 @@ namespace Insight.Base.Services
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall, IncludeExceptionDetailInFaults = true)]
     public class Security : ISecurity
     {
+        private Session _Session;
+
         /// <summary>
         /// 为跨域请求设置响应头信息
         /// </summary>
@@ -88,6 +90,38 @@ namespace Insight.Base.Services
         public Result Verification(string action)
         {
             return new Compare(action).Result;
+        }
+
+        /// <summary>
+        /// 设置支付密码
+        /// </summary>
+        /// <param name="code">短信验证码</param>
+        /// <param name="password">支付密码</param>
+        /// <returns>Result</returns>
+        public Result SetPayPW(string code, string password)
+        {
+            if (!Verify()) return _Result;
+
+            if (!VerifySmsCode(_Session.Mobile, code, 3)) return _Result.SMSCodeError();
+
+            var key = Util.Decrypt(RSAKey, password).Replace(_Session.secret, "");
+            return _Session.SetPayPW(key) ? _Result : _Result.DataBaseError();
+        }
+
+        /// <summary>
+        /// 验证支付密码
+        /// </summary>
+        /// <param name="password">支付密码</param>
+        /// <returns>Result</returns>
+        public Result VerifyPayPW(string password)
+        {
+            if (!Verify()) return _Result;
+
+            var key = Util.Decrypt(RSAKey, password).Replace(_Session.secret, "");
+            var result = _Session.Verify(key);
+            if (!result.HasValue) return _Result.PayKeyNotExists();
+
+            return result.Value ? _Result : _Result.InvalidPayKey();
         }
 
         /// <summary>
@@ -169,6 +203,7 @@ namespace Insight.Base.Services
         private bool Verify(string action = null, int limit = 0)
         {
             var verify = new Compare(action, limit);
+            _Session = verify.Basis;
             _Result = verify.Result;
 
             return _Result.successful;

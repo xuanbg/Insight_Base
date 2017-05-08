@@ -20,8 +20,8 @@ namespace Insight.Base.Services
         /// </summary>
         public Guid ID
         {
-            get { return _Org.ID; }
-            set { _Org.ID = value; }
+            get => _Org.ID;
+            set => _Org.ID = value;
         }
 
         /// <summary>
@@ -29,8 +29,8 @@ namespace Insight.Base.Services
         /// </summary>
         public Guid? ParentId
         {
-            get { return _Org.ParentId; }
-            set { _Org.ParentId = value; }
+            get => _Org.ParentId;
+            set => _Org.ParentId = value;
         }
 
         /// <summary>
@@ -38,8 +38,8 @@ namespace Insight.Base.Services
         /// </summary>
         public int NodeType
         {
-            get { return _Org.NodeType; }
-            set { _Org.NodeType = value; }
+            get => _Org.NodeType;
+            set => _Org.NodeType = value;
         }
 
         /// <summary>
@@ -47,8 +47,8 @@ namespace Insight.Base.Services
         /// </summary>
         public int Index
         {
-            get { return _Org.Index; }
-            set { _Org.Index = value; }
+            get => _Org.Index;
+            set => _Org.Index = value;
         }
 
         /// <summary>
@@ -56,8 +56,8 @@ namespace Insight.Base.Services
         /// </summary>
         public string Code
         {
-            get { return _Org.Code; }
-            set { _Org.Code = value; }
+            get => _Org.Code;
+            set => _Org.Code = value;
         }
 
         /// <summary>
@@ -65,8 +65,8 @@ namespace Insight.Base.Services
         /// </summary>
         public string Name
         {
-            get { return _Org.Name; }
-            set { _Org.Name = value; }
+            get => _Org.Name;
+            set => _Org.Name = value;
         }
 
         /// <summary>
@@ -74,8 +74,8 @@ namespace Insight.Base.Services
         /// </summary>
         public string Alias
         {
-            get { return _Org.Alias; }
-            set { _Org.Alias = value; }
+            get => _Org.Alias;
+            set => _Org.Alias = value;
         }
 
         /// <summary>
@@ -83,8 +83,8 @@ namespace Insight.Base.Services
         /// </summary>
         public string FullName
         {
-            get { return _Org.FullName; }
-            set { _Org.FullName = value; }
+            get => _Org.FullName;
+            set => _Org.FullName = value;
         }
 
         /// <summary>
@@ -92,8 +92,8 @@ namespace Insight.Base.Services
         /// </summary>
         public Guid? PositionId
         {
-            get { return _Org.PositionId; }
-            set { _Org.PositionId = value; }
+            get => _Org.PositionId;
+            set => _Org.PositionId = value;
         }
 
         /// <summary>
@@ -101,8 +101,8 @@ namespace Insight.Base.Services
         /// </summary>
         public bool Validity
         {
-            get { return _Org.Validity; }
-            set { _Org.Validity = value; }
+            get => _Org.Validity;
+            set => _Org.Validity = value;
         }
 
         /// <summary>
@@ -110,8 +110,8 @@ namespace Insight.Base.Services
         /// </summary>
         public Guid CreatorUserId
         {
-            get { return _Org.CreatorUserId; }
-            set { _Org.CreatorUserId = value; }
+            get => _Org.CreatorUserId;
+            set => _Org.CreatorUserId = value;
         }
 
         /// <summary>
@@ -119,8 +119,8 @@ namespace Insight.Base.Services
         /// </summary>
         public DateTime CreateTime
         {
-            get { return _Org.CreateTime; }
-            set { _Org.CreateTime = value; }
+            get => _Org.CreateTime;
+            set => _Org.CreateTime = value;
         }
 
         /// <summary>
@@ -128,8 +128,8 @@ namespace Insight.Base.Services
         /// </summary>
         public List<MemberUser> Members
         {
-            get { return GetMember(); }
-            set { SetMember(value ?? new List<MemberUser>()); }
+            get => GetMember();
+            set => SetMember(value ?? new List<MemberUser>());
         }
 
         /// <summary>
@@ -181,6 +181,7 @@ namespace Insight.Base.Services
                 }
             }
         }
+
         /// <summary>
         /// 新增组织机构节点
         /// </summary>

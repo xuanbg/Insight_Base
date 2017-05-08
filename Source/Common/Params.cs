@@ -14,6 +14,7 @@ namespace Insight.Base.Common
         public static CallManage CallManage = new CallManage(Util.GetAppSetting("Redis"));
         public static bool LockAccount = bool.Parse(Util.GetAppSetting("LockAccount"));
         public static bool SignOut = bool.Parse(Util.GetAppSetting("SignOut"));
+        public static string RSAKey = Util.Base64Encode(Util.GetAppSetting("RSAKey"));
 
         /// <summary>
         /// 进程同步基元

@@ -21,6 +21,9 @@ namespace Insight.Base.OAuth
         // 用户签名
         private string _Signature;
 
+        // 支付密码
+        private string _PayPassword;
+
         // 刷新密码
         private string _RefreshKey;
 
@@ -85,6 +88,7 @@ namespace Insight.Base.OAuth
                 userName = user.Name;
                 Validity = user.Validity;
                 _Signature = user.Password;
+                _PayPassword = user.PayPassword;
             }
         }
 
@@ -141,6 +145,18 @@ namespace Insight.Base.OAuth
 
             _FailureCount++;
             return false;
+        }
+
+        /// <summary>
+        /// 验证支付密码
+        /// </summary>
+        /// <param name="password">支付密码</param>
+        /// <returns>bool 是否通过验证</returns>
+        public bool? Verify(string password)
+        {
+            if (_PayPassword != null) return null;
+
+            return Util.Hash(id + password) == _PayPassword;
         }
 
         /// <summary>
@@ -208,6 +224,27 @@ namespace Insight.Base.OAuth
         public void Sign(string password)
         {
             _Signature = Util.Hash(account.ToUpper() + password);
+        }
+
+        /// <summary>
+        /// 设置支付密码
+        /// </summary>
+        /// <param name="password">支付密码</param>
+        /// <returns></returns>
+        public bool SetPayPW(string password)
+        {
+            var pw = Util.Hash(id + password);
+            if (pw == _PayPassword) return true;
+
+            _PayPassword = pw;
+            using (var context = new BaseEntities())
+            {
+                var user = context.SYS_User.SingleOrDefault(s => s.ID == userId);
+                if (user == null) return false;
+
+                user.PayPassword = _PayPassword;
+                return context.SaveChanges() > 0;
+            }
         }
 
         /// <summary>
