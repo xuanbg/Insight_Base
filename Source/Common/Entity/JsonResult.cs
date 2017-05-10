@@ -92,7 +92,7 @@ namespace Insight.Base.Common.Entity
         }
 
         /// <summary>
-        /// 错误的支付密码（417）
+        /// 支付密码未设置（417）
         /// </summary>
         public static Result PayKeyNotExists(this Result result)
         {

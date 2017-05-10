@@ -154,7 +154,7 @@ namespace Insight.Base.OAuth
         /// <returns>bool 是否通过验证</returns>
         public bool? Verify(string password)
         {
-            if (_PayPassword != null) return null;
+            if (_PayPassword == null) return null;
 
             return Util.Hash(userId + password) == _PayPassword;
         }

@@ -104,7 +104,9 @@ namespace Insight.Base.Services
 
             if (!VerifySmsCode(_Session.Mobile, code, 3)) return _Result.SMSCodeError();
 
-            var key = Util.Decrypt(RSAKey, password).Replace(_Session.secret, "");
+            var key = Util.Decrypt(RSAKey, password)?.Replace(_Session.secret, "");
+            if (string.IsNullOrEmpty(key)) return _Result.BadRequest();
+
             return _Session.SetPayPW(key) ? _Result : _Result.DataBaseError();
         }
 
@@ -117,7 +119,7 @@ namespace Insight.Base.Services
         {
             if (!Verify()) return _Result;
 
-            var key = Util.Decrypt(RSAKey, password).Replace(_Session.secret, "");
+            var key = Util.Decrypt(RSAKey, password)?.Replace(_Session.secret, "");
             var result = _Session.Verify(key);
             if (!result.HasValue) return _Result.PayKeyNotExists();
 
