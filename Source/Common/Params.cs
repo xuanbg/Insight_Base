@@ -5,21 +5,32 @@ using System.Threading;
 using Insight.Base.Common.Entity;
 using Insight.Utils.Common;
 using Insight.Utils.Server;
+using StackExchange.Redis;
 
 namespace Insight.Base.Common
 {
     public static class Params
     {
         private static List<SYS_Logs_Rules> _Rules;
-        public static CallManage CallManage = new CallManage(Util.GetAppSetting("Redis"));
-        public static bool LockAccount = bool.Parse(Util.GetAppSetting("LockAccount"));
-        public static bool SignOut = bool.Parse(Util.GetAppSetting("SignOut"));
-        public static string RSAKey = Util.Base64Decode(Util.GetAppSetting("RSAKey"));
+        private static readonly string _RedisConn = Util.GetAppSetting("Redis");
 
-        /// <summary>
-        /// 进程同步基元
-        /// </summary>
+        // 日志进程同步基元
         public static readonly Mutex Mutex = new Mutex();
+
+        // Redis链接对象
+        public static readonly ConnectionMultiplexer Redis = ConnectionMultiplexer.Connect(_RedisConn);
+
+        // 访问管理器
+        public static CallManage CallManage = new CallManage(Redis);
+
+        // 是否锁定多次登录错误的账号
+        public static bool LockAccount = bool.Parse(Util.GetAppSetting("LockAccount"));
+
+        // 是否在注销后使Token失效
+        public static bool SignOut = bool.Parse(Util.GetAppSetting("SignOut"));
+
+        // RSA私钥
+        public static string RSAKey = Util.Base64Decode(Util.GetAppSetting("RSAKey"));
 
         /// <summary>
         /// 规则缓存
@@ -39,11 +50,6 @@ namespace Insight.Base.Common
         }
 
         /// <summary>
-        /// 短信验证码的缓存列表
-        /// </summary>
-        public static readonly List<VerifyRecord> SmsCodes = new List<VerifyRecord>();
-
-        /// <summary>
         /// 用于生成短信验证码的随机数发生器
         /// </summary>
         public static readonly Random Random = new Random(Environment.TickCount);
@@ -61,20 +67,18 @@ namespace Insight.Base.Common
         /// <summary>
         /// 验证验证码是否正确
         /// </summary>
-        /// <param name="mobile">手机号</param>
+        /// <param name="key">验证码类型 + 手机号</param>
         /// <param name="code">验证码</param>
-        /// <param name="type">验证码类型</param>
         /// <param name="remove">是否验证成功后删除记录</param>
         /// <returns>bool 验证码是否正确</returns>
-        public static bool VerifySmsCode(string mobile, string code, int type, bool remove = true)
+        public static bool VerifySmsCode(string key, string code, bool remove = true)
         {
-            SmsCodes.RemoveAll(c => c.FailureTime < DateTime.Now);
-            var record = SmsCodes.FirstOrDefault(c => c.Mobile == mobile && c.Code == code && c.Type == type);
-            if (record == null) return false;
+            var db = Redis.GetDatabase();
+            var result = db.SetContains(key, code);
 
-            if (remove) SmsCodes.RemoveAll(c => c.Mobile == mobile && c.Type == type);
+            if (result && remove) db.KeyDelete(key);
 
-            return true;
+            return result;
         }
     }
 }

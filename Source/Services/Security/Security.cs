@@ -102,7 +102,7 @@ namespace Insight.Base.Services
         {
             if (!Verify()) return _Result;
 
-            if (!VerifySmsCode(_Session.Mobile, code, 3)) return _Result.SMSCodeError();
+            if (!VerifySmsCode(3 + _Session.Mobile, code)) return _Result.SMSCodeError();
 
             var key = Util.Decrypt(RSAKey, password)?.Replace(_Session.secret, "");
             if (string.IsNullOrEmpty(key)) return _Result.BadRequest();
@@ -138,17 +138,13 @@ namespace Insight.Base.Services
             if (!Verify(null, 60)) return _Result;
 
             var code = Params.Random.Next(100000, 999999).ToString();
-            var record = new VerifyRecord
-            {
-                Type = type,
-                Mobile = mobile,
-                Code = code,
-                FailureTime = DateTime.Now.AddMinutes(time),
-                CreateTime = DateTime.Now
-            };
-            SmsCodes.Add(record);
+            var key = type + mobile;
+            var expire = DateTime.Now.AddMinutes(time);
+            var db = Redis.GetDatabase();
+            db.SetAdd(key, code);
+            db.KeyExpire(key, expire);
 
-            var msg = $"已经为手机号【{mobile}】的用户生成了类型为【{type}】的短信验证码：【{code}】。此验证码将于{record.FailureTime}失效。";
+            var msg = $"已经为手机号【{mobile}】的用户生成了类型为【{type}】的短信验证码：【{code}】。此验证码将于{expire}失效。";
             Task.Run(() => new Logger("700501", msg).Write());
 
             return _Result.Created(code);
@@ -166,7 +162,7 @@ namespace Insight.Base.Services
         {
             if (!Verify()) return _Result;
 
-            return VerifySmsCode(mobile, code, type, remove) ? _Result : _Result.SMSCodeError();
+            return VerifySmsCode(type + mobile, code, remove) ? _Result : _Result.SMSCodeError();
         }
 
         /// <summary>
