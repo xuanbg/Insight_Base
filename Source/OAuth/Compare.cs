@@ -56,34 +56,12 @@ namespace Insight.Base.OAuth
         }
 
         /// <summary>
-        /// 构造方法，用于获取Code
+        /// 构造方法，用于获取Code或Token
         /// </summary>
-        /// <param name="account">登录账号</param>
-        public Compare(string account)
+        /// <param name="token">AccessToken</param>
+        public Compare(AccessToken token)
         {
-            var uid = Core.GetUserId(account);
-            if (!uid.HasValue)
-            {
-                Result.GetCodeFailured();
-                return;
-            }
-
-            _Basis = Core.FindSession(uid.Value);
-            if (!CheckBasis()) return;
-
-            var code = Basis.GenerateCode();
-            Result.Success(code);
-        }
-
-        /// <summary>
-        /// 构造方法，用于获取AccessToken
-        /// </summary>
-        /// <param name="account">登录账号</param>
-        /// <param name="signature">用户签名</param>
-        /// <param name="deptId"></param>
-        public Compare(string account, string signature, Guid? deptId)
-        {
-            var uid = Core.GetUserId(account);
+            var uid = Core.GetUserId(token.account);
             if (!uid.HasValue)
             {
                 Result.GetTokenFailured();
@@ -93,23 +71,31 @@ namespace Insight.Base.OAuth
             _Basis = Core.FindSession(uid.Value);
             if (!CheckBasis()) return;
 
-            // 验证用户签名
-            if (!Basis.Codes.ContainsKey(signature))
+            var sign = token.secret;
+            if (string.IsNullOrEmpty(sign))
             {
-                Result.GetTokenFailured();
-                return;
+                var code = Basis.GenerateCode();
+                Result.Success(code);
             }
-
-            var code = Basis.Codes[signature];
-            lock (Basis.Codes)
+            else
             {
-                Basis.Codes.Remove(signature);
-            }
+                if (!Basis.Codes.ContainsKey(sign))
+                {
+                    Result.GetTokenFailured();
+                    return;
+                }
 
-            Basis.InitSecret();
-            Basis.Refresh();
-            Basis.Online(deptId);
-            Result.Success(Basis.CreatorKey(code));
+                var code = Basis.Codes[sign];
+                lock (Basis.Codes)
+                {
+                    Basis.Codes.Remove(sign);
+                }
+
+                Basis.InitSecret();
+                Basis.Refresh();
+                Basis.Online(token.deptId);
+                Result.Success(Basis.CreatorKey(code));
+            }
         }
 
         /// <summary>

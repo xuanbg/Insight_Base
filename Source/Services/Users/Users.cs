@@ -179,7 +179,7 @@ namespace Insight.Base.Services
         /// 更新指定用户Session的签名
         /// </summary>
         /// <param name="account">登录账号</param>
-        /// <param name="password">新密码</param>
+        /// <param name="password">新密码（RSA加密）</param>
         /// <returns>Result</returns>
         public Result UpdateSignature(string account, string password)
         {
@@ -205,7 +205,7 @@ namespace Insight.Base.Services
         /// 用户重置登录密码
         /// </summary>
         /// <param name="account">登录账号</param>
-        /// <param name="password">新密码</param>
+        /// <param name="password">新密码（RSA加密）</param>
         /// <param name="code">短信验证码</param>
         /// <param name="mobile">手机号，默认为空。如为空，则使用account</param>
         /// <returns>Result</returns>
