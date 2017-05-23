@@ -39,8 +39,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result GetCode(string account)
         {
-            var token = new AccessToken { account = account };
-            return new Compare(token).Result;
+            return new Compare(account).Result;
         }
 
         /// <summary>
@@ -53,10 +52,7 @@ namespace Insight.Base.Services
         public Result GetToken(string account, string signature, string deptid)
         {
             var parse = new GuidParse(deptid, true);
-            if (!parse.Result.successful) return parse.Result;
-
-            var token = new AccessToken {account = account, deptId = parse.Guid};
-            return new Compare(token, signature).Result;
+            return parse.Result.successful ? new Compare(account, signature, parse.Guid).Result : parse.Result;
         }
 
         /// <summary>

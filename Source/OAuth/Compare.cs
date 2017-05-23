@@ -23,7 +23,7 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 用于验证的基准对象
         /// </summary>
-        public Session Basis => _Basis ?? (_Basis = Common.GetSession(_Token.account));
+        public Session Basis => _Basis ?? (_Basis = Core.GetSession(_Token.userId));
 
         /// <summary>
         /// 构造方法，如Action不为空，则同时进行鉴权
@@ -58,10 +58,17 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 构造方法，用于获取Code
         /// </summary>
-        /// <param name="token">传入参数</param>
-        public Compare(AccessToken token)
+        /// <param name="account">登录账号</param>
+        public Compare(string account)
         {
-            _Token = token;
+            var uid = Core.GetUserId(account);
+            if (!uid.HasValue)
+            {
+                Result.GetCodeFailured();
+                return;
+            }
+
+            _Basis = Core.FindSession(uid.Value);
             if (!CheckBasis()) return;
 
             var code = Basis.GenerateCode();
@@ -71,11 +78,19 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 构造方法，用于获取AccessToken
         /// </summary>
-        /// <param name="token">传入参数</param>
+        /// <param name="account">登录账号</param>
         /// <param name="signature">用户签名</param>
-        public Compare(AccessToken token, string signature)
+        /// <param name="deptId"></param>
+        public Compare(string account, string signature, Guid? deptId)
         {
-            _Token = token;
+            var uid = Core.GetUserId(account);
+            if (!uid.HasValue)
+            {
+                Result.GetTokenFailured();
+                return;
+            }
+
+            _Basis = Core.FindSession(uid.Value);
             if (!CheckBasis()) return;
 
             // 验证用户签名
@@ -93,7 +108,7 @@ namespace Insight.Base.OAuth
 
             Basis.InitSecret();
             Basis.Refresh();
-            Basis.Online(token.deptId);
+            Basis.Online(deptId);
             Result.Success(Basis.CreatorKey(code));
         }
 
