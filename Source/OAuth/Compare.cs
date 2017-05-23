@@ -79,17 +79,15 @@ namespace Insight.Base.OAuth
             }
             else
             {
-                if (!Basis.Codes.ContainsKey(sign))
+                var db = Params.Redis.GetDatabase();
+                if (!db.KeyExists(sign))
                 {
                     Result.GetTokenFailured();
                     return;
                 }
 
-                var code = Basis.Codes[sign];
-                lock (Basis.Codes)
-                {
-                    Basis.Codes.Remove(sign);
-                }
+                var code = Guid.Parse(db.StringGet(sign));
+                db.KeyDelete(sign);
 
                 Basis.InitSecret();
                 Basis.Refresh();

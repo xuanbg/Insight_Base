@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Insight.Base.Common;
@@ -15,7 +14,6 @@ namespace Insight.Base.OAuth
     public class Session:AccessToken
     {
         // 进程同步基元
-        private static readonly Mutex _CodeMutex = new Mutex();
         private static readonly Mutex _SecretMutex = new Mutex();
 
         // 用户签名
@@ -35,9 +33,6 @@ namespace Insight.Base.OAuth
 
         // 最后一次验证通过的TokenId
         private Guid _LastConnectId;
-
-        // 有效Code集合
-        public Dictionary<string, Guid> Codes { get; } = new Dictionary<string, Guid>();
 
         /// <summary>
         /// Secret过期时间
@@ -94,23 +89,19 @@ namespace Insight.Base.OAuth
         }
 
         /// <summary>
-        /// 产生Code
+        /// 产生Code(有效时间：3秒)
         /// </summary>
         /// <returns>string Code</returns>
         public string GenerateCode()
         {
-            _CodeMutex.WaitOne();
             var tid = id;
             id = Guid.NewGuid();
 
             var code = tid.ToString("N");
             var sign = Util.Hash(_Signature + code);
-            lock (Codes)
-            {
-                Codes.Add(sign, tid);
-            }
-            _CodeMutex.ReleaseMutex();
 
+            var db = Params.Redis.GetDatabase();
+            db.StringSet(sign, tid.ToString(), TimeSpan.FromSeconds(3));
             return code;
         }
 
