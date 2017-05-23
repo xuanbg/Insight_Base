@@ -53,7 +53,7 @@ namespace Insight.Base.Services
         public Result GetToken(string account, string signature, string deptid)
         {
             var parse = new GuidParse(deptid, true);
-            var token = new AccessToken { account = account, secret = signature, deptId = parse.Guid};
+            var token = new AccessToken {account = account, secret = signature, deptId = parse.Guid};
             return parse.Result.successful ? new Compare(token).Result : parse.Result;
         }
 
