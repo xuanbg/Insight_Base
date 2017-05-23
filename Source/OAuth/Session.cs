@@ -70,15 +70,18 @@ namespace Insight.Base.OAuth
         public bool Validity { get; set; }
 
         /// <summary>
-        /// 构造方法，根据用户账号和索引构建对象
+        /// 构造方法，根据UserID构建对象
         /// </summary>
-        /// <param name="loginName">用户账号</param>
-        public Session(string loginName)
+        /// <param name="uid">UserID</param>
+        public Session(Guid uid)
         {
             using (var context = new BaseEntities())
             {
-                var user = context.SYS_User.SingleOrDefault(s => s.LoginName == loginName);
+                var user = context.SYS_User.SingleOrDefault(s => s.ID == uid);
                 if (user == null) return;
+
+                _Signature = Util.Decrypt(Params.RSAKey, user.Password);
+                _PayPassword = user.PayPassword;
 
                 id = Guid.NewGuid();
                 UserType = user.Type;
@@ -87,8 +90,6 @@ namespace Insight.Base.OAuth
                 userId = user.ID;
                 userName = user.Name;
                 Validity = user.Validity;
-                _Signature = user.Password;
-                _PayPassword = user.PayPassword;
             }
         }
 
@@ -178,7 +179,7 @@ namespace Insight.Base.OAuth
             secret = Util.Hash(Guid.NewGuid() + _Signature + now);
             _RefreshKey = Util.Hash(Guid.NewGuid() + secret);
             ExpiryTime = now.AddHours(2);
-            FailureTime = now.AddHours(Common.Expired);
+            FailureTime = now.AddHours(Core.Expired);
             _SecretMutex.ReleaseMutex();
         }
 
