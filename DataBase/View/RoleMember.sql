@@ -1,4 +1,4 @@
-USE Insight_Base
+ÔªøUSE Insight_Base
 GO
 
 IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'RoleMember') AND OBJECTPROPERTY(id, N'ISVIEW') = 1)
@@ -6,63 +6,69 @@ DROP VIEW RoleMember
 GO
 
 
-/***** ”Õº£∫≤È—ØÀ˘”–Ω«…´µƒ≥…‘±*****/
+/*****ËßÜÂõæÔºöÊü•ËØ¢ÊâÄÊúâËßíËâ≤ÁöÑÊàêÂëò*****/
 
 CREATE VIEW RoleMember
 AS
 
-with List as (
-select cast('10000000-0000-0000-0000-000000000000' as uniqueidentifier) as MemberId,
+select distinct '00000000-0000-0000-0000-000000000001' as ID,
        null as ParentId,
-       0 as NodeType,
+       RoleId,
+	   '00000000-0000-0000-0000-000000000000' as MemberId,
        1 as [Index],
-       RoleId,
-       '”√ªß' as ≥…‘±
-from Sys_Role_User
-union
-select cast('20000000-0000-0000-0000-000000000000' as uniqueidentifier) as MemberId,
-       null as ParentId,
-       0 as NodeType,
-       2 as [Index],
-       RoleId,
-       '”√ªß◊È' as ≥…‘±
-from Sys_Role_UserGroup
-union
-select cast('30000000-0000-0000-0000-000000000000' as uniqueidentifier) as MemberId,
-       null as ParentId,
-       0 as NodeType,
-       3 as [Index],
-       RoleId,
-       '÷∞Œª' as ≥…‘±
-from Sys_Role_Title)
-
-select newid() as ID, * from List
-union
-select RU.ID, U.ID as MemberId,
-       cast('10000000-0000-0000-0000-000000000000' as uniqueidentifier) as ParentId,
        1 as NodeType,
+       'Áî®Êà∑' as Name
+from SYS_Role_Member
+where Type = 1
+union
+select distinct M.ID,
+       cast('00000000-0000-0000-0000-000000000001' as uniqueidentifier) as ParentId,
+       M.RoleId,
+       U.ID as MemberId,
        U.SN as [Index],
-       RU.RoleId,
-       U.Name + '(' + U.LoginName + ')' as ≥…‘±
-from Sys_Role_User RU
-join Sys_User U on U.ID = RU.UserId
+       0 as NodeType,
+       U.Name
+from SYS_Role_Member M
+join Sys_User U on U.ID = M.MemberId
 union
-select RG.ID, G.ID as MemberId,
-       cast('20000000-0000-0000-0000-000000000000' as uniqueidentifier) as ParentId,
+select distinct '00000000-0000-0000-0000-000000000002' as ID,
+       null as ParentId,
+       RoleId,
+	   '00000000-0000-0000-0000-000000000000' as MemberId,
+       2 as [Index],
        2 as NodeType,
-       G.SN as [Index],
-       RG.RoleId,
-       G.Name as ≥…‘±
-from Sys_Role_UserGroup RG
-join Sys_UserGroup G on G.ID = RG.GroupId
+       'Áî®Êà∑ÁªÑ' as Name
+from SYS_Role_Member
+where Type = 2
 union
-select RP.ID, P.ID as MemberId,
-       cast('30000000-0000-0000-0000-000000000000' as uniqueidentifier) as ParentId,
+select distinct M.ID,
+       '00000000-0000-0000-0000-000000000002' as ParentId,
+       M.RoleId,
+       G.ID as MemberId,
+       G.SN as [Index],
+       0 as NodeType,
+       G.Name
+from SYS_Role_Member M
+join Sys_UserGroup G on G.ID = M.MemberId
+union
+select distinct '00000000-0000-0000-0000-000000000003' as ID,
+       null as ParentId,
+       RoleId,
+	   '00000000-0000-0000-0000-000000000000' as MemberId,
+       3 as [Index],
        3 as NodeType,
+       'ËÅå‰Ωç' as Name
+from SYS_Role_Member
+where Type = 3
+union
+select M.ID,
+       '00000000-0000-0000-0000-000000000003' as ParentId,
+       M.RoleId,
+       P.ID as MemberId,
        P.SN as [Index],
-       RP.RoleId,
-       case when P.FullName is null then P.Name else P.FullName end as ≥…‘±
-from Sys_Role_Title RP
-join Sys_Organization P on P.ID = RP.OrgId
+       0 as NodeType,
+       P.FullName as Name
+from SYS_Role_Member M
+join Sys_Organization P on P.ID = M.MemberId
 
 GO
