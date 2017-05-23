@@ -16,7 +16,7 @@ namespace Insight.Base.Services
         internal Authority Authority;
 
         /// <summary>
-        /// 用户是否已存在(按登录账号)
+        /// 用户是否已存在(按登录账号和手机号)
         /// </summary>
         public bool existed
         {
@@ -24,8 +24,7 @@ namespace Insight.Base.Services
             {
                 using (var context = new BaseEntities())
                 {
-                    var user = context.SYS_User.SingleOrDefault(u => u.LoginName == _User.LoginName);
-                    var isExisted = user != null && user.ID != _User.ID;
+                    var isExisted = context.SYS_User.Any(u => u.LoginName == _User.LoginName || u.Mobile == _User.Mobile);
                     if (isExisted) Result.AccountExists();
 
                     return isExisted;

@@ -30,7 +30,7 @@ namespace Insight.Base.Services
 
             if (user.existed) return user.Result;
 
-            user.password = Util.Hash(user.loginName.ToUpper() + Util.Hash("123456"));
+            user.password = Util.Encrypt(Params.RSAKey, Util.Hash("123456"));
             user.validity = true;
             user.creatorUserId = _UserId;
             user.createTime = DateTime.Now;
@@ -75,7 +75,7 @@ namespace Insight.Base.Services
             if (!data.Update()) return data.Result;
 
             _Result.Success(data);
-            var session = OAuth.Common.GetSession(user.loginName);
+            var session = Core.GetSession(user.id);
             if (session == null) return _Result;
 
             session.userName = user.name;
@@ -169,7 +169,7 @@ namespace Insight.Base.Services
             user.createTime = DateTime.Now;
             if (!user.Add()) return user.Result;
 
-            var session = OAuth.Common.GetSession(user.loginName);
+            var session = Core.GetSession(user.id);
             session.InitSecret();
 
             return _Result.Created(session.CreatorKey());
@@ -179,7 +179,7 @@ namespace Insight.Base.Services
         /// 更新指定用户Session的签名
         /// </summary>
         /// <param name="account">登录账号</param>
-        /// <param name="password">新密码</param>
+        /// <param name="password">新密码（RSA加密）</param>
         /// <returns>Result</returns>
         public Result UpdateSignature(string account, string password)
         {
@@ -188,12 +188,12 @@ namespace Insight.Base.Services
             _Result = verify.Result;
             if (!_Result.successful) return _Result;
 
+            var user = new User(account) {password = password};
+            if (!user.Result.successful || !user.Update()) return user.Result;
+
             var session = Util.StringCompare(verify.Basis.account, account)
                 ? verify.Basis
-                : OAuth.Common.GetSession(account);
-
-            var user = new User(account) {password = Util.Hash(account.ToUpper() + password)};
-            if (!user.Result.successful || !user.Update()) return user.Result;
+                : Core.GetSession(user.id);
 
             if (session == null) return _Result;
 
@@ -205,7 +205,7 @@ namespace Insight.Base.Services
         /// 用户重置登录密码
         /// </summary>
         /// <param name="account">登录账号</param>
-        /// <param name="password">新密码</param>
+        /// <param name="password">新密码（RSA加密）</param>
         /// <param name="code">短信验证码</param>
         /// <param name="mobile">手机号，默认为空。如为空，则使用account</param>
         /// <returns>Result</returns>
@@ -213,14 +213,14 @@ namespace Insight.Base.Services
         {
             if (!Verify()) return _Result;
 
-            var session = OAuth.Common.GetSession(account);
-            if (session == null) return _Result.NotFound();
-
             // 验证短信验证码
             if (!Params.VerifySmsCode(2 + (mobile ?? account), code)) return _Result.SMSCodeError();
 
-            var user = new User(account) {password = Util.Hash(account.ToUpper() + password)};
+            var user = new User(account) {password = password};
             if (!user.Result.successful || !user.Update()) return user.Result;
+
+            var session = Core.GetSession(user.id);
+            if (session == null) return _Result.NotFound();
 
             session.Sign(password);
             session.InitSecret(true);
@@ -242,7 +242,7 @@ namespace Insight.Base.Services
             var user = new User(account) {validity = validity};
             if (!user.Result.successful || !user.Update()) return user.Result;
 
-            var session = OAuth.Common.GetSession(account);
+            var session = Core.GetSession(user.id);
             if (session != null) session.Validity = validity;
 
             return _Result;
