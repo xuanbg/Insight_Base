@@ -14,7 +14,7 @@ namespace Insight.Base.OAuth
     public class Session:AccessToken
     {
         // 进程同步基元
-        private static readonly Mutex _SecretMutex = new Mutex();
+        private static readonly Mutex _Mutex = new Mutex();
 
         // 用户签名
         private string _Signature;
@@ -160,10 +160,10 @@ namespace Insight.Base.OAuth
             var now = DateTime.Now;
             if (!force && now < FailureTime) return;
 
-            _SecretMutex.WaitOne();
+            _Mutex.WaitOne();
             if (now < FailureTime)
             {
-                _SecretMutex.ReleaseMutex();
+                _Mutex.ReleaseMutex();
                 return;
             }
 
@@ -171,7 +171,7 @@ namespace Insight.Base.OAuth
             _RefreshKey = Util.Hash(Guid.NewGuid() + secret);
             ExpiryTime = now.AddHours(2);
             FailureTime = now.AddHours(Core.Expired);
-            _SecretMutex.ReleaseMutex();
+            _Mutex.ReleaseMutex();
         }
 
         /// <summary>
