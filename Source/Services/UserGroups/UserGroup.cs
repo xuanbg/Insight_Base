@@ -110,7 +110,7 @@ namespace Insight.Base.Services
         public UserGroup()
         {
             _Group = new SYS_UserGroup();
-            Result.Success();
+            Result.Success<object>();
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace Insight.Base.Services
                 }
                 else
                 {
-                    Result.Success();
+                    Result.Success<object>();
                 }
             }
         }
@@ -142,7 +142,7 @@ namespace Insight.Base.Services
         {
             var result = DbHelper.Insert(_Group);
             if (result)
-                Result.Created();
+                Result.Created<object>();
             else
                 Result.DataBaseError();
 

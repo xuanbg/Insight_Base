@@ -29,7 +29,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result Test()
         {
-            return new Result().Success();
+            return new Result().Success<object>();
         }
 
         /// <summary>
@@ -39,8 +39,20 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result GetCode(string account)
         {
-            var token = new AccessToken {account = account};
-            return new Compare(token).Result;
+            var result = new Result();
+            var uid = Core.GetUserId(account);
+            if (!uid.HasValue) return result.GetCodeFailured();
+
+            var session = Core.GetSession(uid.Value);
+            var id = session.GenerateCode();
+            if (id == null) return result.TooManyOnline();
+
+            var db = Redis.GetDatabase();
+            var code = Util.Hash(id);
+            var sign = session.GetSign(account, code);
+            db.StringSet(sign, id, TimeSpan.FromSeconds(3));
+
+            return result.Success(code);
         }
 
         /// <summary>
@@ -52,9 +64,26 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result GetToken(string account, string signature, string deptid)
         {
+            var result = new Result();
+            var uid = Core.GetUserId(account, false);
+            if (!uid.HasValue) return result.BadRequest();
+
+            var session = Core.GetSession(uid.Value);
+            if (!session.IsValidity()) return result.Disabled();
+
+            var db = Redis.GetDatabase();
+            var id = db.StringGet(signature);
+            if (id.IsNullOrEmpty)
+            {
+                session.AddFailureCount();
+                return result.GetTokenFailured();
+            }
+
             var parse = new GuidParse(deptid, true);
-            var token = new AccessToken {account = account, secret = signature, deptId = parse.Guid};
-            return parse.Result.successful ? new Compare(token).Result : parse.Result;
+            if (!parse.Result.successful) return parse.Result;
+
+            var token = session.CreatorKey(id, parse.Guid);
+            return result.Success(token);
         }
 
         /// <summary>
@@ -67,7 +96,7 @@ namespace Insight.Base.Services
             var result = verify.Result;
             if (!result.successful) return result;
 
-            verify.Basis.SignOut();
+            verify.Basis.Offline(verify.Token.id);
             return result;
         }
 
@@ -77,7 +106,9 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result RefreshToken()
         {
-            return new Compare(60).Result;
+            var compare = new Compare();
+            _Result = compare.Result;
+            return _Result.successful ? compare.Verify(null, 2) : _Result;
         }
 
         /// <summary>
@@ -87,7 +118,9 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result Verification(string action)
         {
-            return new Compare(action).Result;
+            var compare = new Compare();
+            _Result = compare.Result;
+            return _Result.successful ? compare.Verify(action) : _Result;
         }
 
         /// <summary>
@@ -198,10 +231,12 @@ namespace Insight.Base.Services
         /// <returns>bool 身份是否通过验证</returns>
         private bool Verify(string action = null, int limit = 0)
         {
-            var verify = new Compare(action, limit);
-            _Session = verify.Basis;
-            _Result = verify.Result;
+            var compare = new Compare(limit);
+            _Result = compare.Result;
+            if (!_Result.successful) return false;
 
+            _Session = compare.Basis;
+            _Result = compare.Verify(action);
             return _Result.successful;
         }
     }

@@ -32,7 +32,7 @@ namespace Insight.Base.Services
             group.CreatorUserId = _UserId;
             group.CreateTime = DateTime.Now;
 
-            return group.Add() ? _Result.Created(group) : group.Result;
+            return group.Add() ? _Result.Created(@group) : group.Result;
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.successful) return parse.Result;
 
-            return group.Existed || !group.Update() ? group.Result : _Result.Success(group);
+            return group.Existed || !group.Update() ? group.Result : _Result.Success(@group);
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace Insight.Base.Services
             if (!Verify("6C41724C-E118-4BCD-82AD-6B13D05C7894")) return _Result;
 
             group.SetCreatorInfo(_UserId);
-            return group.AddMember() ? _Result.Success(group) : group.Result;
+            return group.AddMember() ? _Result.Success(@group) : group.Result;
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace Insight.Base.Services
         {
             if (!Verify("686C115A-CE2E-4E84-8F25-B63C15AC173C")) return _Result;
 
-            return group.RemoveMembers() ? _Result.Success(group) : group.Result;
+            return group.RemoveMembers() ? _Result.Success(@group) : group.Result;
         }
 
         /// <summary>
@@ -179,9 +179,12 @@ namespace Insight.Base.Services
         /// <returns>bool 身份是否通过验证</returns>
         private bool Verify(string action = null)
         {
-            var verify = new Compare(action);
-            _UserId = verify.Basis.userId;
-            _Result = verify.Result;
+            var compare = new Compare();
+            _Result = compare.Result;
+            if (!_Result.successful) return false;
+
+            _UserId = compare.Basis.userId;
+            _Result = compare.Verify(action);
 
             return _Result.successful;
         }

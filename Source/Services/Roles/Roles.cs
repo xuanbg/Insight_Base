@@ -109,13 +109,9 @@ namespace Insight.Base.Services
                 var list = from r in context.SYS_Role.Where(r => r.Validity).OrderBy(r => r.SN)
                            select new {r.ID, r.Name, r.Description, r.BuiltIn, r.Validity, r.CreatorUserId, r.CreateTime};
                 var skip = ipr.Value*(ipp.Value - 1);
-                var roles = new
-                {
-                    Total = list.Count(),
-                    Items = list.Skip(skip).Take(ipr.Value).ToList()
-                };
+                var roles = list.Skip(skip).Take(ipr.Value).ToList();
 
-                return _Result.Success(roles);
+                return _Result.Success(roles, list.Count());
             }
         }
 
@@ -214,13 +210,9 @@ namespace Insight.Base.Services
             {
                 var skip = ipr.Value*(ipp.Value - 1);
                 var list = context.RoleMemberUser.Where(u => u.RoleId == parse.Value).OrderBy(m => m.SN);
-                var members = new
-                {
-                    Total = list.Count(),
-                    Items = list.Skip(skip).Take(ipr.Value).ToList()
-                };
+                var members = list.Skip(skip).Take(ipr.Value).ToList();
 
-                return _Result.Success(members);
+                return _Result.Success(members, list.Count());
             }
         }
 
@@ -320,9 +312,12 @@ namespace Insight.Base.Services
         /// <returns>bool 身份是否通过验证</returns>
         private bool Verify(string action = null)
         {
-            var verify = new Compare(action);
-            _UserId = verify.Basis.userId;
-            _Result = verify.Result;
+            var compare = new Compare();
+            _Result = compare.Result;
+            if (!_Result.successful) return false;
+
+            _UserId = compare.Basis.userId;
+            _Result = compare.Verify(action);
 
             return _Result.successful;
         }

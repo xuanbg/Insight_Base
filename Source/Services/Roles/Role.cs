@@ -151,7 +151,7 @@ namespace Insight.Base.Services
         public Role()
         {
             _Role = new SYS_Role();
-            Result.Success();
+            Result.Success<object>();
         }
 
         /// <summary>
@@ -171,7 +171,7 @@ namespace Insight.Base.Services
                 else
                 {
                     Authority = new Authority(id);
-                    Result.Success();
+                    Result.Success<object>();
                 }
             }
         }

@@ -65,7 +65,7 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.successful) return parse.Result;
 
-            if (!Verify("3BC17B61-327D-4EAA-A0D7-7F825A6C71DB", 0, parse.Value)) return _Result;
+            if (!Verify("3BC17B61-327D-4EAA-A0D7-7F825A6C71DB")) return _Result;
 
             var data = new User(parse.Value);
             if (!data.Result.successful) return data.Result;
@@ -93,7 +93,7 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.successful) return parse.Result;
 
-            if (!Verify("B5992AA3-4AD3-4795-A641-2ED37AC6425C", 0, parse.Value)) return _Result;
+            if (!Verify("B5992AA3-4AD3-4795-A641-2ED37AC6425C")) return _Result;
 
             var data = new User(parse.Value);
             if (!data.Result.successful) return data.Result;
@@ -172,7 +172,8 @@ namespace Insight.Base.Services
             var session = Core.GetSession(user.id);
             session.InitSecret();
 
-            return _Result.Created(session.CreatorKey());
+            var tid = session.GenerateCode();
+            return _Result.Created(session.CreatorKey(tid));
         }
 
         /// <summary>
@@ -183,17 +184,12 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result UpdateSignature(string account, string password)
         {
-            const string action = "26481E60-0917-49B4-BBAA-2265E71E7B3F";
-            var verify = new Compare(action, account);
-            _Result = verify.Result;
-            if (!_Result.successful) return _Result;
+            if (!Verify("26481E60-0917-49B4-BBAA-2265E71E7B3F", 0, null, account)) return _Result;
 
             var user = new User(account) {password = password};
             if (!user.Result.successful || !user.Update()) return user.Result;
 
-            var session = Util.StringCompare(verify.Basis.account, account)
-                ? verify.Basis
-                : Core.GetSession(user.id);
+            var session = _Session.UserIsSame(account) ? _Session : Core.GetSession(user.id);
 
             if (session == null) return _Result;
 
@@ -225,7 +221,8 @@ namespace Insight.Base.Services
             session.Sign(password);
             session.InitSecret(true);
 
-            return _Result.Success(session.CreatorKey());
+            var tid = session.GenerateCode();
+            return _Result.Success(session.CreatorKey(tid));
         }
 
         /// <summary>
@@ -257,7 +254,7 @@ namespace Insight.Base.Services
         {
             if (!Verify()) return _Result;
 
-            _Session.SignOut();
+            _Session.Offline(_Token.id);
             return _Result;
         }
 
@@ -283,21 +280,29 @@ namespace Insight.Base.Services
 
         private Result _Result = new Result();
         private Session _Session;
+        private AccessToken _Token;
         private Guid _UserId;
 
         /// <summary>
         /// 会话合法性验证
         /// </summary>
         /// <param name="action">操作权限代码，默认为空，即不进行鉴权</param>
-        /// <param name="limit"></param>
-        /// <param name="userid"></param>
+        /// <param name="limit">单位时间(秒)内限制调用，默认为0：不限制</param>
+        /// <param name="uid">用户ID，默认为空，如用户ID与SessionID一致，则不进行鉴权</param>
+        /// <param name="account"></param>
         /// <returns>bool 身份是否通过验证</returns>
-        private bool Verify(string action = null, int limit = 0, Guid? userid = null)
+        private bool Verify(string action = null, int limit = 0, Guid? uid = null, string account = null)
         {
-            var verify = new Compare(action, limit, userid);
-            _Session = verify.Basis;
-            _UserId = verify.Basis.userId;
-            _Result = verify.Result;
+            var compare = new Compare(limit);
+            _Result = compare.Result;
+            if (!_Result.successful) return false;
+
+            _Session = compare.Basis;
+            _Token = compare.Token;
+            _UserId = _Session.userId;
+            if (uid == _Session.userId || _Session.UserIsSame(account)) action = null;
+
+            _Result = compare.Verify(action);
 
             return _Result.successful;
         }
