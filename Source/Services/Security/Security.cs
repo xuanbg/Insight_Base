@@ -29,7 +29,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result Test()
         {
-            return new Result().Success<object>();
+            return new Result().Success();
         }
 
         /// <summary>

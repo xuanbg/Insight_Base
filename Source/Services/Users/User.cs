@@ -156,7 +156,7 @@ namespace Insight.Base.Services
         public User()
         {
             _User = new SYS_User();
-            Result.Success<object>();
+            Result.Success();
         }
 
         /// <summary>
@@ -175,7 +175,7 @@ namespace Insight.Base.Services
                 }
                 else
                 {
-                    Result.Success<object>();
+                    Result.Success();
                 }
             }
         }
@@ -194,7 +194,7 @@ namespace Insight.Base.Services
                     _User = new SYS_User();
                     Result.NotFound();
                 }
-                else Result.Success<object>();
+                else Result.Success();
             }
         }
 
@@ -206,7 +206,7 @@ namespace Insight.Base.Services
         {
             var result = DbHelper.Insert(_User);
             if (result)
-                Result.Created<object>();
+                Result.Created();
             else
                 Result.DataBaseError();
 

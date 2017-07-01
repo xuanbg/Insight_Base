@@ -20,7 +20,7 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 验证结果
         /// </summary>
-        public Result Result { get; } = new Result().Success<object>();
+        public Result Result { get; } = new Result().Success();
 
         /// <summary>
         /// 用于验证的基准对象
@@ -89,13 +89,13 @@ namespace Insight.Base.OAuth
             if (!Basis.Verify(Token.secret, type)) return Result.InvalidAuth();
 
             // 如action为空，立即返回；否则进行鉴权
-            if (string.IsNullOrEmpty(action)) return Result.Success<object>();
+            if (string.IsNullOrEmpty(action)) return Result.Success();
 
             if (!Guid.TryParse(action, out Guid aid)) return Result.InvalidGuid();
 
             // 根据传入的操作码进行鉴权
             var auth = new Authority(Basis.userId, Basis.deptId);
-            return auth.Identify(aid) ? Result.Success<object>() : Result.Forbidden();
+            return auth.Identify(aid) ? Result.Success() : Result.Forbidden();
         }
     }
 }

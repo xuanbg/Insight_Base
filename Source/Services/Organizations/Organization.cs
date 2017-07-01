@@ -158,7 +158,7 @@ namespace Insight.Base.Services
         public Organization()
         {
             _Org = new SYS_Organization();
-            Result.Success<object>();
+            Result.Success();
         }
 
         /// <summary>
@@ -177,7 +177,7 @@ namespace Insight.Base.Services
                 }
                 else
                 {
-                    Result.Success<object>();
+                    Result.Success();
                 }
             }
         }
