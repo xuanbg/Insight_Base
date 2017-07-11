@@ -141,13 +141,9 @@ namespace Insight.Base.Services
                         createTime = u.CreateTime
                     };
                 var skip = ipr.Value*(ipp.Value - 1);
-                var users = new
-                {
-                    Total = list.Count(),
-                    Items = list.Skip(skip).Take(ipr.Value).ToList()
-                };
+                var users = list.Skip(skip).Take(ipr.Value).ToList();
 
-                return _Result.Success(users);
+                return _Result.Success(users, list.Count());
             }
         }
 

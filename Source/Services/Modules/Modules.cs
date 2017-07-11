@@ -86,6 +86,7 @@ namespace Insight.Base.Services
             if (!_Result.successful) return false;
 
             _UserId = compare.Basis.userId;
+            _DeptId = compare.Token.deptId;
             _Result = compare.Verify(action);
             return _Result.successful;
         }

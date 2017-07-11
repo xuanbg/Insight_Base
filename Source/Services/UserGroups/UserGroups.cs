@@ -108,13 +108,9 @@ namespace Insight.Base.Services
                            orderby g.SN
                            select new {g.ID, g.Name, g.Description, g.BuiltIn, g.CreatorUserId, g.CreateTime};
                 var skip = ipr.Value * (ipp.Value - 1);
-                var data = new
-                {
-                    Total = list.Count(),
-                    Items = list.Skip(skip).Take(ipr.Value).ToList()
-                };
+                var data = list.Skip(skip).Take(ipr.Value).ToList();
 
-                return _Result.Success(data);
+                return _Result.Success(data, list.Count());
             }
         }
 
