@@ -21,7 +21,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "groups", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result AddGroup(UserGroup group);
+        Result<object> AddGroup(UserGroup group);
 
         /// <summary>
         /// 根据ID删除用户组
@@ -30,7 +30,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "groups/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result RemoveGroup(string id);
+        Result<object> RemoveGroup(string id);
 
         /// <summary>
         /// 根据对象实体数据更新用户组信息
@@ -40,7 +40,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "groups/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result UpdateGroup(string id, UserGroup group);
+        Result<object> UpdateGroup(string id, UserGroup group);
 
         /// <summary>
         /// 根据ID获取用户组对象实体
@@ -49,7 +49,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "groups/{id}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result GetGroup(string id);
+        Result<object> GetGroup(string id);
 
         /// <summary>
         /// 获取全部用户组
@@ -59,7 +59,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "groups?rows={rows}&page={page}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result GetGroups(string rows, string page);
+        Result<object> GetGroups(string rows, string page);
 
         /// <summary>
         /// 根据参数组集合批量插入用户组成员关系
@@ -69,7 +69,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "groups/{id}/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result AddGroupMember(string id, UserGroup group);
+        Result<object> AddGroupMember(string id, UserGroup group);
 
         /// <summary>
         /// 根据ID集合删除用户组成员关系
@@ -79,7 +79,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "groups/{id}/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result RemoveMember(string id, UserGroup group);
+        Result<object> RemoveMember(string id, UserGroup group);
 
         /// <summary>
         /// 根据ID获取组成员之外的全部用户
@@ -88,6 +88,6 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "groups/{id}/other", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result GetOtherUser(string id);
+        Result<object> GetOtherUser(string id);
     }
 }

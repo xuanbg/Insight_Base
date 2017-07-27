@@ -12,7 +12,7 @@ namespace Insight.Base.Services
     {
         private readonly SYS_UserGroup _Group;
         private List<SYS_UserGroupMember> _Members;
-        internal Result Result = new Result();
+        internal Result<object> Result = new Result<object>();
 
         /// <summary>
         /// 用户组是否已存在(按名称)
@@ -37,8 +37,8 @@ namespace Insight.Base.Services
         /// </summary>
         public Guid ID
         {
-            get { return _Group.ID; }
-            set { _Group.ID = value; }
+            get => _Group.ID;
+            set => _Group.ID = value;
         }
 
         /// <summary>
@@ -46,8 +46,8 @@ namespace Insight.Base.Services
         /// </summary>
         public string Name
         {
-            get { return _Group.Name; }
-            set { _Group.Name = value; }
+            get => _Group.Name;
+            set => _Group.Name = value;
         }
 
         /// <summary>
@@ -55,8 +55,8 @@ namespace Insight.Base.Services
         /// </summary>
         public string Description
         {
-            get { return _Group.Description; }
-            set { _Group.Description = value; }
+            get => _Group.Description;
+            set => _Group.Description = value;
         }
 
         /// <summary>
@@ -64,8 +64,8 @@ namespace Insight.Base.Services
         /// </summary>
         public bool BuiltIn
         {
-            get { return _Group.BuiltIn; }
-            set { _Group.BuiltIn = value; }
+            get => _Group.BuiltIn;
+            set => _Group.BuiltIn = value;
         }
 
         /// <summary>
@@ -73,8 +73,8 @@ namespace Insight.Base.Services
         /// </summary>
         public bool Validity
         {
-            get { return _Group.Visible; }
-            set { _Group.Visible = value; }
+            get => _Group.Visible;
+            set => _Group.Visible = value;
         }
 
         /// <summary>
@@ -82,8 +82,8 @@ namespace Insight.Base.Services
         /// </summary>
         public Guid CreatorUserId
         {
-            get { return _Group.CreatorUserId; }
-            set { _Group.CreatorUserId = value; }
+            get => _Group.CreatorUserId;
+            set => _Group.CreatorUserId = value;
         }
 
         /// <summary>
@@ -91,8 +91,8 @@ namespace Insight.Base.Services
         /// </summary>
         public DateTime CreateTime
         {
-            get { return _Group.CreateTime; }
-            set { _Group.CreateTime = value; }
+            get => _Group.CreateTime;
+            set => _Group.CreateTime = value;
         }
 
         /// <summary>
@@ -100,8 +100,8 @@ namespace Insight.Base.Services
         /// </summary>
         public List<MemberUser> Members
         {
-            get { return GetMember(); }
-            set { SetMember(value ?? new List<MemberUser>()); }
+            get => GetMember();
+            set => SetMember(value ?? new List<MemberUser>());
         }
 
         /// <summary>
