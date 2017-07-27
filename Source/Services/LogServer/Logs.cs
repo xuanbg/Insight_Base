@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using System.Text.RegularExpressions;
@@ -31,7 +32,7 @@ namespace Insight.Base.Services
         /// <param name="key">查询用的关键字段</param>
         /// <param name="userid">事件源用户ID（可为空）</param>
         /// <returns>Result</returns>
-        public Result WriteToLog(string code, string message, string source, string action, string key, string userid)
+        public Result<object> WriteToLog(string code, string message, string source, string action, string key, string userid)
         {
             if (!Verify()) return _Result;
 
@@ -50,7 +51,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="rule">日志规则数据对象</param>
         /// <returns>Result</returns>
-        public Result AddRule(SYS_Logs_Rules rule)
+        public Result<object> AddRule(SYS_Logs_Rules rule)
         {
             if (!Verify("60A97A33-0E6E-4856-BB2B-322FEEEFD96A")) return _Result;
 
@@ -79,7 +80,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">日志规则ID</param>
         /// <returns>Result</returns>
-        public Result RemoveRule(string id)
+        public Result<object> RemoveRule(string id)
         {
             if (!Verify("BBC43098-A030-46CA-A681-0C3D1ECC15AB")) return _Result;
 
@@ -103,7 +104,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="rule">日志规则数据对象</param>
         /// <returns>Result</returns>
-        public Result EditRule(SYS_Logs_Rules rule)
+        public Result<object> EditRule(SYS_Logs_Rules rule)
         {
             if (!Verify("9FF1547D-2E3F-4552-963F-5EA790D586EA")) return _Result;
 
@@ -124,7 +125,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">日志规则ID</param>
         /// <returns>Result</returns>
-        public Result GetRule(string id)
+        public Result<object> GetRule(string id)
         {
             if (!Verify("E3CFC5AA-CD7D-4A3C-8900-8132ADB7099F")) return _Result;
 
@@ -139,14 +140,14 @@ namespace Insight.Base.Services
         /// 获取全部日志规则
         /// </summary>
         /// <returns>Result</returns>
-        public Result GetRules()
+        public Result<object> GetRules()
         {
             if (!Verify("E3CFC5AA-CD7D-4A3C-8900-8132ADB7099F")) return _Result;
 
-            return Rules.Any() ? _Result.Success(Rules) : _Result.NoContent();
+            return Rules.Any() ? _Result.Success(Rules) : _Result.NoContent(new List<object>());
         }
 
-        private Result _Result = new Result();
+        private Result<object> _Result = new Result<object>();
         private Guid _UserId;
         private string _UserName;
 

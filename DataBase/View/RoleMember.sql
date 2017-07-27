@@ -67,7 +67,7 @@ select M.ID,
        P.ID as MemberId,
        P.SN as [Index],
        0 as NodeType,
-       P.FullName as Name
+       case when P.FullName is not null then P.FullName else P.Name end as Name
 from SYS_Role_Member M
 join Sys_Organization P on P.ID = M.MemberId
 

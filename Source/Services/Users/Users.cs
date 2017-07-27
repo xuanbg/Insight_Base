@@ -24,7 +24,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="user">用户对象</param>
         /// <returns>Result</returns>
-        public Result AddUser(User user)
+        public Result<object> AddUser(User user)
         {
             if (!Verify("60D5BE64-0102-4189-A999-96EDAD3DA1B5")) return _Result;
 
@@ -43,7 +43,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">用户ID</param>
         /// <returns>Result</returns>
-        public Result RemoveUser(string id)
+        public Result<object> RemoveUser(string id)
         {
             if (!Verify("BE2DE9AB-C109-418D-8626-236DEF8E8504")) return _Result;
 
@@ -60,7 +60,7 @@ namespace Insight.Base.Services
         /// <param name="id">用户ID</param>
         /// <param name="user">用户数据对象</param>
         /// <returns>Result</returns>
-        public Result UpdateUserInfo(string id, User user)
+        public Result<object> UpdateUserInfo(string id, User user)
         {
             var parse = new GuidParse(id);
             if (!parse.Result.successful) return parse.Result;
@@ -88,7 +88,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">用户ID</param>
         /// <returns>Result</returns>
-        public Result GetUser(string id)
+        public Result<object> GetUser(string id)
         {
             var parse = new GuidParse(id);
             if (!parse.Result.successful) return parse.Result;
@@ -109,7 +109,7 @@ namespace Insight.Base.Services
         /// <param name="page">当前页</param>
         /// <param name="key">关键词</param>
         /// <returns>Result</returns>
-        public Result GetUsers(string rows, string page, string key)
+        public Result<object> GetUsers(string rows, string page, string key)
         {
             if (!Verify("B5992AA3-4AD3-4795-A641-2ED37AC6425C")) return _Result;
 
@@ -143,7 +143,7 @@ namespace Insight.Base.Services
                 var skip = ipr.Value*(ipp.Value - 1);
                 var users = list.Skip(skip).Take(ipr.Value).ToList();
 
-                return _Result.Success(users, list.Count());
+                return _Result.Success(users, list.Count().ToString());
             }
         }
 
@@ -153,7 +153,7 @@ namespace Insight.Base.Services
         /// <param name="code">验证码</param>
         /// <param name="user">用户对象</param>
         /// <returns>Result</returns>
-        public Result SignUp(string code, User user)
+        public Result<object> SignUp(string code, User user)
         {
             if (!Verify()) return _Result;
 
@@ -178,7 +178,7 @@ namespace Insight.Base.Services
         /// <param name="account">登录账号</param>
         /// <param name="password">新密码（RSA加密）</param>
         /// <returns>Result</returns>
-        public Result UpdateSignature(string account, string password)
+        public Result<object> UpdateSignature(string account, string password)
         {
             if (!Verify("26481E60-0917-49B4-BBAA-2265E71E7B3F", 0, null, account)) return _Result;
 
@@ -201,7 +201,7 @@ namespace Insight.Base.Services
         /// <param name="code">短信验证码</param>
         /// <param name="mobile">手机号，默认为空。如为空，则使用account</param>
         /// <returns>Result</returns>
-        public Result ResetSignature(string account, string password, string code, string mobile = null)
+        public Result<object> ResetSignature(string account, string password, string code, string mobile = null)
         {
             if (!Verify()) return _Result;
 
@@ -227,7 +227,7 @@ namespace Insight.Base.Services
         /// <param name="account">登录账号</param>
         /// <param name="validity">可用状态</param>
         /// <returns>Result</returns>
-        public Result SetUserStatus(string account, bool validity)
+        public Result<object> SetUserStatus(string account, bool validity)
         {
             var action = validity ? "369548E9-C8DB-439B-A604-4FDC07F3CCDD" : "0FA34D43-2C52-4968-BDDA-C9191D7FCE80";
             if (!Verify(action)) return _Result;
@@ -246,7 +246,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="account">用户账号</param>
         /// <returns>Result</returns>
-        public Result UserSignOut(string account)
+        public Result<object> UserSignOut(string account)
         {
             if (!Verify()) return _Result;
 
@@ -260,7 +260,7 @@ namespace Insight.Base.Services
         /// <param name="id">用户ID</param>
         /// <param name="deptid">登录部门ID</param>
         /// <returns>Result</returns>
-        public Result GetUserRoles(string id, string deptid)
+        public Result<object> GetUserRoles(string id, string deptid)
         {
             if (!Verify()) return _Result;
 
@@ -274,7 +274,7 @@ namespace Insight.Base.Services
             return _Result.Success(auth.RoleList);
         }
 
-        private Result _Result = new Result();
+        private Result<object> _Result = new Result<object>();
         private Session _Session;
         private AccessToken _Token;
         private Guid _UserId;

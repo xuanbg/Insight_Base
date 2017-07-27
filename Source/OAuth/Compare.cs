@@ -20,7 +20,7 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 验证结果
         /// </summary>
-        public Result Result { get; } = new Result().Success();
+        public Result<object> Result { get; } = new Result<object>().Success();
 
         /// <summary>
         /// 用于验证的基准对象
@@ -78,7 +78,7 @@ namespace Insight.Base.OAuth
         /// <param name="action">操作码，默认为空</param>
         /// <param name="type">类型：1、验证Secret；2、验证RefreshKey。默认为0</param>
         /// <returns>Result</returns>
-        public Result Verify(string action = null, int type = 1)
+        public Result<object> Verify(string action = null, int type = 1)
         {
             var now = DateTime.Now;
             if (now > Basis.FailureTime.AddMinutes(10)) return Result.Failured();

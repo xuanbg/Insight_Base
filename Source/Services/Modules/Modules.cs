@@ -23,7 +23,7 @@ namespace Insight.Base.Services
         /// 获取登录用户的导航信息
         /// </summary>
         /// <returns>Result</returns>
-        public Result GetNavigation()
+        public Result<object> GetNavigation()
         {
             if (!Verify()) return _Result;
 
@@ -38,7 +38,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">模块ID</param>
         /// <returns>Result</returns>
-        public Result GetAction(string id)
+        public Result<object> GetAction(string id)
         {
             if (!Verify()) return _Result;
 
@@ -47,30 +47,30 @@ namespace Insight.Base.Services
 
             var auth = new Authority(_UserId, _DeptId, InitType.ToolBar);
             var data = auth.ModuleActions(parse.Value);
-            return data.Any() ? _Result.Success(data) : _Result.NoContent();
+            return data.Any() ? _Result.Success(data) : _Result.NoContent(new List<object>());
         }
 
-        public Result GetModuleParam(string id)
+        public Result<object> GetModuleParam(string id)
         {
             throw new NotImplementedException();
         }
 
-        public Result GetModuleUserParam(string id)
+        public Result<object> GetModuleUserParam(string id)
         {
             throw new NotImplementedException();
         }
 
-        public Result GetModuleDeptParam(string id)
+        public Result<object> GetModuleDeptParam(string id)
         {
             throw new NotImplementedException();
         }
 
-        public Result SaveModuleParam(string id, List<SYS_ModuleParam> apl, List<SYS_ModuleParam> upl)
+        public Result<object> SaveModuleParam(string id, List<SYS_ModuleParam> apl, List<SYS_ModuleParam> upl)
         {
             throw new NotImplementedException();
         }
 
-        private Result _Result = new Result();
+        private Result<object> _Result = new Result<object>();
         private Guid _UserId;
         private Guid? _DeptId;
 

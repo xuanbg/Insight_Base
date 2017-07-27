@@ -93,7 +93,8 @@ namespace Insight.Base.OAuth
             if (_Codes.Count > 9) return null;
 
             var code = new Code {Id = Guid.NewGuid(), ExpiryTime = now.AddMinutes(30)};
-            _Codes.Add(code);
+            if (UserType != 0) _Codes.Add(code);
+
             return code.ToString();
         }
 
