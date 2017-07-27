@@ -24,7 +24,7 @@ namespace Insight.Base.Services
             {
                 using (var context = new BaseEntities())
                 {
-                    var isExisted = context.SYS_User.Any(u => u.LoginName == _User.LoginName || u.Mobile == _User.Mobile);
+                    var isExisted = context.SYS_User.Any(u => u.ID != id && (u.LoginName == _User.LoginName || u.Mobile == _User.Mobile));
                     if (isExisted) Result.AccountExists();
 
                     return isExisted;
