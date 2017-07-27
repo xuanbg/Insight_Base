@@ -12,7 +12,7 @@ namespace Insight.Base.Services
     public class User
     {
         private readonly SYS_User _User;
-        internal Result Result = new Result();
+        internal Result<object> Result = new Result<object>();
         internal Authority Authority;
 
         /// <summary>

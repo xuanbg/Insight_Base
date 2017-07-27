@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using Insight.Base.Common.Entity;
@@ -23,7 +24,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="org">组织节点对象</param>
         /// <returns>Result</returns>
-        public Result AddOrg(Organization org)
+        public Result<object> AddOrg(Organization org)
         {
             if (!Verify("88AC97EF-52A3-4F7F-8121-4C311206535F")) return _Result;
 
@@ -39,7 +40,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">节点ID</param>
         /// <returns>Result</returns>
-        public Result RemoveOrg(string id)
+        public Result<object> RemoveOrg(string id)
         {
             if (!Verify("71803766-97FE-4E6E-82DB-D5C90D2B7004")) return _Result;
 
@@ -56,7 +57,7 @@ namespace Insight.Base.Services
         /// <param name="id">节点ID</param>
         /// <param name="org">组织节点对象</param>
         /// <returns>Result</returns>
-        public Result UpdateOrg(string id, Organization org)
+        public Result<object> UpdateOrg(string id, Organization org)
         {
             if (!Verify("542D5E28-8102-40C6-9C01-190D13DBF6C6")) return _Result;
 
@@ -68,7 +69,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">节点ID</param>
         /// <returns>Result</returns>
-        public Result GetOrg(string id)
+        public Result<object> GetOrg(string id)
         {
             if (!Verify("928C7527-A2F7-49A3-A548-12B3834D8822")) return _Result;
 
@@ -83,7 +84,7 @@ namespace Insight.Base.Services
         /// 获取组织机构树
         /// </summary>
         /// <returns>Result</returns>
-        public Result GetOrgs()
+        public Result<object> GetOrgs()
         {
             if (!Verify("928C7527-A2F7-49A3-A548-12B3834D8822")) return _Result;
 
@@ -92,7 +93,7 @@ namespace Insight.Base.Services
                 var list = from o in context.SYS_Organization
                            select new {o.ID, o.ParentId, o.NodeType, o.Index, o.Code, o.Name, o.FullName, o.Alias, o.Validity, o.CreatorUserId, o.CreateTime};
 
-                return list.Any() ? _Result.Success(list.ToList()) : _Result.NoContent();
+                return list.Any() ? _Result.Success(list.ToList()) : _Result.NoContent(new List<object>());
             }
         }
 
@@ -102,7 +103,7 @@ namespace Insight.Base.Services
         /// <param name="id">合并目标ID</param>
         /// <param name="org">组织节点对象（被合并节点）</param>
         /// <returns>Result</returns>
-        public Result OrgMerger(string id, Organization org)
+        public Result<object> OrgMerger(string id, Organization org)
         {
             if (!Verify("DAE7F2C5-E379-4F74-8043-EB616D4A5F8B")) return _Result;
 
@@ -119,7 +120,7 @@ namespace Insight.Base.Services
         /// <param name="id">节点ID</param>
         /// <param name="org">组织节点对象</param>
         /// <returns>Result</returns>
-        public Result AddOrgMember(string id, Organization org)
+        public Result<object> AddOrgMember(string id, Organization org)
         {
             if (!Verify("1F29DDEA-A4D7-4EF9-8136-0D4AFE88CB08")) return _Result;
 
@@ -133,7 +134,7 @@ namespace Insight.Base.Services
         /// <param name="id">节点ID</param>
         /// <param name="org">组织节点对象</param>
         /// <returns>Result</returns>
-        public Result RemoveOrgMember(string id, Organization org)
+        public Result<object> RemoveOrgMember(string id, Organization org)
         {
             if (!Verify("70AC8EEB-F920-468D-8C8F-2DBA049ADAE9")) return _Result;
 
@@ -144,7 +145,7 @@ namespace Insight.Base.Services
         /// 获取职位成员之外的所有用户
         /// </summary>
         /// <param name="id">节点ID</param>
-        public Result GetOtherOrgMember(string id)
+        public Result<object> GetOtherOrgMember(string id)
         {
             if (!Verify("928C7527-A2F7-49A3-A548-12B3834D8822")) return _Result;
 
@@ -159,7 +160,7 @@ namespace Insight.Base.Services
                            where t == null && u.Validity && u.Type > 0
                            orderby u.SN
                            select new {ID = Guid.NewGuid(), UserId = u.ID, u.Name, u.LoginName};
-                return list.Any() ? _Result.Success(list.ToList()) : _Result.NoContent();
+                return list.Any() ? _Result.Success(list.ToList()) : _Result.NoContent(new List<object>());
             }
         }
 
@@ -168,7 +169,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="account">用户登录名</param>
         /// <returns>Result</returns>
-        public Result GetLoginDepts(string account)
+        public Result<object> GetLoginDepts(string account)
         {
             if (!Verify()) return _Result;
 
@@ -181,11 +182,11 @@ namespace Insight.Base.Services
                            join t in context.SYS_Organization on m.OrgId equals t.ID
                            join d in context.SYS_Organization on t.ParentId equals d.ID
                            select new {d.ID, Name = d.FullName, Description = d.Code};
-                return list.Any() ? _Result.Success(list.ToList()) : _Result.NoContent();
+                return list.Any() ? _Result.Success(list.ToList()) : _Result.NoContent(new List<object>());
             }
         }
 
-        private Result _Result = new Result();
+        private Result<object> _Result = new Result<object>();
         private Guid _UserId;
 
         /// <summary>
@@ -195,9 +196,12 @@ namespace Insight.Base.Services
         /// <returns>bool 身份是否通过验证</returns>
         private bool Verify(string action = null)
         {
-            var verify = new Compare(action);
-            _UserId = verify.Basis.userId;
-            _Result = verify.Result;
+            var compare = new Compare();
+            _Result = compare.Result;
+            if (!_Result.successful) return false;
+
+            _UserId = compare.Basis.userId;
+            _Result = compare.Verify(action);
 
             return _Result.successful;
         }

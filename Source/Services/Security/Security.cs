@@ -27,9 +27,9 @@ namespace Insight.Base.Services
         /// 联通性测试接口
         /// </summary>
         /// <returns>Result</returns>
-        public Result Test()
+        public Result<object> Test()
         {
-            return new Result().Success();
+            return new Result<object>().Success();
         }
 
         /// <summary>
@@ -37,10 +37,21 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="account">用户账号</param>
         /// <returns>Result</returns>
-        public Result GetCode(string account)
+        public Result<object> GetCode(string account)
         {
-            var token = new AccessToken {account = account};
-            return new Compare(token).Result;
+            var uid = Core.GetUserId(account);
+            if (!uid.HasValue) return _Result.GetCodeFailured();
+
+            var session = Core.GetSession(uid.Value);
+            var id = session.GenerateCode();
+            if (id == null) return _Result.TooManyOnline();
+
+            var db = Redis.GetDatabase();
+            var code = Util.Hash(id);
+            var sign = session.GetSign(account, code);
+            db.StringSet(sign, id, TimeSpan.FromSeconds(3));
+
+            return _Result.Success(code);
         }
 
         /// <summary>
@@ -50,24 +61,40 @@ namespace Insight.Base.Services
         /// <param name="signature">用户签名</param>
         /// <param name="deptid">登录部门ID（可为空）</param>
         /// <returns>Result</returns>
-        public Result GetToken(string account, string signature, string deptid)
+        public Result<object> GetToken(string account, string signature, string deptid)
         {
+            var uid = Core.GetUserId(account, false);
+            if (!uid.HasValue) return _Result.BadRequest();
+
+            var session = Core.GetSession(uid.Value);
+            if (!session.IsValidity()) return _Result.Disabled();
+
+            var db = Redis.GetDatabase();
+            var id = db.StringGet(signature);
+            if (id.IsNullOrEmpty)
+            {
+                session.AddFailureCount();
+                return _Result.GetTokenFailured();
+            }
+
             var parse = new GuidParse(deptid, true);
-            var token = new AccessToken {account = account, secret = signature, deptId = parse.Guid};
-            return parse.Result.successful ? new Compare(token).Result : parse.Result;
+            if (!parse.Result.successful) return parse.Result;
+
+            var token = session.CreatorKey(id, parse.Guid);
+            return _Result.Success(token);
         }
 
         /// <summary>
         /// 移除指定账户的AccessToken
         /// </summary>
         /// <returns>Result</returns>
-        public Result RemoveToken()
+        public Result<object> RemoveToken()
         {
             var verify = new Compare();
             var result = verify.Result;
             if (!result.successful) return result;
 
-            verify.Basis.SignOut();
+            verify.Basis.Offline(verify.Token.id);
             return result;
         }
 
@@ -75,9 +102,11 @@ namespace Insight.Base.Services
         /// 刷新AccessToken，延长过期时间
         /// </summary>
         /// <returns>Result</returns>
-        public Result RefreshToken()
+        public Result<object> RefreshToken()
         {
-            return new Compare(60).Result;
+            var compare = new Compare();
+            _Result = compare.Result;
+            return _Result.successful ? compare.Verify(null, 2) : _Result;
         }
 
         /// <summary>
@@ -85,9 +114,11 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="action">需要鉴权的操作ID</param>
         /// <returns>Result</returns>
-        public Result Verification(string action)
+        public Result<object> Verification(string action)
         {
-            return new Compare(action).Result;
+            var compare = new Compare();
+            _Result = compare.Result;
+            return _Result.successful ? compare.Verify(action) : _Result;
         }
 
         /// <summary>
@@ -96,7 +127,7 @@ namespace Insight.Base.Services
         /// <param name="code">短信验证码</param>
         /// <param name="password">支付密码</param>
         /// <returns>Result</returns>
-        public Result SetPayPW(string code, string password)
+        public Result<object> SetPayPW(string code, string password)
         {
             if (!Verify()) return _Result;
 
@@ -113,7 +144,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="password">支付密码</param>
         /// <returns>Result</returns>
-        public Result VerifyPayPW(string password)
+        public Result<object> VerifyPayPW(string password)
         {
             if (!Verify()) return _Result;
 
@@ -131,7 +162,7 @@ namespace Insight.Base.Services
         /// <param name="type">验证类型</param>
         /// <param name="time">过期时间（分钟）</param>
         /// <returns>Result</returns>
-        public Result NewCode(string mobile, int type, int time)
+        public Result<object> NewCode(string mobile, int type, int time)
         {
             if (!Verify(null, 60)) return _Result;
 
@@ -156,7 +187,7 @@ namespace Insight.Base.Services
         /// <param name="type">验证码类型</param>
         /// <param name="remove">是否验证成功后删除记录</param>
         /// <returns>Result</returns>
-        public Result VerifyCode(string mobile, string code, int type, bool remove = true)
+        public Result<object> VerifyCode(string mobile, string code, int type, bool remove = true)
         {
             if (!Verify()) return _Result;
 
@@ -168,7 +199,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">验证图形ID</param>
         /// <returns>Result</returns>
-        public Result GetPicCode(string id)
+        public Result<object> GetPicCode(string id)
         {
             if (!Verify()) return _Result;
 
@@ -181,14 +212,14 @@ namespace Insight.Base.Services
         /// <param name="id">验证图形ID</param>
         /// <param name="code">验证码</param>
         /// <returns>Result</returns>
-        public Result VerifyPicCode(string id, string code)
+        public Result<object> VerifyPicCode(string id, string code)
         {
             if (!Verify()) return _Result;
 
             throw new NotImplementedException();
         }
 
-        private Result _Result = new Result();
+        private Result<object> _Result = new Result<object>();
 
         /// <summary>
         /// 会话合法性验证
@@ -198,10 +229,12 @@ namespace Insight.Base.Services
         /// <returns>bool 身份是否通过验证</returns>
         private bool Verify(string action = null, int limit = 0)
         {
-            var verify = new Compare(action, limit);
-            _Session = verify.Basis;
-            _Result = verify.Result;
+            var compare = new Compare(limit);
+            _Result = compare.Result;
+            if (!_Result.successful) return false;
 
+            _Session = compare.Basis;
+            _Result = compare.Verify(action);
             return _Result.successful;
         }
     }

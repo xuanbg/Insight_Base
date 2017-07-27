@@ -24,7 +24,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="user">用户对象</param>
         /// <returns>Result</returns>
-        public Result AddUser(User user)
+        public Result<object> AddUser(User user)
         {
             if (!Verify("60D5BE64-0102-4189-A999-96EDAD3DA1B5")) return _Result;
 
@@ -43,7 +43,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">用户ID</param>
         /// <returns>Result</returns>
-        public Result RemoveUser(string id)
+        public Result<object> RemoveUser(string id)
         {
             if (!Verify("BE2DE9AB-C109-418D-8626-236DEF8E8504")) return _Result;
 
@@ -60,12 +60,12 @@ namespace Insight.Base.Services
         /// <param name="id">用户ID</param>
         /// <param name="user">用户数据对象</param>
         /// <returns>Result</returns>
-        public Result UpdateUserInfo(string id, User user)
+        public Result<object> UpdateUserInfo(string id, User user)
         {
             var parse = new GuidParse(id);
             if (!parse.Result.successful) return parse.Result;
 
-            if (!Verify("3BC17B61-327D-4EAA-A0D7-7F825A6C71DB", 0, parse.Value)) return _Result;
+            if (!Verify("3BC17B61-327D-4EAA-A0D7-7F825A6C71DB")) return _Result;
 
             var data = new User(parse.Value);
             if (!data.Result.successful) return data.Result;
@@ -88,12 +88,12 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">用户ID</param>
         /// <returns>Result</returns>
-        public Result GetUser(string id)
+        public Result<object> GetUser(string id)
         {
             var parse = new GuidParse(id);
             if (!parse.Result.successful) return parse.Result;
 
-            if (!Verify("B5992AA3-4AD3-4795-A641-2ED37AC6425C", 0, parse.Value)) return _Result;
+            if (!Verify("B5992AA3-4AD3-4795-A641-2ED37AC6425C")) return _Result;
 
             var data = new User(parse.Value);
             if (!data.Result.successful) return data.Result;
@@ -109,7 +109,7 @@ namespace Insight.Base.Services
         /// <param name="page">当前页</param>
         /// <param name="key">关键词</param>
         /// <returns>Result</returns>
-        public Result GetUsers(string rows, string page, string key)
+        public Result<object> GetUsers(string rows, string page, string key)
         {
             if (!Verify("B5992AA3-4AD3-4795-A641-2ED37AC6425C")) return _Result;
 
@@ -141,13 +141,9 @@ namespace Insight.Base.Services
                         createTime = u.CreateTime
                     };
                 var skip = ipr.Value*(ipp.Value - 1);
-                var users = new
-                {
-                    Total = list.Count(),
-                    Items = list.Skip(skip).Take(ipr.Value).ToList()
-                };
+                var users = list.Skip(skip).Take(ipr.Value).ToList();
 
-                return _Result.Success(users);
+                return _Result.Success(users, list.Count().ToString());
             }
         }
 
@@ -157,7 +153,7 @@ namespace Insight.Base.Services
         /// <param name="code">验证码</param>
         /// <param name="user">用户对象</param>
         /// <returns>Result</returns>
-        public Result SignUp(string code, User user)
+        public Result<object> SignUp(string code, User user)
         {
             if (!Verify()) return _Result;
 
@@ -172,7 +168,8 @@ namespace Insight.Base.Services
             var session = Core.GetSession(user.id);
             session.InitSecret();
 
-            return _Result.Created(session.CreatorKey());
+            var tid = session.GenerateCode();
+            return _Result.Created(session.CreatorKey(tid));
         }
 
         /// <summary>
@@ -181,19 +178,14 @@ namespace Insight.Base.Services
         /// <param name="account">登录账号</param>
         /// <param name="password">新密码（RSA加密）</param>
         /// <returns>Result</returns>
-        public Result UpdateSignature(string account, string password)
+        public Result<object> UpdateSignature(string account, string password)
         {
-            const string action = "26481E60-0917-49B4-BBAA-2265E71E7B3F";
-            var verify = new Compare(action, account);
-            _Result = verify.Result;
-            if (!_Result.successful) return _Result;
+            if (!Verify("26481E60-0917-49B4-BBAA-2265E71E7B3F", 0, null, account)) return _Result;
 
             var user = new User(account) {password = password};
             if (!user.Result.successful || !user.Update()) return user.Result;
 
-            var session = Util.StringCompare(verify.Basis.account, account)
-                ? verify.Basis
-                : Core.GetSession(user.id);
+            var session = _Session.UserIsSame(account) ? _Session : Core.GetSession(user.id);
 
             if (session == null) return _Result;
 
@@ -209,7 +201,7 @@ namespace Insight.Base.Services
         /// <param name="code">短信验证码</param>
         /// <param name="mobile">手机号，默认为空。如为空，则使用account</param>
         /// <returns>Result</returns>
-        public Result ResetSignature(string account, string password, string code, string mobile = null)
+        public Result<object> ResetSignature(string account, string password, string code, string mobile = null)
         {
             if (!Verify()) return _Result;
 
@@ -225,7 +217,8 @@ namespace Insight.Base.Services
             session.Sign(password);
             session.InitSecret(true);
 
-            return _Result.Success(session.CreatorKey());
+            var tid = session.GenerateCode();
+            return _Result.Success(session.CreatorKey(tid));
         }
 
         /// <summary>
@@ -234,7 +227,7 @@ namespace Insight.Base.Services
         /// <param name="account">登录账号</param>
         /// <param name="validity">可用状态</param>
         /// <returns>Result</returns>
-        public Result SetUserStatus(string account, bool validity)
+        public Result<object> SetUserStatus(string account, bool validity)
         {
             var action = validity ? "369548E9-C8DB-439B-A604-4FDC07F3CCDD" : "0FA34D43-2C52-4968-BDDA-C9191D7FCE80";
             if (!Verify(action)) return _Result;
@@ -253,11 +246,11 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="account">用户账号</param>
         /// <returns>Result</returns>
-        public Result UserSignOut(string account)
+        public Result<object> UserSignOut(string account)
         {
             if (!Verify()) return _Result;
 
-            _Session.SignOut();
+            _Session.Offline(_Token.id);
             return _Result;
         }
 
@@ -267,7 +260,7 @@ namespace Insight.Base.Services
         /// <param name="id">用户ID</param>
         /// <param name="deptid">登录部门ID</param>
         /// <returns>Result</returns>
-        public Result GetUserRoles(string id, string deptid)
+        public Result<object> GetUserRoles(string id, string deptid)
         {
             if (!Verify()) return _Result;
 
@@ -281,23 +274,31 @@ namespace Insight.Base.Services
             return _Result.Success(auth.RoleList);
         }
 
-        private Result _Result = new Result();
+        private Result<object> _Result = new Result<object>();
         private Session _Session;
+        private AccessToken _Token;
         private Guid _UserId;
 
         /// <summary>
         /// 会话合法性验证
         /// </summary>
         /// <param name="action">操作权限代码，默认为空，即不进行鉴权</param>
-        /// <param name="limit"></param>
-        /// <param name="userid"></param>
+        /// <param name="limit">单位时间(秒)内限制调用，默认为0：不限制</param>
+        /// <param name="uid">用户ID，默认为空，如用户ID与SessionID一致，则不进行鉴权</param>
+        /// <param name="account"></param>
         /// <returns>bool 身份是否通过验证</returns>
-        private bool Verify(string action = null, int limit = 0, Guid? userid = null)
+        private bool Verify(string action = null, int limit = 0, Guid? uid = null, string account = null)
         {
-            var verify = new Compare(action, limit, userid);
-            _Session = verify.Basis;
-            _UserId = verify.Basis.userId;
-            _Result = verify.Result;
+            var compare = new Compare(limit);
+            _Result = compare.Result;
+            if (!_Result.successful) return false;
+
+            _Session = compare.Basis;
+            _Token = compare.Token;
+            _UserId = _Session.userId;
+            if (uid == _Session.userId || _Session.UserIsSame(account)) action = null;
+
+            _Result = compare.Verify(action);
 
             return _Result.successful;
         }

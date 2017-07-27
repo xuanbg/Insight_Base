@@ -24,7 +24,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="role">RoleInfo</param>
         /// <returns>Result</returns>
-        public Result AddRole(Role role)
+        public Result<object> AddRole(Role role)
         {
             if (!Verify("10B574A2-1A69-4273-87D9-06EDA77B80B6")) return _Result;
 
@@ -40,7 +40,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">角色ID</param>
         /// <returns>Result</returns>
-        public Result RemoveRole(string id)
+        public Result<object> RemoveRole(string id)
         {
             if (!Verify("FBCEE515-8576-4B10-BA68-CF46743D2199")) return _Result;
 
@@ -57,7 +57,7 @@ namespace Insight.Base.Services
         /// <param name="id">角色ID</param>
         /// <param name="role">RoleInfo</param>
         /// <returns>Result</returns>
-        public Result EditRole(string id, Role role)
+        public Result<object> EditRole(string id, Role role)
         {
             if (!Verify("4DC0141D-FE3D-4504-BE70-763028796808")) return _Result;
 
@@ -75,7 +75,7 @@ namespace Insight.Base.Services
         /// </summary>ID
         /// <param name="id">角色</param>
         /// <returns>Result</returns>
-        public Result GetRole(string id)
+        public Result<object> GetRole(string id)
         {
             if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
 
@@ -92,7 +92,7 @@ namespace Insight.Base.Services
         /// <param name="rows">每页行数</param>
         /// <param name="page">当前页</param>
         /// <returns>Result</returns>
-        public Result GetRoles(string rows, string page)
+        public Result<object> GetRoles(string rows, string page)
         {
             if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
 
@@ -109,13 +109,9 @@ namespace Insight.Base.Services
                 var list = from r in context.SYS_Role.Where(r => r.Validity).OrderBy(r => r.SN)
                            select new {r.ID, r.Name, r.Description, r.BuiltIn, r.Validity, r.CreatorUserId, r.CreateTime};
                 var skip = ipr.Value*(ipp.Value - 1);
-                var roles = new
-                {
-                    Total = list.Count(),
-                    Items = list.Skip(skip).Take(ipr.Value).ToList()
-                };
+                var roles = list.Skip(skip).Take(ipr.Value).ToList();
 
-                return _Result.Success(roles);
+                return _Result.Success(roles, list.Count().ToString());
             }
         }
 
@@ -125,7 +121,7 @@ namespace Insight.Base.Services
         /// <param name="id">角色ID</param>
         /// <param name="members">成员对象集合</param>
         /// <returns>Result</returns>
-        public Result AddRoleMember(string id, List<RoleMember> members)
+        public Result<object> AddRoleMember(string id, List<RoleMember> members)
         {
             if (!Verify("13D93852-53EC-4A15-AAB2-46C9C48C313A")) return _Result;
 
@@ -163,7 +159,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">角色成员ID</param>
         /// <returns>Result</returns>
-        public Result RemoveRoleMember(string id)
+        public Result<object> RemoveRoleMember(string id)
         {
             if (!Verify("2EF4D82B-4A75-4902-BD9E-B63153D093D2")) return _Result;
 
@@ -195,7 +191,7 @@ namespace Insight.Base.Services
         /// <param name="rows">每页行数</param>
         /// <param name="page">当前页</param>
         /// <returns>Result</returns>
-        public Result GetMemberUsers(string id, string rows, string page)
+        public Result<object> GetMemberUsers(string id, string rows, string page)
         {
             if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
 
@@ -214,13 +210,9 @@ namespace Insight.Base.Services
             {
                 var skip = ipr.Value*(ipp.Value - 1);
                 var list = context.RoleMemberUser.Where(u => u.RoleId == parse.Value).OrderBy(m => m.SN);
-                var members = new
-                {
-                    Total = list.Count(),
-                    Items = list.Skip(skip).Take(ipr.Value).ToList()
-                };
+                var members = list.Skip(skip).Take(ipr.Value).ToList();
 
-                return _Result.Success(members);
+                return _Result.Success(members, list.Count().ToString());
             }
         }
 
@@ -229,7 +221,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">角色ID</param>
         /// <returns>Result</returns>
-        public Result GetMemberOfTitle(string id)
+        public Result<object> GetMemberOfTitle(string id)
         {
             if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
 
@@ -243,7 +235,7 @@ namespace Insight.Base.Services
                            on o.ID equals r.MemberId into temp from t in temp.DefaultIfEmpty()
                            where t == null
                            select new { o.ID, o.ParentId, o.Index, o.NodeType, o.Name };
-                return list.Any() ? _Result.Success(list.OrderBy(o => o.Index).ToList()) : _Result.NoContent();
+                return list.Any() ? _Result.Success(list.OrderBy(o => o.Index).ToList()) : _Result.NoContent(new List<object>());
             }
         }
 
@@ -252,7 +244,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">角色ID</param>
         /// <returns>Result</returns>
-        public Result GetMemberOfGroup(string id)
+        public Result<object> GetMemberOfGroup(string id)
         {
             if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
             var parse = new GuidParse(id);
@@ -265,7 +257,7 @@ namespace Insight.Base.Services
                            on g.ID equals r.MemberId into temp from t in temp.DefaultIfEmpty()
                            where g.Visible && t == null
                            select new { g.ID, g.Name, g.Description };
-                return list.Any() ? _Result.Success(list.ToList()) : _Result.NoContent();
+                return list.Any() ? _Result.Success(list.ToList()) : _Result.NoContent(new List<object>());
             }
         }
 
@@ -274,7 +266,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">角色ID</param>
         /// <returns>Result</returns>
-        public Result GetMemberOfUser(string id)
+        public Result<object> GetMemberOfUser(string id)
         {
             if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
 
@@ -288,7 +280,7 @@ namespace Insight.Base.Services
                            on u.ID equals r.MemberId into temp from t in temp.DefaultIfEmpty()
                            where u.Validity && u.Type > 0 && t == null
                            select new { u.ID, u.Name, u.LoginName, u.Description };
-                return list.Any() ? _Result.Success(list.ToList()) : _Result.NoContent();
+                return list.Any() ? _Result.Success(list.ToList()) : _Result.NoContent(new List<object>());
             }
         }
 
@@ -297,7 +289,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">角色ID（可为空）</param>
         /// <returns>Result</returns>
-        public Result GetAllPermission(string id)
+        public Result<object> GetAllPermission(string id)
         {
             if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
 
@@ -310,7 +302,7 @@ namespace Insight.Base.Services
             return _Result.Success(role);
         }
 
-        private Result _Result = new Result();
+        private Result<object> _Result = new Result<object>();
         private Guid _UserId;
 
         /// <summary>
@@ -320,9 +312,12 @@ namespace Insight.Base.Services
         /// <returns>bool 身份是否通过验证</returns>
         private bool Verify(string action = null)
         {
-            var verify = new Compare(action);
-            _UserId = verify.Basis.userId;
-            _Result = verify.Result;
+            var compare = new Compare();
+            _Result = compare.Result;
+            if (!_Result.successful) return false;
+
+            _UserId = compare.Basis.userId;
+            _Result = compare.Verify(action);
 
             return _Result.successful;
         }

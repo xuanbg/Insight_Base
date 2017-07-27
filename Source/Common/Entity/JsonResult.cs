@@ -10,7 +10,7 @@ namespace Insight.Base.Common.Entity
         /// <summary>
         /// 未知的验证码类型（440）
         /// </summary>
-        public static Result UnknownSmsType(this Result result)
+        public static Result<T> UnknownSmsType<T>(this Result<T> result)
         {
             result.successful = false;
             result.code = "440";
@@ -22,7 +22,7 @@ namespace Insight.Base.Common.Entity
         /// <summary>
         /// 短信验证码错误（441）
         /// </summary>
-        public static Result SMSCodeError(this Result result)
+        public static Result<T> SMSCodeError<T>(this Result<T> result)
         {
             result.successful = false;
             result.code = "441";
@@ -34,7 +34,7 @@ namespace Insight.Base.Common.Entity
         /// <summary>
         /// 事件代码已使用（412）
         /// </summary>
-        public static Result EventCodeUsed(this Result result)
+        public static Result<T> EventCodeUsed<T>(this Result<T> result)
         {
             result.successful = false;
             result.code = "412";
@@ -46,7 +46,7 @@ namespace Insight.Base.Common.Entity
         /// <summary>
         /// 事件规则无需配置（413）
         /// </summary>
-        public static Result EventWithoutConfig(this Result result)
+        public static Result<T> EventWithoutConfig<T>(this Result<T> result)
         {
             result.successful = false;
             result.code = "413";
@@ -58,7 +58,7 @@ namespace Insight.Base.Common.Entity
         /// <summary>
         /// 事件代码未配置（414）
         /// </summary>
-        public static Result EventCodeNotConfig(this Result result)
+        public static Result<T> EventCodeNotConfig<T>(this Result<T> result)
         {
             result.successful = false;
             result.code = "414";
@@ -70,7 +70,7 @@ namespace Insight.Base.Common.Entity
         /// <summary>
         /// 事件代码错误（415）
         /// </summary>
-        public static Result InvalidEventCode(this Result result)
+        public static Result<T> InvalidEventCode<T>(this Result<T> result)
         {
             result.successful = false;
             result.code = "415";
@@ -82,7 +82,7 @@ namespace Insight.Base.Common.Entity
         /// <summary>
         /// 错误的支付密码（416）
         /// </summary>
-        public static Result InvalidPayKey(this Result result)
+        public static Result<T> InvalidPayKey<T>(this Result<T> result)
         {
             result.successful = false;
             result.code = "416";
@@ -94,7 +94,7 @@ namespace Insight.Base.Common.Entity
         /// <summary>
         /// 支付密码未设置（417）
         /// </summary>
-        public static Result PayKeyNotExists(this Result result)
+        public static Result<T> PayKeyNotExists<T>(this Result<T> result)
         {
             result.successful = false;
             result.code = "417";
@@ -106,7 +106,7 @@ namespace Insight.Base.Common.Entity
         /// <summary>
         /// 指定的编码方案不存在（450）
         /// </summary>
-        public static Result CodeSchemeNotExists(this Result result)
+        public static Result<T> CodeSchemeNotExists<T>(this Result<T> result)
         {
             result.successful = false;
             result.code = "450";

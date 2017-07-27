@@ -22,7 +22,7 @@ namespace Insight.Base.Server
         /// <param name="args"></param>
         protected override void OnStart(string[] args)
         {
-            _Services.CreateHosts(Util.GetAppSetting("Address"));
+            _Services.CreateHosts(Util.GetAppSetting("Address"), Util.GetAppSetting("AllowOrigin"));
             _Services.StartService();
         }
 

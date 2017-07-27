@@ -23,12 +23,6 @@ namespace Insight.Base.Common
         // 访问管理器
         public static CallManage CallManage = new CallManage(Redis);
 
-        // 是否锁定多次登录错误的账号
-        public static bool LockAccount = bool.Parse(Util.GetAppSetting("LockAccount"));
-
-        // 是否在注销后使Token失效
-        public static bool SignOut = bool.Parse(Util.GetAppSetting("SignOut"));
-
         // RSA私钥
         public static string RSAKey = Util.Base64Decode(Util.GetAppSetting("RSAKey"));
 
