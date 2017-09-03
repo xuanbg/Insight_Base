@@ -18,7 +18,7 @@ namespace Insight.Base.OAuth
         private static readonly Mutex _Mutex = new Mutex();
 
         // 验证记录
-        private readonly List<Code> _Codes = new List<Code>();
+        private readonly Dictionary<Guid, DateTime> _Codes = new Dictionary<Guid, DateTime>();
 
         // 上次连接时间
         private DateTime _LastConnectTime;
@@ -89,11 +89,12 @@ namespace Insight.Base.OAuth
         public string GenerateCode()
         {
             var now = DateTime.Now;
-            _Codes.RemoveAll(c => now > c.ExpiryTime);
+            var codes = _Codes.Where(c => c.Value < now).ToList();
+            codes.ForEach(c => _Codes.Remove(c.Key));
             if (_Codes.Count > 9) return null;
 
-            var code = new Code {Id = Guid.NewGuid(), ExpiryTime = now.AddMinutes(30)};
-            if (UserType != 0) _Codes.Add(code);
+            var code = Guid.NewGuid();
+            if (UserType != 0) _Codes.Add(code, now.AddMinutes(30));
 
             return code.ToString();
         }
@@ -280,31 +281,6 @@ namespace Insight.Base.OAuth
         public bool UserIsSame(string loginName)
         {
             return Util.StringCompare(account, loginName);
-        }
-
-        /// <summary>
-        /// Token记录
-        /// </summary>
-        private class Code
-        {
-            /// <summary>
-            /// TokenID
-            /// </summary>
-            public Guid Id { private get; set; }
-
-            /// <summary>
-            /// 失效时间
-            /// </summary>
-            public DateTime ExpiryTime { get; set; }
-
-            /// <summary>
-            /// 返回此实例的ID的字符串表示形式
-            /// </summary>
-            /// <returns>string 实例的ID的字符串表示形式</returns>
-            public override string ToString()
-            {
-                return Id.ToString();
-            }
         }
     }
 }
