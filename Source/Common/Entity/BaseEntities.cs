@@ -1,4 +1,7 @@
-﻿using System.Data.Entity;
+﻿using System.Collections.Generic;
+using System.Data.Entity;
+using System.Data.Entity.Core.Objects;
+using System.Data.Entity.Infrastructure;
 
 namespace Insight.Base.Common.Entity
 {
@@ -8,7 +11,7 @@ namespace Insight.Base.Common.Entity
         /// 构造函数
         /// </summary>
         public BaseEntities() : base("name=BaseEntities")
-        {            
+        {
         }
 
         /// <summary>
@@ -60,6 +63,7 @@ namespace Insight.Base.Common.Entity
         /// 
         /// </summary>
         public virtual DbSet<RoleMember> roleMembers { get; set; }
+
         /// <summary>
         /// 
         /// </summary>
@@ -74,5 +78,20 @@ namespace Insight.Base.Common.Entity
         /// 
         /// </summary>
         public virtual DbSet<UserRole> userRoles { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="deptId"></param>
+        /// <returns></returns>
+        public virtual IEnumerable<Permit> GetPermits(string userId, string deptId)
+        {
+            var userIdParam = new ObjectParameter("userId", userId);
+            var deptIdParam = new ObjectParameter("deptId", deptId);
+            var adapter = this as IObjectContextAdapter;
+
+            return adapter.ObjectContext.ExecuteFunction<Permit>("ucf_permit", userIdParam, deptIdParam);
+        }
     }
 }

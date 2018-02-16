@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.ServiceModel.Web;
 using System.Text;
 using System.Threading;
 using Insight.Base.Common;
+using Insight.Base.Common.Entity;
 using Insight.Utils.Common;
 using Insight.Utils.Entity;
 
@@ -75,10 +77,10 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 对Secret进行校验，返回验证结果
         /// </summary>
-        /// <param name="action">操作码，默认为空</param>
+        /// <param name="key">操作码，默认为空</param>
         /// <param name="type">类型：1、验证Secret；2、验证RefreshKey。默认为0</param>
         /// <returns>Result</returns>
-        public Result<object> Verify(string action = null, int type = 1)
+        public Result<object> Verify(string key = null, int type = 1)
         {
             if (Basis.IsFailure()) return Result.Failured();
 
@@ -88,11 +90,16 @@ namespace Insight.Base.OAuth
             if (!Basis.VerifyToken(Token.secret, type)) return Result.InvalidAuth();
 
             // 如action为空，立即返回；否则进行鉴权
-            if (string.IsNullOrEmpty(action)) return Result.Success();
+            if (string.IsNullOrEmpty(key)) return Result.Success();
 
             // 根据传入的操作码进行鉴权
-            var auth = new Authority(Basis.userId, Basis.deptId);
-            return auth.Identify(action) ? Result.Success() : Result.Forbidden();
+            using (var context = new BaseEntities())
+            {
+                var permits = context.GetPermits(Basis.userId, Basis.deptId);
+                var isPermit = permits.Any(i => i.alias.Contains(key) || i.routes.Contains(key));
+
+                return isPermit ? Result.Success() : Result.Forbidden();
+            }
         }
     }
 }

@@ -96,6 +96,11 @@ namespace Insight.Base.Common.Entity
         public string alias { get; set; }
 
         /// <summary>
+        /// 模块url
+        /// </summary>
+        public string url { get; set; }
+
+        /// <summary>
         /// 控制器命名空间
         /// </summary>
         [Column("class_name")]
@@ -169,6 +174,16 @@ namespace Insight.Base.Common.Entity
         /// 别名
         /// </summary>
         public string alias { get; set; }
+
+        /// <summary>
+        /// 接口路由
+        /// </summary>
+        public string routes { get; set; }
+
+        /// <summary>
+        /// 功能url
+        /// </summary>
+        public string url { get; set; }
 
         /// <summary>
         /// 图标url
