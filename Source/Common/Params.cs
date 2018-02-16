@@ -11,7 +11,7 @@ namespace Insight.Base.Common
 {
     public static class Params
     {
-        private static List<SYS_Logs_Rules> _Rules;
+        private static List<LogRule> _Rules;
         private static readonly string _RedisConn = Util.GetAppSetting("Redis");
 
         // 日志进程同步基元
@@ -29,7 +29,7 @@ namespace Insight.Base.Common
         /// <summary>
         /// 规则缓存
         /// </summary>
-        public static List<SYS_Logs_Rules> Rules
+        public static List<LogRule> Rules
         {
             get
             {
@@ -37,7 +37,7 @@ namespace Insight.Base.Common
 
                 using (var context = new BaseEntities())
                 {
-                    _Rules = context.SYS_Logs_Rules.ToList();
+                    _Rules = context.logRules.ToList();
                 }
                 return _Rules;
             }

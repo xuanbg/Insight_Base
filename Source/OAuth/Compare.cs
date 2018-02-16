@@ -48,7 +48,7 @@ namespace Insight.Base.OAuth
                 }
 
                 // 检查Session是否正常
-                if (!Basis.IsValidity())
+                if (!Basis.UserIsInvalid())
                 {
                     Result.Disabled();
                     return;
@@ -57,7 +57,7 @@ namespace Insight.Base.OAuth
                 if (limit == 0) return;
 
                 var uri = _Context.IncomingRequest.UriTemplateMatch;
-                var key = Util.Hash(Token.id.ToString() + uri.Data);
+                var key = Util.Hash(Token.id + uri.Data);
                 var time = Params.CallManage.LimitCall(key, limit);
                 if (time == 0) return;
 
@@ -80,22 +80,19 @@ namespace Insight.Base.OAuth
         /// <returns>Result</returns>
         public Result<object> Verify(string action = null, int type = 1)
         {
-            var now = DateTime.Now;
-            if (now > Basis.FailureTime.AddMinutes(10)) return Result.Failured();
+            if (Basis.IsFailure()) return Result.Failured();
 
-            if (type == 0 && now > Basis.ExpiryTime.AddMinutes(10)) return Result.Expired();
+            if (type == 0 && Basis.IsExpiry()) return Result.Expired();
 
             // 验证Secret
-            if (!Basis.Verify(Token.secret, type)) return Result.InvalidAuth();
+            if (!Basis.VerifyToken(Token.secret, type)) return Result.InvalidAuth();
 
             // 如action为空，立即返回；否则进行鉴权
             if (string.IsNullOrEmpty(action)) return Result.Success();
 
-            if (!Guid.TryParse(action, out Guid aid)) return Result.InvalidGuid();
-
             // 根据传入的操作码进行鉴权
             var auth = new Authority(Basis.userId, Basis.deptId);
-            return auth.Identify(aid) ? Result.Success() : Result.Forbidden();
+            return auth.Identify(action) ? Result.Success() : Result.Forbidden();
         }
     }
 }

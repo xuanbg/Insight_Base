@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Insight.Base.Common.Entity;
@@ -10,10 +9,10 @@ namespace Insight.Base.OAuth
     public static class Core
     {
         // Account缓存
-        private static readonly Dictionary<string, Guid> _Accounts = new Dictionary<string, Guid>();
+        private static readonly Dictionary<string, string> _Accounts = new Dictionary<string, string>();
 
         // Session缓存
-        private static readonly Dictionary<Guid, Session> _Sessions = new Dictionary<Guid, Session>();
+        private static readonly Dictionary<string, Session> _Sessions = new Dictionary<string, Session>();
 
         // 进程同步基元
         private static readonly Mutex _Mutex = new Mutex();
@@ -29,7 +28,7 @@ namespace Insight.Base.OAuth
         /// <param name="key">登录账号</param>
         /// <param name="initSession">是否初始化Session，默认为是</param>
         /// <returns>Guid? UserID(未查询到用户数据时返回Null)</returns>
-        public static Guid? GetUserId(string key, bool initSession = true)
+        public static string GetUserId(string key, bool initSession = true)
         {
             if (_Accounts.ContainsKey(key)) return _Accounts[key];
 
@@ -49,28 +48,28 @@ namespace Insight.Base.OAuth
                 return null;
             }
 
-            _Accounts.Add(key, user.ID);
-            if (_Sessions.ContainsKey(user.ID))
+            _Accounts.Add(key, user.id);
+            if (_Sessions.ContainsKey(user.id))
             {
                 _Mutex.ReleaseMutex();
-                return user.ID;
+                return user.id;
             }
 
             var session = new Session(user);
-            _Sessions.Add(user.ID, session);
+            _Sessions.Add(user.id, session);
 
             _Mutex.ReleaseMutex();
-            return user.ID;
+            return user.id;
         }
 
         /// <summary>
         /// 根据key(UserID)在缓存中查找Session
         /// </summary>
-        /// <param name="uid">UserID</param>
+        /// <param name="userId">UserID</param>
         /// <returns>Session(可能为null)</returns>
-        public static Session GetSession(Guid uid)
+        public static Session GetSession(string userId)
         {
-            return _Sessions.ContainsKey(uid) ? _Sessions[uid] : null;
+            return _Sessions.ContainsKey(userId) ? _Sessions[userId] : null;
         }
 
         /// <summary>
@@ -78,11 +77,11 @@ namespace Insight.Base.OAuth
         /// </summary>
         /// <param name="account">登录账号</param>
         /// <returns>用户实体</returns>
-        private static SYS_User GetUser(string account)
+        private static User GetUser(string account)
         {
             using (var context = new BaseEntities())
             {
-                return context.SYS_User.SingleOrDefault(u => u.LoginName == account || u.Mobile == account);
+                return context.users.SingleOrDefault(u => u.account == account || u.mobile == account || u.email == account);
             }
         }
     }

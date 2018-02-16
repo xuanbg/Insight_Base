@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
-using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Utils.Common;
 using Insight.Utils.Entity;
@@ -12,275 +10,264 @@ namespace Insight.Base.OAuth
     /// <summary>
     /// 用户会话信息
     /// </summary>
-    public class Session:AccessToken
+    public class Session
     {
         // 进程同步基元
         private static readonly Mutex _Mutex = new Mutex();
 
-        // 验证记录
-        private readonly Dictionary<Guid, DateTime> _Codes = new Dictionary<Guid, DateTime>();
+        // 当前令牌对应的关键数据集
+        private Keys _currentKeys;
 
-        // 上次连接时间
-        private DateTime _LastConnectTime;
+        // Token属性是否已改变
+        public bool isChanged;
 
-        // 连续失败次数
-        private int _FailureCount;
+        // 登录部门ID
+        public string deptId;
 
-        // 用户签名
-        private string _Signature;
+        // 用户ID
+        public string userId;
+
+        // 用户名
+        public string userName;
+
+        // 登录账号
+        private string _account;
+
+        // 用户手机号
+        private string _mobile;
+
+        // 用户E-mail
+        private string _email;
+
+        // 登录密码
+        private string _password;
 
         // 支付密码
-        private string _PayPassword;
+        private readonly string _payPassword;
 
-        // 刷新密码
-        private string _RefreshKey;
+        // 用户是否内置
+        private bool _isBuiltIn;
 
-        /// <summary>
-        /// Secret过期时间
-        /// </summary>
-        public DateTime ExpiryTime { get; private set; }
+        // 用户是否失效
+        private readonly bool _isInvalid;
 
-        /// <summary>
-        /// Secret失效时间
-        /// </summary>
-        public DateTime FailureTime { get; private set; }
+        // 上次验证失败时间
+        private DateTime _lastFailureTime;
 
-        /// <summary>
-        /// 用户在线状态
-        /// </summary>
-        public bool OnlineStatus { get; private set; }
+        // 连续失败次数
+        private int _failureCount;
 
-        /// <summary>
-        /// 用户类型
-        /// </summary>
-        public int UserType { get; set; }
-
-        /// <summary>
-        /// 绑定的手机号
-        /// </summary>
-        public string Mobile { get; set; }
-
-        /// <summary>
-        /// 用户状态，是否被禁止登录
-        /// </summary>
-        public bool Validity { get; set; }
+        // 使用中的令牌关键数据集
+        private readonly Dictionary<string, Keys> _keyMap;
 
         /// <summary>
         /// 构造方法，根据UserID构建对象
         /// </summary>
         /// <param name="user">用户实体</param>
-        public Session(SYS_User user)
+        public Session(User user)
         {
-            _Signature = Util.Decrypt(Params.RSAKey, user.Password);
-            _PayPassword = user.PayPassword;
+            userId = user.id;
+            userName = user.name;
+            _account = user.account;
+            _mobile = user.mobile;
+            _email = user.email;
+            _password = user.password;
+            _payPassword = user.payPassword;
+            _isBuiltIn = user.isBuiltin;
+            _isInvalid = user.isInvalid;
 
-            UserType = user.Type;
-            account = user.LoginName;
-            Mobile = user.Mobile;
-            userId = user.ID;
-            userName = user.Name;
-            Validity = user.Validity;
+            _lastFailureTime = DateTime.Now;
+            _failureCount = 0;
+            _keyMap = new Dictionary<string, Keys>();
+            isChanged = true;
         }
 
         /// <summary>
-        /// 生成Code
+        /// 选择当前令牌对应的关键数据集
         /// </summary>
-        /// <returns>string 一个GUID字符串</returns>
-        public string GenerateCode()
+        /// <param name="tokenId">令牌ID</param>
+        public void SelectKeys(string tokenId)
         {
-            var now = DateTime.Now;
-            var codes = _Codes.Where(c => c.Value < now).ToList();
-            codes.ForEach(c => _Codes.Remove(c.Key));
-            if (_Codes.Count > 9) return null;
-
-            var code = Guid.NewGuid();
-            if (UserType != 0) _Codes.Add(code, now.AddMinutes(30));
-
-            return code.ToString();
+            _currentKeys = _keyMap[tokenId];
         }
 
         /// <summary>
-        /// 检查Session是否正常(未封禁、未锁定)
+        /// 生成令牌关键数据
         /// </summary>
-        /// <returns>bool 账户是否正常</returns>
-        public bool IsValidity()
+        /// <param name="code">Code</param>
+        /// <param name="hours">令牌有效小时数</param>
+        /// <param name="appId">应用ID</param>
+        /// <returns>令牌数据包</returns>
+        public TokenPackage CreatorKey(string code, int hours = 24, string appId = null)
         {
-            var now = DateTime.Now;
-            var span = now - _LastConnectTime;
-            if (span.TotalMinutes > 15) _FailureCount = 0;
-
-            _LastConnectTime = now;
-            return Validity && (UserType == 0 || _FailureCount < 5);
-        }
-
-        /// <summary>
-        /// 生成Token
-        /// </summary>
-        /// <param name="tid">TokenID</param>
-        /// <param name="did">登录部门ID，可为空</param>
-        /// <returns>string 序列化为Json的Token数据</returns>
-        public TokenResult CreatorKey(string tid, Guid? did = null)
-        {
-            _FailureCount = 0;
-            deptId = did;
-            InitSecret();
-            Refresh();
-
-            var access = new {id = tid, userId, deptId, account, userName, secret};
-            var refresh = new {id = tid, account, Secret = _RefreshKey};
-            var token = new TokenResult
+            foreach (var item in _keyMap)
             {
-                accessToken = Util.Base64(access),
-                refreshToken = Util.Base64(refresh),
-                expiryTime = ExpiryTime,
-                failureTime = FailureTime
-            };
+                // 如应用ID不为空,且应用ID有对应的Key则从Map中删除该应用对应的Key.否则使用无应用ID的公共Key.
+                if (!string.IsNullOrEmpty(appId))
+                {
+                    if (appId == item.Value.appId)
+                    {
+                        _keyMap.Remove(item.Key);
+                        _currentKeys = null;
+                        break;
+                    }
+                }
+                else
+                {
+                    if (item.Value.appId == null)
+                    {
+                        item.Value.refresh();
 
-            return token;
-        }
-
-        /// <summary>
-        /// 累计失败次数
-        /// </summary>
-        public void AddFailureCount()
-        {
-            _FailureCount++;
-        }
-
-        /// <summary>
-        /// 设置Secret及过期时间
-        /// </summary>
-        /// <param name="force">是否强制</param>
-        public void InitSecret(bool force = false)
-        {
-            var now = DateTime.Now;
-            if (!force && now < FailureTime) return;
-
-            _Mutex.WaitOne();
-            if (now < FailureTime)
-            {
-                _Mutex.ReleaseMutex();
-                return;
+                        _currentKeys = item.Value;
+                        code = item.Key;
+                        break;
+                    }
+                }
             }
 
-            secret = Util.Hash(Guid.NewGuid() + _Signature + now);
-            _RefreshKey = Util.Hash(Guid.NewGuid() + secret);
-            ExpiryTime = now.AddHours(2);
-            FailureTime = now.AddHours(Core.Expired);
-            _Mutex.ReleaseMutex();
+            // 生成新的Key加入Map
+            if (_currentKeys == null)
+            {
+                _currentKeys = new Keys(hours, appId);
+                _keyMap.Add(code, _currentKeys);
+            }
+
+            if (_failureCount > 0) _failureCount = 0;
+
+            isChanged = true;
+
+            return InitPackage(code);
         }
 
         /// <summary>
         /// 刷新Secret过期时间
         /// </summary>
-        public void Refresh()
+        /// <param name="tokenId">令牌ID</param>
+        /// <returns>令牌数据包</returns>
+        public TokenPackage RefreshToken(string tokenId)
         {
-            var now = DateTime.Now;
-            if (now < ExpiryTime) return;
+            _currentKeys.refresh();
+            isChanged = true;
 
-            ExpiryTime = now.AddHours(2);
+            return InitPackage(tokenId);
         }
 
         /// <summary>
-        /// 验证Token合法性
+        /// Token是否合法
+        /// </summary>
+        /// <param name="code">Code</param>
+        /// <returns>令牌数据包</returns>
+        private TokenPackage InitPackage(string code)
+        {
+            var accessToken = new AccessToken
+            {
+                id = code,
+                userId = userId,
+                userName = userName,
+                secret = _currentKeys.secretKey
+            };
+
+            var refreshToken = new RefreshToken
+            {
+                id = code,
+                secret = _currentKeys.refreshKey
+            };
+
+            var tokenPackage = new TokenPackage
+            {
+                accessToken = Util.Base64(accessToken),
+                refreshToken = Util.Base64(refreshToken),
+                expiryTime = _currentKeys.tokenLife / 12,
+                failureTime = _currentKeys.tokenLife
+            };
+
+            return tokenPackage;
+        }
+
+        /// <summary>
+        /// 验证Token是否合法
         /// </summary>
         /// <param name="key">密钥</param>
-        /// <param name="type">类型：1、验证Secret；2、验证RefreshKey</param>
-        /// <returns>bool 是否通过验证</returns>
-        public bool Verify(string key, int type)
+        /// <param name="type">验证类型(1:验证AccessToken、2:验证RefreshToken)</param>
+        /// <returns>Token是否合法</returns>
+        public bool VerifyToken(string key, int type)
         {
-            if (type == 1 && secret == key || type == 2 && _RefreshKey == key) return true;
+            if (_currentKeys != null && _currentKeys.verifyKey(key, type)) return true;
 
             AddFailureCount();
             return false;
         }
 
         /// <summary>
+        /// 累计失败次数(有效时)
+        /// </summary>
+        public void AddFailureCount()
+        {
+            if (UserIsInvalid()) return;
+
+            _failureCount++;
+            _lastFailureTime = DateTime.Now;
+            isChanged = true;
+        }
+
+        /// <summary>
         /// 验证支付密码
         /// </summary>
-        /// <param name="password">支付密码</param>
-        /// <returns>bool 是否通过验证</returns>
-        public bool? Verify(string password)
+        /// <param name="key">支付密码</param>
+        /// <returns>支付密码是否通过验证</returns>
+        public bool? VerifyPayPassword(string key)
         {
-            if (_PayPassword == null) return null;
+            if (_payPassword == null) return null;
 
-            return Util.Hash(userId + password) == _PayPassword;
+            var pw = Util.Hash(userId + key);
+            return _payPassword == pw;
         }
 
         /// <summary>
-        /// 使Session在线
+        /// Token是否过期
         /// </summary>
-        /// <param name="tokenId">TokenID</param>
-        /// <param name="did">用户登录部门ID</param>
-        public void Online(Guid tokenId, Guid? did)
+        /// <returns>Token是否过期</returns>
+        public bool IsExpiry()
         {
-            deptId = did;
-            OnlineStatus = true;
+            return _currentKeys == null || _currentKeys.isExpiry();
         }
 
         /// <summary>
-        /// 注销Session
+        /// Token是否失效
         /// </summary>
-        /// <param name="tid">TokenID</param>
-        public void Offline(Guid tid)
+        /// <returns>Token是否失效</returns>
+        public bool IsFailure()
+        {
+            return _currentKeys == null || _currentKeys.isFailure();
+        }
+
+        /// <summary>
+        /// 用户是否失效状态
+        /// </summary>
+        /// <returns>用户是否失效状态</returns>
+        public bool UserIsInvalid()
         {
             var now = DateTime.Now;
-            ExpiryTime = now;
-            FailureTime = now;
-            secret = Guid.NewGuid().ToString();
-            OnlineStatus = false;
-        }
-
-        /// <summary>
-        /// 生成用户签名
-        /// </summary>
-        /// <param name="password">用户密码</param>
-        public void Sign(string password)
-        {
-            _Signature = Util.Decrypt(Params.RSAKey, password);
-        }
-
-        /// <summary>
-        /// 获取账号签名
-        /// </summary>
-        /// <param name="key">登录账号</param>
-        /// <param name="code">获取到的Code</param>
-        /// <returns>string 签名字符串</returns>
-        public string GetSign(string key, string code)
-        {
-            var sign = Util.Hash(key.ToUpper() + _Signature);
-            return Util.Hash(sign + code);
-        }
-
-        /// <summary>
-        /// 设置支付密码
-        /// </summary>
-        /// <param name="password">支付密码</param>
-        /// <returns></returns>
-        public bool SetPayPW(string password)
-        {
-            var pw = Util.Hash(userId + password);
-            if (pw == _PayPassword) return true;
-
-            _PayPassword = pw;
-            using (var context = new BaseEntities())
+            var resetTime = _lastFailureTime.AddMinutes(10);
+            if (_failureCount > 0 && now > resetTime)
             {
-                var user = context.SYS_User.SingleOrDefault(s => s.ID == userId);
-                if (user == null) return false;
-
-                user.PayPassword = _PayPassword;
-                return context.SaveChanges() > 0;
+                _failureCount = 0;
+                isChanged = true;
             }
+
+            return _failureCount > 5 || _isInvalid;
         }
 
         /// <summary>
-        /// 根据Account判断用户是否相同
+        /// 使用户离线
         /// </summary>
-        /// <param name="loginName">用户账号</param>
-        /// <returns>bool 用户是否相同</returns>
-        public bool UserIsSame(string loginName)
+        /// <param name="tokenId">令牌ID</param>
+        public void DeleteKeys(string tokenId)
         {
-            return Util.StringCompare(account, loginName);
+            if (!_keyMap.ContainsKey(tokenId)) return;
+
+            _keyMap.Remove(tokenId);
+            isChanged = true;
         }
     }
 }

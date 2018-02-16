@@ -38,7 +38,7 @@ namespace Insight.Base.Common
         /// <summary>
         /// 事件源用户ID
         /// </summary>
-        private readonly Guid? UserId;
+        private readonly string UserId;
 
         /// <summary>
         /// 写入日志
@@ -50,7 +50,7 @@ namespace Insight.Base.Common
         /// <param name="key">查询关键字</param>
         /// <param name="uid">事件源用户ID</param>
         /// <returns>bool 是否写入成功</returns>
-        public Logger(string code, string message = null, string source = null, string action = null, string key = null, Guid? uid = null)
+        public Logger(string code, string message = null, string source = null, string action = null, string key = null, string uid = null)
         {
             Code = code;
             Message = message;
@@ -69,23 +69,23 @@ namespace Insight.Base.Common
             if (string.IsNullOrEmpty(Code) || !Regex.IsMatch(Code, @"^\d{6}$")) return null;
 
             var level = Convert.ToInt32(Code.Substring(0, 1));
-            var rule = Params.Rules.SingleOrDefault(r => r.Code == Code);
+            var rule = Params.Rules.SingleOrDefault(r => r.code == Code);
             if (level > 1 && level < 7 && rule == null) return null;
 
-            var log = new SYS_Logs
+            var log = new Log
             {
-                ID = Guid.NewGuid(),
-                Code = Code,
-                Level = level,
-                Source = rule?.Source ?? Source,
-                Action = rule?.Action ?? Action,
-                Message = string.IsNullOrEmpty(Message) ? rule?.Message : Message,
-                Key = Key,
-                SourceUserId = UserId,
-                CreateTime = DateTime.Now
+                id = Util.NewId(),
+                code = Code,
+                level = level,
+                source = rule?.source ?? Source,
+                action = rule?.action ?? Action,
+                message = string.IsNullOrEmpty(Message) ? rule?.message : Message,
+                key = Key,
+                userId = UserId,
+                createTime = DateTime.Now
             };
 
-            return (rule?.ToDataBase ?? false) ? WriteToDB(log) : WriteToFile(log);
+            return (rule?.isFile ?? false) ? WriteToFile(log) : WriteToDB(log);
         }
 
         /// <summary>
@@ -93,11 +93,11 @@ namespace Insight.Base.Common
         /// </summary>
         /// <param name="log"></param>
         /// <returns>bool 是否写入成功</returns>
-        public static bool WriteToDB(SYS_Logs log)
+        public static bool WriteToDB(Log log)
         {
             using (var context = new BaseEntities())
             {
-                context.SYS_Logs.Add(log);
+                context.logs.Add(log);
                 return context.SaveChanges() > 0;
             }
         }
@@ -107,18 +107,18 @@ namespace Insight.Base.Common
         /// </summary>
         /// <param name="log"></param>
         /// <returns>bool 是否写入成功</returns>
-        public static bool WriteToFile(SYS_Logs log)
+        public static bool WriteToFile(Log log)
         {
             Params.Mutex.WaitOne();
-            var path = $"{Util.GetAppSetting("LogLocal")}\\{GetLevelName(log.Level)}\\";
+            var path = $"{Util.GetAppSetting("LogLocal")}\\{GetLevelName(log.level)}\\";
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
             }
 
             path += $"{DateTime.Today:yyyy-MM-dd}.log";
-            var time = log.CreateTime.ToString("O");
-            var text = $"[{log.CreateTime.Kind} {time}] [{log.Code}] [{log.Source}] [{log.Action}] Message:{log.Message}\r\n";
+            var time = log.createTime.ToString("O");
+            var text = $"[{log.createTime.Kind} {time}] [{log.code}] [{log.source}] [{log.action}] Message:{log.message}\r\n";
             var buffer = Encoding.UTF8.GetBytes(text);
             try
             {

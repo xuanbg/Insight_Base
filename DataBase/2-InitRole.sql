@@ -8,7 +8,7 @@ DECLARE @RoleId UNIQUEIDENTIFIER
 delete SYS_Role where Name = '所有用户'
 insert SYS_Role (Name, Description, BuiltIn, CreatorUserId) 
 select '所有用户', '内置角色，角色成员为全部用户成员', 1, '00000000-0000-0000-0000-000000000000';
-select @RoleId = ID from Sys_Role where SN = scope_identity()
+select @RoleId = ID from SYS_Role where SN = scope_identity()
 
 -- 初始化角色成员
 insert SYS_Role_Member(Type, RoleId, MemberId, CreatorUserId)
@@ -34,7 +34,7 @@ DECLARE @RoleId UNIQUEIDENTIFIER
 delete SYS_Role where Name = '系统管理员'
 insert SYS_Role (Name, Description, BuiltIn, CreatorUserId) 
 select '系统管理员', '内置角色，角色成员为系统管理员组成员', 1, '00000000-0000-0000-0000-000000000000';
-select @RoleId = ID from Sys_Role where SN = scope_identity()
+select @RoleId = ID from SYS_Role where SN = scope_identity()
 
 -- 初始化角色成员
 insert SYS_Role_Member(Type, RoleId, MemberId, CreatorUserId)

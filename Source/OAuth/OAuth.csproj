@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Insight.Base.OAuth</RootNamespace>
     <AssemblyName>OAuth</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -38,30 +38,29 @@
       <HintPath>..\packages\EntityFramework.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Server, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\WCF\Server.dll</HintPath>
+    </Reference>
     <Reference Include="StackExchange.Redis, Version=1.2.1.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Web" />
+    <Reference Include="Utils, Version=1.1.6620.17850, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Utility\Utils.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Authority.cs" />
     <Compile Include="Compare.cs" />
+    <Compile Include="Keys.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Session.cs" />
     <Compile Include="Core.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Utility\Server\Server.csproj">
-      <Project>{230C3E9F-83B2-4641-9C07-135E1962F424}</Project>
-      <Name>Server</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Utility\Utils\Utils.csproj">
-      <Project>{0C3F2F08-6816-49FD-BB13-8526E43ACCC6}</Project>
-      <Name>Utils</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{c4f26dd1-de5a-4773-a789-7823e96ea166}</Project>
       <Name>Common</Name>

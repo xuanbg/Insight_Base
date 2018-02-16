@@ -6,7 +6,7 @@ namespace Insight.Base.Common.Entity
     /// <summary>
     /// 组织机构
     /// </summary>
-    public class OrgInfo
+    public class Organization
     {
         public Guid ID { get; set; }
         public Guid? ParentId { get; set; }

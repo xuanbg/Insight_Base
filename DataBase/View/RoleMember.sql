@@ -29,7 +29,7 @@ select distinct M.ID,
        0 as NodeType,
        U.Name
 from SYS_Role_Member M
-join Sys_User U on U.ID = M.MemberId
+join SYS_User U on U.ID = M.MemberId
 union
 select distinct '00000000-0000-0000-0000-000000000002' as ID,
        null as ParentId,
@@ -49,7 +49,7 @@ select distinct M.ID,
        0 as NodeType,
        G.Name
 from SYS_Role_Member M
-join Sys_UserGroup G on G.ID = M.MemberId
+join SYS_UserGroup G on G.ID = M.MemberId
 union
 select distinct '00000000-0000-0000-0000-000000000003' as ID,
        null as ParentId,
@@ -69,6 +69,6 @@ select M.ID,
        0 as NodeType,
        case when P.FullName is not null then P.FullName else P.Name end as Name
 from SYS_Role_Member M
-join Sys_Organization P on P.ID = M.MemberId
+join SYS_Organization P on P.ID = M.MemberId
 
 GO
