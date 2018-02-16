@@ -1,29 +1,29 @@
-USE Insight_Base
-GO
+use insight_base
+go
 
-IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'UserRole') AND OBJECTPROPERTY(id, N'ISVIEW') = 1)
-DROP VIEW UserRole
-GO
+if exists (select * from sysobjects where id = object_id(N'ucv_user_role') and objectproperty(id, N'isview') = 1)
+drop view ucv_user_role
+go
 
 
-/*****视图：查询所有角色的操作权限*****/
+/*****瑙嗗浘锛氭煡璇㈡墍鏈夎鑹茬殑鎿嶄綔鏉冮檺*****/
 
-CREATE VIEW UserRole
-AS
+create view ucv_user_role
+as
 
-select newid() as ID, RoleId, MemberId as UserId, null as DiptId
-from SYS_Role_Member
-where Type = 1
+select role_id, member_id as user_id, null as dept_id
+from ucr_role_member
+where member_type = 1
 union
-select newid() as ID, RoleId, M.UserId, null as DiptId
-from SYS_Role_Member R
-join SYS_UserGroupMember M on M.GroupId = R.MemberId
-where R.Type = 2
+select role_id, m.user_id, null as dept_id
+from ucr_role_member r
+join ucg_group_member m on m.group_id = r.member_id
+where r.member_type = 2
 union
-select newid() as ID, RoleId, M.UserId, O.ParentId as DiptId
-from SYS_Role_Member R
-join SYS_OrgMember M on M.OrgId = R.MemberId
-join SYS_Organization O on O.ID = M.OrgId
-where R.Type = 3
+select role_id, m.user_id, o.parent_id as dept_id
+from ucr_role_member r
+join uco_org_member m on m.org_id = r.member_id
+join uco_organization o on o.id = m.org_id
+where r.member_type = 3
 
-GO
+go

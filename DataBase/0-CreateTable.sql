@@ -1,523 +1,325 @@
-USE Insight_Base
-GO
+use insight_base
+go
 
-IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'SYS_VerifyImage') AND OBJECTPROPERTY(id, N'ISUSERTABLE') = 1)
-DROP TABLE SYS_VerifyImage
-GO
+if exists (select * from sysobjects where id = object_id(N'ibs_log') and objectproperty(id, N'isusertable') = 1)
+drop table ibs_log
+go
+if exists (select * from sysobjects where id = object_id(N'ibs_log_rule') and objectproperty(id, N'isusertable') = 1)
+drop table ibs_log_rule
+go
 
-IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'SYS_Logs') AND OBJECTPROPERTY(id, N'ISUSERTABLE') = 1)
-DROP TABLE SYS_Logs
-GO
-IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'SYS_Logs_Rules') AND OBJECTPROPERTY(id, N'ISUSERTABLE') = 1)
-DROP TABLE SYS_Logs_Rules
-GO
+if exists (select * from sysobjects where id = object_id(N'ucr_role_data') and objectproperty(id, N'isusertable') = 1)
+drop table ucr_role_data
+go
+if exists (select * from sysobjects where id = object_id(N'ucr_role_function') and objectproperty(id, N'isusertable') = 1)
+drop table ucr_role_function
+go
+if exists (select * from sysobjects where id = object_id(N'ucr_role_member') and objectproperty(id, N'isusertable') = 1)
+drop table ucr_role_member
+go
+if exists (select * from sysobjects where id = object_id(N'ucr_role') and objectproperty(id, N'isusertable') = 1)
+drop table ucr_role
+go
 
-IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'SYS_Code_Allot') AND OBJECTPROPERTY(id, N'ISUSERTABLE') = 1)
-DROP TABLE SYS_Code_Allot
-GO
-IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'SYS_Code_Record') AND OBJECTPROPERTY(id, N'ISUSERTABLE') = 1)
-DROP TABLE SYS_Code_Record
-GO
-IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'SYS_Allot_Record') AND OBJECTPROPERTY(id, N'ISUSERTABLE') = 1)
-DROP TABLE SYS_Allot_Record
-GO
-IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'SYS_Code_Scheme') AND OBJECTPROPERTY(id, N'ISUSERTABLE') = 1)
-DROP TABLE SYS_Code_Scheme
-GO
+if exists (select * from sysobjects where id = object_id(N'ucc_data_conf') and objectproperty(id, N'isusertable') = 1)
+drop table ucc_data_conf
+go
+if exists (select * from sysobjects where id = object_id(N'ucc_param') and objectproperty(id, N'isusertable') = 1)
+drop table ucc_param
+go
+if exists (select * from sysobjects where id = object_id(N'ucs_function') and objectproperty(id, N'isusertable') = 1)
+drop table ucs_function
+go
+if exists (select * from sysobjects where id = object_id(N'ucs_navigator') and objectproperty(id, N'isusertable') = 1)
+drop table ucs_navigator
+go
+if exists (select * from sysobjects where id = object_id(N'ucs_application') and objectproperty(id, N'isusertable') = 1)
+drop table ucs_application
+go
 
-IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'SYS_Role_Data') AND OBJECTPROPERTY(id, N'ISUSERTABLE') = 1)
-DROP TABLE SYS_Role_Data
-GO
-IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'SYS_Role_Action') AND OBJECTPROPERTY(id, N'ISUSERTABLE') = 1)
-DROP TABLE SYS_Role_Action
-GO
-IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'SYS_Role_Member') AND OBJECTPROPERTY(id, N'ISUSERTABLE') = 1)
-DROP TABLE SYS_Role_Member
-GO
-IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'SYS_Role') AND OBJECTPROPERTY(id, N'ISUSERTABLE') = 1)
-DROP TABLE SYS_Role
-GO
+if exists (select * from sysobjects where id = object_id(N'uco_org_member') and objectproperty(id, N'isusertable') = 1)
+drop table uco_org_member
+go
+if exists (select * from sysobjects where id = object_id(N'uco_organization') and objectproperty(id, N'isusertable') = 1)
+drop table uco_organization
+go
 
-
-IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'SYS_Data') AND OBJECTPROPERTY(id, N'ISUSERTABLE') = 1)
-DROP TABLE SYS_Data
-GO
-IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'SYS_ModuleParam') AND OBJECTPROPERTY(id, N'ISUSERTABLE') = 1)
-DROP TABLE SYS_ModuleParam
-GO
-IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'SYS_ModuleAction') AND OBJECTPROPERTY(id, N'ISUSERTABLE') = 1)
-DROP TABLE SYS_ModuleAction
-GO
-IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'SYS_Module') AND OBJECTPROPERTY(id, N'ISUSERTABLE') = 1)
-DROP TABLE SYS_Module
-GO
-IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'SYS_ModuleGroup') AND OBJECTPROPERTY(id, N'ISUSERTABLE') = 1)
-DROP TABLE SYS_ModuleGroup
-GO
-
-
-IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'SYS_OrgMember') AND OBJECTPROPERTY(id, N'ISUSERTABLE') = 1)
-DROP TABLE SYS_OrgMember
-GO
-IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'SYS_Organization') AND OBJECTPROPERTY(id, N'ISUSERTABLE') = 1)
-DROP TABLE SYS_Organization
-GO
-
-IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'SYS_UserGroupMember') AND OBJECTPROPERTY(id, N'ISUSERTABLE') = 1)
-DROP TABLE SYS_UserGroupMember
-GO
-IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'SYS_UserGroup') AND OBJECTPROPERTY(id, N'ISUSERTABLE') = 1)
-DROP TABLE SYS_UserGroup
-GO
-IF EXISTS (SELECT * FROM sysobjects WHERE id = OBJECT_ID(N'SYS_User') AND OBJECTPROPERTY(id, N'ISUSERTABLE') = 1)
-DROP TABLE SYS_User
-GO
+if exists (select * from sysobjects where id = object_id(N'ucg_group_member') and objectproperty(id, N'isusertable') = 1)
+drop table ucg_group_member
+go
+if exists (select * from sysobjects where id = object_id(N'ucg_group') and objectproperty(id, N'isusertable') = 1)
+drop table ucg_group
+go
+if exists (select * from sysobjects where id = object_id(N'ucb_user') and objectproperty(id, N'isusertable') = 1)
+drop table ucb_user
+go
 
 
 /*****组织机构、用户和用户组*****/
 
 /*****用户表*****/
-
-CREATE TABLE SYS_User(
-[ID]               UNIQUEIDENTIFIER CONSTRAINT IX_SYS_User PRIMARY KEY,                                                                    --此ID与主数据ID相同
-[SN]               BIGINT IDENTITY(1,1),                                                                                                   --自增序列
-[Name]             NVARCHAR(16) NOT NULL,                                                                                                  --用户名
-[LoginName]        NVARCHAR(32) NOT NULL,                                                                                                  --登录名
-[Password]         VARCHAR(32) DEFAULT 'E10ADC3949BA59ABBE56E057F20F883E' NOT NULL,                                                        --登录密码，保存密码的MD5值，初始密码123456
-[PayPassword]      VARCHAR(32),                                                                                                            --支付密码，保存密码的MD5值
-[Mobile]           VARCHAR(16),                                                                                                            --手机号
-[Description]      NVARCHAR(MAX),                                                                                                          --描述
-[Type]             INT DEFAULT 0 NOT NULL,                                                                                                 --用户类型：-1、外部用户；1、内部用户
-[BuiltIn]          BIT DEFAULT 0 NOT NULL,                                                                                                 --是否预置：0、自定；1、预置
-[Validity]         BIT DEFAULT 1 NOT NULL,                                                                                                 --是否有效：0、无效；1、有效
-[CreatorUserId]    UNIQUEIDENTIFIER DEFAULT '00000000-0000-0000-0000-000000000000' NOT NULL,                                               --创建人ID
-[CreateTime]       DATETIME DEFAULT GETDATE() NOT NULL                                                                                     --创建时间
+create table ucb_user(
+[id]               varchar(36) constraint ix_ucb_user primary key,                                                                         --此id与主数据id相同
+[name]             nvarchar(64) not null,                                                                                                  --姓名/昵称
+[account]          nvarchar(32) constraint ix_ucb_user_account unique not null,                                                            --登录账号
+[mobile]           varchar(11) constraint ix_ucb_user_mobile unique,                                                                       --手机号
+[email]            nvarchar(64) constraint ix_ucb_user_email unique,                                                                       --注册邮箱
+[password]         varchar(32) default 'e10adc3949ba59abbe56e057f20f883e' not null,                                                        --登录密码，保存密码的md5值，初始密码123456
+[pay_pw]           varchar(32),                                                                                                            --支付密码，保存密码的md5值
+[remark]           nvarchar(max),                                                                                                          --描述
+[is_builtin]       bit default 0 not null,                                                                                                 --是否预置：0、自定；1、预置
+[is_invalid]       bit default 0 not null,                                                                                                 --是否失效：0、有效；1、失效
+[creator_id]       varchar(36) default '00000000-0000-0000-0000-000000000000' not null,                                                    --创建人id
+[created_time]     datetime default getdate() not null                                                                                     --创建时间
 )
-GO
+go
 
 /*****用户组表*****/
-
-CREATE TABLE SYS_UserGroup(
-[ID]               UNIQUEIDENTIFIER CONSTRAINT IX_SYS_UserGroup PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-[SN]               BIGINT IDENTITY(1,1),                                                                                                   --自增序列
-[Name]             NVARCHAR(64) NOT NULL,                                                                                                  --用户组名称
-[Description]      NVARCHAR(MAX),                                                                                                          --描述
-[BuiltIn]          BIT DEFAULT 0 NOT NULL,                                                                                                 --是否预置：0、自定；1、预置
-[Visible]          BIT DEFAULT 1 NOT NULL,                                                                                                 --是否可见：0、不可见；1、可见
-[CreatorUserId]    UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_User(ID) DEFAULT '00000000-0000-0000-0000-000000000000' NOT NULL,           --创建人ID
-[CreateTime]       DATETIME DEFAULT GETDATE() NOT NULL                                                                                     --创建时间
+create table ucg_group(
+[id]               varchar(36) constraint ix_ucg_group primary key,
+[name]             nvarchar(64) not null,                                                                                                  --用户组名称
+[remark]           nvarchar(max),                                                                                                          --描述
+[is_builtin]       bit default 0 not null,                                                                                                 --是否预置：0、自定；1、预置
+[is_visible]       bit default 1 not null,                                                                                                 --是否可见：0、不可见；1、可见
+[creator_id]       varchar(36) foreign key references ucb_user(id) default '00000000-0000-0000-0000-000000000000' not null,                --创建人id
+[created_time]     datetime default getdate() not null                                                                                     --创建时间
 )
-GO
+go
 
 /*****用户组成员表*****/
-
-CREATE TABLE SYS_UserGroupMember(
-[ID]               UNIQUEIDENTIFIER CONSTRAINT IX_SYS_UserGroupMember PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-[SN]               BIGINT IDENTITY(1,1),                                                                                                   --自增序列
-[GroupId]          UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_UserGroup(ID) ON DELETE CASCADE NOT NULL,                                   --用户组ID
-[UserId]           UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_User(ID) ON DELETE CASCADE NOT NULL,                                        --用户ID
-[CreatorUserId]    UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_User(ID) DEFAULT '00000000-0000-0000-0000-000000000000' NOT NULL,           --创建人ID
-[CreateTime]       DATETIME DEFAULT GETDATE() NOT NULL                                                                                     --创建时间
+create table ucg_group_member(
+[id]               varchar(36) constraint ix_ucg_group_member primary key,
+[group_id]         varchar(36) foreign key references ucg_group(id) on delete cascade not null,                                            --用户组id
+[user_id]          varchar(36) foreign key references ucb_user(id) on delete cascade not null,                                             --用户id
+[creator_id]       varchar(36) foreign key references ucb_user(id) default '00000000-0000-0000-0000-000000000000' not null,                --创建人id
+[created_time]     datetime default getdate() not null                                                                                     --创建时间
 )
-GO
-
+go
 
 /*****组织机构表*****/
-
-CREATE TABLE SYS_Organization(
-[ID]               UNIQUEIDENTIFIER CONSTRAINT IX_SYS_Organization PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-[SN]               BIGINT IDENTITY(1,1),                                                                                                   --自增序列
-[ParentId]         UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_Organization(ID),                                                           --父节点ID
-[NodeType]         INT NOT NULL,                                                                                                           --节点类型：1、机构；2、部门；3、岗位
-[Index]            INT NOT NULL,                                                                                                           --序号
-[Code]             VARCHAR(32),                                                                                                            --编码
-[Name]             NVARCHAR(32) NOT NULL,                                                                                                  --名称
-[Alias]            NVARCHAR(16),                                                                                                           --别名/简称
-[FullName]         NVARCHAR(32),                                                                                                           --全称
-[PositionId]       UNIQUEIDENTIFIER,                                                                                                       --职能ID，字典
-[Validity]         BIT DEFAULT 1 NOT NULL,                                                                                                 --是否有效：0、无效；1、有效
-[CreatorUserId]    UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_User(ID) DEFAULT '00000000-0000-0000-0000-000000000000' NOT NULL,           --创建人ID
-[CreateTime]       DATETIME DEFAULT GETDATE() NOT NULL                                                                                     --创建时间
+create table uco_organization(
+[id]               varchar(36) constraint ix_uco_organization primary key,
+[parent_id]        varchar(36) foreign key references uco_organization(id),                                                                --父节点id
+[node_type]        int not null,                                                                                                           --节点类型：1、机构；2、部门；3、岗位
+[index]            int not null,                                                                                                           --序号
+[code]             varchar(32),                                                                                                            --编码
+[name]             nvarchar(32) not null,                                                                                                  --名称
+[alias]            nvarchar(16),                                                                                                           --别名/简称
+[fullname]         nvarchar(32),                                                                                                           --全称
+[position_id]      varchar(36),                                                                                                            --职能id，字典
+[is_invalid]       bit default 0 not null,                                                                                                 --是否失效：0、有效；1、失效
+[creator_id]       varchar(36) foreign key references ucb_user(id) default '00000000-0000-0000-0000-000000000000' not null,                --创建人id
+[created_time]     datetime default getdate() not null                                                                                     --创建时间
 )
-GO
+go
 
 /*****职位成员表*****/
-
-CREATE TABLE SYS_OrgMember(
-[ID]               UNIQUEIDENTIFIER CONSTRAINT IX_SYS_OrgMember PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-[SN]               BIGINT IDENTITY(1,1),                                                                                                   --自增序列
-[OrgId]            UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_Organization(ID) ON DELETE CASCADE NOT NULL,                                --组织机构（职位）ID
-[UserId]           UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_User(ID) ON DELETE CASCADE NOT NULL,                                        --用户ID
-[CreatorUserId]    UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_User(ID) DEFAULT '00000000-0000-0000-0000-000000000000' NOT NULL,           --创建人ID
-[CreateTime]       DATETIME DEFAULT GETDATE() NOT NULL                                                                                     --创建时间
+create table uco_org_member(
+[id]               varchar(36) constraint ix_uco_org_member primary key,
+[org_id]           varchar(36) foreign key references uco_organization(id) on delete cascade not null,                                    --组织机构（职位）id
+[user_id]          varchar(36) foreign key references ucb_user(id) on delete cascade not null,                                            --用户id
+[creator_id]       varchar(36) foreign key references ucb_user(id) default '00000000-0000-0000-0000-000000000000' not null,               --创建人id
+[created_time]     datetime default getdate() not null                                                                                    --创建时间
 )
-GO
+go
 
 
 /*****模块注册数据*****/
 
-/*****模块组表*****/
-
-CREATE TABLE SYS_ModuleGroup(
-[ID]               UNIQUEIDENTIFIER PRIMARY KEY NONCLUSTERED,
-[SN]               BIGINT CONSTRAINT IX_SYS_ModuleGroup UNIQUE CLUSTERED IDENTITY(1,1),                                                    --自增序列
-[Index]            INT,                                                                                                                    --序号
-[Name]             NVARCHAR(64) NOT NULL,                                                                                                  --名称
-[Description]      NVARCHAR(MAX),                                                                                                          --描述
-[IconUrl]          VARCHAR(128),                                                                                                           --图标URL
-[Icon]             IMAGE,                                                                                                                  --图标二进制数据
+/*****应用表*****/
+create table ucs_application(
+[id]               varchar(36) constraint ix_ucs_application primary key,
+[name]             nvarchar(16) not null,                                                                                                  --应用名称
+[alias]            nvarchar(16) not null,                                                                                                  --应用别名
+[host]             varchar(128),                                                                                                           --域名
+[token_life]       int default 24 not null,                                                                                                --令牌生存周期(小时)
+[icon]             image,                                                                                                                  --图标
+[iconurl]          varchar(128),                                                                                                           --图标url
+[remark]           nvarchar(max),                                                                                                          --描述
+[creator_id]       varchar(36) foreign key references ucb_user(id) default '00000000-0000-0000-0000-000000000000' not null,                --创建人id
+[created_time]     datetime default getdate() not null                                                                                     --创建时间
 )
-GO
+go
 
-/*****模块表*****/
-
-CREATE TABLE SYS_Module(
-[ID]               UNIQUEIDENTIFIER PRIMARY KEY NONCLUSTERED,
-[SN]               BIGINT CONSTRAINT IX_SYS_Module UNIQUE CLUSTERED IDENTITY(1,1),                                                         --自增序列
-[ModuleGroupId]    UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_ModuleGroup(ID) NOT NULL,                                                   --模块组ID
-[Type]             INT NOT NULL,                                                                                                           --模块类型：0、系统模块；1、业务模块；2、个人模块
-[Index]            INT,                                                                                                                    --序号
-[Name]             NVARCHAR(16),                                                                                                           --模块名称
-[ProgramName]      VARCHAR(32) NOT NULL,                                                                                                   --程序集名称
-[NameSpace]        VARCHAR(128) NOT NULL,                                                                                                  --模块命名空间
-[ApplicationName]  NVARCHAR(16),                                                                                                           --应用名称
-[Location]         NVARCHAR(MAX),                                                                                                          --文件路径
-[Description]      NVARCHAR(MAX),                                                                                                          --描述
-[RegisterTime]     DATETIME DEFAULT GETDATE(),                                                                                             --模块注册时间
-[Default]          BIT DEFAULT 0 NOT NULL,                                                                                                 --是否默认启动：0、否；1、是
-[Validity]         BIT DEFAULT 1 NOT NULL,                                                                                                 --是否有效：0、无效；1、有效
-[IconUrl]          VARCHAR(128),                                                                                                           --图标URL
-[Icon]             IMAGE,                                                                                                                  --图标
+/*****导航表*****/
+create table ucs_navigator(
+[id]               varchar(36) constraint ix_ucs_navigator primary key,
+[parent_id]        varchar(36),                                                                                                            --上级导航id
+[app_id]           varchar(36) foreign key references ucs_application(id) on delete cascade not null,                                      --应用id
+[index]            int default 0 not null,                                                                                                 --序号
+[name]             nvarchar(16) not null,                                                                                                  --导航名称
+[alias]            nvarchar(16) not null,                                                                                                  --应用名称
+[class_name]       varchar(128),                                                                                                           --控制器命名空间
+[file_path]        nvarchar(max),                                                                                                          --文件路径
+[iconurl]          varchar(128),                                                                                                           --图标url
+[icon]             image,                                                                                                                  --图标
+[remark]           nvarchar(max),                                                                                                          --描述
+[is_default]       bit default 0 not null,                                                                                                 --是否默认启动：0、否；1、是
+[creator_id]       varchar(36) foreign key references ucb_user(id) default '00000000-0000-0000-0000-000000000000' not null,                --创建人id
+[created_time]     datetime default getdate() not null                                                                                     --创建时间
 )
-GO
+go
 
 /*****模块功能表*****/
-
-CREATE TABLE SYS_ModuleAction(
-[ID]               UNIQUEIDENTIFIER PRIMARY KEY NONCLUSTERED,
-[SN]               BIGINT CONSTRAINT IX_SYS_ModuleAction UNIQUE CLUSTERED IDENTITY(1,1),                                                   --自增序列
-[ModuleId]         UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_Module(ID) ON DELETE CASCADE NOT NULL,                                      --模块注册ID
-[Index]            INT,                                                                                                                    --序号
-[BeginGroup]       BIT NOT NULL,                                                                                                           --是否开始分组：0、否；1、是
-[ShowText]         BIT NOT NULL,                                                                                                           --是否显示文字：0、不显示；1、显示
-[Name]             VARCHAR(64) NOT NULL,                                                                                                   --名称
-[Alias]            NVARCHAR(16) NOT NULL,                                                                                                  --别名/简称
-[Description]      NVARCHAR(MAX),                                                                                                          --描述
-[Validity]         BIT DEFAULT 1 NOT NULL,                                                                                                 --是否有效：0、无效；1、有效
-[IconUrl]          VARCHAR(128),                                                                                                           --图标URL
-[Icon]             IMAGE,                                                                                                                  --图标
+create table ucs_function(
+[id]               varchar(36) constraint ix_ucs_function primary key,
+[navigator_id]     varchar(36) foreign key references ucs_navigator(id) on delete cascade not null,                                        --导航id
+[index]            int default 0 not null,                                                                                                 --序号
+[name]             varchar(64) not null,                                                                                                   --名称
+[alias]            nvarchar(16) not null,                                                                                                  --别名/简称
+[iconurl]          varchar(128),                                                                                                           --图标url
+[icon]             image,                                                                                                                  --图标
+[remark]           nvarchar(max),                                                                                                          --描述
+[is_begin]         bit default 0 not null,                                                                                                 --是否开始分组：0、否；1、是
+[is_hide_text]     bit default 0 not null,                                                                                                 --是否隐藏文字：0、显示；1、隐藏
+[is_visible]       bit default 1 not null,                                                                                                 --是否可见：0、不可见；1、可见
+[creator_id]       varchar(36) foreign key references ucb_user(id) default '00000000-0000-0000-0000-000000000000' not null,                --创建人id
+[created_time]     datetime default getdate() not null                                                                                     --创建时间
 )
-GO
+go
 
 /*****模块选项配置表*****/
-
-CREATE TABLE SYS_ModuleParam(
-[ID]               UNIQUEIDENTIFIER CONSTRAINT IX_SYS_ModuleParam PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-[SN]               BIGINT IDENTITY(1,1),                                                                                                   --自增序列
-[ModuleId]         UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_Module(ID) ON DELETE CASCADE NOT NULL,                                      --模块注册ID
-[ParamId]          UNIQUEIDENTIFIER NOT NULL,                                                                                              --选项ID
-[Name]             NVARCHAR(64) NOT NULL,                                                                                                  --选项名称
-[Value]            NVARCHAR(MAX),                                                                                                          --选项参数值
-[OrgId]            UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_Organization(ID),                                                           --生效机构ID
-[UserId]           UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_User(ID),                                                                   --生效用户ID
-[Description]      NVARCHAR(MAX)                                                                                                           --描述
+create table ucc_param(
+[id]               varchar(36) constraint ix_ucc_param primary key,
+[module_id]        varchar(36) foreign key references ucs_navigator(id) on delete cascade not null,                                        --模块注册id
+[param_id]         varchar(36) not null,                                                                                                   --选项id
+[name]             nvarchar(64) not null,                                                                                                  --选项名称
+[value]            nvarchar(max),                                                                                                          --选项参数值
+[org_id]           varchar(36) foreign key references uco_organization(id),                                                                --生效机构id
+[user_id]          varchar(36) foreign key references ucb_user(id),                                                                        --生效用户id
+[remark]           nvarchar(max),                                                                                                           --描述
+[creator_id]       varchar(36) foreign key references ucb_user(id) default '00000000-0000-0000-0000-000000000000' not null,                --创建人id
+[created_time]     datetime default getdate() not null                                                                                     --创建时间
 )
-GO
+go
 
 /*****数据配置表*****/
-
-CREATE TABLE SYS_Data(
-[ID]               UNIQUEIDENTIFIER CONSTRAINT IX_SYS_Data PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-[SN]               BIGINT IDENTITY(1,1),                                                                                                   --自增序列
-[Type]             INT NOT NULL,                                                                                                           --类型：0、无归属；1、仅本人；2、仅本部门；3、部门所有；4、机构所有；5、根域所有；
-[Alias]            NVARCHAR(16) NOT NULL,                                                                                                  --别名/简称
+create table ucc_data_conf(
+[id]               varchar(36) constraint ix_ucc_data_conf primary key,
+[data_type]        int not null,                                                                                                           --类型：0、无归属；1、仅本人；2、仅本部门；3、部门所有；4、机构所有；5、根域所有
+[alias]            nvarchar(16) not null,                                                                                                  --别名/简称
 )
-GO
-
+go
 
 
 /*****角色权限数据表*****/
 
 /*****角色表*****/
-
-CREATE TABLE SYS_Role(
-[ID]               UNIQUEIDENTIFIER CONSTRAINT IX_SYS_Role PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-[SN]               BIGINT IDENTITY(1,1),                                                                                                   --自增序列
-[Name]             NVARCHAR(64) NOT NULL,                                                                                                  --名称
-[Description]      NVARCHAR(MAX),                                                                                                          --描述
-[BuiltIn]          BIT DEFAULT 0 NOT NULL,                                                                                                 --是否预置：0、自定；1、预置
-[Validity]         BIT DEFAULT 1 NOT NULL,                                                                                                 --是否有效：0、无效；1、有效
-[CreatorUserId]    UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_User(ID) DEFAULT '00000000-0000-0000-0000-000000000000' NOT NULL,           --创建人ID
-[CreateTime]       DATETIME DEFAULT GETDATE() NOT NULL                                                                                     --创建时间
+create table ucr_role(
+[id]               varchar(36) constraint ix_ucr_role primary key,
+[name]             nvarchar(64) not null,                                                                                                  --名称
+[remark]           nvarchar(max),                                                                                                          --描述
+[is_builtin]       bit default 0 not null,                                                                                                 --是否预置：0、自定；1、预置
+[creator_id]       varchar(36) foreign key references ucb_user(id) default '00000000-0000-0000-0000-000000000000' not null,                --创建人id
+[created_time]     datetime default getdate() not null                                                                                     --创建时间
 )
-GO
-
+go
 
 /*****角色成员表*****/
-
-CREATE TABLE SYS_Role_Member(
-[ID]               UNIQUEIDENTIFIER CONSTRAINT IX_SYS_Role_Member PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-[SN]               BIGINT IDENTITY(1,1),                                                                                                   --自增序列
-[Type]             INT NOT NULL,                                                                                                           --类型：1、用户；2、用户组；3、岗位；
-[RoleId]           UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_Role(ID) ON DELETE CASCADE NOT NULL,                                        --角色ID
-[MemberId]         UNIQUEIDENTIFIER NOT NULL,                                                                                              --成员ID
-[CreatorUserId]    UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_User(ID) DEFAULT '00000000-0000-0000-0000-000000000000' NOT NULL,           --创建人ID
-[CreateTime]       DATETIME DEFAULT GETDATE() NOT NULL                                                                                     --创建时间
+create table ucr_role_member(
+[id]               varchar(36) constraint ix_ucr_role_member primary key,
+[member_type]      int default 1 not null,                                                                                                 --类型：1、用户；2、用户组；3、岗位；
+[role_id]          varchar(36) foreign key references ucr_role(id) on delete cascade not null,                                             --角色id
+[member_id]        varchar(36) not null,                                                                                                   --成员id
+[creator_id]       varchar(36) foreign key references ucb_user(id) default '00000000-0000-0000-0000-000000000000' not null,                --创建人id
+[created_time]     datetime default getdate() not null                                                                                     --创建时间
 )
-GO
-
-
+go
 
 /*****角色操作权限表*****/
-
-CREATE TABLE SYS_Role_Action(
-[ID]               UNIQUEIDENTIFIER CONSTRAINT IX_SYS_RolePerm_Action PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-[SN]               BIGINT IDENTITY(1,1),                                                                                                   --自增序列
-[RoleId]           UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_Role(ID) ON DELETE CASCADE NOT NULL,                                        --角色ID
-[ActionId]         UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_ModuleAction(ID) ON DELETE CASCADE NOT NULL,                                --模块功能注册ID
-[Action]           INT DEFAULT 0 NOT NULL,                                                                                                 --操作行为：0、拒绝；1、允许
-[CreatorUserId]    UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_User(ID) DEFAULT '00000000-0000-0000-0000-000000000000' NOT NULL,           --创建人ID
-[CreateTime]       DATETIME DEFAULT GETDATE() NOT NULL                                                                                     --创建时间
+create table ucr_role_function(
+[id]               varchar(36) constraint ix_ucr_role_function primary key,
+[role_id]          varchar(36) foreign key references ucr_role(id) on delete cascade not null,                                             --角色id
+[function_id]      varchar(36) foreign key references ucs_function(id) on delete cascade not null,                                         --功能id
+[permit]           int default 1 not null,                                                                                                 --操作行为：0、拒绝；1、允许
+[creator_id]       varchar(36) foreign key references ucb_user(id) default '00000000-0000-0000-0000-000000000000' not null,                --创建人id
+[created_time]     datetime default getdate() not null                                                                                     --创建时间
 )
-GO
+go
 
 /*****角色数据权限表*****/
-
-CREATE TABLE SYS_Role_Data(
-[ID]               UNIQUEIDENTIFIER CONSTRAINT IX_SYS_RolePerm_Data_Rel PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-[SN]               BIGINT IDENTITY(1,1),                                                                                                   --自增序列
-[RoleId]           UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_Role(ID) ON DELETE CASCADE NOT NULL,                                        --角色ID
-[ModuleId]         UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_Module(ID) ON DELETE CASCADE NOT NULL,                                      --业务模块ID
-[Mode]             INT DEFAULT 0 NOT NULL,                                                                                                 --数据授权模式：0、相对模式；1、用户模式；2、部门模式；
-[ModeId]           UNIQUEIDENTIFIER NOT NULL,                                                                                              --模式ID或部门/用户ID（绝对模式）
-[Permission]       INT DEFAULT 0 NOT NULL,                                                                                                 --权限：0、只读；1、读写
-[CreatorUserId]    UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_User(ID) DEFAULT '00000000-0000-0000-0000-000000000000' NOT NULL,           --创建人ID
-[CreateTime]       DATETIME DEFAULT GETDATE() NOT NULL                                                                                     --创建时间
+create table ucr_role_data(
+[id]               varchar(36) constraint ix_ucr_role_data primary key,
+[role_id]          varchar(36) foreign key references ucr_role(id) on delete cascade not null,                                             --角色id
+[module_id]        varchar(36) foreign key references ucs_navigator(id) on delete cascade not null,                                        --业务模块id
+[mode_id]          varchar(36) not null,                                                                                                   --模式id或部门/用户id（绝对模式）
+[mode]             int default 0 not null,                                                                                                 --授权模式：0、相对模式；1、用户模式；2、部门模式
+[permit]           int default 0 not null,                                                                                                 --权限：0、只读；1、读写
+[creator_id]       varchar(36) foreign key references ucb_user(id) default '00000000-0000-0000-0000-000000000000' not null,                --创建人id
+[created_time]     datetime default getdate() not null                                                                                     --创建时间
 )
-GO
+go
 
-
-/*****编码方案*****/
-
-/*****编码方案表*****/
-
-CREATE TABLE SYS_Code_Scheme(
-[ID]               UNIQUEIDENTIFIER CONSTRAINT IX_SYS_Code_Scheme PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-[SN]               BIGINT IDENTITY(1,1),                                                                                                   --自增序列
-[Name]             NVARCHAR(64) NOT NULL,                                                                                                  --名称
-[CodeFormat]       NVARCHAR(64) NOT NULL,                                                                                                  --编码格式
-[SerialFormat]     NVARCHAR(16),                                                                                                           --流水码关联字符串格式
-[Description]      NVARCHAR(MAX),                                                                                                          --描述
-[Validity]         BIT DEFAULT 1 NOT NULL,                                                                                                 --是否有效：0、无效；1、有效
-[CreatorDeptId]    UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_Organization(ID),                                                           --创建部门ID
-[CreatorUserId]    UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_User(ID) DEFAULT '00000000-0000-0000-0000-000000000000' NOT NULL,           --创建人ID
-[CreateTime]       DATETIME DEFAULT GETDATE() NOT NULL                                                                                     --创建时间
-)
-GO
-
-/*****编码分配记录表*****/
-
-CREATE TABLE SYS_Allot_Record(
-[ID]               UNIQUEIDENTIFIER CONSTRAINT IX_SYS_Allot_Record PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-[SN]               BIGINT IDENTITY(1,1),                                                                                                   --自增序列
-[SchemeId]         UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_Code_Scheme(ID) ON DELETE CASCADE NOT NULL,                                 --编码方案ID
-[ModuleId]         UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_Module(ID) ON DELETE CASCADE NOT NULL,                                      --模块注册ID
-[OwnerId]          UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_User(ID) NOT NULL,                                                          --用户ID
-[StartNumber]      VARCHAR(8),                                                                                                             --编码区段起始值
-[EndNumber]        VARCHAR(8),                                                                                                             --编码区段结束值
-[CreatorDeptId]    UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_Organization(ID),                                                           --创建部门ID
-[CreatorUserId]    UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_User(ID) NOT NULL,                                                          --创建人ID
-[CreateTime]       DATETIME DEFAULT GETDATE() NOT NULL                                                                                     --创建时间
-)
-
-/*****编码流水记录表*****/
-
-CREATE TABLE SYS_Code_Record(
-[ID]               UNIQUEIDENTIFIER CONSTRAINT IX_SYS_Code_Record PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-[SN]               BIGINT IDENTITY(1,1),                                                                                                   --自增序列
-[SchemeId]         UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_Code_Scheme(ID) ON DELETE CASCADE NOT NULL,                                 --编码方案ID
-[RelationChar]     NVARCHAR(16),                                                                                                           --关联字符串
-[SerialNumber]     INT NOT NULL,                                                                                                           --流水号
-[BusinessId]       UNIQUEIDENTIFIER,                                                                                                       --业务记录ID
-[CreateTime]       DATETIME DEFAULT GETDATE() NOT NULL                                                                                     --创建时间
-)
-CREATE NONCLUSTERED INDEX IX_SYS_Code_Record_Serial ON SYS_Code_Record(SchemeId, RelationChar) INCLUDE (SerialNumber)
-CREATE NONCLUSTERED INDEX IX_SYS_Code_Record_BusinessId ON SYS_Code_Record(BusinessId)
-GO
-
-/*****编码分配记录表*****/
-
-CREATE TABLE SYS_Code_Allot(
-[ID]               UNIQUEIDENTIFIER CONSTRAINT IX_SYS_Code_Allot PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-[SN]               BIGINT IDENTITY(1,1),                                                                                                   --自增序列
-[SchemeId]         UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_Code_Scheme(ID) ON DELETE CASCADE NOT NULL,                                 --编码方案ID
-[ModuleId]         UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_Module(ID) ON DELETE CASCADE NOT NULL,                                      --模块注册ID
-[OwnerId]          UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_User(ID) NOT NULL,                                                          --用户ID
-[AllotNumber]      VARCHAR(8) NOT NULL,                                                                                                    --分配流水号
-[BusinessId]       UNIQUEIDENTIFIER,                                                                                                       --业务记录ID
-[UpdateTime]       DATETIME,                                                                                                               --使用时间
-[CreatorDeptId]    UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_Organization(ID),                                                           --创建部门ID
-[CreatorUserId]    UNIQUEIDENTIFIER FOREIGN KEY REFERENCES SYS_User(ID) NOT NULL,                                                          --创建人ID
-[CreateTime]       DATETIME DEFAULT GETDATE() NOT NULL                                                                                     --创建时间
-)
-CREATE NONCLUSTERED INDEX IX_SYS_Code_Allot_Serial ON SYS_Code_Allot(SchemeId, ModuleId, OwnerId) INCLUDE (AllotNumber)
-CREATE NONCLUSTERED INDEX IX_SYS_Code_Allot_BusinessId ON SYS_Code_Allot(BusinessId)
-GO
 
 /*****日志数据表*****/
 
 /*****日志规则表*****/
-
-CREATE TABLE SYS_Logs_Rules(
-[ID]               UNIQUEIDENTIFIER CONSTRAINT IX_SYS_Logs_Rules PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-[SN]               BIGINT IDENTITY(1,1),                                                                                                   --自增序列
-[Code]             VARCHAR(6) NOT NULL,                                                                                                    --操作代码
-[ToDataBase]       BIT DEFAULT 0 NOT NULL,                                                                                                 --是否写到数据库：0、否；1、是
-[Level]            INT DEFAULT 0 NOT NULL,                                                                                                 --日志等级：0、Emergency；1、Alert；2、Critical；3、Error；4、Warning；5、Notice；6、Informational；7、Debug
-[Source]           NVARCHAR(16),                                                                                                           --事件来源
-[Action]           NVARCHAR(16),                                                                                                           --操作名称
-[Message]          NVARCHAR(128),                                                                                                          --日志默认内容
-[CreatorUserId]    UNIQUEIDENTIFIER NOT NULL,                                                                                              --创建人ID
-[CreateTime]       DATETIME DEFAULT GETDATE() NOT NULL                                                                                     --创建时间
+create table ibs_log_rule(
+[id]               varchar(36) constraint ix_ibs_log_rule primary key,
+[level]            int default 0 not null,                                                                                                 --日志等级：0、emergency；1、alert；2、critical；3、error；4、warning；5、notice；6、informational；7、debug
+[code]             varchar(6) not null,                                                                                                    --操作代码
+[source]           nvarchar(16),                                                                                                           --事件来源
+[action]           nvarchar(16),                                                                                                           --操作名称
+[message]          nvarchar(128),                                                                                                          --日志默认内容
+[is_file]          bit default 1 not null,                                                                                                 --是否写到文件：0、否；1、是
+[creator_id]       varchar(36) not null,                                                                                                   --创建人id
+[created_time]     datetime default getdate() not null                                                                                     --创建时间
 )
-GO
+go
 
 /*****日志表*****/
 
-CREATE TABLE SYS_Logs(
-[ID]               UNIQUEIDENTIFIER CONSTRAINT IX_SYS_Logs PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-[SN]               BIGINT IDENTITY(1,1),                                                                                                   --自增序列
-[Level]            INT NOT NULL,                                                                                                           --日志等级：0、Emergency；1、Alert；2、Critical；3、Error；4、Warning；5、Notice；6、Informational；7、Debug
-[Code]             VARCHAR(6),                                                                                                             --操作代码
-[Source]           NVARCHAR(16) NOT NULL,                                                                                                  --事件来源
-[Action]           NVARCHAR(16) NOT NULL,                                                                                                  --操作名称
-[Message]          NVARCHAR(MAX),                                                                                                          --日志内容
-[Key]              VARCHAR(64),                                                                                                            --操作名称
-[SourceUserId]     UNIQUEIDENTIFIER,                                                                                                       --来源用户ID
-[CreateTime]       DATETIME DEFAULT GETDATE() NOT NULL                                                                                     --创建时间
+create table ibs_log(
+[id]               varchar(36) constraint ix_ibs_log primary key,
+[level]            int not null,                                                                                                           --日志等级：0、emergency；1、alert；2、critical；3、error；4、warning；5、notice；6、informational；7、debug
+[code]             varchar(6),                                                                                                             --操作代码
+[source]           nvarchar(16) not null,                                                                                                  --事件来源
+[action]           nvarchar(16) not null,                                                                                                  --操作名称
+[message]          nvarchar(max),                                                                                                          --日志内容
+[key]              varchar(64),                                                                                                            --关键词
+[user_id]          varchar(36),                                                                                                            --来源用户id
+[created_time]     datetime default getdate() not null                                                                                     --创建时间
 )
-GO
+go
 
-/*****验证图形表*****/
-
-CREATE TABLE SYS_VerifyImage(
-[ID]               UNIQUEIDENTIFIER CONSTRAINT IX_SYS_VerifyImage PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-[SN]               BIGINT IDENTITY(1,1),                                                                                                   --自增序列
-[Type]             INT NOT NULL,                                                                                                           --图形类型：0、遮罩图；1、背景图；
-[Name]             NVARCHAR(16) NOT NULL,                                                                                                  --图形名称
-[Path]             VARCHAR(256) NOT NULL,                                                                                                  --图片本地路径
-[CreateTime]       DATETIME DEFAULT GETDATE() NOT NULL                                                                                     --创建时间
-)
-GO
 
 /*****初始化用户：系统管理员，密码：admin*****/
-
-insert SYS_User (ID, Name, LoginName, Password, Type, BuiltIn)
-select '00000000-0000-0000-0000-000000000000', '系统管理员', 'Admin', '908720E5EED8090CF950329A1B35182B', 1, 1
-GO
+insert ucb_user (id, name, account, is_builtin)
+select '00000000-0000-0000-0000-000000000000', '系统管理员', 'admin', 1
+go
 
 /*****初始化用户组：所有用户和系统管理员组*****/
-
-insert SYS_UserGroup (Name, Description, BuiltIn, Visible)
-select 'AllUsers', '所有用户', 1, 0 union all
-select 'Administers', '系统管理员组', 1, 1
-GO
+insert ucg_group (id, name, remark, is_builtin, is_visible)
+select lower(newid()), 'allusers', '所有用户', 1, 0 union all
+select lower(newid()), 'administers', '系统管理员组', 1, 1
+go
 
 /*****初始化组成员：系统管理员*****/
-
-insert SYS_UserGroupMember (GroupId, UserId)
-select ID, '00000000-0000-0000-0000-000000000000' from SYS_UserGroup
-GO
-
+insert ucg_group_member (id, group_id, user_id)
+select lower(newid()), id, '00000000-0000-0000-0000-000000000000' from ucg_group
+go
 
 /*****初始化数据权限定义*****/
-INSERT SYS_Data (Type, Alias)
-select 0, '无归属' union all
-select 1, '本人' union all
-select 2, '本部门' union all
-select 3, '部门所有' union all
-select 4, '机构所有'
-GO
+insert ucc_data_conf (id, data_type, alias)
+select lower(newid()), 0, '无归属' union all
+select lower(newid()), 1, '本人' union all
+select lower(newid()), 2, '本部门' union all
+select lower(newid()), 3, '部门所有' union all
+select lower(newid()), 4, '机构所有'
+go
 
 /*****初始化日志规则*****/
-INSERT SYS_Logs_Rules (Code, Level, Source, Action, Message, CreatorUserId)
-select '200101', 2, '系统平台', 'SqlQuery', null, '00000000-0000-0000-0000-000000000000' union all
-select '200102', 2, '系统平台', 'SqlNonQuery', null, '00000000-0000-0000-0000-000000000000' union all
-select '200103', 2, '系统平台', 'SqlScalar', null, '00000000-0000-0000-0000-000000000000' union all
-select '200104', 2, '系统平台', 'SqlExecute', null, '00000000-0000-0000-0000-000000000000' union all
-select '200105', 2, '系统平台', 'SqlExecute', null, '00000000-0000-0000-0000-000000000000' union all
-
-select '300601', 3, '日志服务', '新增规则', '插入数据失败', '00000000-0000-0000-0000-000000000000' union all
-select '300602', 3, '日志服务', '删除规则', '删除数据失败', '00000000-0000-0000-0000-000000000000' union all
-select '300603', 3, '日志服务', '编辑规则', '更新数据失败', '00000000-0000-0000-0000-000000000000' union all
-
-select '500101', 5, '系统平台', '接口验证', null, '00000000-0000-0000-0000-000000000000' union all
-
-select '600601', 6, '日志服务', '新增规则', null, '00000000-0000-0000-0000-000000000000' union all
-select '600602', 6, '日志服务', '删除规则', null, '00000000-0000-0000-0000-000000000000' union all
-select '600603', 6, '日志服务', '编辑规则', null, '00000000-0000-0000-0000-000000000000'
-GO
-
-/*****触发器：自动添加用户组【所有用户】成员*****/
-
-CREATE TRIGGER SYS_User_Insert ON SYS_User AFTER INSERT AS
-
-BEGIN
-SET NOCOUNT ON
-
-DECLARE @GroupId UNIQUEIDENTIFIER
-select @GroupId = ID from SYS_UserGroup where Name = 'AllUsers'
-
-INSERT SYS_UserGroupMember (GroupId, UserId, CreatorUserId)
-select @GroupId, TI.ID, TI.CreatorUserId 
-from Inserted TI 
-where TI.Type > 0
-
-END
-GO
-
-/*****触发器：自动删除角色成员用户*****/
-
-CREATE TRIGGER SYS_User_Delete ON SYS_User AFTER DELETE AS
-
-BEGIN
-SET NOCOUNT ON
-
-DELETE M
-from SYS_Role_Member M
-join deleted D on D.ID = M.MemberId
-where M.Type = 1
-
-END
-GO
-
-/*****触发器：自动删除角色成员用户组*****/
-
-CREATE TRIGGER SYS_UserGroup_Delete ON SYS_UserGroup AFTER DELETE AS
-
-BEGIN
-SET NOCOUNT ON
-
-DELETE M
-from SYS_Role_Member M
-join deleted D on D.ID = M.MemberId
-where M.Type = 2
-
-END
-GO
-
-/*****触发器：自动删除角色成员职位*****/
-
-CREATE TRIGGER SYS_Organization_Delete ON SYS_Organization AFTER DELETE AS
-
-BEGIN
-SET NOCOUNT ON
-
-DELETE M
-from SYS_Role_Member M
-join deleted D on D.ID = M.MemberId
-and D.NodeType = 3
-where M.Type = 3
-
-END
-GO
+insert ibs_log_rule (id, code, level, source, action, message, creator_id)
+select lower(newid()), '200101', 2, '系统平台', 'sqlquery', null, '00000000-0000-0000-0000-000000000000' union all
+select lower(newid()), '200102', 2, '系统平台', 'sqlnonquery', null, '00000000-0000-0000-0000-000000000000' union all
+select lower(newid()), '200103', 2, '系统平台', 'sqlscalar', null, '00000000-0000-0000-0000-000000000000' union all
+select lower(newid()), '200104', 2, '系统平台', 'sqlexecute', null, '00000000-0000-0000-0000-000000000000' union all
+select lower(newid()), '200105', 2, '系统平台', 'sqlexecute', null, '00000000-0000-0000-0000-000000000000' union all
+select lower(newid()), '300601', 3, '日志服务', '新增规则', '插入数据失败', '00000000-0000-0000-0000-000000000000' union all
+select lower(newid()), '300602', 3, '日志服务', '删除规则', '删除数据失败', '00000000-0000-0000-0000-000000000000' union all
+select lower(newid()), '300603', 3, '日志服务', '编辑规则', '更新数据失败', '00000000-0000-0000-0000-000000000000' union all
+select lower(newid()), '500101', 5, '系统平台', '接口验证', null, '00000000-0000-0000-0000-000000000000' union all
+select lower(newid()), '600601', 6, '日志服务', '新增规则', null, '00000000-0000-0000-0000-000000000000' union all
+select lower(newid()), '600602', 6, '日志服务', '删除规则', null, '00000000-0000-0000-0000-000000000000' union all
+select lower(newid()), '600603', 6, '日志服务', '编辑规则', null, '00000000-0000-0000-0000-000000000000'
+go
