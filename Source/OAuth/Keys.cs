@@ -9,43 +9,44 @@ namespace Insight.Base.OAuth
         private const int TIME_OUT = 300;
 
         // Token过期时间
-        private DateTime _expiryTime;
+        private DateTime expiryTime;
 
         // Token失效时间
-        private DateTime _failureTime;
+        private DateTime failureTime;
 
-        // Token验证密钥
-        public string secretKey;
+        /// <summary>
+        /// Token验证密钥
+        /// </summary>
+        public string secretKey { get; private set; }
 
-        // Token刷新密钥
-        public string refreshKey;
+        /// <summary>
+        /// Token刷新密钥
+        /// </summary>
+        public string refreshKey { get;}
 
-        // 令牌生命周期(秒)
-        public readonly int tokenLife;
+        /// <summary>
+        /// 令牌生命周期(秒)
+        /// </summary>
+        public int tokenLife { get; }
 
-        // 应用ID
-        public string appId;
+        /// <summary>
+        /// 应用ID
+        /// </summary>
+        public string appId { get; }
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        public Keys()
-        {
-        }
-
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <param name="hours">令牌有效小时数</param>
+        /// <param name="tokenLife">令牌有效小时数</param>
         /// <param name="appId">应用ID</param>
-        public Keys(int hours, string appId = null)
+        public Keys(int tokenLife, string appId = null)
         {
             this.appId = appId;
-            tokenLife = 3600 * hours;
+            this.tokenLife = 3600 * tokenLife;
             secretKey = Util.NewId("N");
             refreshKey = Util.NewId("N");
-            _expiryTime = DateTime.Now.AddSeconds(tokenLife / 12 + TIME_OUT);
-            _failureTime = DateTime.Now.AddSeconds(tokenLife + TIME_OUT);
+            expiryTime = DateTime.Now.AddSeconds(this.tokenLife / 12 + TIME_OUT);
+            failureTime = DateTime.Now.AddSeconds(this.tokenLife + TIME_OUT);
         }
 
         /// <summary>
@@ -54,7 +55,7 @@ namespace Insight.Base.OAuth
         /// <param name="key">密钥</param>
         /// <param name="type">验证类型(1:验证AccessToken、2:验证RefreshToken)</param>
         /// <returns>是否通过验证</returns>
-        public bool verifyKey(string key, int type)
+        public bool VerifyKey(string key, int type)
         {
             if (type < 1 || type > 2) return false;
 
@@ -65,10 +66,10 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 刷新令牌关键数据
         /// </summary>
-        public void refresh()
+        public void Refresh()
         {
-            _expiryTime = DateTime.Now.AddSeconds(tokenLife / 12 + TIME_OUT);
-            _failureTime = DateTime.Now.AddSeconds(tokenLife + TIME_OUT);
+            expiryTime = DateTime.Now.AddSeconds(tokenLife / 12 + TIME_OUT);
+            failureTime = DateTime.Now.AddSeconds(tokenLife + TIME_OUT);
             secretKey = Util.NewId("N");
         }
 
@@ -77,10 +78,10 @@ namespace Insight.Base.OAuth
         /// </summary>
         /// <param name="isReal">是否实际过期时间</param>
         /// <returns>Token是否过期</returns>
-        public bool isExpiry(bool isReal = false)
+        public bool IsExpiry(bool isReal = false)
         {
             var now = DateTime.Now;
-            var expiry = _expiryTime.AddSeconds(isReal ? -TIME_OUT : 0);
+            var expiry = expiryTime.AddSeconds(isReal ? -TIME_OUT : 0);
             return now.CompareTo(expiry) > 0;
         }
 
@@ -88,9 +89,9 @@ namespace Insight.Base.OAuth
         /// Token是否失效
         /// </summary>
         /// <returns>Token是否失效</returns>
-        public bool isFailure()
+        public bool IsFailure()
         {
-            return DateTime.Now.CompareTo(_failureTime) > 0;
+            return DateTime.Now.CompareTo(failureTime) > 0;
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Insight.Base.Services
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall, IncludeExceptionDetailInFaults = true)]
     public class Security : ISecurity
     {
-        private Session _Session;
+        private Token _Session;
 
         /// <summary>
         /// 为跨域请求设置响应头信息
@@ -39,19 +39,10 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> GetCode(string account)
         {
-            var uid = Core.GetUserId(account);
-            if (!uid.HasValue) return _Result.GetCodeFailured();
+            var userId = Core.GetUserId(account);
 
-            var session = Core.GetSession(uid.Value);
-            var id = session.GenerateCode();
-            if (id == null) return _Result.TooManyOnline();
 
-            var db = Redis.GetDatabase();
-            var code = Util.Hash(id);
-            var sign = session.GetSign(account, code);
-            db.StringSet(sign, id, TimeSpan.FromSeconds(3));
-
-            return _Result.Success(code);
+            return _Result.Success(userId);
         }
 
         /// <summary>
@@ -63,24 +54,12 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> GetToken(string account, string signature, string deptid)
         {
-            var uid = Core.GetUserId(account, false);
-            if (!uid.HasValue) return _Result.BadRequest();
+            var userId = Core.GetUserId(account);
+            if (string.IsNullOrEmpty(userId)) return _Result.BadRequest();
 
-            var session = Core.GetSession(uid.Value);
-            if (!session.IsValidity()) return _Result.Disabled();
+            var token = Core.GetToken(userId);
+            if (token.UserIsInvalid()) return _Result.Disabled();
 
-            var db = Redis.GetDatabase();
-            var id = db.StringGet(signature);
-            if (id.IsNullOrEmpty)
-            {
-                session.AddFailureCount();
-                return _Result.GetTokenFailured();
-            }
-
-            var parse = new GuidParse(deptid, true);
-            if (!parse.Result.successful) return parse.Result;
-
-            var token = session.CreatorKey(id, parse.Guid);
             return _Result.Success(token);
         }
 
@@ -131,12 +110,6 @@ namespace Insight.Base.Services
         {
             if (!Verify()) return _Result;
 
-            if (!VerifySmsCode(3 + _Session.Mobile, code)) return _Result.SMSCodeError();
-
-            var key = Util.Decrypt(RSAKey, password)?.Replace(_Session.secret, "");
-            if (string.IsNullOrEmpty(key)) return _Result.BadRequest();
-
-            return _Session.SetPayPW(key) ? _Result : _Result.DataBaseError();
         }
 
         /// <summary>
@@ -147,10 +120,6 @@ namespace Insight.Base.Services
         public Result<object> VerifyPayPW(string password)
         {
             if (!Verify()) return _Result;
-
-            var key = Util.Decrypt(RSAKey, password)?.Replace(_Session.secret, "");
-            var result = _Session.Verify(key);
-            if (!result.HasValue) return _Result.PayKeyNotExists();
 
             return result.Value ? _Result : _Result.InvalidPayKey();
         }
@@ -169,12 +138,9 @@ namespace Insight.Base.Services
             var code = Params.Random.Next(100000, 999999).ToString();
             var key = type + mobile;
             var expire = DateTime.Now.AddMinutes(time);
-            var db = Redis.GetDatabase();
-            db.SetAdd(key, code);
-            db.KeyExpire(key, expire);
 
             var msg = $"已经为手机号【{mobile}】的用户生成了类型为【{type}】的短信验证码：【{code}】。此验证码将于{expire}失效。";
-            Task.Run(() => new Logger("700501", msg).Write());
+            Task.Run(() => Logger.Write("700501", msg));
 
             return _Result.Created(code);
         }

@@ -10,7 +10,7 @@ namespace Insight.Base.OAuth
     /// <summary>
     /// 用户会话信息
     /// </summary>
-    public class Session
+    public class Token
     {
         // 进程同步基元
         private static readonly Mutex _Mutex = new Mutex();
@@ -34,13 +34,13 @@ namespace Insight.Base.OAuth
         private string _account;
 
         // 用户手机号
-        private string _mobile;
+        public string mobile;
 
         // 用户E-mail
-        private string _email;
+        public string email;
 
         // 登录密码
-        private string _password;
+        public string password;
 
         // 支付密码
         private readonly string _payPassword;
@@ -64,14 +64,14 @@ namespace Insight.Base.OAuth
         /// 构造方法，根据UserID构建对象
         /// </summary>
         /// <param name="user">用户实体</param>
-        public Session(User user)
+        public Token(User user)
         {
             userId = user.id;
             userName = user.name;
             _account = user.account;
-            _mobile = user.mobile;
-            _email = user.email;
-            _password = user.password;
+            mobile = user.mobile;
+            email = user.email;
+            password = user.password;
             _payPassword = user.payPassword;
             _isBuiltIn = user.isBuiltin;
             _isInvalid = user.isInvalid;
@@ -116,7 +116,7 @@ namespace Insight.Base.OAuth
                 {
                     if (item.Value.appId == null)
                     {
-                        item.Value.refresh();
+                        item.Value.Refresh();
 
                         _currentKeys = item.Value;
                         code = item.Key;
@@ -146,7 +146,7 @@ namespace Insight.Base.OAuth
         /// <returns>令牌数据包</returns>
         public TokenPackage RefreshToken(string tokenId)
         {
-            _currentKeys.refresh();
+            _currentKeys.Refresh();
             isChanged = true;
 
             return InitPackage(tokenId);
@@ -192,7 +192,7 @@ namespace Insight.Base.OAuth
         /// <returns>Token是否合法</returns>
         public bool VerifyToken(string key, int type)
         {
-            if (_currentKeys != null && _currentKeys.verifyKey(key, type)) return true;
+            if (_currentKeys != null && _currentKeys.VerifyKey(key, type)) return true;
 
             AddFailureCount();
             return false;
@@ -229,7 +229,7 @@ namespace Insight.Base.OAuth
         /// <returns>Token是否过期</returns>
         public bool IsExpiry()
         {
-            return _currentKeys == null || _currentKeys.isExpiry();
+            return _currentKeys == null || _currentKeys.IsExpiry();
         }
 
         /// <summary>
@@ -238,7 +238,7 @@ namespace Insight.Base.OAuth
         /// <returns>Token是否失效</returns>
         public bool IsFailure()
         {
-            return _currentKeys == null || _currentKeys.isFailure();
+            return _currentKeys == null || _currentKeys.IsFailure();
         }
 
         /// <summary>

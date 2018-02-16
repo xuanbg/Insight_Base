@@ -275,7 +275,7 @@ namespace Insight.Base.Services
         }
 
         private Result<object> _Result = new Result<object>();
-        private Session _Session;
+        private Token _Session;
         private AccessToken _Token;
         private Guid _UserId;
 

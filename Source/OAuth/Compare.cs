@@ -14,7 +14,7 @@ namespace Insight.Base.OAuth
     public class Compare
     {
         private readonly WebOperationContext _Context = WebOperationContext.Current;
-        private Session _Basis;
+        private Token _Basis;
 
         // 用户传入Token
         public AccessToken Token;
@@ -27,7 +27,7 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 用于验证的基准对象
         /// </summary>
-        public Session Basis => _Basis ?? (_Basis = Core.GetSession(Token.userId));
+        public Token Basis => _Basis ?? (_Basis = Core.GetToken(Token.userId));
 
         /// <summary>
         /// 构造方法，可选流控
@@ -68,7 +68,7 @@ namespace Insight.Base.OAuth
             catch (Exception ex)
             {
                 var msg = $"提取验证信息失败。Token is:{auth ?? "null"}\r\nException:{ex}";
-                new Thread(() => new Logger("500101", msg).Write()).Start();
+                new Thread(() => Logger.Write("500101", msg)).Start();
 
                 Result.InvalidAuth();
             }

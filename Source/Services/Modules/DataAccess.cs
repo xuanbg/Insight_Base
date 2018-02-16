@@ -35,7 +35,7 @@ namespace Insight.Base.Services
         /// <param name="session">Session对象实体</param>
         /// <param name="mid"></param>
         /// <returns>SYS_ModuleParam List 参数集合</returns>
-        public List<SYS_ModuleParam> GetModuleParam(Session session, Guid mid)
+        public List<SYS_ModuleParam> GetModuleParam(Token session, Guid mid)
         {
             var ids = new List<Guid>();
             List<SYS_ModuleParam> mps;
@@ -66,7 +66,7 @@ namespace Insight.Base.Services
         /// <param name="session">Session对象实体</param>
         /// <param name="mid">模块ID</param>
         /// <returns>SYS_ModuleParam List 参数集合</returns>
-        public List<SYS_ModuleParam> GetModuleUserParam(Session session, Guid mid)
+        public List<SYS_ModuleParam> GetModuleUserParam(Token session, Guid mid)
         {
             using (var context = new BaseEntities())
             {
@@ -80,7 +80,7 @@ namespace Insight.Base.Services
         /// <param name="session">Session对象实体</param>
         /// <param name="mid">模块ID</param>
         /// <returns>SYS_ModuleParam List 参数集合</returns>
-        public List<SYS_ModuleParam> GetModuleDeptParam(Session session, Guid mid)
+        public List<SYS_ModuleParam> GetModuleDeptParam(Token session, Guid mid)
         {
             using (var context = new BaseEntities())
             {
