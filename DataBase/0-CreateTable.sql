@@ -148,7 +148,8 @@ create table ucs_navigator(
 [app_id]           varchar(36) foreign key references ucs_application(id) on delete cascade not null,                                      --应用id
 [index]            int default 0 not null,                                                                                                 --序号
 [name]             nvarchar(16) not null,                                                                                                  --导航名称
-[alias]            nvarchar(16) not null,                                                                                                  --应用名称
+[alias]            nvarchar(16),                                                                                                           --应用名称
+[url]              varchar(128),                                                                                                           --模块url
 [class_name]       varchar(128),                                                                                                           --控制器命名空间
 [file_path]        nvarchar(max),                                                                                                          --文件路径
 [iconurl]          varchar(128),                                                                                                           --图标url
@@ -166,12 +167,14 @@ create table ucs_function(
 [navigator_id]     varchar(36) foreign key references ucs_navigator(id) on delete cascade not null,                                        --导航id
 [index]            int default 0 not null,                                                                                                 --序号
 [name]             varchar(64) not null,                                                                                                   --名称
-[alias]            nvarchar(16) not null,                                                                                                  --别名/简称
+[alias]            varchar(128) not null,                                                                                                  --别名/简称
+[routes]           varchar(max),                                                                                                           --接口路由
+[url]              varchar(128),                                                                                                           --功能url
 [iconurl]          varchar(128),                                                                                                           --图标url
 [icon]             image,                                                                                                                  --图标
 [remark]           nvarchar(max),                                                                                                          --描述
 [is_begin]         bit default 0 not null,                                                                                                 --是否开始分组：0、否；1、是
-[is_hide_text]     bit default 0 not null,                                                                                                 --是否隐藏文字：0、显示；1、隐藏
+[is_show_text]     bit default 1 not null,                                                                                                 --是否显示文字：0、隐藏；1、显示
 [is_visible]       bit default 1 not null,                                                                                                 --是否可见：0、不可见；1、可见
 [creator_id]       varchar(36) foreign key references ucb_user(id) default '00000000-0000-0000-0000-000000000000' not null,                --创建人id
 [created_time]     datetime default getdate() not null                                                                                     --创建时间
