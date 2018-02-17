@@ -8,31 +8,42 @@ namespace Insight.Base.OAuth
         // Token允许的超时毫秒数(300秒)
         private const int TIME_OUT = 300;
 
-        // Token过期时间
-        private DateTime expiryTime;
+        /// <summary>
+        /// Token过期时间
+        /// </summary>
+        public DateTime expiryTime { get; set; }
 
-        // Token失效时间
-        private DateTime failureTime;
+        /// <summary>
+        /// Token失效时间
+        /// </summary>
+        public DateTime failureTime { get; set; }
 
         /// <summary>
         /// Token验证密钥
         /// </summary>
-        public string secretKey { get; private set; }
+        public string secretKey { get; set; }
 
         /// <summary>
         /// Token刷新密钥
         /// </summary>
-        public string refreshKey { get;}
+        public string refreshKey { get; set; }
 
         /// <summary>
         /// 令牌生命周期(秒)
         /// </summary>
-        public int tokenLife { get; }
+        public int tokenLife { get; set; }
 
         /// <summary>
         /// 应用ID
         /// </summary>
-        public string appId { get; }
+        public string appId { get; set; }
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public Keys()
+        {
+        }
 
         /// <summary>
         /// 构造函数

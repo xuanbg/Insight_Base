@@ -14,6 +14,10 @@ namespace Insight.Base.Common.Entity
         {
         }
 
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -85,13 +89,14 @@ namespace Insight.Base.Common.Entity
         /// <param name="userId"></param>
         /// <param name="deptId"></param>
         /// <returns></returns>
+        [DbFunction("Entities", "ucf_permit")]
         public virtual IEnumerable<Permit> GetPermits(string userId, string deptId)
         {
             var userIdParam = new ObjectParameter("userId", userId);
             var deptIdParam = new ObjectParameter("deptId", deptId);
             var adapter = this as IObjectContextAdapter;
 
-            return adapter.ObjectContext.ExecuteFunction<Permit>("ucf_permit", userIdParam, deptIdParam);
+            return adapter.ObjectContext.ExecuteFunction<Permit>("[Entities].[ucf_permit](@userId, @deptId)", userIdParam, deptIdParam);
         }
     }
 }

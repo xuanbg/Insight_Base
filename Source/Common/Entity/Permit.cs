@@ -30,6 +30,11 @@ namespace Insight.Base.Common.Entity
     public class UserRole
     {
         /// <summary>
+        /// ID，唯一标识
+        /// </summary>
+        public string id { get; set; }
+
+        /// <summary>
         /// 角色ID
         /// </summary>
         [Column("role_id")]

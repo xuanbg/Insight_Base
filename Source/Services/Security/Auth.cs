@@ -197,7 +197,7 @@ namespace Insight.Base.Services
 
             // 更新Token缓存
             token.payPassword = key;
-            token.isChanged = true;
+            token.setChanged();
             Core.SetTokenCache(token);
 
             return result.Success();

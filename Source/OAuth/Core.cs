@@ -11,7 +11,7 @@ namespace Insight.Base.OAuth
     public static class Core
     {
         // 进程同步基元
-        private static readonly Mutex Mutex = new Mutex();
+        private static readonly Mutex mutex = new Mutex();
 
         /// <summary>
         /// 根据用户登录账号获取Account缓存中的用户ID
@@ -24,40 +24,41 @@ namespace Insight.Base.OAuth
             var userId = RedisHelper.StringGet(key);
             if (!string.IsNullOrEmpty(userId)) return userId;
 
-            Mutex.WaitOne();
+            mutex.WaitOne();
             userId = RedisHelper.StringGet(account);
             if (!string.IsNullOrEmpty(userId))
             {
-                Mutex.ReleaseMutex();
+                mutex.ReleaseMutex();
                 return userId;
             }
 
             var user = GetUser(account);
             if (user == null)
             {
-                Mutex.ReleaseMutex();
+                mutex.ReleaseMutex();
                 return null;
             }
 
             // 缓存用户ID到Redis
+            userId = user.id;
             key = "ID:" + user.account;
-            RedisHelper.StringSet(key, user.id);
+            RedisHelper.StringSet(key, userId);
 
             if (!string.IsNullOrEmpty(user.mobile))
             {
                 key = "ID:" + user.mobile;
-                RedisHelper.StringSet(key, user.id);
+                RedisHelper.StringSet(key, userId);
             }
 
             if (!string.IsNullOrEmpty(user.email))
             {
                 key = "ID:" + user.email;
-                RedisHelper.StringSet(key, user.id);
+                RedisHelper.StringSet(key, userId);
             }
 
             var token = new Token(user);
             SetTokenCache(token);
-            Mutex.ReleaseMutex();
+            mutex.ReleaseMutex();
 
             return userId;
         }
@@ -72,7 +73,7 @@ namespace Insight.Base.OAuth
         public static string GenerateCode(Token token, string account, int type)
         {
             string key;
-            var life = 3;
+            var life = 300;
             switch (type)
             {
                 case 0:
@@ -220,7 +221,7 @@ namespace Insight.Base.OAuth
         /// <param name="token">Token</param>
         public static void SetTokenCache(Token token)
         {
-            if (!token.isChanged) return;
+            if (!token.IsChanged()) return;
 
             var key = "Token:" + token.userId;
             var json = Util.Serialize(token);
