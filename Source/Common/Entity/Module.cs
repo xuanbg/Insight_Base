@@ -207,10 +207,10 @@ namespace Insight.Base.Common.Entity
         public bool isBegin { get; set; }
 
         /// <summary>
-        /// 是否隐藏文字：0、显示；1、隐藏
+        /// 是否显示文字：0、隐藏；1、显示
         /// </summary>
-        [Column("is_hide_text")]
-        public bool isHideText { get; set; }
+        [Column("is_show_text")]
+        public bool isShowText { get; set; }
 
         /// <summary>
         /// 是否可见：0、不可见；1、可见
