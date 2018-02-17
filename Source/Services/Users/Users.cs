@@ -275,7 +275,7 @@ namespace Insight.Base.Services
         }
 
         private Result<object> _Result = new Result<object>();
-        private Session _Session;
+        private Token _Session;
         private AccessToken _Token;
         private Guid _UserId;
 
@@ -289,16 +289,16 @@ namespace Insight.Base.Services
         /// <returns>bool 身份是否通过验证</returns>
         private bool Verify(string action = null, int limit = 0, Guid? uid = null, string account = null)
         {
-            var compare = new Compare(limit);
+            var compare = new Verify(limit);
             _Result = compare.Result;
             if (!_Result.successful) return false;
 
-            _Session = compare.Basis;
+            _Session = compare.basis;
             _Token = compare.Token;
             _UserId = _Session.userId;
             if (uid == _Session.userId || _Session.UserIsSame(account)) action = null;
 
-            _Result = compare.Verify(action);
+            _Result = compare.Compare(action);
 
             return _Result.successful;
         }

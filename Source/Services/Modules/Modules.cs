@@ -81,13 +81,13 @@ namespace Insight.Base.Services
         /// <returns>bool 身份是否通过验证</returns>
         private bool Verify(string action = null)
         {
-            var compare = new Compare();
+            var compare = new Verify();
             _Result = compare.Result;
             if (!_Result.successful) return false;
 
-            _UserId = compare.Basis.userId;
+            _UserId = compare.basis.userId;
             _DeptId = compare.Token.deptId;
-            _Result = compare.Verify(action);
+            _Result = compare.Compare(action);
             return _Result.successful;
         }
     }

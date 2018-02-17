@@ -10,75 +10,108 @@ namespace Insight.Base.OAuth
     /// <summary>
     /// 用户会话信息
     /// </summary>
-    public class Session
+    public class Token
     {
         // 进程同步基元
-        private static readonly Mutex _Mutex = new Mutex();
+        private static readonly Mutex mutex = new Mutex();
 
         // 当前令牌对应的关键数据集
-        private Keys _currentKeys;
+        private Keys currentKeys;
 
         // Token属性是否已改变
-        public bool isChanged;
-
-        // 登录部门ID
-        public string deptId;
-
-        // 用户ID
-        public string userId;
-
-        // 用户名
-        public string userName;
-
-        // 登录账号
-        private string _account;
-
-        // 用户手机号
-        private string _mobile;
-
-        // 用户E-mail
-        private string _email;
-
-        // 登录密码
-        private string _password;
-
-        // 支付密码
-        private readonly string _payPassword;
-
-        // 用户是否内置
-        private bool _isBuiltIn;
-
-        // 用户是否失效
-        private readonly bool _isInvalid;
-
-        // 上次验证失败时间
-        private DateTime _lastFailureTime;
-
-        // 连续失败次数
-        private int _failureCount;
-
-        // 使用中的令牌关键数据集
-        private readonly Dictionary<string, Keys> _keyMap;
+        private bool isChanged;
 
         /// <summary>
-        /// 构造方法，根据UserID构建对象
+        /// 登录部门ID
+        /// </summary>
+        public string deptId { get; set; }
+
+        /// <summary>
+        /// 用户ID
+        /// </summary>
+        public string userId { get; set; }
+
+        /// <summary>
+        /// 用户名
+        /// </summary>
+        public string userName { get; set; }
+
+        /// <summary>
+        /// 登录账号
+        /// </summary>
+        public string account { get; set; }
+
+        /// <summary>
+        /// 用户手机号
+        /// </summary>
+        public string mobile { get; set; }
+
+        /// <summary>
+        /// 用户E-mail
+        /// </summary>
+        public string email { get; set; }
+
+        /// <summary>
+        /// 登录密码
+        /// </summary>
+        public string password { get; set; }
+
+        /// <summary>
+        /// 支付密码
+        /// </summary>
+        public string payPassword { get; set; }
+
+        /// <summary>
+        /// 用户是否内置
+        /// </summary>
+        public bool isBuiltIn { get; set; }
+
+        /// <summary>
+        /// 用户是否失效
+        /// </summary>
+        public bool isInvalid { get; set; }
+
+        /// <summary>
+        /// 上次验证失败时间
+        /// </summary>
+        public DateTime lastFailureTime { get; set; }
+
+        /// <summary>
+        /// 连续失败次数
+        /// </summary>
+        public int failureCount { get; set; }
+
+        /// <summary>
+        /// 使用中的令牌关键数据集
+        /// </summary>
+        public Dictionary<string, Keys> keyMap { get; set; }
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public Token()
+        {
+        }
+
+        /// <summary>
+        /// 构造函数，根据UserID构建对象
         /// </summary>
         /// <param name="user">用户实体</param>
-        public Session(User user)
+        public Token(User user)
         {
             userId = user.id;
             userName = user.name;
-            _account = user.account;
-            _mobile = user.mobile;
-            _email = user.email;
-            _password = user.password;
-            _payPassword = user.payPassword;
-            _isBuiltIn = user.isBuiltin;
-            _isInvalid = user.isInvalid;
+            account = user.account;
+            mobile = user.mobile;
+            email = user.email;
+            password = user.password;
+            payPassword = user.payPassword;
+            isBuiltIn = user.isBuiltin;
+            isInvalid = user.isInvalid;
 
-            _lastFailureTime = DateTime.Now;
-            _failureCount = 0;
-            _keyMap = new Dictionary<string, Keys>();
+            lastFailureTime = DateTime.Now;
+            failureCount = 0;
+            keyMap = new Dictionary<string, Keys>();
             isChanged = true;
         }
 
@@ -88,7 +121,7 @@ namespace Insight.Base.OAuth
         /// <param name="tokenId">令牌ID</param>
         public void SelectKeys(string tokenId)
         {
-            _currentKeys = _keyMap[tokenId];
+            currentKeys = keyMap[tokenId];
         }
 
         /// <summary>
@@ -100,15 +133,15 @@ namespace Insight.Base.OAuth
         /// <returns>令牌数据包</returns>
         public TokenPackage CreatorKey(string code, int hours = 24, string appId = null)
         {
-            foreach (var item in _keyMap)
+            foreach (var item in keyMap)
             {
                 // 如应用ID不为空,且应用ID有对应的Key则从Map中删除该应用对应的Key.否则使用无应用ID的公共Key.
                 if (!string.IsNullOrEmpty(appId))
                 {
                     if (appId == item.Value.appId)
                     {
-                        _keyMap.Remove(item.Key);
-                        _currentKeys = null;
+                        keyMap.Remove(item.Key);
+                        currentKeys = null;
                         break;
                     }
                 }
@@ -116,9 +149,9 @@ namespace Insight.Base.OAuth
                 {
                     if (item.Value.appId == null)
                     {
-                        item.Value.refresh();
+                        item.Value.Refresh();
 
-                        _currentKeys = item.Value;
+                        currentKeys = item.Value;
                         code = item.Key;
                         break;
                     }
@@ -126,13 +159,13 @@ namespace Insight.Base.OAuth
             }
 
             // 生成新的Key加入Map
-            if (_currentKeys == null)
+            if (currentKeys == null)
             {
-                _currentKeys = new Keys(hours, appId);
-                _keyMap.Add(code, _currentKeys);
+                currentKeys = new Keys(hours, appId);
+                keyMap.Add(code, currentKeys);
             }
 
-            if (_failureCount > 0) _failureCount = 0;
+            if (failureCount > 0) failureCount = 0;
 
             isChanged = true;
 
@@ -146,7 +179,7 @@ namespace Insight.Base.OAuth
         /// <returns>令牌数据包</returns>
         public TokenPackage RefreshToken(string tokenId)
         {
-            _currentKeys.refresh();
+            currentKeys.Refresh();
             isChanged = true;
 
             return InitPackage(tokenId);
@@ -164,21 +197,22 @@ namespace Insight.Base.OAuth
                 id = code,
                 userId = userId,
                 userName = userName,
-                secret = _currentKeys.secretKey
+                secret = currentKeys.secretKey
             };
 
             var refreshToken = new RefreshToken
             {
                 id = code,
-                secret = _currentKeys.refreshKey
+                userId = userId,
+                secret = currentKeys.refreshKey
             };
 
             var tokenPackage = new TokenPackage
             {
                 accessToken = Util.Base64(accessToken),
                 refreshToken = Util.Base64(refreshToken),
-                expiryTime = _currentKeys.tokenLife / 12,
-                failureTime = _currentKeys.tokenLife
+                expiryTime = currentKeys.tokenLife / 12,
+                failureTime = currentKeys.tokenLife
             };
 
             return tokenPackage;
@@ -192,7 +226,7 @@ namespace Insight.Base.OAuth
         /// <returns>Token是否合法</returns>
         public bool VerifyToken(string key, int type)
         {
-            if (_currentKeys != null && _currentKeys.verifyKey(key, type)) return true;
+            if (currentKeys != null && currentKeys.VerifyKey(key, type)) return true;
 
             AddFailureCount();
             return false;
@@ -205,8 +239,8 @@ namespace Insight.Base.OAuth
         {
             if (UserIsInvalid()) return;
 
-            _failureCount++;
-            _lastFailureTime = DateTime.Now;
+            failureCount++;
+            lastFailureTime = DateTime.Now;
             isChanged = true;
         }
 
@@ -217,10 +251,10 @@ namespace Insight.Base.OAuth
         /// <returns>支付密码是否通过验证</returns>
         public bool? VerifyPayPassword(string key)
         {
-            if (_payPassword == null) return null;
+            if (payPassword == null) return null;
 
             var pw = Util.Hash(userId + key);
-            return _payPassword == pw;
+            return payPassword == pw;
         }
 
         /// <summary>
@@ -229,7 +263,7 @@ namespace Insight.Base.OAuth
         /// <returns>Token是否过期</returns>
         public bool IsExpiry()
         {
-            return _currentKeys == null || _currentKeys.isExpiry();
+            return currentKeys == null || currentKeys.IsExpiry();
         }
 
         /// <summary>
@@ -238,7 +272,7 @@ namespace Insight.Base.OAuth
         /// <returns>Token是否失效</returns>
         public bool IsFailure()
         {
-            return _currentKeys == null || _currentKeys.isFailure();
+            return currentKeys == null || currentKeys.IsFailure();
         }
 
         /// <summary>
@@ -248,14 +282,14 @@ namespace Insight.Base.OAuth
         public bool UserIsInvalid()
         {
             var now = DateTime.Now;
-            var resetTime = _lastFailureTime.AddMinutes(10);
-            if (_failureCount > 0 && now > resetTime)
+            var resetTime = lastFailureTime.AddMinutes(10);
+            if (failureCount > 0 && now > resetTime)
             {
-                _failureCount = 0;
+                failureCount = 0;
                 isChanged = true;
             }
 
-            return _failureCount > 5 || _isInvalid;
+            return failureCount > 5 || isInvalid;
         }
 
         /// <summary>
@@ -264,9 +298,26 @@ namespace Insight.Base.OAuth
         /// <param name="tokenId">令牌ID</param>
         public void DeleteKeys(string tokenId)
         {
-            if (!_keyMap.ContainsKey(tokenId)) return;
+            if (!keyMap.ContainsKey(tokenId)) return;
 
-            _keyMap.Remove(tokenId);
+            keyMap.Remove(tokenId);
+            isChanged = true;
+        }
+
+        /// <summary>
+        /// 是否已修改
+        /// </summary>
+        /// <returns></returns>
+        public bool IsChanged()
+        {
+            return isChanged;
+        }
+
+        /// <summary>
+        /// 设置修改标志位为真值
+        /// </summary>
+        public void setChanged()
+        {
             isChanged = true;
         }
     }
