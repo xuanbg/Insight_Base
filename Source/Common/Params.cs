@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Insight.Base.Common.Entity;
-using Insight.Utils.Common;
 using Insight.Utils.Server;
 
 namespace Insight.Base.Common
@@ -16,10 +15,7 @@ namespace Insight.Base.Common
         public static readonly Mutex Mutex = new Mutex();
 
         // 访问管理器
-        public static CallManage CallManage = new CallManage();
-
-        // RSA私钥
-        public static string RSAKey = Util.Base64Decode(Util.GetAppSetting("RSAKey"));
+        public static CallManage callManage { get; } = new CallManage();
 
         /// <summary>
         /// 规则缓存
@@ -48,5 +44,18 @@ namespace Insight.Base.Common
         /// 日志接口URL
         /// </summary>
         public static string LogUrl;
+
+        /// <summary>
+        /// 根据用户ID获取用户实体
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <returns>用户实体</returns>
+        public static User GetUser(string userId)
+        {
+            using (var context = new BaseEntities())
+            {
+                return context.users.SingleOrDefault(u => u.id == userId);
+            }
+        }
     }
 }

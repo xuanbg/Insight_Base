@@ -43,7 +43,7 @@ namespace Insight.Base.OAuth
         public string password;
 
         // 支付密码
-        private readonly string _payPassword;
+        public string payPassword;
 
         // 用户是否内置
         private bool _isBuiltIn;
@@ -72,7 +72,7 @@ namespace Insight.Base.OAuth
             mobile = user.mobile;
             email = user.email;
             password = user.password;
-            _payPassword = user.payPassword;
+            payPassword = user.payPassword;
             _isBuiltIn = user.isBuiltin;
             _isInvalid = user.isInvalid;
 
@@ -170,6 +170,7 @@ namespace Insight.Base.OAuth
             var refreshToken = new RefreshToken
             {
                 id = code,
+                userId = userId,
                 secret = _currentKeys.refreshKey
             };
 
@@ -217,10 +218,10 @@ namespace Insight.Base.OAuth
         /// <returns>支付密码是否通过验证</returns>
         public bool? VerifyPayPassword(string key)
         {
-            if (_payPassword == null) return null;
+            if (payPassword == null) return null;
 
             var pw = Util.Hash(userId + key);
-            return _payPassword == pw;
+            return payPassword == pw;
         }
 
         /// <summary>

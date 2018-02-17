@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 // 有关程序集的一般信息由以下
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("SecurityService")]
+[assembly: AssemblyTitle("AuthService")]
 [assembly: AssemblyDescription("用户验证服务库")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Insight Software Ltd.")]

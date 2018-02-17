@@ -5,7 +5,7 @@ using Insight.Utils.Entity;
 namespace Insight.Base.Services
 {
     [ServiceContract]
-    public interface ISecurity
+    public interface IAuth
     {
 
         #region Verify
@@ -29,21 +29,23 @@ namespace Insight.Base.Services
         /// 获取指定账户的Code
         /// </summary>
         /// <param name="account">用户账号</param>
+        /// <param name="type">登录类型</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "tokens/codes?account={account}", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "tokens/codes?account={account}&type={type}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetCode(string account);
+        Result<object> GetCode(string account, int type);
 
         /// <summary>
         /// 获取指定账户的AccessToken
         /// </summary>
+        /// <param name="appId">应用ID</param>
         /// <param name="account">用户账号</param>
         /// <param name="signature">用户签名</param>
         /// <param name="deptid">登录部门ID（可为空）</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "tokens?account={account}&signature={signature}&deptid={deptid}", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "tokens?appid={appId}&account={account}&signature={signature}&deptid={deptid}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetToken(string account, string signature, string deptid);
+        Result<object> GetToken(string appId, string account, string signature, string deptid);
 
         /// <summary>
         /// 移除指定账户的AccessToken
@@ -119,26 +121,7 @@ namespace Insight.Base.Services
         [WebGet(UriTemplate = "smscodes/compare?mobile={mobile}&code={code}&type={type}&remove={remove}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         Result<object> VerifyCode(string mobile, string code, int type, bool remove);
-
-        /// <summary>
-        /// 生成图形验证码
-        /// </summary>
-        /// <param name="id">验证图形ID</param>
-        /// <returns>Result</returns>
-        [WebGet(UriTemplate = "piccodes/{id}", ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        Result<object> GetPicCode(string id);
-
-        /// <summary>
-        /// 验证图形验证码是否正确
-        /// </summary>
-        /// <param name="id">验证图形ID</param>
-        /// <param name="code">验证码</param>
-        /// <returns>Result</returns>
-        [WebGet(UriTemplate = "smscodes/{id}/compare?code={code}", ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        Result<object> VerifyPicCode(string id, string code);
-
+        
         #endregion
 
     }
