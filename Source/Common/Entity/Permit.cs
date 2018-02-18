@@ -12,7 +12,6 @@ namespace Insight.Base.Common.Entity
         /// <summary>
         /// 导航ID
         /// </summary>
-        [Column("navigator_id")]
         public string navigatorId { get; set; }
 
         /// <summary>
@@ -24,6 +23,11 @@ namespace Insight.Base.Common.Entity
         /// 接口路由
         /// </summary>
         public string routes { get; set; }
+
+        /// <summary>
+        /// 授权
+        /// </summary>
+        public int permit { get; set; }
     }
 
     [Table("ucv_user_role")]

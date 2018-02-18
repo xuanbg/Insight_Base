@@ -21,7 +21,7 @@ namespace Insight.Base.Services
         {
             get
             {
-                using (var context = new BaseEntities())
+                using (var context = new Entities())
                 {
                     var group = context.SYS_UserGroup.SingleOrDefault(u => u.Name == _Group.Name);
                     var existed = group != null && group.ID != _Group.ID;
@@ -119,7 +119,7 @@ namespace Insight.Base.Services
         /// <param name="id">用户组ID</param>
         public UserGroup(Guid id)
         {
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 _Group = context.SYS_UserGroup.SingleOrDefault(g => g.ID == id);
                 if (_Group == null)
@@ -222,7 +222,7 @@ namespace Insight.Base.Services
         /// <returns></returns>
         private List<MemberUser> GetMember()
         {
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 var list = from m in context.SYS_UserGroupMember
                            join u in context.SYS_User on m.UserId equals u.ID

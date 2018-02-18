@@ -193,7 +193,7 @@ namespace Insight.Base.OAuth
             if (!string.IsNullOrEmpty(val)) return Convert.ToInt32(val);
 
             // 从数据库读取应用的令牌生命周期
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 var hours = context.applications.SingleOrDefault(i => i.id == appId)?.tokenLife ?? 24;
                 RedisHelper.HashSet(appId, fiele, hours.ToString());
@@ -209,7 +209,7 @@ namespace Insight.Base.OAuth
         /// <returns>用户是否存在</returns>
         public static bool IsExisted(User user)
         {
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 return context.users.Any(u => u.account == user.account || u.mobile == user.mobile || u.email == user.email);
             }
@@ -235,7 +235,7 @@ namespace Insight.Base.OAuth
         /// <returns>用户实体</returns>
         private static User GetUser(string account)
         {
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 return context.users.SingleOrDefault(u => u.account == account || u.mobile == account || u.email == account);
             }

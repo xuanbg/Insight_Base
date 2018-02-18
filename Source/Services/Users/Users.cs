@@ -121,7 +121,7 @@ namespace Insight.Base.Services
 
             if (ipr.Value > 500 || ipp.Value < 1) return _Result.BadRequest();
 
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 var filter = !string.IsNullOrEmpty(key);
                 var list = from u in context.SYS_User

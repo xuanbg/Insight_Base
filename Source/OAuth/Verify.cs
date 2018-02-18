@@ -74,10 +74,16 @@ namespace Insight.Base.OAuth
             if (string.IsNullOrEmpty(key)) return result.Success();
 
             // 根据传入的操作码进行鉴权
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
-                var permits = context.GetPermits(basis.userId, basis.deptId);
-                var isPermit = permits.Any(i => i.alias.Contains(key) || i.routes.Contains(key));
+                var list = from f in context.functions
+                    join p in context.roleFunctions on f.id equals p.functionId
+                    join r in context.userRoles on p.roleId equals r.roleId
+                    where r.userId == basis.userId && (r.deptId == null || r.deptId == basis.deptId)
+                    group p by new { f.id, f.navigatorId, f.alias, routes = f.url } into g
+                    select new { g.Key, permit = g.Min(i => i.permit) };
+                var permits = list.Where(i => i.permit > 0);
+                var isPermit = permits.Any(i => i.Key.alias.Contains(key) || i.Key.routes.Contains(key));
 
                 return isPermit ? result.Success() : result.Forbidden();
             }

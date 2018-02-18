@@ -102,7 +102,7 @@ namespace Insight.Base.Services
 
             if (ipr.Value > 500 || ipp.Value < 1) return _Result.BadRequest();
 
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 var list = from g in context.SYS_UserGroup
                            where g.Visible
@@ -154,7 +154,7 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.successful) return parse.Result;
 
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 var list = from u in context.SYS_User
                            join m in context.SYS_UserGroupMember.Where(i => i.GroupId == parse.Value) on u.ID equals m.UserId

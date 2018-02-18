@@ -88,7 +88,7 @@ namespace Insight.Base.Services
         {
             if (!Verify("928C7527-A2F7-49A3-A548-12B3834D8822")) return _Result;
 
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 var list = from o in context.SYS_Organization
                            select new {o.ID, o.ParentId, o.NodeType, o.Index, o.Code, o.Name, o.FullName, o.Alias, o.Validity, o.CreatorUserId, o.CreateTime};
@@ -152,7 +152,7 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.successful) return parse.Result;
 
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 var list = from u in context.SYS_User
                            join m in context.SYS_OrgMember.Where(i => i.OrgId == parse.Value) on u.ID equals m.UserId
@@ -173,7 +173,7 @@ namespace Insight.Base.Services
         {
             if (!Verify()) return _Result;
 
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 var user = context.SYS_User.SingleOrDefault(u => u.LoginName == account);
                 if (user == null) return _Result.NotFound();

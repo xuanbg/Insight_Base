@@ -31,7 +31,7 @@ namespace Insight.Base.Services
         {
             get
             {
-                using (var context = new BaseEntities())
+                using (var context = new Entities())
                 {
                     var role = context.SYS_Role.SingleOrDefault(r => r.Name == _Role.Name);
                     var existed = role != null && role.ID != _Role.ID;
@@ -112,7 +112,7 @@ namespace Insight.Base.Services
         {
             get
             {
-                using (var context = new BaseEntities())
+                using (var context = new Entities())
                 {
                     return context.RoleMember.Where(m => m.RoleId == ID).ToList();
                 }
@@ -160,7 +160,7 @@ namespace Insight.Base.Services
         /// <param name="id">角色ID</param>
         public Role(Guid id)
         {
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 _Role = context.SYS_Role.SingleOrDefault(r => r.ID == id);
                 if (_Role == null)
@@ -182,7 +182,7 @@ namespace Insight.Base.Services
         /// <returns>bool 是否成功</returns>
         public bool Add()
         {
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 context.SYS_Role.Add(_Role);
                 context.SYS_Role_Action.AddRange(_AddActions);
@@ -224,7 +224,7 @@ namespace Insight.Base.Services
         /// <returns>bool 是否成功</returns>
         public bool Update()
         {
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 context.SYS_Role.Attach(_Role);
                 context.Entry(_Role).State = EntityState.Modified;
@@ -293,7 +293,7 @@ namespace Insight.Base.Services
                               CreatorUserId = CreatorUserId,
                               CreateTime = DateTime.Now
                           };
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 var list = context.SYS_Role_Action.ToList();
                 _UpActions = from a in actions.Where(i => i.Action.HasValue && i.Permit.HasValue)
@@ -331,7 +331,7 @@ namespace Insight.Base.Services
                             CreatorUserId = CreatorUserId,
                             CreateTime = DateTime.Now
                         };
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 var list = context.SYS_Role_Data.ToList();
                 _UpDatas = from d in datas.Where(i => i.Permission.HasValue && i.Permit.HasValue)

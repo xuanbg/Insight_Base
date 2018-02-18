@@ -1,16 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Core.Objects;
-using System.Data.Entity.Infrastructure;
+﻿using System.Data.Entity;
 
 namespace Insight.Base.Common.Entity
 {
-    public class BaseEntities : DbContext
+    public class Entities : DbContext
     {
         /// <summary>
         /// 构造函数
         /// </summary>
-        public BaseEntities() : base("name=BaseEntities")
+        public Entities() : base("name=Entities")
         {
         }
 
@@ -97,21 +94,5 @@ namespace Insight.Base.Common.Entity
         /// 
         /// </summary>
         public virtual DbSet<ModuleParam> moduleParams { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="deptId"></param>
-        /// <returns></returns>
-        [DbFunction("Entities", "ucf_permit")]
-        public virtual IEnumerable<Permit> GetPermits(string userId, string deptId)
-        {
-            var userIdParam = new ObjectParameter("userId", userId);
-            var deptIdParam = new ObjectParameter("deptId", deptId);
-            var adapter = this as IObjectContextAdapter;
-
-            return adapter.ObjectContext.ExecuteFunction<Permit>("[Entities].[ucf_permit](@userId, @deptId)", userIdParam, deptIdParam);
-        }
     }
 }

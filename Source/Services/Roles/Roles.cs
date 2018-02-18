@@ -104,7 +104,7 @@ namespace Insight.Base.Services
 
             if (ipr.Value > 500 || ipp.Value < 1) return _Result.BadRequest();
 
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 var list = from r in context.SYS_Role.Where(r => r.Validity).OrderBy(r => r.SN)
                            select new {r.ID, r.Name, r.Description, r.BuiltIn, r.Validity, r.CreatorUserId, r.CreateTime};
@@ -128,7 +128,7 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.successful || !members.Any()) return parse.Result;
 
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 var data = from m in members
                            select new SYS_Role_Member
@@ -166,7 +166,7 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.successful) return parse.Result;
 
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 var obj = context.SYS_Role_Member.SingleOrDefault(m => m.ID == parse.Value);
                 if (obj == null) return _Result.NotFound();
@@ -206,7 +206,7 @@ namespace Insight.Base.Services
 
             if (ipr.Value > 500 || ipp.Value < 1) return _Result.BadRequest();
 
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 var skip = ipr.Value*(ipp.Value - 1);
                 var list = context.RoleMemberUser.Where(u => u.RoleId == parse.Value).OrderBy(m => m.SN);
@@ -228,7 +228,7 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.successful) return parse.Result;
 
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 var list = from o in context.SYS_Organization
                            join r in context.SYS_Role_Member.Where(r => r.RoleId == parse.Value && r.Type == 3)
@@ -250,7 +250,7 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.successful) return parse.Result;
 
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 var list = from g in context.SYS_UserGroup.OrderBy(g => g.SN)
                            join r in context.SYS_Role_Member.Where(r => r.RoleId == parse.Value && r.Type == 2)
@@ -273,7 +273,7 @@ namespace Insight.Base.Services
             var parse = new GuidParse(id);
             if (!parse.Result.successful) return parse.Result;
 
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 var list = from u in context.SYS_User.OrderBy(g => g.SN)
                            join r in context.SYS_Role_Member.Where(r => r.RoleId == parse.Value && r.Type == 1) 

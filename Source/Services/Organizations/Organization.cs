@@ -141,7 +141,7 @@ namespace Insight.Base.Services
             {
                 if (string.IsNullOrEmpty(FullName)) return false;
 
-                using (var context = new BaseEntities())
+                using (var context = new Entities())
                 {
                     var org = context.SYS_Organization.SingleOrDefault(u => u.FullName == FullName);
                     var existed = org != null && org.ID != ID;
@@ -167,7 +167,7 @@ namespace Insight.Base.Services
         /// <param name="id">组织机构ID</param>
         public Organization(Guid id)
         {
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 _Org = context.SYS_Organization.SingleOrDefault(i => i.ID == id);
                 if (_Org == null)
@@ -188,7 +188,7 @@ namespace Insight.Base.Services
         /// <returns>bool 是否成功</returns>
         public bool Add()
         {
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 context.SYS_Organization.Where(i => i.ParentId == ParentId && i.Index >= Index).ToList().ForEach(i => i.Index ++);
                 context.SYS_Organization.Add(_Org);
@@ -211,7 +211,7 @@ namespace Insight.Base.Services
         /// <returns>bool 是否成功</returns>
         public bool Delete()
         {
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 context.SYS_Organization.Where(i => i.ParentId == ParentId && i.Index > Index).ToList().ForEach(i => i.Index--);
                 context.SYS_Organization.Attach(_Org);
@@ -235,7 +235,7 @@ namespace Insight.Base.Services
         /// <returns>bool 是否成功</returns>
         public bool Update()
         {
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 var org = context.SYS_Organization.Single(i => i.ID == ID);
                 if (org.ParentId != ParentId)
@@ -326,7 +326,7 @@ namespace Insight.Base.Services
         {
             if (NodeType < 3) return null;
 
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 var list = from m in context.SYS_OrgMember
                            join u in context.SYS_User on m.UserId equals u.ID

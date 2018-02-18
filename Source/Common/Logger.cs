@@ -51,7 +51,7 @@ namespace Insight.Base.Common
         /// <returns>bool 是否写入成功</returns>
         public static bool WriteToDB(Log log)
         {
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 context.logs.Add(log);
                 return context.SaveChanges() > 0;

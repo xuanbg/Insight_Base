@@ -21,7 +21,7 @@ namespace Insight.Base.Services
         /// <returns>SYS_Module</returns>
         private Navigator GetModuleInfo(string id)
         {
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 return context.navigators.SingleOrDefault(m => m.id == id);
             }
@@ -39,7 +39,7 @@ namespace Insight.Base.Services
         {
             var ids = new List<string>();
             List<ModuleParam> mps;
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 mps = context.moduleParams.Where(p => p.moduleId == mid && ((p.orgId == null && p.userId == null) || p.orgId == session.deptId || p.userId == session.userId)).ToList();
             }
@@ -68,7 +68,7 @@ namespace Insight.Base.Services
         /// <returns>SYS_ModuleParam List 参数集合</returns>
         public List<ModuleParam> GetModuleUserParam(Token session, string mid)
         {
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 return context.moduleParams.Where(p => p.moduleId == mid && p.userId == session.userId).ToList();
             }
@@ -82,7 +82,7 @@ namespace Insight.Base.Services
         /// <returns>SYS_ModuleParam List 参数集合</returns>
         public List<ModuleParam> GetModuleDeptParam(Token session, string mid)
         {
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 return context.moduleParams.Where(p => p.moduleId == mid && p.orgId == session.deptId && p.userId == null).ToList();
             }

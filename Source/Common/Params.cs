@@ -26,7 +26,7 @@ namespace Insight.Base.Common
             {
                 if (_Rules != null) return _Rules;
 
-                using (var context = new BaseEntities())
+                using (var context = new Entities())
                 {
                     _Rules = context.logRules.ToList();
                 }
@@ -52,7 +52,7 @@ namespace Insight.Base.Common
         /// <returns>用户实体</returns>
         public static User GetUser(string userId)
         {
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 return context.users.SingleOrDefault(u => u.id == userId);
             }

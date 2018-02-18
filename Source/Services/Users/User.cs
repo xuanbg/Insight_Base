@@ -22,7 +22,7 @@ namespace Insight.Base.Services
         {
             get
             {
-                using (var context = new BaseEntities())
+                using (var context = new Entities())
                 {
                     var isExisted = context.SYS_User.Any(u => u.ID != id && (u.LoginName == _User.LoginName || u.Mobile == _User.Mobile));
                     if (isExisted) Result.AccountExists();
@@ -165,7 +165,7 @@ namespace Insight.Base.Services
         /// <param name="id">用户ID</param>
         public User(Guid id)
         {
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 _User = context.SYS_User.SingleOrDefault(u => u.ID == id);
                 if (_User == null)
@@ -186,7 +186,7 @@ namespace Insight.Base.Services
         /// <param name="account">登录账号</param>
         public User(string account)
         {
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 _User = context.SYS_User.SingleOrDefault(u => u.LoginName == account);
                 if (_User == null)
