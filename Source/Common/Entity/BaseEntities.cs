@@ -86,6 +86,21 @@ namespace Insight.Base.Common.Entity
         /// <summary>
         /// 
         /// </summary>
+        public virtual DbSet<Category> categories { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public virtual DbSet<ImageData> imageDatas { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public virtual DbSet<ModuleParam> moduleParams { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="userId"></param>
         /// <param name="deptId"></param>
         /// <returns></returns>

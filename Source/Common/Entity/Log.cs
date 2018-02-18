@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Insight.Base.Common.Entity
 {
-    [Table("ibs_log_rule")]
+    [Table("ibl_rule")]
     public class LogRule
     {
         /// <summary>
@@ -55,7 +55,7 @@ namespace Insight.Base.Common.Entity
         public DateTime createTime { get; set; }
     }
 
-    [Table("ibs_log")]
+    [Table("ibl_log")]
     public class Log
     {
         /// <summary>

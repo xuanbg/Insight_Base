@@ -59,17 +59,5 @@ namespace Insight.Base.Services
         [WebGet(UriTemplate = "modules/{id}/params/dept", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         Result<object> GetModuleDeptParam(string id);
-
-        /// <summary>
-        /// 保存模块选项参数
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="apl">新增参数集合</param>
-        /// <param name="upl">更新参数集合</param>
-        /// <returns>Result</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "modules/{id}/params", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
-        [OperationContract]
-        Result<object> SaveModuleParam(string id, List<SYS_ModuleParam> apl, List<SYS_ModuleParam> upl);
-
     }
 }

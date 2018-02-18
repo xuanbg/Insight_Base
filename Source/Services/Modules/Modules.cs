@@ -25,12 +25,10 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> GetNavigation()
         {
-            if (!Verify()) return _Result;
+            if (!Verify()) return result;
 
-            var auth = new Authority(_UserId, _DeptId, InitType.Navigation);
-            var data = new {Groups = auth.GetModuleGroups(), Modules = auth.GetModules()};
 
-            return _Result.Success(data);
+            return result.Success();
         }
 
         /// <summary>
@@ -40,14 +38,12 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> GetAction(string id)
         {
-            if (!Verify()) return _Result;
+            if (!Verify()) return result;
 
             var parse = new GuidParse(id);
             if (!parse.Result.successful) return parse.Result;
 
-            var auth = new Authority(_UserId, _DeptId, InitType.ToolBar);
-            var data = auth.ModuleActions(parse.Value);
-            return data.Any() ? _Result.Success(data) : _Result.NoContent(new List<object>());
+            return result.Success();
         }
 
         public Result<object> GetModuleParam(string id)
@@ -65,30 +61,26 @@ namespace Insight.Base.Services
             throw new NotImplementedException();
         }
 
-        public Result<object> SaveModuleParam(string id, List<SYS_ModuleParam> apl, List<SYS_ModuleParam> upl)
-        {
-            throw new NotImplementedException();
-        }
-
-        private Result<object> _Result = new Result<object>();
-        private Guid _UserId;
-        private Guid? _DeptId;
+        private Result<object> result = new Result<object>();
+        private Token token;
+        private string tokenId;
+        private string userId;
 
         /// <summary>
         /// 会话合法性验证
         /// </summary>
-        /// <param name="action">操作权限代码，默认为空，即不进行鉴权</param>
+        /// <param name="key">操作权限代码，默认为空，即不进行鉴权</param>
         /// <returns>bool 身份是否通过验证</returns>
-        private bool Verify(string action = null)
+        private bool Verify(string key = null)
         {
-            var compare = new Verify();
-            _Result = compare.Result;
-            if (!_Result.successful) return false;
+            var verify = new OAuth.Verify();
+            result = verify.Compare(key);
+            if (!result.successful) return false;
 
-            _UserId = compare.basis.userId;
-            _DeptId = compare.Token.deptId;
-            _Result = compare.Compare(action);
-            return _Result.successful;
+            token = verify.basis;
+            tokenId = verify.tokenId;
+            userId = token.userId;
+            return result.successful;
         }
     }
 }

@@ -19,11 +19,11 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">模块ID</param>
         /// <returns>SYS_Module</returns>
-        private SYS_Module GetModuleInfo(Guid id)
+        private Navigator GetModuleInfo(string id)
         {
             using (var context = new BaseEntities())
             {
-                return context.SYS_Module.SingleOrDefault(m => m.ID == id);
+                return context.navigators.SingleOrDefault(m => m.id == id);
             }
         }
 
@@ -35,28 +35,28 @@ namespace Insight.Base.Services
         /// <param name="session">Session对象实体</param>
         /// <param name="mid"></param>
         /// <returns>SYS_ModuleParam List 参数集合</returns>
-        public List<SYS_ModuleParam> GetModuleParam(Token session, Guid mid)
+        public List<ModuleParam> GetModuleParam(Token session, string mid)
         {
-            var ids = new List<Guid>();
-            List<SYS_ModuleParam> mps;
+            var ids = new List<string>();
+            List<ModuleParam> mps;
             using (var context = new BaseEntities())
             {
-                mps = context.SYS_ModuleParam.Where(p => p.ModuleId == mid && ((p.OrgId == null && p.UserId == null) || p.OrgId == session.deptId || p.UserId == session.userId)).ToList();
+                mps = context.moduleParams.Where(p => p.moduleId == mid && ((p.orgId == null && p.userId == null) || p.orgId == session.deptId || p.userId == session.userId)).ToList();
             }
             foreach (var pam in mps)
             {
                 // 当前全局选项，判断是否存在同类非全局选项
-                if (pam.OrgId == null && pam.UserId == null && mps.Exists(p => p.ParamId == pam.ParamId && (p.OrgId != null || p.UserId != null)))
+                if (pam.orgId == null && pam.userId == null && mps.Exists(p => p.paramId == pam.paramId && (p.orgId != null || p.userId != null)))
                 {
-                    ids.Add(pam.ID);
+                    ids.Add(pam.id);
                 }
                 // 当前部门选项，判断是否存在同类用户选项
-                if (pam.OrgId != null && pam.UserId == null && mps.Exists(p => p.ParamId == pam.ParamId && p.UserId != null))
+                if (pam.orgId != null && pam.userId == null && mps.Exists(p => p.paramId == pam.paramId && p.userId != null))
                 {
-                    ids.Add(pam.ID);
+                    ids.Add(pam.id);
                 }
             }
-            ids.ForEach(pid => mps.Remove(mps.Find(p => p.ID == pid)));
+            ids.ForEach(pid => mps.Remove(mps.Find(p => p.id == pid)));
             return mps;
         }
 
@@ -66,11 +66,11 @@ namespace Insight.Base.Services
         /// <param name="session">Session对象实体</param>
         /// <param name="mid">模块ID</param>
         /// <returns>SYS_ModuleParam List 参数集合</returns>
-        public List<SYS_ModuleParam> GetModuleUserParam(Token session, Guid mid)
+        public List<ModuleParam> GetModuleUserParam(Token session, string mid)
         {
             using (var context = new BaseEntities())
             {
-                return context.SYS_ModuleParam.Where(p => p.ModuleId == mid && p.UserId == session.userId).ToList();
+                return context.moduleParams.Where(p => p.moduleId == mid && p.userId == session.userId).ToList();
             }
         }
 
@@ -80,37 +80,12 @@ namespace Insight.Base.Services
         /// <param name="session">Session对象实体</param>
         /// <param name="mid">模块ID</param>
         /// <returns>SYS_ModuleParam List 参数集合</returns>
-        public List<SYS_ModuleParam> GetModuleDeptParam(Token session, Guid mid)
+        public List<ModuleParam> GetModuleDeptParam(Token session, string mid)
         {
             using (var context = new BaseEntities())
             {
-                return context.SYS_ModuleParam.Where(p => p.ModuleId == mid && p.OrgId == session.deptId && p.UserId == null).ToList();
+                return context.moduleParams.Where(p => p.moduleId == mid && p.orgId == session.deptId && p.userId == null).ToList();
             }
-        }
-
-        /// <summary>
-        /// 保存模块选项参数
-        /// </summary>
-        /// <param name="us">Session对象实体</param>
-        /// <param name="apl">新增参数集合</param>
-        /// <param name="upl">更新参数集合</param>
-        /// <returns>bool 是否保存成功</returns>
-        public bool SaveModuleParam(AccessToken us, List<SYS_ModuleParam> apl, List<SYS_ModuleParam> upl)
-        {
-            var helper = new SqlHelper(Params.Database);
-            const string sql = "insert SYS_ModuleParam (ModuleId, ParamId, Name, Value, OrgId, UserId, Description) select @ModuleId, @ParamId, @Name, @Value, @OrgId, @UserId, @Description";
-            var cmds = apl.Select(p => new[]
-            {
-                new SqlParameter("@ModuleId", SqlDbType.UniqueIdentifier) {Value = p.ModuleId},
-                new SqlParameter("@ParamId", SqlDbType.UniqueIdentifier) {Value = p.ParamId},
-                new SqlParameter("@Name", p.Name),
-                new SqlParameter("@Value", p.Value),
-                new SqlParameter("@OrgId", SqlDbType.UniqueIdentifier) {Value = p.OrgId},
-                new SqlParameter("@UserId", SqlDbType.UniqueIdentifier) {Value = p.UserId},
-                new SqlParameter("@Description", p.Description)
-            }).Select(parm => helper.MakeCommand(sql, parm)).ToList();
-            cmds.AddRange(upl.Select(p => $"update SYS_ModuleParam set Value = '{p.Value}' where ID = '{p.ID}'").Select(s => helper.MakeCommand(s)));
-            return helper.SqlExecute(cmds);
         }
 
         #endregion

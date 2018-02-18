@@ -58,8 +58,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DbHelper.cs" />
+    <Compile Include="Entity\BaseData.cs" />
     <Compile Include="Entity\BaseEntities.cs" />
-    <Compile Include="Entity\Config.cs" />
     <Compile Include="Entity\Enum.cs" />
     <Compile Include="Entity\Log.cs" />
     <Compile Include="Entity\MemberUser.cs" />
