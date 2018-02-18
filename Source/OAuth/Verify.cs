@@ -41,6 +41,7 @@ namespace Insight.Base.OAuth
 
             tokenId = accessToken.id;
             basis = Core.GetToken(accessToken.userId);
+            basis?.SelectKeys(tokenId);
         }
 
         /// <summary>
@@ -53,7 +54,6 @@ namespace Insight.Base.OAuth
             if (basis == null) return result.InvalidToken();
 
             // 验证令牌
-            basis.SelectKeys(tokenId);
             if (basis.IsExpiry()) return result.Expired();
 
             if (basis.IsFailure()) return result.Failured();
@@ -80,8 +80,9 @@ namespace Insight.Base.OAuth
                     join p in context.roleFunctions on f.id equals p.functionId
                     join r in context.userRoles on p.roleId equals r.roleId
                     where r.userId == basis.userId && (r.deptId == null || r.deptId == basis.deptId)
-                    group p by new { f.id, f.navigatorId, f.alias, routes = f.url } into g
-                    select new { g.Key, permit = g.Min(i => i.permit) };
+                    group p by new {f.id, f.navigatorId, f.alias, routes = f.url}
+                    into g
+                    select new {g.Key, permit = g.Min(i => i.permit)};
                 var permits = list.Where(i => i.permit > 0);
                 var isPermit = permits.Any(i => i.Key.alias.Contains(key) || i.Key.routes.Contains(key));
 
