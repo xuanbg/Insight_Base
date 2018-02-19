@@ -1,11 +1,11 @@
 use insight_base
 go
 
-if exists (select * from sysobjects where id = object_id(N'ibs_log') and objectproperty(id, N'isusertable') = 1)
-drop table ibs_log
+if exists (select * from sysobjects where id = object_id(N'ibl_log') and objectproperty(id, N'isusertable') = 1)
+drop table ibl_log
 go
-if exists (select * from sysobjects where id = object_id(N'ibs_log_rule') and objectproperty(id, N'isusertable') = 1)
-drop table ibs_log_rule
+if exists (select * from sysobjects where id = object_id(N'ibl_rule') and objectproperty(id, N'isusertable') = 1)
+drop table ibl_rule
 go
 
 if exists (select * from sysobjects where id = object_id(N'ucr_role_data') and objectproperty(id, N'isusertable') = 1)
@@ -20,13 +20,10 @@ go
 if exists (select * from sysobjects where id = object_id(N'ucr_role') and objectproperty(id, N'isusertable') = 1)
 drop table ucr_role
 go
+if exists (select * from sysobjects where id = object_id(N'ucr_config') and objectproperty(id, N'isusertable') = 1)
+drop table ucr_config
+go
 
-if exists (select * from sysobjects where id = object_id(N'ucc_data_conf') and objectproperty(id, N'isusertable') = 1)
-drop table ucc_data_conf
-go
-if exists (select * from sysobjects where id = object_id(N'ucc_param') and objectproperty(id, N'isusertable') = 1)
-drop table ucc_param
-go
 if exists (select * from sysobjects where id = object_id(N'ucs_function') and objectproperty(id, N'isusertable') = 1)
 drop table ucs_function
 go
@@ -181,31 +178,16 @@ create table ucs_function(
 )
 go
 
-/*****模块选项配置表*****/
-create table ucc_param(
-[id]               varchar(36) constraint ix_ucc_param primary key,
-[module_id]        varchar(36) foreign key references ucs_navigator(id) on delete cascade not null,                                        --模块注册id
-[param_id]         varchar(36) not null,                                                                                                   --选项id
-[name]             nvarchar(64) not null,                                                                                                  --选项名称
-[value]            nvarchar(max),                                                                                                          --选项参数值
-[org_id]           varchar(36) foreign key references uco_organization(id),                                                                --生效机构id
-[user_id]          varchar(36) foreign key references ucb_user(id),                                                                        --生效用户id
-[remark]           nvarchar(max),                                                                                                           --描述
-[creator_id]       varchar(36) foreign key references ucb_user(id) default '00000000-0000-0000-0000-000000000000' not null,                --创建人id
-[created_time]     datetime default getdate() not null                                                                                     --创建时间
-)
-go
+
+/*****角色权限数据表*****/
 
 /*****数据配置表*****/
-create table ucc_data_conf(
-[id]               varchar(36) constraint ix_ucc_data_conf primary key,
+create table ucr_config(
+[id]               varchar(36) constraint ix_ucr_config primary key,
 [data_type]        int not null,                                                                                                           --类型：0、无归属；1、仅本人；2、仅本部门；3、部门所有；4、机构所有；5、根域所有
 [alias]            nvarchar(16) not null,                                                                                                  --别名/简称
 )
 go
-
-
-/*****角色权限数据表*****/
 
 /*****角色表*****/
 create table ucr_role(
@@ -257,8 +239,8 @@ go
 /*****日志数据表*****/
 
 /*****日志规则表*****/
-create table ibs_log_rule(
-[id]               varchar(36) constraint ix_ibs_log_rule primary key,
+create table ibl_rule(
+[id]               varchar(36) constraint ix_ibl_rule primary key,
 [level]            int default 0 not null,                                                                                                 --日志等级：0、emergency；1、alert；2、critical；3、error；4、warning；5、notice；6、informational；7、debug
 [code]             varchar(6) not null,                                                                                                    --操作代码
 [source]           nvarchar(16),                                                                                                           --事件来源
@@ -272,8 +254,8 @@ go
 
 /*****日志表*****/
 
-create table ibs_log(
-[id]               varchar(36) constraint ix_ibs_log primary key,
+create table ibl_log(
+[id]               varchar(36) constraint ix_ibl_log primary key,
 [level]            int not null,                                                                                                           --日志等级：0、emergency；1、alert；2、critical；3、error；4、warning；5、notice；6、informational；7、debug
 [code]             varchar(6),                                                                                                             --操作代码
 [source]           nvarchar(16) not null,                                                                                                  --事件来源
@@ -303,7 +285,7 @@ select lower(newid()), id, '00000000-0000-0000-0000-000000000000' from ucg_group
 go
 
 /*****初始化数据权限定义*****/
-insert ucc_data_conf (id, data_type, alias)
+insert ucr_config (id, data_type, alias)
 select lower(newid()), 0, '无归属' union all
 select lower(newid()), 1, '本人' union all
 select lower(newid()), 2, '本部门' union all
@@ -312,7 +294,7 @@ select lower(newid()), 4, '机构所有'
 go
 
 /*****初始化日志规则*****/
-insert ibs_log_rule (id, code, level, source, action, message, creator_id)
+insert ibl_rule (id, code, level, source, action, message, creator_id)
 select lower(newid()), '200101', 2, '系统平台', 'sqlquery', null, '00000000-0000-0000-0000-000000000000' union all
 select lower(newid()), '200102', 2, '系统平台', 'sqlnonquery', null, '00000000-0000-0000-0000-000000000000' union all
 select lower(newid()), '200103', 2, '系统平台', 'sqlscalar', null, '00000000-0000-0000-0000-000000000000' union all
