@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Insight.Base.Common.Entity
@@ -70,5 +71,15 @@ namespace Insight.Base.Common.Entity
         /// </summary>
         [Column("created_time")]
         public DateTime createTime { get; set; }
+
+        /// <summary>
+        /// 授予用户的功能权限
+        /// </summary>
+        public List<PermitFunt> funts { get; set; }
+
+        /// <summary>
+        /// 授予用户的数据权限
+        /// </summary>
+        public List<PermitData> datas { get; set; }
     }
 }

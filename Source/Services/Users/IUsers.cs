@@ -1,5 +1,6 @@
 ﻿using System.ServiceModel;
 using System.ServiceModel.Web;
+using Insight.Base.Common.Entity;
 using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
@@ -35,12 +36,11 @@ namespace Insight.Base.Services
         /// <summary>
         /// 根据用户ID更新用户信息
         /// </summary>
-        /// <param name="id">用户ID</param>
         /// <param name="user">用户数据对象</param>
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "users/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> UpdateUserInfo(string id, User user);
+        Result<object> UpdateUserInfo(User user);
 
         /// <summary>
         /// 根据ID获取用户对象实体
@@ -75,12 +75,12 @@ namespace Insight.Base.Services
         /// <summary>
         /// 更新指定用户Session的签名
         /// </summary>
-        /// <param name="account">登录账号</param>
+        /// <param name="id">用户ID</param>
         /// <param name="password">新密码</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "users/{account}/signature", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "users/{id}/signature", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> UpdateSignature(string account, string password);
+        Result<object> UpdateSignature(string id, string password);
 
         /// <summary>
         /// 用户重置登录密码
@@ -97,12 +97,12 @@ namespace Insight.Base.Services
         /// <summary>
         /// 根据用户ID设置用户状态
         /// </summary>
-        /// <param name="account">登录账号</param>
-        /// <param name="validity">可用状态</param>
+        /// <param name="id">用户ID</param>
+        /// <param name="invalid">可用状态</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "users/{account}/validity", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "users/{id}/validity", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> SetUserStatus(string account, bool validity);
+        Result<object> SetUserStatus(string id, bool invalid);
 
         /// <summary>
         /// 设置指定用户的登录状态为离线

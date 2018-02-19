@@ -22,11 +22,11 @@ namespace Insight.Base.OAuth
         {
             var key = "ID:" + account;
             var userId = RedisHelper.StringGet(key);
-            if (!string.IsNullOrEmpty(userId)) return userId;
+            if (!String.IsNullOrEmpty(userId)) return userId;
 
             mutex.WaitOne();
             userId = RedisHelper.StringGet(account);
-            if (!string.IsNullOrEmpty(userId))
+            if (!String.IsNullOrEmpty(userId))
             {
                 mutex.ReleaseMutex();
                 return userId;
@@ -44,13 +44,13 @@ namespace Insight.Base.OAuth
             key = "ID:" + user.account;
             RedisHelper.StringSet(key, userId);
 
-            if (!string.IsNullOrEmpty(user.mobile))
+            if (!String.IsNullOrEmpty(user.mobile))
             {
                 key = "ID:" + user.mobile;
                 RedisHelper.StringSet(key, userId);
             }
 
-            if (!string.IsNullOrEmpty(user.email))
+            if (!String.IsNullOrEmpty(user.email))
             {
                 key = "ID:" + user.email;
                 RedisHelper.StringSet(key, userId);
@@ -82,7 +82,7 @@ namespace Insight.Base.OAuth
                 case 1:
                     // 生成短信验证码(5分钟内有效)并发送
                     var mobile = token.mobile;
-                    if (string.IsNullOrEmpty(mobile)) return null;
+                    if (String.IsNullOrEmpty(mobile)) return null;
 
                     life = 60 * 5;
                     var smsCode = GenerateSmsCode(4, mobile, 5, 4);
@@ -160,7 +160,7 @@ namespace Insight.Base.OAuth
         public static string GetCode(string sign)
         {
             var code = RedisHelper.StringGet(sign);
-            if (string.IsNullOrEmpty(code)) return null;
+            if (String.IsNullOrEmpty(code)) return null;
 
             RedisHelper.Delete(sign);
             return code;
@@ -175,7 +175,7 @@ namespace Insight.Base.OAuth
         {
             var key = "Token:" + userId;
             var json = RedisHelper.StringGet(key);
-            return string.IsNullOrEmpty(json) ? null : Util.Deserialize<Token>(json);
+            return String.IsNullOrEmpty(json) ? null : Util.Deserialize<Token>(json);
         }
 
         /// <summary>
@@ -185,12 +185,12 @@ namespace Insight.Base.OAuth
         /// <returns>应用的令牌生命周期小时数</returns>
         public static int GetTokenLife(string appId)
         {
-            if (string.IsNullOrEmpty(appId)) return 24;
+            if (String.IsNullOrEmpty(appId)) return 24;
 
             // 从缓存读取应用的令牌生命周期
             const string fiele = "TokenLife";
             var val = RedisHelper.HashGet(appId, fiele);
-            if (!string.IsNullOrEmpty(val)) return Convert.ToInt32(val);
+            if (!String.IsNullOrEmpty(val)) return Convert.ToInt32(val);
 
             // 从数据库读取应用的令牌生命周期
             using (var context = new Entities())
@@ -226,6 +226,19 @@ namespace Insight.Base.OAuth
             var key = "Token:" + token.userId;
             var json = Util.Serialize(token);
             RedisHelper.StringSet(key, json);
+        }
+
+        /// <summary>
+        /// 根据用户ID获取用户实体
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <returns>用户实体</returns>
+        public static User GetUserById(string userId)
+        {
+            using (var context = new Entities())
+            {
+                return context.users.SingleOrDefault(u => u.id == userId);
+            }
         }
 
         /// <summary>

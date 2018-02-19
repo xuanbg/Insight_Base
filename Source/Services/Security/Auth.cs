@@ -191,7 +191,7 @@ namespace Insight.Base.Services
             if (token.payPassword == key) return result.Success();
 
             // 保存支付密码到数据库
-            var user = Params.GetUser(userId);
+            var user = Core.GetUserById(userId);
             user.payPassword = key;
             if (!DbHelper.Update(user)) return result.DataBaseError();
 

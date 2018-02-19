@@ -44,18 +44,5 @@ namespace Insight.Base.Common
         /// 日志接口URL
         /// </summary>
         public static string LogUrl;
-
-        /// <summary>
-        /// 根据用户ID获取用户实体
-        /// </summary>
-        /// <param name="userId">用户ID</param>
-        /// <returns>用户实体</returns>
-        public static User GetUser(string userId)
-        {
-            using (var context = new Entities())
-            {
-                return context.users.SingleOrDefault(u => u.id == userId);
-            }
-        }
     }
 }

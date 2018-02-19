@@ -26,16 +26,15 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> AddUser(User user)
         {
-            if (!Verify("60D5BE64-0102-4189-A999-96EDAD3DA1B5")) return _Result;
+            if (!Verify("newUser")) return result;
 
-            if (user.existed) return user.Result;
+            if (Core.IsExisted(user)) return result.AccountExists();
 
-            user.password = Util.Encrypt(Params.RSAKey, Util.Hash("123456"));
-            user.validity = true;
-            user.creatorUserId = _UserId;
+            user.password = Util.Hash("123456");
+            user.creatorId = userId;
             user.createTime = DateTime.Now;
-
-            return user.Add() ? _Result.Created(user) : user.Result;
+            
+            return DbHelper.Insert(user) ? result.Created(user) : result.DataBaseError();
         }
 
         /// <summary>
@@ -45,42 +44,40 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> RemoveUser(string id)
         {
-            if (!Verify("BE2DE9AB-C109-418D-8626-236DEF8E8504")) return _Result;
+            if (!Verify("deleteUser")) return result;
 
-            var parse = new GuidParse(id);
-            if (!parse.Result.successful) return parse.Result;
+            var user = Core.GetUserById(id);
+            if (user == null) return result.NotFound();
 
-            var user = new User(parse.Value);
-            return user.Result.successful && user.Delete() ? _Result : user.Result;
+            user.isInvalid = true;
+
+            return DbHelper.Update(user) ? result : result.DataBaseError();
         }
 
         /// <summary>
         /// 更新用户信息
         /// </summary>
-        /// <param name="id">用户ID</param>
         /// <param name="user">用户数据对象</param>
         /// <returns>Result</returns>
-        public Result<object> UpdateUserInfo(string id, User user)
+        public Result<object> UpdateUserInfo(User user)
         {
-            var parse = new GuidParse(id);
-            if (!parse.Result.successful) return parse.Result;
+            if (!Verify("editUser")) return result;
 
-            if (!Verify("3BC17B61-327D-4EAA-A0D7-7F825A6C71DB")) return _Result;
-
-            var data = new User(parse.Value);
-            if (!data.Result.successful) return data.Result;
+            var data = Core.GetUserById(user.id);
+            if (data == null) return result.NotFound();
 
             data.name = user.name;
-            data.description = user.description;
-            if (!data.Update()) return data.Result;
+            data.remark = user.remark;
+            if (!DbHelper.Update(data)) return result.DataBaseError();
 
-            _Result.Success(data);
-            var session = Core.GetSession(user.id);
-            if (session == null) return _Result;
+            var session = Core.GetToken(user.id);
+            if (session == null) return result;
 
             session.userName = user.name;
-            session.UserType = user.type;
-            return _Result;
+            session.setChanged();
+            Core.SetTokenCache(session);
+
+            return result;
         }
 
         /// <summary>
@@ -90,16 +87,13 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> GetUser(string id)
         {
-            var parse = new GuidParse(id);
-            if (!parse.Result.successful) return parse.Result;
+            if (!Verify("getUsers")) return result;
 
-            if (!Verify("B5992AA3-4AD3-4795-A641-2ED37AC6425C")) return _Result;
+            var data = Core.GetUserById(id);
+            if (data == null) return result.NotFound();
 
-            var data = new User(parse.Value);
-            if (!data.Result.successful) return data.Result;
-
-            data.Authority = new Authority(parse.Value, null, InitType.Permission, true);
-            return _Result.Success(data);
+            data.funts = null;
+            return result.Success(data);
         }
 
         /// <summary>
@@ -111,7 +105,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> GetUsers(string rows, string page, string key)
         {
-            if (!Verify("B5992AA3-4AD3-4795-A641-2ED37AC6425C")) return _Result;
+            if (!Verify("getUsers")) return result;
 
             var ipr = new IntParse(rows);
             if (!ipr.Result.successful) return ipr.Result;
@@ -119,31 +113,16 @@ namespace Insight.Base.Services
             var ipp = new IntParse(page);
             if (!ipp.Result.successful) return ipp.Result;
 
-            if (ipr.Value > 500 || ipp.Value < 1) return _Result.BadRequest();
+            if (ipr.Value > 500 || ipp.Value < 1) return result.BadRequest();
 
             using (var context = new Entities())
             {
-                var filter = !string.IsNullOrEmpty(key);
-                var list = from u in context.SYS_User
-                        .Where(u => u.Type > 0 && (!filter || u.Name.Contains(key) || u.LoginName.Contains(key)))
-                        .OrderBy(u => u.SN)
-                    select new
-                    {
-                        id = u.ID,
-                        name = u.Name,
-                        loginName = u.LoginName,
-                        mobile =u.Mobile,
-                        description = u.Description,
-                        type = u.Type,
-                        builtIn = u.BuiltIn,
-                        validity = u.Validity,
-                        creatorUserId = u.CreatorUserId,
-                        createTime = u.CreateTime
-                    };
+                var list = from u in context.users.Where(u => string.IsNullOrEmpty(key) || u.name.Contains(key) || u.account.Contains(key) || u.mobile.Contains(key) || u.email.Contains(key))
+                    select new{u.id,u.name,u.account,u.mobile,u.email,u.remark,u.isBuiltin,u.isInvalid,u.creatorId,u.createTime};
                 var skip = ipr.Value*(ipp.Value - 1);
-                var users = list.Skip(skip).Take(ipr.Value).ToList();
+                var users = list.OrderBy(u => u.createTime).Skip(skip).Take(ipr.Value).ToList();
 
-                return _Result.Success(users, list.Count().ToString());
+                return result.Success(users, list.Count());
             }
         }
 
@@ -155,42 +134,50 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> SignUp(string code, User user)
         {
-            if (!Verify()) return _Result;
+            if (!Verify()) return result;
 
-            if (!Params.VerifySmsCode(1 + user.mobile, code)) return _Result.SMSCodeError();
+            if (!Core.VerifySmsCode(1, user.mobile, code)) return result.SMSCodeError();
 
-            if (user.existed) return user.Result;
+            if (Core.IsExisted(user)) return result.AccountExists();
 
-            user.validity = true;
+            user.id = Util.NewId();
+            user.creatorId = user.id;
             user.createTime = DateTime.Now;
-            if (!user.Add()) return user.Result;
+            if (!DbHelper.Insert(user)) return result.DataBaseError();
 
-            var session = Core.GetSession(user.id);
-            session.InitSecret();
+            var session = Core.GetToken(user.id);
+            var tokens = session.CreatorKey(Util.NewId("N"));
+            Core.SetTokenCache(session);
 
-            var tid = session.GenerateCode();
-            return _Result.Created(session.CreatorKey(tid));
+            return result.Created(tokens);
         }
 
         /// <summary>
         /// 更新指定用户Session的签名
         /// </summary>
-        /// <param name="account">登录账号</param>
+        /// <param name="id">用户ID</param>
         /// <param name="password">新密码（RSA加密）</param>
         /// <returns>Result</returns>
-        public Result<object> UpdateSignature(string account, string password)
+        public Result<object> UpdateSignature(string id, string password)
         {
-            if (!Verify("26481E60-0917-49B4-BBAA-2265E71E7B3F", 0, null, account)) return _Result;
+            if (!Verify("reset", id)) return result;
 
-            var user = new User(account) {password = password};
-            if (!user.Result.successful || !user.Update()) return user.Result;
+            var user = Core.GetUserById(id);
+            if (user == null) return result.NotFound();
 
-            var session = _Session.UserIsSame(account) ? _Session : Core.GetSession(user.id);
+            if (user.password == password) result.BadRequest("密码不能与原密码相同");
 
-            if (session == null) return _Result;
+            user.password = password;
+            if (!DbHelper.Update(user)) return result.DataBaseError();
 
-            session.Sign(password);
-            return _Result;
+            var session = Core.GetToken(id);
+            if (session == null) return result;
+
+            session.password = password;
+            session.setChanged();
+            Core.SetTokenCache(session);
+
+            return result;
         }
 
         /// <summary>
@@ -203,42 +190,53 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> ResetSignature(string account, string password, string code, string mobile = null)
         {
-            if (!Verify()) return _Result;
+            if (!Core.VerifySmsCode(2, mobile ?? account, code)) return result.SMSCodeError();
 
-            // 验证短信验证码
-            if (!Params.VerifySmsCode(2 + (mobile ?? account), code)) return _Result.SMSCodeError();
+            userId = Core.GetUserId(account);
+            if (userId == null) return result.NotFound();
 
-            var user = new User(account) {password = password};
-            if (!user.Result.successful || !user.Update()) return user.Result;
+            token = Core.GetToken(userId);
+            if (token.password != password)
+            {
+                var user = Core.GetUserById(userId);
+                user.password = password;
+                if (!DbHelper.Update(user)) return result.DataBaseError();
+            }
 
-            var session = Core.GetSession(user.id);
-            if (session == null) return _Result.NotFound();
+            token.password = password;
+            var tokens = token.CreatorKey(Util.NewId("N"));
+            Core.SetTokenCache(token);
 
-            session.Sign(password);
-            session.InitSecret(true);
-
-            var tid = session.GenerateCode();
-            return _Result.Success(session.CreatorKey(tid));
+            return result.Created(tokens);
         }
 
         /// <summary>
         /// 为指定的登录账号设置用户状态
         /// </summary>
-        /// <param name="account">登录账号</param>
-        /// <param name="validity">可用状态</param>
+        /// <param name="id">用户ID</param>
+        /// <param name="invalid">失效状态</param>
         /// <returns>Result</returns>
-        public Result<object> SetUserStatus(string account, bool validity)
+        public Result<object> SetUserStatus(string id, bool invalid)
         {
-            var action = validity ? "369548E9-C8DB-439B-A604-4FDC07F3CCDD" : "0FA34D43-2C52-4968-BDDA-C9191D7FCE80";
-            if (!Verify(action)) return _Result;
+            var action = invalid ? "banned" : "release";
+            if (!Verify(action)) return result;
 
-            var user = new User(account) {validity = validity};
-            if (!user.Result.successful || !user.Update()) return user.Result;
+            var user = Core.GetUserById(id);
+            if (user == null) return result.NotFound();
 
-            var session = Core.GetSession(user.id);
-            if (session != null) session.Validity = validity;
+            if (user.isInvalid == invalid) return result;
 
-            return _Result;
+            user.isInvalid = invalid;
+            if (!DbHelper.Update(user)) return result.DataBaseError();
+
+            var session = Core.GetToken(user.id);
+            if (session == null) return result;
+
+            session.isInvalid = invalid;
+            session.setChanged();
+            Core.SetTokenCache(session);
+
+            return result;
         }
 
         /// <summary>
@@ -248,10 +246,10 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> UserSignOut(string account)
         {
-            if (!Verify()) return _Result;
+            if (!Verify()) return result;
 
-            _Session.Offline(_Token.id);
-            return _Result;
+            token.DeleteKeys(tokenId);
+            return result;
         }
 
         /// <summary>
@@ -262,45 +260,37 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> GetUserRoles(string id, string deptid)
         {
-            if (!Verify()) return _Result;
+            if (!Verify()) return result;
 
-            var parse = new GuidParse(id);
-            if (!parse.Result.successful) return parse.Result;
-
-            var dept = new GuidParse(deptid, true);
-            if (!parse.Result.successful) return parse.Result;
-
-            var auth = new Authority(parse.Value, dept.Guid);
-            return _Result.Success(auth.RoleList);
+            using (var context = new Entities())
+            {
+                var list = context.userRoles.ToList();
+                return result.Success(list);
+            }
         }
 
-        private Result<object> _Result = new Result<object>();
-        private Token _Session;
-        private AccessToken _Token;
-        private Guid _UserId;
+        private Result<object> result = new Result<object>();
+        private Token token;
+        private string tokenId;
+        private string userId;
 
         /// <summary>
         /// 会话合法性验证
         /// </summary>
-        /// <param name="action">操作权限代码，默认为空，即不进行鉴权</param>
-        /// <param name="limit">单位时间(秒)内限制调用，默认为0：不限制</param>
-        /// <param name="uid">用户ID，默认为空，如用户ID与SessionID一致，则不进行鉴权</param>
-        /// <param name="account"></param>
+        /// <param name="key">操作权限代码，默认为空，即不进行鉴权</param>
         /// <returns>bool 身份是否通过验证</returns>
-        private bool Verify(string action = null, int limit = 0, Guid? uid = null, string account = null)
+        private bool Verify(string key = null, string id = null)
         {
-            var compare = new Verify(limit);
-            _Result = compare.Result;
-            if (!_Result.successful) return false;
+            var verify = new Verify();
+            if (verify.basis.userId == id) key = null;
 
-            _Session = compare.basis;
-            _Token = compare.Token;
-            _UserId = _Session.userId;
-            if (uid == _Session.userId || _Session.UserIsSame(account)) action = null;
+            result = verify.Compare(key);
+            if (!result.successful) return false;
 
-            _Result = compare.Compare(action);
-
-            return _Result.successful;
+            token = verify.basis;
+            tokenId = verify.tokenId;
+            userId = token.userId;
+            return result.successful;
         }
     }
 }

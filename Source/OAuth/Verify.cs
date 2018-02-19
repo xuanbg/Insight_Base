@@ -80,7 +80,7 @@ namespace Insight.Base.OAuth
                     join p in context.roleFunctions on f.id equals p.functionId
                     join r in context.userRoles on p.roleId equals r.roleId
                     where r.userId == basis.userId && (r.deptId == null || r.deptId == basis.deptId)
-                    group p by new {f.id, f.navigatorId, f.alias, routes = f.url}
+                    group p by new {f.id, f.alias, routes = f.url}
                     into g
                     select new {g.Key, permit = g.Min(i => i.permit)};
                 var permits = list.Where(i => i.permit > 0);
