@@ -47,9 +47,9 @@ join ucs_navigator m on m.id = a.navigator_id
 declare @id0 varchar(36)
 declare @id1 varchar(36)
 declare @id5 varchar(36)
-select @id0 = id from ucc_data_conf where data_type = 0
-select @id1 = id from ucc_data_conf where data_type = 1
-select @id5 = id from ucc_data_conf where data_type = 4
+select @id0 = id from ucr_config where data_type = 0
+select @id1 = id from ucr_config where data_type = 1
+select @id5 = id from ucr_config where data_type = 4
 insert ucr_role_data (id, role_id, module_id, mode, mode_id, permit)
 select lower(newid()), '1faf0cf9-c28e-427e-bbd0-107607c01306', m.id, 0, @id0, 1
 from ucs_navigator m
