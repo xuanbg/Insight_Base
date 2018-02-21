@@ -39,9 +39,8 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
-    <Reference Include="Server, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\WCF\Server.dll</HintPath>
+    <Reference Include="Redis">
+      <HintPath>..\..\..\WCF\Redis.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -60,14 +59,12 @@
     <Compile Include="DbHelper.cs" />
     <Compile Include="Entity\BaseData.cs" />
     <Compile Include="Entity\Entities.cs" />
-    <Compile Include="Entity\Enum.cs" />
     <Compile Include="Entity\Log.cs" />
-    <Compile Include="Entity\MemberUser.cs" />
-    <Compile Include="Entity\Level.cs" />
     <Compile Include="Entity\Module.cs" />
     <Compile Include="Entity\Organization.cs" />
     <Compile Include="Entity\Permit.cs" />
     <Compile Include="Entity\Role.cs" />
+    <Compile Include="Entity\Tenant.cs" />
     <Compile Include="Entity\User.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Params.cs" />

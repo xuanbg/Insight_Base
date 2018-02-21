@@ -15,16 +15,21 @@ namespace Insight.Base.OAuth
         // 进程同步基元
         private static readonly Mutex mutex = new Mutex();
 
+        // Token属性是否已改变
+        private bool isChanged;
+
         // 当前令牌对应的关键数据集
         private Keys currentKeys;
 
-        // Token属性是否已改变
-        private bool isChanged;
+        /// <summary>
+        /// 租户ID
+        /// </summary>
+        public string tenantId => currentKeys?.tenantId;
 
         /// <summary>
         /// 登录部门ID
         /// </summary>
-        public string deptId { get; set; }
+        public string deptId => currentKeys?.deptId;
 
         /// <summary>
         /// 用户ID
@@ -119,54 +124,33 @@ namespace Insight.Base.OAuth
         /// 选择当前令牌对应的关键数据集
         /// </summary>
         /// <param name="tokenId">令牌ID</param>
-        public void SelectKeys(string tokenId)
+        /// <returns>bool 是否存在关键数据集</returns>
+        public bool SelectKeys(string tokenId)
         {
             currentKeys = keyMap[tokenId];
+
+            return currentKeys != null;
         }
 
         /// <summary>
         /// 生成令牌关键数据
         /// </summary>
         /// <param name="code">Code</param>
-        /// <param name="hours">令牌有效小时数</param>
         /// <param name="appId">应用ID</param>
+        /// <param name="tid">租户ID</param>
         /// <returns>令牌数据包</returns>
-        public TokenPackage CreatorKey(string code, int hours = 24, string appId = null)
+        public TokenPackage CreatorKey(string code, string appId, string tid = null)
         {
             foreach (var item in keyMap)
             {
-                // 如应用ID不为空,且应用ID有对应的Key则从Map中删除该应用对应的Key.否则使用无应用ID的公共Key.
-                if (!string.IsNullOrEmpty(appId))
-                {
-                    if (appId == item.Value.appId)
-                    {
-                        keyMap.Remove(item.Key);
-                        currentKeys = null;
-                        break;
-                    }
-                }
-                else
-                {
-                    if (item.Value.appId == null)
-                    {
-                        item.Value.Refresh();
+                if (appId != item.Value.appId) continue;
 
-                        currentKeys = item.Value;
-                        code = item.Key;
-                        break;
-                    }
-                }
+                keyMap.Remove(item.Key);
+                break;
             }
 
-            // 生成新的Key加入Map
-            if (currentKeys == null)
-            {
-                currentKeys = new Keys(hours, appId);
-                keyMap.Add(code, currentKeys);
-            }
-
-            if (failureCount > 0) failureCount = 0;
-
+            currentKeys = new Keys(tid, appId);
+            keyMap.Add(code, currentKeys);
             isChanged = true;
 
             return InitPackage(code);
@@ -192,28 +176,17 @@ namespace Insight.Base.OAuth
         /// <returns>令牌数据包</returns>
         private TokenPackage InitPackage(string code)
         {
-            var accessToken = new AccessToken
-            {
-                id = code,
-                userId = userId,
-                userName = userName,
-                secret = currentKeys.secretKey
-            };
-
-            var refreshToken = new RefreshToken
-            {
-                id = code,
-                userId = userId,
-                secret = currentKeys.refreshKey
-            };
-
+            var accessToken = new AccessToken {id = code, userId = userId, secret = currentKeys.secretKey};
+            var refreshToken = new AccessToken {id = code, userId = userId, secret = currentKeys.refreshKey};
             var tokenPackage = new TokenPackage
             {
                 accessToken = Util.Base64(accessToken),
                 refreshToken = Util.Base64(refreshToken),
-                expiryTime = currentKeys.tokenLife / 12,
-                failureTime = currentKeys.tokenLife
+                expiryTime = currentKeys.tokenLife,
+                failureTime = currentKeys.tokenLife * 12
             };
+
+            currentKeys.hash = Util.Hash(tokenPackage.accessToken);
 
             return tokenPackage;
         }
@@ -221,15 +194,15 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 验证Token是否合法
         /// </summary>
+        /// <param name="hash">令牌哈希值</param>
         /// <param name="key">密钥</param>
-        /// <param name="type">验证类型(1:验证AccessToken、2:验证RefreshToken)</param>
+        /// <param name="tokenType">令牌类型</param>
         /// <returns>Token是否合法</returns>
-        public bool VerifyToken(string key, int type)
+        public bool VerifyToken(string hash, string key, TokenType tokenType)
         {
-            if (currentKeys != null && currentKeys.VerifyKey(key, type)) return true;
+            if (currentKeys == null) return false;
 
-            AddFailureCount();
-            return false;
+            return (tokenType == TokenType.RefreshToken || currentKeys.hash == hash) && currentKeys.VerifyKey(key, tokenType);
         }
 
         /// <summary>
@@ -237,10 +210,10 @@ namespace Insight.Base.OAuth
         /// </summary>
         public void AddFailureCount()
         {
-            if (UserIsInvalid()) return;
+            if (UserIsLocked()) return;
 
-            failureCount++;
             lastFailureTime = DateTime.Now;
+            failureCount++;
             isChanged = true;
         }
 
@@ -255,6 +228,15 @@ namespace Insight.Base.OAuth
 
             var pw = Util.Hash(userId + key);
             return payPassword == pw;
+        }
+
+        /// <summary>
+        /// Token是否过期
+        /// </summary>
+        /// <returns>Token是否过期</returns>
+        public bool TenantIsExpiry()
+        {
+            return currentKeys == null || DateTime.Now > currentKeys.expireDate;
         }
 
         /// <summary>
@@ -279,7 +261,7 @@ namespace Insight.Base.OAuth
         /// 用户是否失效状态
         /// </summary>
         /// <returns>用户是否失效状态</returns>
-        public bool UserIsInvalid()
+        public bool UserIsLocked()
         {
             var now = DateTime.Now;
             var resetTime = lastFailureTime.AddMinutes(10);
@@ -289,7 +271,7 @@ namespace Insight.Base.OAuth
                 isChanged = true;
             }
 
-            return failureCount > 5 || isInvalid;
+            return failureCount > 5;
         }
 
         /// <summary>
@@ -316,7 +298,7 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 设置修改标志位为真值
         /// </summary>
-        public void setChanged()
+        public void SetChanged()
         {
             isChanged = true;
         }

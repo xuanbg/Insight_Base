@@ -11,13 +11,13 @@ namespace Insight.Base.OAuth
 {
     public class Verify
     {
-        private readonly Result<object> result = new Result<object>();
-        private readonly AccessToken accessToken;
-
-        /// <summary>
-        /// 令牌ID
-        /// </summary>
-        public string tokenId { get; }
+        private Result<object> result = new Result<object>();
+        private readonly TokenType tokenType;
+        private readonly string secret;
+        private readonly string hash;
+        private readonly string tenantId;
+        private readonly string userId;
+        private readonly string deptId;
 
         /// <summary>
         /// 用于验证的基准对象
@@ -25,13 +25,21 @@ namespace Insight.Base.OAuth
         public Token basis { get; }
 
         /// <summary>
-        /// 构造方法
+        /// 令牌ID
         /// </summary>
-        public Verify()
+        public string tokenId { get; }
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="tokenType">令牌类型：1、访问令牌(默认)；2、刷新令牌</param>
+        public Verify(TokenType tokenType = TokenType.AccessToken)
         {
+            this.tokenType = tokenType;
+
             var headers = WebOperationContext.Current.IncomingRequest.Headers;
             var auth = headers[HttpRequestHeader.Authorization];
-            accessToken = Util.Base64ToAccessToken(auth);
+            var accessToken = Util.Base64ToAccessToken(auth);
             if (accessToken == null)
             {
                 var msg = $"提取验证信息失败。Token is:{auth ?? "null"}";
@@ -40,8 +48,16 @@ namespace Insight.Base.OAuth
             }
 
             tokenId = accessToken.id;
+            secret = accessToken.secret;
+            hash = Util.Hash(auth);
             basis = Core.GetToken(accessToken.userId);
-            basis?.SelectKeys(tokenId);
+            if (basis == null) return;
+
+            userId = basis.userId;
+            if (!basis.SelectKeys(tokenId)) return;
+
+            tenantId = basis.tenantId;
+            deptId = basis.deptId;
         }
 
         /// <summary>
@@ -54,24 +70,22 @@ namespace Insight.Base.OAuth
             if (basis == null) return result.InvalidToken();
 
             // 验证令牌
-            if (basis.IsExpiry()) return result.Expired();
+            if (!basis.VerifyToken(hash, secret, tokenType)) return result.InvalidAuth();
+
+            if (basis.TenantIsExpiry()) return result.TenantIsExpiry();
+
+            if (tokenType == TokenType.AccessToken && basis.IsExpiry()) return result.Expired();
 
             if (basis.IsFailure()) return result.Failured();
 
-            if (basis.UserIsInvalid())
-            {
-                Core.SetTokenCache(basis);
-                return result.Disabled();
-            }
+            if (basis.isInvalid) return result.Disabled();
 
-            if (!basis.VerifyToken(accessToken.secret, 1))
-            {
-                Core.SetTokenCache(basis);
-                return result.InvalidAuth();
-            }
+            result = tokenType == TokenType.AccessToken
+                ? result.Success(Util.ConvertTo<Session>(basis))
+                : result.Success();
 
             // 如key为空，立即返回；否则进行鉴权
-            if (string.IsNullOrEmpty(key)) return result.Success();
+            if (string.IsNullOrEmpty(key)) return result;
 
             // 根据传入的操作码进行鉴权
             using (var context = new Entities())
@@ -79,14 +93,14 @@ namespace Insight.Base.OAuth
                 var list = from f in context.functions
                     join p in context.roleFunctions on f.id equals p.functionId
                     join r in context.userRoles on p.roleId equals r.roleId
-                    where r.userId == basis.userId && (r.deptId == null || r.deptId == basis.deptId)
+                    where r.tenantId == tenantId && r.userId == userId && (r.deptId == null || r.deptId == deptId)
                     group p by new {f.id, f.alias, routes = f.url}
                     into g
                     select new {g.Key, permit = g.Min(i => i.permit)};
                 var permits = list.Where(i => i.permit > 0);
                 var isPermit = permits.Any(i => i.Key.alias.Contains(key) || i.Key.routes.Contains(key));
 
-                return isPermit ? result.Success() : result.Forbidden();
+                return isPermit ? result : result.Forbidden();
             }
         }
     }

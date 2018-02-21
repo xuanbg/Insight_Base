@@ -1,22 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.ServiceModel;
-using System.ServiceModel.Web;
-using System.Text;
+﻿using System.ServiceModel;
 using System.Threading;
-using System.Threading.Tasks;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Base.OAuth;
 using Insight.Utils.Common;
 using Insight.Utils.Entity;
-using Insight.Utils.Server;
+using Insight.Utils.Redis;
 
 namespace Insight.Base.Services
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall, IncludeExceptionDetailInFaults = true)]
-    public class Auth : IAuth
+    public class Auth : ServiceBase, IAuth
     {
         /// <summary>
         /// 为跨域请求设置响应头信息
@@ -42,20 +36,20 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> GetCode(string account, int type = 0)
         {
+            // 限流,每用户每天可访问100次
+            var key = Util.Hash("GetCode" + account + type);
+            var limited = Params.callManage.IsLimited(key, 3600 * 24, 100);
+            if (limited) return result.BadRequest("当天获取Code次数已用完,请合理使用接口");
+
             userId = Core.GetUserId(account);
             if (userId == null) return result.NotExists();
 
             token = Core.GetToken(userId);
             if (token == null)
             {
-                RedisHelper.Delete(account);
+                RedisHelper.Delete($"ID:{account}");
                 return result.ServerError("缓存异常，请重试");
             }
-
-            // 限流,每用户5/30秒可访问一次
-            var key = Util.Hash("getCode" + userId + type);
-            var surplus = Params.callManage.GetSurplus(key, type == 0 ? 5 : 30);
-            if (surplus > 0) return result.TooFrequent(surplus);
 
             // 生成Code
             object code = Core.GenerateCode(token, account, type);
@@ -66,13 +60,19 @@ namespace Insight.Base.Services
         /// <summary>
         /// 获取指定账户的AccessToken
         /// </summary>
+        /// <param name="tid">租户ID</param>
         /// <param name="appId">应用ID</param>
         /// <param name="account">用户账号</param>
         /// <param name="signature">用户签名</param>
         /// <param name="deptid">登录部门ID（可为空）</param>
         /// <returns>Result</returns>
-        public Result<object> GetToken(string appId, string account, string signature, string deptid)
+        public Result<object> GetToken(string tid, string appId, string account, string signature, string deptid)
         {
+            // 限流,每用户每10秒可访问1次
+            var key = Util.Hash("GetCode" + account);
+            var surplus = Params.callManage.GetSurplus(key, 10);
+            if (surplus > 0) return result.TooFrequent(surplus);
+
             var code = Core.GetCode(signature);
             if (string.IsNullOrEmpty(code))
             {
@@ -86,7 +86,7 @@ namespace Insight.Base.Services
                     new Thread(() => Logger.Write("400101", msg)).Start();
                 }
 
-                return result.InvalidAuth();
+                return token.UserIsLocked() ? result.Locked() : result.InvalidAuth();
             }
 
             userId = RedisHelper.StringGet(code);
@@ -96,18 +96,21 @@ namespace Insight.Base.Services
             token = Core.GetToken(userId);
             if (token == null)
             {
-                RedisHelper.Delete(account);
+                RedisHelper.Delete($"ID:{account}");
                 return result.ServerError("缓存异常，请重试");
             }
 
-            if (token.UserIsInvalid())
+            // 验证令牌
+            if (token.isInvalid) return result.Disabled();
+
+            if (token.UserIsLocked())
             {
                 Core.SetTokenCache(token);
-                return result.Disabled();
+                return result.Locked();
             }
 
             // 创建令牌数据并返回
-            var tokens = token.CreatorKey(code, Core.GetTokenLife(appId), appId);
+            var tokens = token.CreatorKey(code, appId, tid);
             Core.SetTokenCache(token);
 
             return result.Success(tokens);
@@ -131,31 +134,21 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> RefreshToken()
         {
-            var headers = WebOperationContext.Current.IncomingRequest.Headers;
-            var auth = headers[HttpRequestHeader.Authorization];
-            var buffer = Convert.FromBase64String(auth);
-            var json = Encoding.UTF8.GetString(buffer);
-            var refreshToken = Util.Deserialize<RefreshToken>(json);
-            if (refreshToken == null) return result.InvalidToken();
+            var verify = new Verify(TokenType.RefreshToken);
+            token = verify.basis;
+            tokenId = verify.tokenId;
 
-            tokenId = refreshToken.id;
-            userId = refreshToken.userId;
-
-            // 限流,每客户端每24小时可访问60次
-            var key = Util.Hash("refreshToken" + tokenId);
-            var limited = Params.callManage.IsLimited(key, 3600 * 24, 60);
+            // 限流,每令牌每24小时可刷新600次
+            var key = Util.Hash("RefreshToken" + tokenId);
+            var limited = Params.callManage.IsLimited(key, 3600 * 24, 600);
             if (limited) return result.BadRequest("刷新次数已用完,请合理刷新");
 
-            // 验证令牌
-            var basis = Core.GetToken(userId);
-            if (basis == null) return result.InvalidToken();
-
-            basis.SelectKeys(tokenId);
-            if (!basis.VerifyToken(refreshToken.secret, 2)) return result.InvalidToken();
+            result = verify.Compare();
+            if (!result.successful) return result;
 
             // 刷新令牌
-            var tokens = basis.RefreshToken(tokenId);
-            Core.SetTokenCache(basis);
+            var tokens = token.RefreshToken(tokenId);
+            Core.SetTokenCache(token);
 
             return result.Success(tokens);
         }
@@ -197,7 +190,7 @@ namespace Insight.Base.Services
 
             // 更新Token缓存
             token.payPassword = key;
-            token.setChanged();
+            token.SetChanged();
             Core.SetTokenCache(token);
 
             return result.Success();
@@ -223,18 +216,14 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="mobile">手机号</param>
         /// <param name="type">验证类型</param>
-        /// <param name="time">过期时间（分钟）</param>
+        /// <param name="life">过期时间（分钟）</param>
+        /// <param name="length">字符长度</param>
         /// <returns>Result</returns>
-        public Result<object> NewCode(string mobile, int type, int time)
+        public Result<object> NewCode(string mobile, int type, int life, int length)
         {
             if (!Verify()) return result;
 
-            var code = Params.Random.Next(100000, 999999).ToString();
-            var key = type + mobile;
-            var expire = DateTime.Now.AddMinutes(time);
-
-            var msg = $"已经为手机号【{mobile}】的用户生成了类型为【{type}】的短信验证码：【{code}】。此验证码将于{expire}失效。";
-            Task.Run(() => Logger.Write("700501", msg));
+            var code = Core.GenerateSmsCode(type, mobile, life, length);
 
             return result.Created(code);
         }
@@ -252,28 +241,6 @@ namespace Insight.Base.Services
             if (!Verify()) return result;
 
             return Core.VerifySmsCode(type, mobile, code, !remove) ? result : result.SMSCodeError();
-        }
-
-        private Result<object> result = new Result<object>();
-        private Token token;
-        private string tokenId;
-        private string userId;
-
-        /// <summary>
-        /// 会话合法性验证
-        /// </summary>
-        /// <param name="key">操作权限代码，默认为空，即不进行鉴权</param>
-        /// <returns>bool 身份是否通过验证</returns>
-        private bool Verify(string key = null)
-        {
-            var verify = new OAuth.Verify();
-            result = verify.Compare(key);
-            if (!result.successful) return false;
-
-            token = verify.basis;
-            tokenId = verify.tokenId;
-            userId = token.userId;
-            return result.successful;
         }
     }
 }

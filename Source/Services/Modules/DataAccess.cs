@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Base.OAuth;
-using Insight.Utils.Common;
-using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
 {
@@ -33,15 +27,16 @@ namespace Insight.Base.Services
         /// 获取模块有效选项参数
         /// </summary>
         /// <param name="session">Session对象实体</param>
-        /// <param name="mid"></param>
-        /// <returns>SYS_ModuleParam List 参数集合</returns>
-        public List<ModuleParam> GetModuleParam(Token session, string mid)
+        /// <param name="deptId">登录部门ID</param>
+        /// <param name="moduleId">模块ID</param>
+        /// <returns>参数集合</returns>
+        public List<ModuleParam> GetModuleParam(Token session, string deptId, string moduleId)
         {
             var ids = new List<string>();
             List<ModuleParam> mps;
             using (var context = new Entities())
             {
-                mps = context.moduleParams.Where(p => p.moduleId == mid && ((p.orgId == null && p.userId == null) || p.orgId == session.deptId || p.userId == session.userId)).ToList();
+                mps = context.moduleParams.Where(p => p.moduleId == moduleId && (p.orgId == null && p.userId == null || p.orgId == deptId || p.userId == session.userId)).ToList();
             }
             foreach (var pam in mps)
             {
@@ -78,13 +73,14 @@ namespace Insight.Base.Services
         /// 获取模块部门选项参数
         /// </summary>
         /// <param name="session">Session对象实体</param>
-        /// <param name="mid">模块ID</param>
-        /// <returns>SYS_ModuleParam List 参数集合</returns>
-        public List<ModuleParam> GetModuleDeptParam(Token session, string mid)
+        /// <param name="deptId">登录部门ID</param>
+        /// <param name="moduleId">模块ID</param>
+        /// <returns>参数集合</returns>
+        public List<ModuleParam> GetModuleDeptParam(Token session, string deptId, string moduleId)
         {
             using (var context = new Entities())
             {
-                return context.moduleParams.Where(p => p.moduleId == mid && p.orgId == session.deptId && p.userId == null).ToList();
+                return context.moduleParams.Where(p => p.moduleId == moduleId && p.orgId == deptId && p.userId == null).ToList();
             }
         }
 

@@ -4,7 +4,7 @@ using System.Threading;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Utils.Common;
-using Insight.Utils.Server;
+using Insight.Utils.Redis;
 
 namespace Insight.Base.OAuth
 {
@@ -22,11 +22,11 @@ namespace Insight.Base.OAuth
         {
             var key = "ID:" + account;
             var userId = RedisHelper.StringGet(key);
-            if (!String.IsNullOrEmpty(userId)) return userId;
+            if (!string.IsNullOrEmpty(userId)) return userId;
 
             mutex.WaitOne();
             userId = RedisHelper.StringGet(account);
-            if (!String.IsNullOrEmpty(userId))
+            if (!string.IsNullOrEmpty(userId))
             {
                 mutex.ReleaseMutex();
                 return userId;
@@ -44,13 +44,13 @@ namespace Insight.Base.OAuth
             key = "ID:" + user.account;
             RedisHelper.StringSet(key, userId);
 
-            if (!String.IsNullOrEmpty(user.mobile))
+            if (!string.IsNullOrEmpty(user.mobile))
             {
                 key = "ID:" + user.mobile;
                 RedisHelper.StringSet(key, userId);
             }
 
-            if (!String.IsNullOrEmpty(user.email))
+            if (!string.IsNullOrEmpty(user.email))
             {
                 key = "ID:" + user.email;
                 RedisHelper.StringSet(key, userId);
@@ -73,7 +73,7 @@ namespace Insight.Base.OAuth
         public static string GenerateCode(Token token, string account, int type)
         {
             string key;
-            var life = 300;
+            var life = 5;
             switch (type)
             {
                 case 0:
@@ -82,7 +82,7 @@ namespace Insight.Base.OAuth
                 case 1:
                     // 生成短信验证码(5分钟内有效)并发送
                     var mobile = token.mobile;
-                    if (String.IsNullOrEmpty(mobile)) return null;
+                    if (string.IsNullOrEmpty(mobile)) return null;
 
                     life = 60 * 5;
                     var smsCode = GenerateSmsCode(4, mobile, 5, 4);
@@ -117,7 +117,7 @@ namespace Insight.Base.OAuth
             var max = Math.Pow(10, length);
             var code = Params.Random.Next(0, (int) max).ToString("D" + length);
             var msg = $"为手机号 {mobile} 生成了类型为 {type} 的验证码 {code}, 有效时间 {life} 分钟.";
-            Logger.Write("600101", msg);
+            Logger.Write("600501", msg);
             var key = Util.Hash(type + mobile + code);
             if (type == 4) return code;
 
@@ -160,7 +160,7 @@ namespace Insight.Base.OAuth
         public static string GetCode(string sign)
         {
             var code = RedisHelper.StringGet(sign);
-            if (String.IsNullOrEmpty(code)) return null;
+            if (string.IsNullOrEmpty(code)) return null;
 
             RedisHelper.Delete(sign);
             return code;
@@ -175,31 +175,7 @@ namespace Insight.Base.OAuth
         {
             var key = "Token:" + userId;
             var json = RedisHelper.StringGet(key);
-            return String.IsNullOrEmpty(json) ? null : Util.Deserialize<Token>(json);
-        }
-
-        /// <summary>
-        /// 查询指定ID的应用的令牌生命周期小时数
-        /// </summary>
-        /// <param name="appId">应用ID</param>
-        /// <returns>应用的令牌生命周期小时数</returns>
-        public static int GetTokenLife(string appId)
-        {
-            if (String.IsNullOrEmpty(appId)) return 24;
-
-            // 从缓存读取应用的令牌生命周期
-            const string fiele = "TokenLife";
-            var val = RedisHelper.HashGet(appId, fiele);
-            if (!String.IsNullOrEmpty(val)) return Convert.ToInt32(val);
-
-            // 从数据库读取应用的令牌生命周期
-            using (var context = new Entities())
-            {
-                var hours = context.applications.SingleOrDefault(i => i.id == appId)?.tokenLife ?? 24;
-                RedisHelper.HashSet(appId, fiele, hours.ToString());
-
-                return hours;
-            }
+            return string.IsNullOrEmpty(json) ? null : Util.Deserialize<Token>(json);
         }
 
         /// <summary>

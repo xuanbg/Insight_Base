@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Insight.Base.Common.Entity;
-using Insight.Utils.Server;
+using Insight.Utils.Redis;
 
 namespace Insight.Base.Common
 {

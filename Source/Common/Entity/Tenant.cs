@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Insight.Base.Common.Entity
 {
-    [Table("ucb_user")]
-    public class User
+    [Table("ucb_tenant")]
+    public class Tenant
     {
         /// <summary>
         /// ID，唯一标识
@@ -13,14 +12,24 @@ namespace Insight.Base.Common.Entity
         public string id { get; set; }
 
         /// <summary>
-        /// 姓名/昵称
+        /// 名称
         /// </summary>
         public string name { get; set; }
 
         /// <summary>
-        /// 登录账号
+        /// 简称
         /// </summary>
-        public string account { get; set; }
+        public string alias { get; set; }
+
+        /// <summary>
+        /// 图标
+        /// </summary>
+        public byte[] icon { get; set; }
+
+        /// <summary>
+        /// 联系人
+        /// </summary>
+        public string contact { get; set; }
 
         /// <summary>
         /// 手机号
@@ -28,20 +37,29 @@ namespace Insight.Base.Common.Entity
         public string mobile { get; set; }
 
         /// <summary>
-        /// 注册邮箱
+        /// 邮箱
         /// </summary>
         public string email { get; set; }
 
         /// <summary>
-        /// 登录密码，保存密码的md5值，初始密码123456
+        /// 所在省/直辖市
         /// </summary>
-        public string password { get; set; }
+        public string province { get; set; }
 
         /// <summary>
-        /// 支付密码，保存密码的md5值
+        /// 所在市/地区
         /// </summary>
-        [Column("pay_pw")]
-        public string payPassword { get; set; }
+        public string city { get; set; }
+
+        /// <summary>
+        /// 所在区/县
+        /// </summary>
+        public string county { get; set; }
+
+        /// <summary>
+        /// 街道楼门号
+        /// </summary>
+        public string address { get; set; }
 
         /// <summary>
         /// 描述
@@ -49,16 +67,10 @@ namespace Insight.Base.Common.Entity
         public string remark { get; set; }
 
         /// <summary>
-        /// 是否预置：0、自定；1、预置
+        /// 租户到期时间
         /// </summary>
-        [Column("is_builtin")]
-        public bool isBuiltin { get; set; }
-
-        /// <summary>
-        /// 是否失效：0、有效；1、失效
-        /// </summary>
-        [Column("is_invalid")]
-        public bool isInvalid { get; set; }
+        [Column("expire_date")]
+        public DateTime expireDate { get; set; }
 
         /// <summary>
         /// 创建人ID
@@ -71,20 +83,10 @@ namespace Insight.Base.Common.Entity
         /// </summary>
         [Column("created_time")]
         public DateTime createTime { get; set; }
-
-        /// <summary>
-        /// 授予用户的功能权限
-        /// </summary>
-        public List<PermitFunt> funts { get; set; }
-
-        /// <summary>
-        /// 授予用户的数据权限
-        /// </summary>
-        public List<PermitData> datas { get; set; }
     }
 
-    [Table("ucg_group")]
-    public class Group
+    [Table("ucb_tenant_app")]
+    public class TenantApp
     {
         /// <summary>
         /// ID，唯一标识
@@ -92,26 +94,16 @@ namespace Insight.Base.Common.Entity
         public string id { get; set; }
 
         /// <summary>
-        /// 是否预置：0、自定；1、预置
+        /// 租户ID
         /// </summary>
         [Column("tenant_id")]
         public string tenantId { get; set; }
 
         /// <summary>
-        /// 姓名/昵称
+        /// 应用ID
         /// </summary>
-        public string name { get; set; }
-
-        /// <summary>
-        /// 描述
-        /// </summary>
-        public string remark { get; set; }
-
-        /// <summary>
-        /// 是否预置：0、自定；1、预置
-        /// </summary>
-        [Column("is_builtin")]
-        public bool isBuiltin { get; set; }
+        [Column("app_id")]
+        public string appId { get; set; }
 
         /// <summary>
         /// 创建人ID
@@ -124,15 +116,10 @@ namespace Insight.Base.Common.Entity
         /// </summary>
         [Column("created_time")]
         public DateTime createTime { get; set; }
-
-        /// <summary>
-        /// 用户组成员
-        /// </summary>
-        public List<GroupMember> members { get; set; }
     }
 
-    [Table("ucg_group_member")]
-    public class GroupMember
+    [Table("ucb_tenant_user")]
+    public class TenantUser
     {
         /// <summary>
         /// ID，唯一标识
@@ -140,13 +127,13 @@ namespace Insight.Base.Common.Entity
         public string id { get; set; }
 
         /// <summary>
-        /// 是否预置：0、自定；1、预置
+        /// 租户ID
         /// </summary>
-        [Column("group_id")]
-        public string groupId { get; set; }
+        [Column("tenant_id")]
+        public string tenantId { get; set; }
 
         /// <summary>
-        /// 是否预置：0、自定；1、预置
+        /// 用户ID
         /// </summary>
         [Column("user_id")]
         public string userId { get; set; }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
+using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Base.OAuth;
 using Insight.Utils.Common;
@@ -10,7 +11,7 @@ using Insight.Utils.Entity;
 namespace Insight.Base.Services
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
-    public class Roles : IRoles
+    public class Roles : ServiceBase, IRoles
     {
         /// <summary>
         /// 为跨域请求设置响应头信息
@@ -26,13 +27,15 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> AddRole(Role role)
         {
-            if (!Verify("10B574A2-1A69-4273-87D9-06EDA77B80B6")) return _Result;
+            if (!Verify("newRole")) return result;
 
-            if (role.Existed) return role.Result;
+            role.id = Util.NewId();
+            if (Existed(role)) return result.DataAlreadyExists();
 
-            role.CreatorUserId = _UserId;
-            role.CreateTime = DateTime.Now;
-            return role.Add() ? _Result.Created(role) : role.Result;
+            role.creatorId = userId;
+            role.createTime = DateTime.Now;
+
+            return DbHelper.Insert(role) ? result.Created(role) : result.DataBaseError();
         }
 
         /// <summary>
@@ -42,32 +45,32 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> RemoveRole(string id)
         {
-            if (!Verify("FBCEE515-8576-4B10-BA68-CF46743D2199")) return _Result;
+            if (!Verify("deleteRole")) return result;
 
-            var parse = new GuidParse(id);
-            if (!parse.Result.successful) return parse.Result;
+            var data = GetData(id);
+            if (data == null) return result.NotFound();
 
-            var role = new Role(parse.Value);
-            return role.Result.successful && role.Delete() ? _Result : role.Result;
+            return DbHelper.Delete(data) ? result.Success(data) : result.DataBaseError();
         }
 
         /// <summary>
         /// 编辑角色
         /// </summary>
-        /// <param name="id">角色ID</param>
+        /// <param name="id"></param>
         /// <param name="role">RoleInfo</param>
         /// <returns>Result</returns>
         public Result<object> EditRole(string id, Role role)
         {
-            if (!Verify("4DC0141D-FE3D-4504-BE70-763028796808")) return _Result;
+            if (!Verify("editRole")) return result;
 
-            var parse = new GuidParse(id);
-            if (!parse.Result.successful) return parse.Result;
+            var data = GetData(role.id);
+            if (data == null) return result.NotFound();
 
-            if (role.Existed || !role.Update()) return role.Result;
+            data.name = role.name;
+            data.remark = role.remark;
+            if (Existed(data)) return result.DataAlreadyExists();
 
-            role.Authority = new Authority(parse.Value);
-            return _Result.Success(role);
+            return DbHelper.Update(role) ? result.Success(role) : result.DataBaseError();
         }
 
         /// <summary>
@@ -77,13 +80,10 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> GetRole(string id)
         {
-            if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
+            if (!Verify("getRoles")) return result;
 
-            var parse = new GuidParse(id);
-            if (!parse.Result.successful) return parse.Result;
-
-            var role = new Role(parse.Value);
-            return role.Result.successful ? _Result.Success(role) : role.Result;
+            var data = GetData(id);
+            return data == null ? result.NotFound() : result.Success(data);
         }
 
         /// <summary>
@@ -91,27 +91,21 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="rows">每页行数</param>
         /// <param name="page">当前页</param>
+        /// <param name="key">查询关键词</param>
         /// <returns>Result</returns>
-        public Result<object> GetRoles(string rows, string page)
+        public Result<object> GetRoles(int rows, int page, string key)
         {
-            if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
+            if (!Verify("getRoles")) return result;
 
-            var ipr = new IntParse(rows);
-            if (!ipr.Result.successful) return ipr.Result;
-
-            var ipp = new IntParse(page);
-            if (!ipp.Result.successful) return ipp.Result;
-
-            if (ipr.Value > 500 || ipp.Value < 1) return _Result.BadRequest();
+            if (page < 1 || rows > 100) return result.BadRequest();
 
             using (var context = new Entities())
             {
-                var list = from r in context.SYS_Role.Where(r => r.Validity).OrderBy(r => r.SN)
-                           select new {r.ID, r.Name, r.Description, r.BuiltIn, r.Validity, r.CreatorUserId, r.CreateTime};
-                var skip = ipr.Value*(ipp.Value - 1);
-                var roles = list.Skip(skip).Take(ipr.Value).ToList();
+                var skip = rows * (page - 1);
+                var list = context.roles.Where(i => i.tenantId == tenantId && (string.IsNullOrEmpty(key) || i.name.Contains(key) || i.remark.Contains(key)));
+                var roles = list.OrderBy(i => i.createTime).Skip(skip).Take(rows).ToList();
 
-                return _Result.Success(roles, list.Count().ToString());
+                return result.Success(roles, list.Count());
             }
         }
 
@@ -123,35 +117,20 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> AddRoleMember(string id, List<RoleMember> members)
         {
-            if (!Verify("13D93852-53EC-4A15-AAB2-46C9C48C313A")) return _Result;
+            if (!Verify("addRoleMember")) return result;
 
-            var parse = new GuidParse(id);
-            if (!parse.Result.successful || !members.Any()) return parse.Result;
+            var data = GetData(id);
+            if (data == null) return result.NotFound();
 
-            using (var context = new Entities())
+            members.ForEach(i =>
             {
-                var data = from m in members
-                           select new SYS_Role_Member
-                           {
-                               ID = m.ID,
-                               Type = m.NodeType,
-                               RoleId = parse.Value,
-                               MemberId = m.MemberId,
-                               CreatorUserId = _UserId,
-                               CreateTime = DateTime.Now
-                           };
-                context.SYS_Role_Member.AddRange(data);
-                try
-                {
-                    context.SaveChanges();
-                    var role = new Role(parse.Value);
-                    return _Result.Success(role);
-                }
-                catch
-                {
-                    return _Result.DataBaseError();
-                }
-            }
+                i.id = Util.NewId();
+                i.roleId = data.id;
+                i.creatorId = userId;
+                i.createTime = DateTime.Now;
+            });
+
+            return DbHelper.Insert(members) ? result : result.DataBaseError();
         }
 
         /// <summary>
@@ -161,27 +140,12 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> RemoveRoleMember(string id)
         {
-            if (!Verify("2EF4D82B-4A75-4902-BD9E-B63153D093D2")) return _Result;
+            if (!Verify("removeRoleMember")) return result;
 
-            var parse = new GuidParse(id);
-            if (!parse.Result.successful) return parse.Result;
+            var data = GetData(id);
+            if (data == null) return result.NotFound();
 
-            using (var context = new Entities())
-            {
-                var obj = context.SYS_Role_Member.SingleOrDefault(m => m.ID == parse.Value);
-                if (obj == null) return _Result.NotFound();
-
-                context.SYS_Role_Member.Remove(obj);
-                try
-                {
-                    context.SaveChanges();
-                    return _Result.Success(new Role(obj.RoleId));
-                }
-                catch (Exception)
-                {
-                    return _Result.DataBaseError();
-                }
-            }
+            return result;
         }
 
         /// <summary>
@@ -191,28 +155,19 @@ namespace Insight.Base.Services
         /// <param name="rows">每页行数</param>
         /// <param name="page">当前页</param>
         /// <returns>Result</returns>
-        public Result<object> GetMemberUsers(string id, string rows, string page)
+        public Result<object> GetMemberUsers(string id, int rows, int page)
         {
-            if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
+            if (!Verify("getRoles")) return result;
 
-            var parse = new GuidParse(id);
-            if (!parse.Result.successful) return parse.Result;
-
-            var ipr = new IntParse(rows);
-            if (!ipr.Result.successful) return ipr.Result;
-
-            var ipp = new IntParse(page);
-            if (!ipp.Result.successful) return ipp.Result;
-
-            if (ipr.Value > 500 || ipp.Value < 1) return _Result.BadRequest();
+            if (page < 1 || rows > 100) return result.BadRequest();
 
             using (var context = new Entities())
             {
-                var skip = ipr.Value*(ipp.Value - 1);
-                var list = context.RoleMemberUser.Where(u => u.RoleId == parse.Value).OrderBy(m => m.SN);
-                var members = list.Skip(skip).Take(ipr.Value).ToList();
+                var skip = rows * (page - 1);
+                var list = context.roleMembers.Where(u => u.roleId == id);
+                var members = list.OrderBy(m => m.createTime).Skip(skip).Take(rows).ToList();
 
-                return _Result.Success(members, list.Count().ToString());
+                return result.Success(members, list.Count());
             }
         }
 
@@ -223,19 +178,16 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> GetMemberOfTitle(string id)
         {
-            if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
-
-            var parse = new GuidParse(id);
-            if (!parse.Result.successful) return parse.Result;
+            if (!Verify("getRoles")) return result;
 
             using (var context = new Entities())
             {
-                var list = from o in context.SYS_Organization
-                           join r in context.SYS_Role_Member.Where(r => r.RoleId == parse.Value && r.Type == 3)
-                           on o.ID equals r.MemberId into temp from t in temp.DefaultIfEmpty()
+                var list = from o in context.organizations
+                           join r in context.roleMembers.Where(i => i.roleId == id && i.memberType == 3) on o.id equals r.memberId into temp from t in temp.DefaultIfEmpty()
                            where t == null
-                           select new { o.ID, o.ParentId, o.Index, o.NodeType, o.Name };
-                return list.Any() ? _Result.Success(list.OrderBy(o => o.Index).ToList()) : _Result.NoContent(new List<object>());
+                           orderby o.index
+                           select new { o.id, o.parentId, o.index, o.nodeType, o.name };
+                return list.Any() ? result.Success(list.ToList()) : result.NoContent(new List<object>());
             }
         }
 
@@ -246,18 +198,17 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> GetMemberOfGroup(string id)
         {
-            if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
-            var parse = new GuidParse(id);
-            if (!parse.Result.successful) return parse.Result;
+            if (!Verify("getRoles")) return result;
 
             using (var context = new Entities())
             {
-                var list = from g in context.SYS_UserGroup.OrderBy(g => g.SN)
-                           join r in context.SYS_Role_Member.Where(r => r.RoleId == parse.Value && r.Type == 2)
-                           on g.ID equals r.MemberId into temp from t in temp.DefaultIfEmpty()
-                           where g.Visible && t == null
-                           select new { g.ID, g.Name, g.Description };
-                return list.Any() ? _Result.Success(list.ToList()) : _Result.NoContent(new List<object>());
+                var list = from g in context.groups
+                           join r in context.roleMembers.Where(r => r.roleId == id && r.memberType == 2) on g.id equals r.memberId
+                           into temp from t in temp.DefaultIfEmpty()
+                           where t == null
+                           orderby g.createTime
+                           select new { g.id, g.name, g.remark };
+                return list.Any() ? result.Success(list.ToList()) : result.NoContent(new List<object>());
             }
         }
 
@@ -268,19 +219,17 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> GetMemberOfUser(string id)
         {
-            if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
-
-            var parse = new GuidParse(id);
-            if (!parse.Result.successful) return parse.Result;
+            if (!Verify("getRoles")) return result;
 
             using (var context = new Entities())
             {
-                var list = from u in context.SYS_User.OrderBy(g => g.SN)
-                           join r in context.SYS_Role_Member.Where(r => r.RoleId == parse.Value && r.Type == 1) 
-                           on u.ID equals r.MemberId into temp from t in temp.DefaultIfEmpty()
-                           where u.Validity && u.Type > 0 && t == null
-                           select new { u.ID, u.Name, u.LoginName, u.Description };
-                return list.Any() ? _Result.Success(list.ToList()) : _Result.NoContent(new List<object>());
+                var list = from u in context.users
+                           join r in context.roleMembers.Where(r => r.roleId ==id && r.memberType == 1) on u.id equals r.memberId
+                           into temp from t in temp.DefaultIfEmpty()
+                           where !u.isInvalid && t == null
+                           orderby u.createTime
+                           select new { u.id, u.name, u.account, u.remark };
+                return list.Any() ? result.Success(list.ToList()) : result.NoContent(new List<object>());
             }
         }
 
@@ -291,35 +240,38 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> GetAllPermission(string id)
         {
-            if (!Verify("3BC74B61-6FA7-4827-A4EE-E1317BF97388")) return _Result;
+            if (!Verify("getRoles")) return result;
 
-            var parse = new GuidParse(id);
-            if (!parse.Result.successful) return parse.Result;
+            var data = GetData(id);
+            if (data == null) return result.NotFound();
 
-            var role = new Role(parse.Value);
-            role.GetAllPermission();
-
-            return _Result.Success(role);
+            return result.Success(data);
+        }
+       
+        /// <summary>
+        /// 获取指定ID的角色
+        /// </summary>
+        /// <param name="id">角色ID</param>
+        /// <returns>角色</returns>
+        private static Role GetData(string id)
+        {
+            using (var context = new Entities())
+            {
+                return context.roles.SingleOrDefault(i => i.id == id);
+            }
         }
 
-        private Result<object> _Result = new Result<object>();
-        private Guid _UserId;
-
         /// <summary>
-        /// 会话合法性验证
+        /// 角色是否已存在
         /// </summary>
-        /// <param name="action">操作权限代码，默认为空，即不进行鉴权</param>
-        /// <returns>bool 身份是否通过验证</returns>
-        private bool Verify(string action = null)
+        /// <param name="role">角色</param>
+        /// <returns>是否已存在</returns>
+        private static bool Existed(Role role)
         {
-            var compare = new Verify();
-            _Result = compare.Result;
-            if (!_Result.successful) return false;
-
-            _UserId = compare.basis.userId;
-            _Result = compare.Compare(action);
-
-            return _Result.successful;
+            using (var context = new Entities())
+            {
+                return context.roles.Any(i => i.id != role.id && i.tenantId == role.tenantId && i.name == role.name);
+            }
         }
     }
 }

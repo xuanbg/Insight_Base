@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Insight.Base.Common.Entity
@@ -32,6 +33,18 @@ namespace Insight.Base.Common.Entity
         public string id { get; set; }
 
         /// <summary>
+        /// 是否预置：0、自定；1、预置
+        /// </summary>
+        [Column("tenant_id")]
+        public string tenantId { get; set; }
+
+        /// <summary>
+        /// 是否预置：0、自定；1、预置
+        /// </summary>
+        [Column("app_id")]
+        public string appId { get; set; }
+
+        /// <summary>
         /// 应用名称
         /// </summary>
         public string name { get; set; }
@@ -58,6 +71,21 @@ namespace Insight.Base.Common.Entity
         /// </summary>
         [Column("created_time")]
         public DateTime createTime { get; set; }
+
+        /// <summary>
+        /// 角色成员
+        /// </summary>
+        public List<RoleMember> members { get; set; }
+
+        /// <summary>
+        /// 角色功能权限
+        /// </summary>
+        public List<PermitFunt> permitFunts { get; set; }
+
+        /// <summary>
+        /// 角色数据权限
+        /// </summary>
+        public List<PermitData> permitDatas { get; set; }
     }
 
     [Table("ucr_role_member")]
@@ -71,7 +99,8 @@ namespace Insight.Base.Common.Entity
         /// <summary>
         /// 类型：1、用户；2、用户组；3、岗位
         /// </summary>
-        public int member_type { get; set; }
+        [Column("member_type")]
+        public int memberType { get; set; }
 
         /// <summary>
         /// 角色ID

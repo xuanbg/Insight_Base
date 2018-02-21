@@ -38,14 +38,15 @@ namespace Insight.Base.Services
         /// <summary>
         /// 获取指定账户的AccessToken
         /// </summary>
+        /// <param name="tenantId">租户ID</param>
         /// <param name="appId">应用ID</param>
         /// <param name="account">用户账号</param>
         /// <param name="signature">用户签名</param>
-        /// <param name="deptid">登录部门ID（可为空）</param>
+        /// <param name="deptId">登录部门ID（可为空）</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "tokens?appid={appId}&account={account}&signature={signature}&deptid={deptid}", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "tokens?tenantid={tenantId}&appid={appId}&account={account}&signature={signature}&deptid={deptId}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetToken(string appId, string account, string signature, string deptid);
+        Result<object> GetToken(string tenantId, string appId, string account, string signature, string deptId);
 
         /// <summary>
         /// 移除指定账户的AccessToken
@@ -104,11 +105,12 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="mobile">手机号</param>
         /// <param name="type">验证类型</param>
-        /// <param name="time">过期时间（分钟）</param>
+        /// <param name="life">过期时间（分钟）</param>
+        /// <param name="length">字符长度</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "smscodes?mobile={mobile}&type={type}&time={time}", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "smscodes?mobile={mobile}&type={type}&life={life}&length={length}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> NewCode(string mobile, int type, int time);
+        Result<object> NewCode(string mobile, int type, int life, int length);
 
         /// <summary>
         /// 验证验证码是否正确

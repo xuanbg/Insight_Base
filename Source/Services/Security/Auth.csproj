@@ -38,8 +38,8 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Server">
-      <HintPath>..\..\..\..\WCF\Server.dll</HintPath>
+    <Reference Include="Redis">
+      <HintPath>..\..\..\..\WCF\Redis.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />

@@ -1,5 +1,6 @@
 ﻿using System.ServiceModel;
 using System.ServiceModel.Web;
+using Insight.Base.Common.Entity;
 using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
@@ -35,7 +36,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 根据对象实体数据更新组织机构信息
         /// </summary>
-        /// <param name="id">节点ID</param>
+        /// <param name="id"></param>
         /// <param name="org">组织节点对象</param>
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "orgs/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
@@ -60,19 +61,9 @@ namespace Insight.Base.Services
         Result<object> GetOrgs();
 
         /// <summary>
-        /// 根据对象实体数据新增一条组织机构节点合并记录
-        /// </summary>
-        /// <param name="id">合并目标ID</param>
-        /// <param name="org">组织节点对象（被合并节点）</param>
-        /// <returns>Result</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "orgs/{id}/merger", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
-        [OperationContract]
-        Result<object> OrgMerger(string id, Organization org);
-
-        /// <summary>
         /// 新增职位成员关系
         /// </summary>
-        /// <param name="id">节点ID</param>
+        /// <param name="id"></param>
         /// <param name="org">组织节点对象</param>
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "orgs/{id}/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
@@ -82,7 +73,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 根删除职位成员关系
         /// </summary>
-        /// <param name="id">节点ID</param>
+        /// <param name="id"></param>
         /// <param name="org">组织节点对象</param>
         /// <returns>Result</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "orgs/{id}/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]

@@ -36,11 +36,12 @@ namespace Insight.Base.Services
         /// <summary>
         /// 根据用户ID更新用户信息
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="user">用户数据对象</param>
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "users/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> UpdateUserInfo(User user);
+        Result<object> UpdateUserInfo(string id, User user);
 
         /// <summary>
         /// 根据ID获取用户对象实体
@@ -60,17 +61,18 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "users?rows={rows}&page={page}&key={key}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetUsers(string rows, string page, string key);
+        Result<object> GetUsers(int rows, int page, string key);
 
         /// <summary>
         /// 根据对象实体数据注册一个用户
         /// </summary>
+        /// <param name="appId">应用ID</param>
         /// <param name="code">验证码</param>
         /// <param name="user">用户对象</param>
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "users/signup?code={code}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> SignUp(string code, User user);
+        Result<object> SignUp(string appId, string code, User user);
 
         /// <summary>
         /// 更新指定用户Session的签名
@@ -85,6 +87,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 用户重置登录密码
         /// </summary>
+        /// <param name="appId">应用ID</param>
         /// <param name="account">登录账号</param>
         /// <param name="password">新密码</param>
         /// <param name="code">短信验证码</param>
@@ -92,7 +95,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "users/{account}/resetpw", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> ResetSignature(string account, string password, string code, string mobile = null);
+        Result<object> ResetSignature(string appId, string account, string password, string code, string mobile = null);
 
         /// <summary>
         /// 根据用户ID设置用户状态
@@ -107,11 +110,11 @@ namespace Insight.Base.Services
         /// <summary>
         /// 设置指定用户的登录状态为离线
         /// </summary>
-        /// <param name="account">用户账号</param>
+        /// <param name="id">用户账号</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "DELETE", UriTemplate = "users/{account}/token", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "DELETE", UriTemplate = "users/{id}/token", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> UserSignOut(string account);
+        Result<object> UserSignOut(string id);
 
         /// <summary>
         /// 根据ID获取用户对象实体

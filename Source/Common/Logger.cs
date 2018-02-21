@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Insight.Base.Common.Entity;
 using Insight.Utils.Common;
+using Insight.Utils.Entity;
 
 namespace Insight.Base.Common
 {

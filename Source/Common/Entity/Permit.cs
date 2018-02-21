@@ -81,6 +81,12 @@ namespace Insight.Base.Common.Entity
         public string roleId { get; set; }
 
         /// <summary>
+        /// 租户ID
+        /// </summary>
+        [Column("tenant_id")]
+        public string tenantId { get; set; }
+
+        /// <summary>
         /// 模块ID
         /// </summary>
         [Column("user_id")]
