@@ -37,8 +37,6 @@ namespace Insight.Base.Services
         {
             if (!Verify()) return result;
 
-            var parse = new GuidParse(id);
-            if (!parse.Result.successful) return parse.Result;
 
             return result.Success();
         }

@@ -11,7 +11,7 @@ namespace Insight.Base.OAuth
 {
     public class Verify
     {
-        private Result<object> result = new Result<object>();
+        private readonly Result<object> result = new Result<object>();
         private readonly TokenType tokenType;
         private readonly string secret;
         private readonly string hash;
@@ -80,9 +80,8 @@ namespace Insight.Base.OAuth
 
             if (basis.isInvalid) return result.Disabled();
 
-            result = tokenType == TokenType.AccessToken
-                ? result.Success(Util.ConvertTo<Session>(basis))
-                : result.Success();
+            if (tokenType == TokenType.RefreshToken) result.Success();
+            else result.Success(Util.ConvertTo<Session>(basis));
 
             // 如key为空，立即返回；否则进行鉴权
             if (string.IsNullOrEmpty(key)) return result;

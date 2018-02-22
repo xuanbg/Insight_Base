@@ -98,8 +98,8 @@ namespace Insight.Base.OAuth
             var signature = Util.Hash(key + code);
 
             // 缓存签名-Code,以及Code-用户ID.
-            RedisHelper.StringSet(signature, code, new TimeSpan(0, 0, life));
-            RedisHelper.StringSet(code, token.userId);
+            RedisHelper.StringSet(signature, code, TimeSpan.FromSeconds(life));
+            RedisHelper.StringSet(code, token.userId, TimeSpan.FromSeconds(life));
 
             return code;
         }
@@ -121,7 +121,7 @@ namespace Insight.Base.OAuth
             var key = Util.Hash(type + mobile + code);
             if (type == 4) return code;
 
-            RedisHelper.StringSet(key, code, new TimeSpan(0, life, 0));
+            RedisHelper.StringSet(key, code, TimeSpan.FromMinutes(life));
             return code;
         }
 

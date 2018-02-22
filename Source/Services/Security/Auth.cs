@@ -140,7 +140,7 @@ namespace Insight.Base.Services
 
             // 限流,每令牌每24小时可刷新600次
             var key = Util.Hash("RefreshToken" + tokenId);
-            var limited = Params.callManage.IsLimited(key, 3600 * 24, 600);
+            var limited = Params.callManage.IsLimited(key, 3600 * 24, 60);
             if (limited) return result.BadRequest("刷新次数已用完,请合理刷新");
 
             result = verify.Compare();
