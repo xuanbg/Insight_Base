@@ -236,7 +236,7 @@ namespace Insight.Base.OAuth
                     group p by new {f.id, f.navigatorId, f.alias}
                     into g
                     let k = g.Key
-                    select new Permit { id = k.id, parentId = k.navigatorId, alias = k.alias, permit = g.Min(i => i.permit)};
+                    select new Permit { id = k.id, alias = k.alias, permit = g.Min(i => i.permit)};
                 return list.Where(i => i.permit > 0).ToList();
             }
         }

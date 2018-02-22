@@ -127,11 +127,11 @@ namespace Insight.Base.Services
         /// <summary>
         /// 根据对象实体数据注册一个用户
         /// </summary>
-        /// <param name="appId">应用ID</param>
+        /// <param name="aid">应用ID</param>
         /// <param name="code">验证码</param>
         /// <param name="user">用户对象</param>
         /// <returns>Result</returns>
-        public Result<object> SignUp(string appId, string code, User user)
+        public Result<object> SignUp(string aid, string code, User user)
         {
             if (!Verify()) return result;
 
@@ -145,7 +145,7 @@ namespace Insight.Base.Services
             if (!DbHelper.Insert(user)) return result.DataBaseError();
 
             var session = Core.GetToken(user.id);
-            var tokens = session.CreatorKey(Util.NewId("N"), appId);
+            var tokens = session.CreatorKey(Util.NewId("N"), aid);
             Core.SetTokenCache(session);
 
             return result.Created(tokens);
@@ -182,13 +182,13 @@ namespace Insight.Base.Services
         /// <summary>
         /// 用户重置登录密码
         /// </summary>
-        /// <param name="appId">应用ID</param>
+        /// <param name="aid">应用ID</param>
         /// <param name="account">登录账号</param>
         /// <param name="password">新密码（RSA加密）</param>
         /// <param name="code">短信验证码</param>
         /// <param name="mobile">手机号，默认为空。如为空，则使用account</param>
         /// <returns>Result</returns>
-        public Result<object> ResetSignature(string appId, string account, string password, string code, string mobile = null)
+        public Result<object> ResetSignature(string aid, string account, string password, string code, string mobile = null)
         {
             if (!Core.VerifySmsCode(2, mobile ?? account, code)) return result.SMSCodeError();
 
@@ -204,7 +204,7 @@ namespace Insight.Base.Services
             }
 
             token.password = password;
-            var tokens = token.CreatorKey(Util.NewId("N"), appId);
+            var tokens = token.CreatorKey(Util.NewId("N"), aid);
             Core.SetTokenCache(token);
 
             return result.Created(tokens);

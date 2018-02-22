@@ -52,11 +52,6 @@ namespace Insight.Base.Common.Entity
     public class PermitFunt : Permit
     {
         /// <summary>
-        /// 控制器命名空间
-        /// </summary>
-        public string className { get; set; }
-
-        /// <summary>
         /// 文件路径
         /// </summary>
         public string filePath { get; set; }

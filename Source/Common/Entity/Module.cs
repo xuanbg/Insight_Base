@@ -101,12 +101,6 @@ namespace Insight.Base.Common.Entity
         public string url { get; set; }
 
         /// <summary>
-        /// 控制器命名空间
-        /// </summary>
-        [Column("class_name")]
-        public string className { get; set; }
-
-        /// <summary>
         /// 文件路径
         /// </summary>
         [Column("file_path")]
