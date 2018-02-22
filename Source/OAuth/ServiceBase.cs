@@ -8,7 +8,9 @@ namespace Insight.Base.OAuth
         public Token token;
         public string tokenId;
         public string tenantId;
+        public string appId;
         public string userId;
+        public string deptId;
 
         /// <summary>
         /// 会话合法性验证
@@ -24,7 +26,9 @@ namespace Insight.Base.OAuth
             if (token == null) return false;
 
             tenantId = token.tenantId;
+            appId = token.appId;
             userId = token.userId;
+            deptId = token.deptId;
             result = verify.Compare(userId == id ? null : key);
 
             return result.successful;

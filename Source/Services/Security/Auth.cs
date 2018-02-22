@@ -1,4 +1,6 @@
-﻿using System.ServiceModel;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.ServiceModel;
 using System.Threading;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
@@ -20,18 +22,9 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 联通性测试接口
-        /// </summary>
-        /// <returns>Result</returns>
-        public Result<object> Test()
-        {
-            return new Result<object>().Success();
-        }
-
-        /// <summary>
         /// 获取指定账户的Code
         /// </summary>
-        /// <param name="account">用户账号</param>
+        /// <param name="account">登录账号</param>
         /// <param name="type">登录类型</param>
         /// <returns>Result</returns>
         public Result<object> GetCode(string account, int type = 0)
@@ -62,7 +55,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="tid">租户ID</param>
         /// <param name="appId">应用ID</param>
-        /// <param name="account">用户账号</param>
+        /// <param name="account">登录账号</param>
         /// <param name="signature">用户签名</param>
         /// <param name="deptid">登录部门ID（可为空）</param>
         /// <returns>Result</returns>
@@ -117,17 +110,15 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 移除指定账户的AccessToken
+        /// 带鉴权的会话合法性验证
         /// </summary>
+        /// <param name="action">需要鉴权的操作ID</param>
         /// <returns>Result</returns>
-        public Result<object> RemoveToken()
+        public Result<object> Verification(string action)
         {
-            if (!Verify()) return result;
+            Verify(action);
 
-            token.DeleteKeys(tokenId);
-            Core.SetTokenCache(token);
-
-            return result.Success();
+            return result;
         }
 
         /// <summary>
@@ -156,15 +147,56 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 带鉴权的会话合法性验证
+        /// 移除指定账户的AccessToken
         /// </summary>
-        /// <param name="action">需要鉴权的操作ID</param>
         /// <returns>Result</returns>
-        public Result<object> Verification(string action)
+        public Result<object> RemoveToken()
         {
-            Verify(action);
+            if (!Verify()) return result;
 
-            return result;
+            token.DeleteKeys(tokenId);
+            Core.SetTokenCache(token);
+
+            return result.Success();
+        }
+
+        /// <summary>
+        /// 获取用户已绑定租户
+        /// </summary>
+        /// <param name="account">登录账号</param>
+        /// <returns>Result</returns>
+        public Result<object> GetTenants(string account)
+        {
+            using (var context = new Entities())
+            {
+                var user = context.users.SingleOrDefault(u => u.account == account || u.mobile == account || u.email == account);
+                if (user == null) return result.NotFound();
+
+                var list = from m in context.tenantUsers.Where(m => m.userId == user.id)
+                    join t in context.tenants on m.tenantId equals t.id
+                    select new { t.id, Name = t.alias, remark = t.name };
+                return list.Any() ? result.Success(list.ToList()) : result.NoContent(new List<object>());
+            }
+        }
+
+        /// <summary>
+        /// 获取用户可登录部门
+        /// </summary>
+        /// <param name="account">登录账号</param>
+        /// <returns>Result</returns>
+        public Result<object> GetDepts(string account)
+        {
+            using (var context = new Entities())
+            {
+                var user = context.users.SingleOrDefault(u => u.account == account || u.mobile == account || u.email == account);
+                if (user == null) return result.NotFound();
+
+                var list = from m in context.orgMembers.Where(m => m.userId == user.id)
+                    join t in context.organizations on m.orgId equals t.id
+                    join d in context.organizations on t.parentId equals d.id
+                    select new { d.id, Name = d.fullname, remark = d.code };
+                return list.Any() ? result.Success(list.ToList()) : result.NoContent(new List<object>());
+            }
         }
 
         /// <summary>

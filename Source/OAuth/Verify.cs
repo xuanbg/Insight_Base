@@ -3,7 +3,6 @@ using System.Net;
 using System.ServiceModel.Web;
 using System.Threading;
 using Insight.Base.Common;
-using Insight.Base.Common.Entity;
 using Insight.Utils.Common;
 using Insight.Utils.Entity;
 
@@ -87,20 +86,10 @@ namespace Insight.Base.OAuth
             if (string.IsNullOrEmpty(key)) return result;
 
             // 根据传入的操作码进行鉴权
-            using (var context = new Entities())
-            {
-                var list = from f in context.functions
-                    join p in context.roleFunctions on f.id equals p.functionId
-                    join r in context.userRoles on p.roleId equals r.roleId
-                    where r.tenantId == tenantId && r.userId == userId && (r.deptId == null || r.deptId == deptId)
-                    group p by new {f.id, f.alias, routes = f.url}
-                    into g
-                    select new {g.Key, permit = g.Min(i => i.permit)};
-                var permits = list.Where(i => i.permit > 0);
-                var isPermit = permits.Any(i => i.Key.alias.Contains(key) || i.Key.routes.Contains(key));
+            var permits = Core.GetPermits(tenantId, userId, deptId);
+            var isPermit = permits.Any(i => i.alias.Contains(key));
 
-                return isPermit ? result : result.Forbidden();
-            }
+            return isPermit ? result : result.Forbidden();
         }
     }
 }

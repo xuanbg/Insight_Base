@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Insight.Base.Common;
@@ -214,6 +215,29 @@ namespace Insight.Base.OAuth
             using (var context = new Entities())
             {
                 return context.users.SingleOrDefault(u => u.id == userId);
+            }
+        }
+
+        /// <summary>
+        /// 获取用户的全部已授权功能集合
+        /// </summary>
+        /// <param name="tenantId">租户ID</param>
+        /// <param name="userId">用户ID</param>
+        /// <param name="deptId">登录部门ID</param>
+        /// <returns>功能集合</returns>
+        public static List<Permit> GetPermits(string tenantId, string userId, string deptId)
+        {
+            using (var context = new Entities())
+            {
+                var list = from f in context.functions
+                    join p in context.roleFunctions on f.id equals p.functionId
+                    join r in context.userRoles on p.roleId equals r.roleId
+                    where r.tenantId == tenantId && r.userId == userId && (r.deptId == null || r.deptId == deptId)
+                    group p by new {f.id, f.navigatorId, f.alias}
+                    into g
+                    let k = g.Key
+                    select new Permit { id = k.id, parentId = k.navigatorId, alias = k.alias, permit = g.Min(i => i.permit)};
+                return list.Where(i => i.permit > 0).ToList();
             }
         }
 

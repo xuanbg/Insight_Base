@@ -34,6 +34,11 @@ namespace Insight.Base.Common.Entity
         public string name { get; set; }
 
         /// <summary>
+        /// 别名
+        /// </summary>
+        public string alias { get; set; }
+
+        /// <summary>
         /// 图标
         /// </summary>
         public byte[] icon { get; set; }
@@ -47,11 +52,6 @@ namespace Insight.Base.Common.Entity
     public class PermitFunt : Permit
     {
         /// <summary>
-        /// 别名
-        /// </summary>
-        public string alias { get; set; }
-
-        /// <summary>
         /// 控制器命名空间
         /// </summary>
         public string className { get; set; }
@@ -60,6 +60,11 @@ namespace Insight.Base.Common.Entity
         /// 文件路径
         /// </summary>
         public string filePath { get; set; }
+
+        /// <summary>
+        /// 接口路由
+        /// </summary>
+        public string routes { get; set; }
     }
 
     public class PermitData : Permit

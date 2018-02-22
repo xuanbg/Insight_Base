@@ -29,7 +29,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">模块ID</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "modules/{id}/actions", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "modules/{id}/functions", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         Result<object> GetAction(string id);
 

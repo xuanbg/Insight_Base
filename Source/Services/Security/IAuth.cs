@@ -18,20 +18,12 @@ namespace Insight.Base.Services
         void ResponseOptions();
 
         /// <summary>
-        /// 联通性测试接口
-        /// </summary>
-        /// <returns>Result</returns>
-        [WebGet(UriTemplate = "test", ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        Result<object> Test();
-
-        /// <summary>
         /// 获取指定账户的Code
         /// </summary>
-        /// <param name="account">用户账号</param>
+        /// <param name="account">登录账号</param>
         /// <param name="type">登录类型</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "tokens/codes?account={account}&type={type}", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "{account}/codes?type={type}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         Result<object> GetCode(string account, int type);
 
@@ -40,29 +32,13 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="tenantId">租户ID</param>
         /// <param name="appId">应用ID</param>
-        /// <param name="account">用户账号</param>
+        /// <param name="account">登录账号</param>
         /// <param name="signature">用户签名</param>
         /// <param name="deptId">登录部门ID（可为空）</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "tokens?tenantid={tenantId}&appid={appId}&account={account}&signature={signature}&deptid={deptId}", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "{account}/tokens?tenantid={tenantId}&appid={appId}&signature={signature}&deptid={deptId}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         Result<object> GetToken(string tenantId, string appId, string account, string signature, string deptId);
-
-        /// <summary>
-        /// 移除指定账户的AccessToken
-        /// </summary>
-        /// <returns>Result</returns>
-        [WebInvoke(Method = "DELETE", UriTemplate = "tokens", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
-        [OperationContract]
-        Result<object> RemoveToken();
-
-        /// <summary>
-        /// 刷新AccessToken，延长过期时间
-        /// </summary>
-        /// <returns>Result</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "tokens", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
-        [OperationContract]
-        Result<object> RefreshToken();
 
         /// <summary>
         /// 带鉴权的会话合法性验证
@@ -73,9 +49,39 @@ namespace Insight.Base.Services
         [OperationContract]
         Result<object> Verification(string action);
 
-        #endregion
+        /// <summary>
+        /// 刷新AccessToken，延长过期时间
+        /// </summary>
+        /// <returns>Result</returns>
+        [WebInvoke(Method = "PUT", UriTemplate = "tokens", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [OperationContract]
+        Result<object> RefreshToken();
 
-        #region PayPW
+        /// <summary>
+        /// 移除指定账户的AccessToken
+        /// </summary>
+        /// <returns>Result</returns>
+        [WebInvoke(Method = "DELETE", UriTemplate = "tokens", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [OperationContract]
+        Result<object> RemoveToken();
+
+        /// <summary>
+        /// 获取用户已绑定租户
+        /// </summary>
+        /// <param name="account">登录账号</param>
+        /// <returns>Result</returns>
+        [WebGet(UriTemplate = "{account}/tenants", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        Result<object> GetTenants(string account);
+
+        /// <summary>
+        /// 获取用户可登录部门
+        /// </summary>
+        /// <param name="account">登录账号</param>
+        /// <returns>Result</returns>
+        [WebGet(UriTemplate = "{account}/depts", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        Result<object> GetDepts(string account);
 
         /// <summary>
         /// 设置支付密码

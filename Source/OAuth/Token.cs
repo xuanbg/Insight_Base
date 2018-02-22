@@ -27,6 +27,11 @@ namespace Insight.Base.OAuth
         public string tenantId => currentKeys?.tenantId;
 
         /// <summary>
+        /// 应用ID
+        /// </summary>
+        public string appId => currentKeys?.appId;
+
+        /// <summary>
         /// 登录部门ID
         /// </summary>
         public string deptId => currentKeys?.deptId;
@@ -137,20 +142,20 @@ namespace Insight.Base.OAuth
         /// 生成令牌关键数据
         /// </summary>
         /// <param name="code">Code</param>
-        /// <param name="appId">应用ID</param>
+        /// <param name="aid">应用ID</param>
         /// <param name="tid">租户ID</param>
         /// <returns>令牌数据包</returns>
-        public TokenPackage CreatorKey(string code, string appId, string tid = null)
+        public TokenPackage CreatorKey(string code, string aid, string tid = null)
         {
             foreach (var item in keyMap)
             {
-                if (appId != item.Value.appId) continue;
+                if (aid != item.Value.appId) continue;
 
                 keyMap.Remove(item.Key);
                 break;
             }
 
-            currentKeys = new Keys(tid, appId);
+            currentKeys = new Keys(tid, aid);
             keyMap.Add(code, currentKeys);
             isChanged = true;
 

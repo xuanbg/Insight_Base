@@ -79,7 +79,7 @@ namespace Insight.Base.OAuth
             this.tenantId = tenantId;
             this.appId = appId;
 
-            expireDate = getExpireDate(tenantId);
+            expireDate = GetExpireDate(tenantId);
             tokenLife = GetTokenLife(appId);
             secretKey = Util.NewId("N");
             refreshKey = Util.NewId("N");
@@ -141,10 +141,8 @@ namespace Insight.Base.OAuth
         /// </summary>
         /// <param name="tenantId">租户ID</param>
         /// <returns>租户的过期时间</returns>
-        private static DateTime getExpireDate(string tenantId)
+        private static DateTime GetExpireDate(string tenantId)
         {
-            if (tenantId == "00000000-0000-0000-0000-000000000000") return DateTime.MaxValue;
-
             using (var context = new Entities())
             {
                 return context.tenants.SingleOrDefault(i => i.id == tenantId)?.expireDate ?? DateTime.MinValue;
@@ -174,6 +172,5 @@ namespace Insight.Base.OAuth
                 return life;
             }
         }
-
     }
 }
