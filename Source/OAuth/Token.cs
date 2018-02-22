@@ -127,9 +127,10 @@ namespace Insight.Base.OAuth
         /// <returns>bool 是否存在关键数据集</returns>
         public bool SelectKeys(string tokenId)
         {
-            currentKeys = keyMap[tokenId];
+            if (!keyMap.ContainsKey(tokenId)) return false;
 
-            return currentKeys != null;
+            currentKeys = keyMap[tokenId];
+            return true;
         }
 
         /// <summary>

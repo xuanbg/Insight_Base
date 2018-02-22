@@ -125,6 +125,8 @@ namespace Insight.Base.Services
             if (!Verify()) return result;
 
             token.DeleteKeys(tokenId);
+            Core.SetTokenCache(token);
+
             return result.Success();
         }
 

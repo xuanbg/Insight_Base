@@ -19,8 +19,10 @@ namespace Insight.Base.OAuth
         public bool Verify(string key = null, string id = null)
         {
             var verify = new Verify();
-            token = verify.basis;
             tokenId = verify.tokenId;
+            token = verify.basis;
+            if (token == null) return false;
+
             tenantId = token.tenantId;
             userId = token.userId;
             result = verify.Compare(userId == id ? null : key);

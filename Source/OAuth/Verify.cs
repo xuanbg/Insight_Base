@@ -70,15 +70,15 @@ namespace Insight.Base.OAuth
             if (basis == null) return result.InvalidToken();
 
             // 验证令牌
-            if (!basis.VerifyToken(hash, secret, tokenType)) return result.InvalidAuth();
-
-            if (basis.TenantIsExpiry()) return result.TenantIsExpiry();
+            if (basis.IsFailure()) return result.Failured();
 
             if (tokenType == TokenType.AccessToken && basis.IsExpiry()) return result.Expired();
 
-            if (basis.IsFailure()) return result.Failured();
-
             if (basis.isInvalid) return result.Disabled();
+
+            if (basis.TenantIsExpiry()) return result.TenantIsExpiry();
+
+            if (!basis.VerifyToken(hash, secret, tokenType)) return result.InvalidAuth();
 
             if (tokenType == TokenType.RefreshToken) result.Success();
             else result.Success(Util.ConvertTo<Session>(basis));
