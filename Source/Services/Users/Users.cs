@@ -83,20 +83,34 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
+        /// 获取登录用户的用户对象实体
+        /// </summary>
+        /// <returns>Result</returns>
+        public Result<object> GetMyself()
+        {
+            if (!Verify()) return result;
+
+            var data = Core.GetUserById(userId);
+
+            return data == null ? result.NotFound() : result.Success(data);
+        }
+
+        /// <summary>
         /// 根据ID获取用户对象实体
         /// </summary>
         /// <param name="id">用户ID</param>
         /// <returns>Result</returns>
         public Result<object> GetUser(string id)
         {
-            if (!Verify("getUsers")) return result;
+            if (!Verify("getUsers", id)) return result;
 
             var data = Core.GetUserById(id);
             if (data == null) return result.NotFound();
 
-            data.password = null;
-            data.payPassword = null;
-            data.funts = null;
+            var navs = Core.GetNavigation(tenantId, appId, userId, deptId);
+            var funs = Core.GetPermitFunts(tenantId, userId, deptId);
+            data.funts = navs.Union(funs).ToList();
+
             return result.Success(data);
         }
 

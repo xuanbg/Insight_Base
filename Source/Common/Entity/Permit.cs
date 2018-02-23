@@ -23,13 +23,14 @@ namespace Insight.Base.Common.Entity
         /// 图标类型
         /// </summary>
         public int mode { get; set; }
+
         /// <summary>
         /// 序号
         /// </summary>
         public int index { get; set; }
 
         /// <summary>
-        /// 导航名称
+        /// 项目名称
         /// </summary>
         public string name { get; set; }
 
@@ -37,6 +38,11 @@ namespace Insight.Base.Common.Entity
         /// 别名
         /// </summary>
         public string alias { get; set; }
+
+        /// <summary>
+        /// 文件路径
+        /// </summary>
+        public string filePath { get; set; }
 
         /// <summary>
         /// 图标
@@ -47,14 +53,15 @@ namespace Insight.Base.Common.Entity
         /// 授权
         /// </summary>
         public int? permit { get; set; }
+
+        /// <summary>
+        /// 是否默认启动：0、否；1、是
+        /// </summary>
+        public bool isDefault { get; set; }
     }
 
     public class PermitFunt : Permit
     {
-        /// <summary>
-        /// 文件路径
-        /// </summary>
-        public string filePath { get; set; }
 
         /// <summary>
         /// 接口路由

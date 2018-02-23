@@ -26,23 +26,9 @@ namespace Insight.Base.Services
         {
             if (!Verify()) return result;
 
-            var permits = Core.GetPermits(tenantId, userId, deptId);
-            using (var context = new Entities())
-            {
-                var navigators = context.navigators.Where(i => i.appId == appId).ToList();
-                var functions = context.functions.Where(i => i.isVisible).ToList();
-                var mids = permits.Join(functions, p => p.id, f => f.id, (p, f) => f.navigatorId).ToList();
-                var gids = from n in navigators
-                    join m in mids on n.id equals m
-                    select n.parentId;
-                var ids = gids.Union(mids).ToList();
-                var list = from n in navigators
-                    join id in ids on n.id equals id
-                    orderby n.parentId, n.index
-                    select new { n.id, n.parentId, n.index, n.name, n.alias, n.filePath, n.icon, n.isDefault };
+            var permits = Core.GetNavigation(tenantId, appId, userId, deptId);
 
-                return result.Success(list.ToList());
-            }
+            return result.Success(permits);
         }
 
         /// <summary>

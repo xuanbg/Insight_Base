@@ -46,6 +46,14 @@ namespace Insight.Base.Services
         /// <summary>
         /// 根据ID获取用户对象实体
         /// </summary>
+        /// <returns>Result</returns>
+        [WebGet(UriTemplate = "users/myself", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        Result<object> GetMyself();
+
+        /// <summary>
+        /// 根据ID获取用户对象实体
+        /// </summary>
         /// <param name="id">用户ID</param>
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "users/{id}", ResponseFormat = WebMessageFormat.Json)]

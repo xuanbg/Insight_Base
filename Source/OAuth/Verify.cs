@@ -86,7 +86,7 @@ namespace Insight.Base.OAuth
             if (string.IsNullOrEmpty(key)) return result;
 
             // 根据传入的操作码进行鉴权
-            var permits = Core.GetPermits(tenantId, userId, deptId);
+            var permits = Core.GetPermitFunts(tenantId, userId, deptId);
             var isPermit = permits.Any(i => i.alias.Contains(key));
 
             return isPermit ? result : result.Forbidden();

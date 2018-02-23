@@ -42,7 +42,7 @@ namespace Insight.Base.Common
                 createTime = DateTime.Now
             };
 
-            return (rule?.isFile ?? false) ? WriteToFile(log) : WriteToDB(log);
+            return (rule?.isFile ?? true) ? WriteToFile(log) : WriteToDB(log);
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Insight.Base.Common
         /// </summary>
         /// <param name="log"></param>
         /// <returns>bool 是否写入成功</returns>
-        public static bool WriteToDB(Log log)
+        private static bool WriteToDB(Log log)
         {
             using (var context = new Entities())
             {
@@ -64,7 +64,7 @@ namespace Insight.Base.Common
         /// </summary>
         /// <param name="log"></param>
         /// <returns>bool 是否写入成功</returns>
-        public static bool WriteToFile(Log log)
+        private static bool WriteToFile(Log log)
         {
             Params.Mutex.WaitOne();
             var path = $"{Util.GetAppSetting("LogLocal")}\\{GetLevelName(log.level)}\\";

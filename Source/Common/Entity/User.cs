@@ -75,7 +75,7 @@ namespace Insight.Base.Common.Entity
         /// <summary>
         /// 授予用户的功能权限
         /// </summary>
-        public List<PermitFunt> funts { get; set; }
+        public List<Permit> funts { get; set; }
 
         /// <summary>
         /// 授予用户的数据权限

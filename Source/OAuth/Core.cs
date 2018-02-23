@@ -118,7 +118,7 @@ namespace Insight.Base.OAuth
             var max = Math.Pow(10, length);
             var code = Params.Random.Next(0, (int) max).ToString("D" + length);
             var msg = $"为手机号 {mobile} 生成了类型为 {type} 的验证码 {code}, 有效时间 {life} 分钟.";
-            Logger.Write("600501", msg);
+            new Thread(() => Logger.Write("600501", msg)).Start();
             var key = Util.Hash(type + mobile + code);
             if (type == 4) return code;
 
@@ -214,7 +214,52 @@ namespace Insight.Base.OAuth
         {
             using (var context = new Entities())
             {
-                return context.users.SingleOrDefault(u => u.id == userId);
+                var user = context.users.SingleOrDefault(u => u.id == userId);
+                user.password = null;
+                user.payPassword = null;
+
+                return user;
+            }
+        }
+
+        /// <summary>
+        /// 获取用户的全部可用导航集合
+        /// </summary>
+        /// <param name="tenantId">租户ID</param>
+        /// <param name="appId">应用ID</param>
+        /// <param name="userId">用户ID</param>
+        /// <param name="deptId">登录部门ID</param>
+        /// <returns>导航集合</returns>
+        public static List<Permit> GetNavigation(string tenantId, string appId, string userId, string deptId)
+        {
+            var permits = GetPermitFunts(tenantId, userId, deptId);
+            using (var context = new Entities())
+            {
+                var navigators = context.navigators.Where(i => i.appId == appId).ToList();
+                var functions = context.functions.Where(i => i.isVisible).ToList();
+                var mids = permits.Join(functions, p => p.id, f => f.id, (p, f) => f.navigatorId).ToList();
+                var gids = from n in navigators
+                    join m in mids on n.id equals m
+                    select n.parentId;
+                var ids = gids.Union(mids).ToList();
+                var list = from n in navigators
+                    join id in ids on n.id equals id
+                    orderby n.parentId, n.index
+                    select new Permit
+                    {
+                        id = n.id,
+                        parentId = n.parentId,
+                        appId = n.appId,
+                        mode = n.parentId == null ? 0 : 1,
+                        index = n.index,
+                        name = n.name,
+                        alias = n.alias,
+                        filePath = n.filePath,
+                        icon = n.icon,
+                        isDefault = n.isDefault
+                    };
+
+                return list.ToList();
             }
         }
 
@@ -225,7 +270,7 @@ namespace Insight.Base.OAuth
         /// <param name="userId">用户ID</param>
         /// <param name="deptId">登录部门ID</param>
         /// <returns>功能集合</returns>
-        public static List<Permit> GetPermits(string tenantId, string userId, string deptId)
+        public static List<Permit> GetPermitFunts(string tenantId, string userId, string deptId)
         {
             using (var context = new Entities())
             {

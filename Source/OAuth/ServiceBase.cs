@@ -10,6 +10,7 @@ namespace Insight.Base.OAuth
         public string tenantId;
         public string appId;
         public string userId;
+        public string userName;
         public string deptId;
 
         /// <summary>
@@ -28,6 +29,7 @@ namespace Insight.Base.OAuth
             tenantId = token.tenantId;
             appId = token.appId;
             userId = token.userId;
+            userName = token.userName;
             deptId = token.deptId;
             result = verify.Compare(userId == id ? null : key);
 

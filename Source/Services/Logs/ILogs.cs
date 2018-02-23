@@ -36,7 +36,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "rules", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> AddRule(SYS_Logs_Rules rule);
+        Result<object> AddRule(LogRule rule);
 
         /// <summary>
         /// 删除日志规则
@@ -54,7 +54,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "rules", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> EditRule(SYS_Logs_Rules rule);
+        Result<object> EditRule(LogRule rule);
 
         /// <summary>
         /// 获取日志规则
@@ -72,6 +72,5 @@ namespace Insight.Base.Services
         [WebGet(UriTemplate = "rules", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         Result<object> GetRules();
-
     }
 }
