@@ -34,8 +34,18 @@ namespace Insight.Base.Services
             user.password = Util.Hash("123456");
             user.creatorId = userId;
             user.createTime = DateTime.Now;
-            
-            return DbHelper.Insert(user) ? result.Created(user) : result.DataBaseError();
+            if (!DbHelper.Insert(user)) return result.DataBaseError();
+
+            var tu = new TenantUser
+            {
+                id = Util.NewId(),
+                tenantId = tenantId,
+                userId = user.id,
+                creatorId = userId,
+                createTime = DateTime.Now
+            };
+
+            return DbHelper.Insert(tu) ? result.Created(user) : result.DataBaseError();
         }
 
         /// <summary>
@@ -135,9 +145,25 @@ namespace Insight.Base.Services
 
             using (var context = new Entities())
             {
-                var list = from u in context.users.Where(u => string.IsNullOrEmpty(key) || u.name.Contains(key) || u.account.Contains(key) || u.mobile.Contains(key) || u.email.Contains(key))
-                    select new{u.id,u.name,u.account,u.mobile,u.email,u.remark,u.isBuiltin,u.isInvalid,u.creatorId,u.createTime};
-                var skip = rows*(page - 1);
+                var list = from u in context.users
+                    join r in context.tenantUsers on u.id equals r.userId
+                    where r.tenantId == tenantId && (string.IsNullOrEmpty(key) || u.name.Contains(key) ||
+                                                     u.account.Contains(key) || u.mobile.Contains(key) ||
+                                                     u.email.Contains(key))
+                    select new
+                    {
+                        u.id,
+                        u.name,
+                        u.account,
+                        u.mobile,
+                        u.email,
+                        u.remark,
+                        u.isBuiltin,
+                        u.isInvalid,
+                        u.creatorId,
+                        u.createTime
+                    };
+                var skip = rows * (page - 1);
                 var users = list.OrderBy(u => u.createTime).Skip(skip).Take(rows).ToList();
 
                 return result.Success(users, list.Count());
@@ -208,7 +234,8 @@ namespace Insight.Base.Services
         /// <param name="code">短信验证码</param>
         /// <param name="mobile">手机号，默认为空。如为空，则使用account</param>
         /// <returns>Result</returns>
-        public Result<object> ResetSignature(string aid, string account, string password, string code, string mobile = null)
+        public Result<object> ResetSignature(string aid, string account, string password, string code,
+            string mobile = null)
         {
             if (!Core.VerifySmsCode(2, mobile ?? account, code)) return result.SMSCodeError();
 
@@ -288,6 +315,5 @@ namespace Insight.Base.Services
                 return result.Success(list);
             }
         }
-
     }
 }
