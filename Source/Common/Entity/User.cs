@@ -75,12 +75,12 @@ namespace Insight.Base.Common.Entity
         /// <summary>
         /// 授予用户的功能权限
         /// </summary>
-        public List<Permit> funts { get; set; }
+        public List<AppTree> funcs { get; set; }
 
         /// <summary>
         /// 授予用户的数据权限
         /// </summary>
-        public List<PermitData> datas { get; set; }
+        public List<AppTree> datas { get; set; }
     }
 
     [Table("ucg_group")]

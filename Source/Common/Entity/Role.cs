@@ -80,12 +80,12 @@ namespace Insight.Base.Common.Entity
         /// <summary>
         /// 角色功能权限
         /// </summary>
-        public List<PermitFunt> permitFunts { get; set; }
+        public List<AppTree> funcs { get; set; }
 
         /// <summary>
         /// 角色数据权限
         /// </summary>
-        public List<PermitData> permitDatas { get; set; }
+        public List<AppTree> datas { get; set; }
     }
 
     [Table("ucr_role_member")]

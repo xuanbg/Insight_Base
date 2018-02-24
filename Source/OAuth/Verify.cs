@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.ServiceModel.Web;
 using System.Threading;
 using Insight.Base.Common;
@@ -85,11 +84,7 @@ namespace Insight.Base.OAuth
             // 如key为空，立即返回；否则进行鉴权
             if (string.IsNullOrEmpty(key)) return result;
 
-            // 根据传入的操作码进行鉴权
-            var permits = Core.GetPermitFunts(tenantId, userId, deptId);
-            var isPermit = permits.Any(i => i.alias.Contains(key));
-
-            return isPermit ? result : result.Forbidden();
+            return Core.VerifyKey(tenantId, userId, deptId, key) ? result : result.Forbidden();
         }
     }
 }

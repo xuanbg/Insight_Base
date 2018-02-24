@@ -50,9 +50,7 @@ namespace Insight.Base.Services
             var user = Core.GetUserById(id);
             if (user == null) return result.NotFound();
 
-            user.isInvalid = true;
-
-            return DbHelper.Update(user) ? result : result.DataBaseError();
+            return DbHelper.Delete(user) ? result : result.DataBaseError();
         }
 
         /// <summary>
@@ -69,6 +67,9 @@ namespace Insight.Base.Services
             if (data == null) return result.NotFound();
 
             data.name = user.name;
+            data.account = user.account;
+            data.mobile = user.mobile;
+            data.email = user.email;
             data.remark = user.remark;
             if (!DbHelper.Update(data)) return result.DataBaseError();
 
@@ -76,6 +77,9 @@ namespace Insight.Base.Services
             if (session == null) return result;
 
             session.userName = user.name;
+            session.account = user.account;
+            session.mobile = user.mobile;
+            session.email = user.email;
             session.SetChanged();
             Core.SetTokenCache(session);
 
@@ -91,6 +95,8 @@ namespace Insight.Base.Services
             if (!Verify()) return result;
 
             var data = Core.GetUserById(userId);
+            data.password = null;
+            data.payPassword = null;
 
             return data == null ? result.NotFound() : result.Success(data);
         }
@@ -107,9 +113,9 @@ namespace Insight.Base.Services
             var data = Core.GetUserById(id);
             if (data == null) return result.NotFound();
 
-            var navs = Core.GetNavigation(tenantId, appId, userId, deptId);
-            var funs = Core.GetPermitFunts(tenantId, userId, deptId);
-            data.funts = navs.Union(funs).ToList();
+            data.password = null;
+            data.payPassword = null;
+            data.funcs = Core.GetPermitAppTree(tenantId, id);
 
             return result.Success(data);
         }

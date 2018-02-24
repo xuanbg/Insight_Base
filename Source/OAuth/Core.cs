@@ -188,7 +188,9 @@ namespace Insight.Base.OAuth
         {
             using (var context = new Entities())
             {
-                return context.users.Any(u => u.account == user.account || u.mobile == user.mobile || u.email == user.email);
+                return context.users.Any(u => u.account == user.account 
+                || !string.IsNullOrEmpty(user.mobile) && u.mobile == user.mobile
+                || !string.IsNullOrEmpty(user.email) && u.email == user.email);
             }
         }
 
@@ -214,11 +216,63 @@ namespace Insight.Base.OAuth
         {
             using (var context = new Entities())
             {
-                var user = context.users.SingleOrDefault(u => u.id == userId);
-                user.password = null;
-                user.payPassword = null;
+                return context.users.SingleOrDefault(u => u.id == userId);
+            }
+        }
 
-                return user;
+        /// <summary>
+        /// 获取用户的全部已授权功能ID集合
+        /// </summary>
+        /// <param name="tenantId">租户ID</param>
+        /// <param name="userId">用户ID</param>
+        /// <param name="deptId">登录部门ID</param>
+        /// <param name="getInfo">是否获取信息，默认为否</param>
+        /// <returns>功能ID集合</returns>
+        public static List<PermitFunc> GetPermitFuncs(string tenantId, string userId, string deptId,
+            bool getInfo = false)
+        {
+            using (var context = new Entities())
+            {
+                var funcs = from f in context.roleFunctions
+                    join r in context.userRoles on f.roleId equals r.roleId
+                    where r.tenantId == tenantId && r.userId == userId &&
+                          (getInfo || r.deptId == null || r.deptId == deptId)
+                    group f by f.functionId
+                    into g
+                    select new PermitFunc {id = g.Key, permit = g.Min(i => i.permit)};
+
+                return funcs.ToList();
+            }
+        }
+
+        /// <summary>
+        /// 获取用户的全部已授权功能ID集合
+        /// </summary>
+        /// <param name="tenantId">租户ID</param>
+        /// <param name="userId">用户ID</param>
+        /// <param name="deptId">登录部门ID</param>
+        /// <param name="getInfo">是否获取信息，默认为否</param>
+        /// <returns>数据ID集合</returns>
+        public static List<PermitData> GetPermitDatas(string tenantId, string userId, string deptId,
+            bool getInfo = false)
+        {
+            using (var context = new Entities())
+            {
+                var datas = from d in context.roleDatas
+                    join r in context.userRoles on d.roleId equals r.roleId
+                    where r.tenantId == tenantId && r.userId == userId &&
+                          (getInfo || r.deptId == null || r.deptId == deptId)
+                    group d by new {d.modeId, d.moduleId, d.mode}
+                    into g
+                    select new PermitData
+                    {
+                        id = g.Key.modeId,
+                        parentId = g.Key.moduleId,
+                        mode = g.Key.mode,
+                        permit = g.Max(i => i.permit)
+                    };
+
+                return datas.ToList();
             }
         }
 
@@ -232,12 +286,12 @@ namespace Insight.Base.OAuth
         /// <returns>导航集合</returns>
         public static List<Permit> GetNavigation(string tenantId, string appId, string userId, string deptId)
         {
-            var permits = GetPermitFunts(tenantId, userId, deptId);
+            var permits = GetPermitFuncs(tenantId, userId, deptId).Where(i => i.permit > 0);
             using (var context = new Entities())
             {
                 var navigators = context.navigators.Where(i => i.appId == appId).ToList();
                 var functions = context.functions.Where(i => i.isVisible).ToList();
-                var mids = permits.Join(functions, p => p.id, f => f.id, (p, f) => f.navigatorId).ToList();
+                var mids = functions.Join(permits, f => f.id, p => p.id, (f, p) => f.navigatorId).ToList();
                 var gids = from n in navigators
                     join m in mids on n.id equals m
                     select n.parentId;
@@ -249,8 +303,6 @@ namespace Insight.Base.OAuth
                     {
                         id = n.id,
                         parentId = n.parentId,
-                        appId = n.appId,
-                        mode = n.parentId == null ? 0 : 1,
                         index = n.index,
                         name = n.name,
                         alias = n.alias,
@@ -264,25 +316,113 @@ namespace Insight.Base.OAuth
         }
 
         /// <summary>
-        /// 获取用户的全部已授权功能集合
+        /// 获取指定模块的用户已授权功能集合
         /// </summary>
         /// <param name="tenantId">租户ID</param>
         /// <param name="userId">用户ID</param>
         /// <param name="deptId">登录部门ID</param>
+        /// <param name="moduleId">模块ID</param>
         /// <returns>功能集合</returns>
-        public static List<Permit> GetPermitFunts(string tenantId, string userId, string deptId)
+        public static List<Permit> GetFunctions(string tenantId, string userId, string deptId, string moduleId)
         {
+            var permits = GetPermitFuncs(tenantId, userId, deptId).Where(i => i.permit > 0);
             using (var context = new Entities())
             {
-                var list = from f in context.functions
-                    join p in context.roleFunctions on f.id equals p.functionId
-                    join r in context.userRoles on p.roleId equals r.roleId
-                    where r.tenantId == tenantId && r.userId == userId && (r.deptId == null || r.deptId == deptId)
-                    group p by new {f.id, f.navigatorId, f.alias}
-                    into g
-                    let k = g.Key
-                    select new Permit { id = k.id, alias = k.alias, permit = g.Min(i => i.permit)};
-                return list.Where(i => i.permit > 0).ToList();
+                var functions = context.functions.Where(i => i.isVisible && i.navigatorId == moduleId).ToList();
+                var list = from f in functions
+                    join p in permits on f.id equals p.id
+                    orderby f.index
+                    select new Permit
+                    {
+                        id = f.id,
+                        index = f.index,
+                        name = f.name,
+                        alias = f.alias,
+                        icon = f.icon,
+                        isBegin = f.isBegin,
+                        isShowText = f.isShowText,
+                        permit = true
+                    };
+
+                return list.ToList();
+            }
+        }
+
+        /// <summary>
+        /// 获取用户的应用功能树
+        /// </summary>
+        /// <param name="tenantId">租户ID</param>
+        /// <param name="userId">用户ID</param>
+        /// <returns>应用功能树</returns>
+        public static List<AppTree> GetPermitAppTree(string tenantId, string userId)
+        {
+            var permits = GetPermitFuncs(tenantId, userId, null, true);
+            using (var context = new Entities())
+            {
+                var funList = context.functions.ToList();
+                var navList = context.navigators.ToList();
+                var appList = context.applications.ToList();
+                var functions = from f in funList
+                    join p in permits on f.id equals p.id
+                    select new AppTree
+                    {
+                        id = f.id,
+                        parentId = f.navigatorId,
+                        index = f.index,
+                        nodeType = p.permit + 3,
+                        name = f.name,
+                        remark = p.permit == 1 ? "允许" : "拒绝"
+                    };
+                var mids = funList.Join(permits, f => f.id, p => p.id, (f, p) => f.navigatorId).Distinct().ToList();
+                var modules = from n in navList
+                    join p in mids on n.id equals p
+                    select new AppTree
+                    {
+                        id = n.id,
+                        parentId = n.parentId,
+                        index = n.index,
+                        nodeType = 2,
+                        name = n.name
+                    };
+                var gids = navList.Join(mids, f => f.id, p => p, (f, p) => f.parentId).Distinct().ToList();
+                var groups = from n in navList
+                    join p in gids on n.id equals p
+                    select new AppTree
+                    {
+                        id = n.id,
+                        parentId = n.appId,
+                        index = n.index,
+                        nodeType = 1,
+                        name = n.name
+                    };
+                var aids = navList.Join(gids, f => f.id, p => p, (f, p) => f.appId).Distinct().ToList();
+                var apps = from a in appList
+                    join p in aids on a.id equals p
+                    select new AppTree {id = a.id, index = a.index, nodeType = 0, name = a.alias};
+                var list = apps.Union(groups).Union(modules).Union(functions);
+
+                return list.OrderBy(i => i.nodeType).ThenBy(i => i.parentId).ThenBy(i => i.index).ToList();
+            }
+        }
+
+        /// <summary>
+        /// 验证用户是否拥有指定功能的授权
+        /// </summary>
+        /// <param name="tenantId">租户ID</param>
+        /// <param name="userId">用户ID</param>
+        /// <param name="deptId">登录部门ID</param>
+        /// <param name="key">操作码</param>
+        /// <returns>bool 是否通过验证</returns>
+        public static bool VerifyKey(string tenantId, string userId, string deptId, string key)
+        {
+            var permits = GetPermitFuncs(tenantId, userId, deptId).Where(i => i.permit > 0);
+            using (var context = new Entities())
+            {
+                var list = from f in context.functions.ToList()
+                    join p in permits on f.id equals p.id
+                    select f.alias;
+
+                return list.Any(i => i.Contains(key));
             }
         }
 
@@ -295,7 +435,8 @@ namespace Insight.Base.OAuth
         {
             using (var context = new Entities())
             {
-                return context.users.SingleOrDefault(u => u.account == account || u.mobile == account || u.email == account);
+                return context.users.SingleOrDefault(u => u.account == account || u.mobile == account ||
+                                                          u.email == account);
             }
         }
     }

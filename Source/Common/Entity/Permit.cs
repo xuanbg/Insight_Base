@@ -2,6 +2,9 @@
 
 namespace Insight.Base.Common.Entity
 {
+    /// <summary>
+    /// 导航/功能授权实体
+    /// </summary>
     public class Permit
     {
         /// <summary>
@@ -13,16 +16,6 @@ namespace Insight.Base.Common.Entity
         /// 父级ID
         /// </summary>
         public string parentId { get; set; }
-
-        /// <summary>
-        /// 应用ID
-        /// </summary>
-        public string appId { get; set; }
-
-        /// <summary>
-        /// 图标类型
-        /// </summary>
-        public int mode { get; set; }
 
         /// <summary>
         /// 序号
@@ -52,7 +45,17 @@ namespace Insight.Base.Common.Entity
         /// <summary>
         /// 授权
         /// </summary>
-        public int? permit { get; set; }
+        public bool? permit { get; set; }
+
+        /// <summary>
+        /// 是否开始分组：0、否；1、是
+        /// </summary>
+        public bool isBegin { get; set; }
+
+        /// <summary>
+        /// 是否显示文字：0、隐藏；1、显示
+        /// </summary>
+        public bool isShowText { get; set; }
 
         /// <summary>
         /// 是否默认启动：0、否；1、是
@@ -60,19 +63,92 @@ namespace Insight.Base.Common.Entity
         public bool isDefault { get; set; }
     }
 
-    public class PermitFunt : Permit
+    /// <summary>
+    /// 功能授权关键数据
+    /// </summary>
+    public class PermitFunc
     {
+        /// <summary>
+        /// ID，唯一标识
+        /// </summary>
+        public string id { get; set; }
 
         /// <summary>
-        /// 接口路由
+        /// 授权
         /// </summary>
-        public string routes { get; set; }
+        public int permit { get; set; }
     }
 
-    public class PermitData : Permit
+    /// <summary>
+    /// 数据授权关键数据
+    /// </summary>
+    public class PermitData
     {
+        /// <summary>
+        /// ID，唯一标识
+        /// </summary>
+        public string id { get; set; }
+
+        /// <summary>
+        /// 父级ID
+        /// </summary>
+        public string parentId { get; set; }
+
+        /// <summary>
+        /// 授权模式()数据权限
+        /// </summary>
+        public int mode { get; set; }
+
+        /// <summary>
+        /// 授权
+        /// </summary>
+        public int permit { get; set; }
     }
 
+    /// <summary>
+    /// 应用树
+    /// </summary>
+    public class AppTree
+    {
+        /// <summary>
+        /// ID，唯一标识
+        /// </summary>
+        public string id { get; set; }
+
+        /// <summary>
+        /// 父级ID
+        /// </summary>
+        public string parentId { get; set; }
+
+        /// <summary>
+        /// 序号
+        /// </summary>
+        public int index { get; set; }
+
+        /// <summary>
+        /// 图标类型
+        /// </summary>
+        public int nodeType { get; set; }
+
+        /// <summary>
+        /// 节点名称
+        /// </summary>
+        public string name { get; set; }
+
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string remark { get; set; }
+
+        /// <summary>
+        /// 授权
+        /// </summary>
+        public bool? permit { get; set; }
+    }
+
+    /// <summary>
+    /// 用户角色表
+    /// </summary>
     [Table("ucv_user_role")]
     public class UserRole
     {
