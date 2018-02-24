@@ -8,19 +8,22 @@ go
 /*****视图：查询用户拥有的所有角色*****/
 
 create view ucv_user_role as
-select lower(newid()) as id, role_id, member_id as user_id, null as dept_id
-from ucr_role_member
-where member_type = 1
+select lower(newid()) as id, m.role_id, r.tenant_id, m.member_id as user_id, null as dept_id
+from ucr_role_member m
+join ucr_role r on r.id = m.role_id
+where m.member_type = 1
 union
-select lower(newid()) as id, role_id, m.user_id, null as dept_id
-from ucr_role_member r
-join ucg_group_member m on m.group_id = r.member_id
-where r.member_type = 2
+select lower(newid()) as id, m.role_id, r.tenant_id, g.user_id, null as dept_id
+from ucr_role_member m
+join ucr_role r on r.id = m.role_id
+join ucg_group_member g on g.group_id = m.member_id
+where m.member_type = 2
 union
-select lower(newid()) as id, role_id, m.user_id, o.parent_id as dept_id
-from ucr_role_member r
-join uco_org_member m on m.org_id = r.member_id
-join uco_organization o on o.id = m.org_id
-where r.member_type = 3
+select lower(newid()) as id, m.role_id, r.tenant_id, o.user_id, d.parent_id as dept_id
+from ucr_role_member m
+join ucr_role r on r.id = m.role_id
+join uco_org_member o on o.org_id = m.member_id
+join uco_organization d on d.id = o.org_id
+where m.member_type = 3
 
 go

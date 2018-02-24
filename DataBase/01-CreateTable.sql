@@ -43,6 +43,7 @@ go
 create table ibd_category(
 [id]               varchar(36) constraint ix_ibd_category primary key,
 [parent_id]        varchar(36),                                                                                                            --父分类id
+[tenant_id]        varchar(36) foreign key references ucb_tenant(id),                                                                      --租户ID
 [module_id]        varchar(36) not null,                                                                                                   --模块注册id
 [index]            int default 0 not null,                                                                                                 --序号
 [code]             varchar(32),                                                                                                            --编码
@@ -63,6 +64,7 @@ go
 /*****电子影像表*****/
 create table ibd_image(
 [id]               varchar(36) constraint ix_ibd_image primary key,
+[tenant_id]        varchar(36) foreign key references ucb_tenant(id) not null,                                                             --租户ID
 [category_id]      varchar(36) foreign key references ibd_category(id) on delete cascade,                                                  --分类id
 [image_type]       int default 0 not null,                                                                                                 --类型：0、附件；1、收据；2、发票；3、付款单；4、报销单；5、入库单；6、出库单
 [code]             varchar(32),                                                                                                            --编码，可索引
@@ -87,7 +89,8 @@ go
 /*****模块选项配置表*****/
 create table ibd_param(
 [id]               varchar(36) constraint ix_ibd_param primary key,
-[module_id]        varchar(36) foreign key references ucs_navigator(id) on delete cascade not null,                                        --模块注册id
+[tenant_id]        varchar(36) foreign key references ucb_tenant(id) not null,                                                             --租户ID
+[module_id]        varchar(36) not null,                                                                                                   --模块注册id
 [param_id]         varchar(36) not null,                                                                                                   --选项id
 [name]             nvarchar(64) not null,                                                                                                  --选项名称
 [value]            nvarchar(max),                                                                                                          --选项参数值
@@ -105,6 +108,7 @@ go
 /*****分期规则表*****/
 create table ibr_rules(
 [id]               varchar(36) constraint ix_ibr_rules primary key,
+[tenant_id]        varchar(36) foreign key references ucb_tenant(id),                                                                      --租户ID
 [name]             nvarchar(64) not null,                                                                                                  --规则名称
 [cycle_type]       int not null,                                                                                                           --报表周期类型：1、年；2、月；3、周；4、日
 [cycle]            int,                                                                                                                    --周期数
@@ -122,10 +126,12 @@ go
 /*****模板表*****/
 create table ibr_templates(
 [id]               varchar(36) constraint ix_ibr_templates primary key,
+[tenant_id]        varchar(36) foreign key references ucb_tenant(id),                                                                      --租户ID
 [category_id]      varchar(36) foreign key references ibd_category(id) on delete cascade,                                                  --报表分类id,
 [name]             nvarchar(64) not null,                                                                                                  --模板名称
 [content]          text not null,                                                                                                          --模板内容
 [remark]           nvarchar(max),                                                                                                          --描述
+[is_builtin]       bit default 0 not null,                                                                                                 --是否预置：0、自定；1、预置
 [creator_dept_id]  varchar(36),                                                                                                            --创建部门id
 [creator]          nvarchar(32),                                                                                                           --创建人姓名
 [creator_id]       varchar(36) foreign key references ucb_user(id) default '00000000-0000-0000-0000-000000000000' not null,                --创建人id
@@ -136,6 +142,7 @@ go
 /*****报表定义表*****/
 create table ibr_definition(
 [id]               varchar(36) constraint ix_ibr_definition primary key,
+[tenant_id]        varchar(36) foreign key references ucb_tenant(id) not null,                                                             --租户ID
 [category_id]      varchar(36) foreign key references ibd_category(id) on delete cascade not null,                                         --报表分类id,
 [name]             nvarchar(64) not null,                                                                                                  --报表名称
 [template_id]      varchar(36) foreign key references ibr_templates(id) not null,                                                          --报表模板id

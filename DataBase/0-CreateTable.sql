@@ -24,6 +24,13 @@ if exists (select * from sysobjects where id = object_id(N'ucr_config') and obje
 drop table ucr_config
 go
 
+if exists (select * from sysobjects where id = object_id(N'ucb_tenant_user') and objectproperty(id, N'isusertable') = 1)
+drop table ucb_tenant_user
+go
+if exists (select * from sysobjects where id = object_id(N'ucb_tenant_app') and objectproperty(id, N'isusertable') = 1)
+drop table ucb_tenant_app
+go
+
 if exists (select * from sysobjects where id = object_id(N'ucs_function') and objectproperty(id, N'isusertable') = 1)
 drop table ucs_function
 go
@@ -47,6 +54,10 @@ go
 if exists (select * from sysobjects where id = object_id(N'ucg_group') and objectproperty(id, N'isusertable') = 1)
 drop table ucg_group
 go
+
+if exists (select * from sysobjects where id = object_id(N'ucb_tenant') and objectproperty(id, N'isusertable') = 1)
+drop table ucb_tenant
+go
 if exists (select * from sysobjects where id = object_id(N'ucb_user') and objectproperty(id, N'isusertable') = 1)
 drop table ucb_user
 go
@@ -58,9 +69,9 @@ go
 create table ucb_user(
 [id]               varchar(36) constraint ix_ucb_user primary key,                                                                         --此id与主数据id相同
 [name]             nvarchar(64) not null,                                                                                                  --姓名/昵称
-[account]          nvarchar(32) constraint ix_ucb_user_account unique not null,                                                            --登录账号
-[mobile]           varchar(11) constraint ix_ucb_user_mobile unique,                                                                       --手机号
-[email]            nvarchar(64) constraint ix_ucb_user_email unique,                                                                       --注册邮箱
+[account]          nvarchar(32) not null,                                                                                                  --登录账号
+[mobile]           varchar(11),                                                                                                            --手机号
+[email]            nvarchar(64),                                                                                                           --注册邮箱
 [password]         varchar(32) default 'e10adc3949ba59abbe56e057f20f883e' not null,                                                        --登录密码，保存密码的md5值，初始密码123456
 [pay_pw]           varchar(32),                                                                                                            --支付密码，保存密码的md5值
 [remark]           nvarchar(max),                                                                                                          --描述
@@ -68,16 +79,41 @@ create table ucb_user(
 [is_invalid]       bit default 0 not null,                                                                                                 --是否失效：0、有效；1、失效
 [creator_id]       varchar(36) default '00000000-0000-0000-0000-000000000000' not null,                                                    --创建人id
 [created_time]     datetime default getdate() not null                                                                                     --创建时间
+);
+create nonclustered index ix_ucb_user_account on ucb_user ([account] asc);
+create nonclustered index ix_ucb_user_mobile on ucb_user ([mobile] asc);
+create nonclustered index ix_ucb_user_email on ucb_user ([email] asc);
+go
+
+/*****租户表*****/
+create table ucb_tenant(
+[id]               varchar(36) constraint ix_ucb_tenant primary key,                                                                       
+[name]             nvarchar(64) not null,                                                                                                  --名称
+[alias]            nvarchar(8),                                                                                                            --简称
+[icon]             image,                                                                                                                  --图标
+[contact]          nvarchar(32),                                                                                                           --联系人
+[mobile]           varchar(11),                                                                                                            --手机号
+[email]            nvarchar(64),                                                                                                           --注册邮箱
+[province]         nvarchar(32),                                                                                                           --所在省/直辖市
+[city]             nvarchar(32),                                                                                                           --所在市/地区
+[county]           nvarchar(32),                                                                                                           --所在区/县
+[address]          nvarchar(64),                                                                                                           --街道楼门号
+[remark]           nvarchar(max),                                                                                                          --描述
+[expire_date]      date not null,                                                                                                          --到期日期
+[is_builtin]       bit default 0 not null,                                                                                                 --是否预置：0、自定；1、预置
+[is_visible]       bit default 1 not null,                                                                                                 --是否可见：0、不可见；1、可见
+[creator_id]       varchar(36) foreign key references ucb_user(id) default '00000000-0000-0000-0000-000000000000' not null,                --创建人ID
+[created_time]     datetime default getdate() not null                                                                                     --创建时间
 )
 go
 
 /*****用户组表*****/
 create table ucg_group(
 [id]               varchar(36) constraint ix_ucg_group primary key,
+[tenant_id]        varchar(36) not null,                                                                                                   --租户ID
 [name]             nvarchar(64) not null,                                                                                                  --用户组名称
 [remark]           nvarchar(max),                                                                                                          --描述
 [is_builtin]       bit default 0 not null,                                                                                                 --是否预置：0、自定；1、预置
-[is_visible]       bit default 1 not null,                                                                                                 --是否可见：0、不可见；1、可见
 [creator_id]       varchar(36) foreign key references ucb_user(id) default '00000000-0000-0000-0000-000000000000' not null,                --创建人id
 [created_time]     datetime default getdate() not null                                                                                     --创建时间
 )
@@ -97,6 +133,7 @@ go
 create table uco_organization(
 [id]               varchar(36) constraint ix_uco_organization primary key,
 [parent_id]        varchar(36) foreign key references uco_organization(id),                                                                --父节点id
+[tenant_id]        varchar(36) foreign key references ucb_tenant(id) not null,                                                             --租户ID
 [node_type]        int not null,                                                                                                           --节点类型：1、机构；2、部门；3、岗位
 [index]            int not null,                                                                                                           --序号
 [code]             varchar(32),                                                                                                            --编码
@@ -126,6 +163,7 @@ go
 /*****应用表*****/
 create table ucs_application(
 [id]               varchar(36) constraint ix_ucs_application primary key,
+[index]            int default 0 not null,                                                                                                 --序号
 [name]             nvarchar(16) not null,                                                                                                  --应用名称
 [alias]            nvarchar(16) not null,                                                                                                  --应用别名
 [host]             varchar(128),                                                                                                           --域名
@@ -147,7 +185,6 @@ create table ucs_navigator(
 [name]             nvarchar(16) not null,                                                                                                  --导航名称
 [alias]            nvarchar(16),                                                                                                           --应用名称
 [url]              varchar(128),                                                                                                           --模块url
-[class_name]       varchar(128),                                                                                                           --控制器命名空间
 [file_path]        nvarchar(max),                                                                                                          --文件路径
 [iconurl]          varchar(128),                                                                                                           --图标url
 [icon]             image,                                                                                                                  --图标
@@ -179,6 +216,26 @@ create table ucs_function(
 go
 
 
+/*****租户-应用绑定表*****/
+create table ucb_tenant_app(
+[id]               varchar(36) constraint ix_ucb_tenant_app primary key,
+[tenant_id]        varchar(36) foreign key references ucb_tenant(id) on delete cascade not null,                                           --租户ID
+[app_id]           varchar(36) foreign key references ucs_application(id) on delete cascade not null,                                      --应用ID
+[creator_id]       varchar(36) foreign key references ucb_user(id) default '00000000-0000-0000-0000-000000000000' not null,                --创建人ID
+[created_time]     datetime default getdate() not null                                                                                     --创建时间
+)
+go
+
+/*****租户-用户绑定表*****/
+create table ucb_tenant_user(
+[id]               varchar(36) constraint ix_ucb_tenant_user primary key,
+[tenant_id]        varchar(36) foreign key references ucb_tenant(id) on delete cascade not null,                                           --租户ID
+[user_id]          varchar(36) foreign key references ucb_user(id) on delete cascade not null,                                             --用户ID
+[creator_id]       varchar(36) foreign key references ucb_user(id) default '00000000-0000-0000-0000-000000000000' not null,                --创建人ID
+[created_time]     datetime default getdate() not null                                                                                     --创建时间
+)
+go
+
 /*****角色权限数据表*****/
 
 /*****数据配置表*****/
@@ -192,6 +249,8 @@ go
 /*****角色表*****/
 create table ucr_role(
 [id]               varchar(36) constraint ix_ucr_role primary key,
+[tenant_id]        varchar(36) not null,                                                                                                   --租户ID
+[app_id]           varchar(36),                                                                                                            --应用ID
 [name]             nvarchar(64) not null,                                                                                                  --名称
 [remark]           nvarchar(max),                                                                                                          --描述
 [is_builtin]       bit default 0 not null,                                                                                                 --是否预置：0、自定；1、预置
@@ -268,20 +327,19 @@ create table ibl_log(
 go
 
 
-/*****初始化用户：系统管理员，密码：admin*****/
+/*****初始化用户：系统管理员*****/
 insert ucb_user (id, name, account, is_builtin)
 select '00000000-0000-0000-0000-000000000000', '系统管理员', 'admin', 1
 go
 
-/*****初始化用户组：所有用户和系统管理员组*****/
-insert ucg_group (id, name, remark, is_builtin, is_visible)
-select lower(newid()), 'allusers', '所有用户', 1, 0 union all
-select lower(newid()), 'administers', '系统管理员组', 1, 1
+/*****初始化租户：平台管理内置租户*****/
+insert ucb_tenant (id, name, expire_date, is_builtin, is_visible) select '2564cd55-9cd3-40f0-b814-09723fd8632a', '平台管理内置租户', '2800-01-01', 1, 0;
+insert ucb_tenant_user (id, tenant_id, user_id) select lower(newid()), '2564cd55-9cd3-40f0-b814-09723fd8632a', '00000000-0000-0000-0000-000000000000';
 go
 
-/*****初始化组成员：系统管理员*****/
-insert ucg_group_member (id, group_id, user_id)
-select lower(newid()), id, '00000000-0000-0000-0000-000000000000' from ucg_group
+/*****初始化应用：平台管理客户端*****/
+insert ucs_application ([id], [name], [alias], [token_life]) select '9dd99dd9-e6df-467a-8207-d05ea5581125', '因赛特多租户平台管理客户端', 'Insight MTP', 7200;
+insert ucb_tenant_app (id, tenant_id, app_id) select lower(newid()), '2564cd55-9cd3-40f0-b814-09723fd8632a', '9dd99dd9-e6df-467a-8207-d05ea5581125';
 go
 
 /*****初始化数据权限定义*****/
