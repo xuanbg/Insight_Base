@@ -57,18 +57,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DbHelper.cs" />
+    <Compile Include="DTO\AppTree.cs" />
+    <Compile Include="DTO\RoleInfo.cs" />
+    <Compile Include="DTO\UserInfo.cs" />
     <Compile Include="Entity\BaseData.cs" />
     <Compile Include="Entity\Entities.cs" />
     <Compile Include="Entity\Log.cs" />
     <Compile Include="Entity\Module.cs" />
     <Compile Include="Entity\Organization.cs" />
-    <Compile Include="Entity\Permit.cs" />
+    <Compile Include="DTO\Permit.cs" />
     <Compile Include="Entity\Role.cs" />
     <Compile Include="Entity\Tenant.cs" />
     <Compile Include="Entity\User.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Params.cs" />
-    <Compile Include="Entity\JsonResult.cs" />
+    <Compile Include="JsonResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

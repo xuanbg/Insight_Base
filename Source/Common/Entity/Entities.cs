@@ -110,6 +110,16 @@ namespace Insight.Base.Common.Entity
         public virtual DbSet<RoleData> roleDatas { get; set; }
 
         /// <summary>
+        /// 角色成员
+        /// </summary>
+        public virtual DbSet<RoleMemberInfo> roleMemberInfos { get; set; }
+
+        /// <summary>
+        /// 角色成员用户
+        /// </summary>
+        public virtual DbSet<RoleUser> roleUsers { get; set; }
+
+        /// <summary>
         /// 用户角色
         /// </summary>
         public virtual DbSet<UserRole> userRoles { get; set; }

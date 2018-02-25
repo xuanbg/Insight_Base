@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Insight.Base.Common.Entity
+﻿namespace Insight.Base.Common.DTO
 {
     /// <summary>
     /// 导航/功能授权实体
@@ -103,82 +101,5 @@ namespace Insight.Base.Common.Entity
         /// 授权
         /// </summary>
         public int permit { get; set; }
-    }
-
-    /// <summary>
-    /// 应用树
-    /// </summary>
-    public class AppTree
-    {
-        /// <summary>
-        /// ID，唯一标识
-        /// </summary>
-        public string id { get; set; }
-
-        /// <summary>
-        /// 父级ID
-        /// </summary>
-        public string parentId { get; set; }
-
-        /// <summary>
-        /// 序号
-        /// </summary>
-        public int index { get; set; }
-
-        /// <summary>
-        /// 图标类型
-        /// </summary>
-        public int nodeType { get; set; }
-
-        /// <summary>
-        /// 节点名称
-        /// </summary>
-        public string name { get; set; }
-
-        /// <summary>
-        /// 描述
-        /// </summary>
-        public string remark { get; set; }
-
-        /// <summary>
-        /// 授权
-        /// </summary>
-        public bool? permit { get; set; }
-    }
-
-    /// <summary>
-    /// 用户角色表
-    /// </summary>
-    [Table("ucv_user_role")]
-    public class UserRole
-    {
-        /// <summary>
-        /// ID，唯一标识
-        /// </summary>
-        public string id { get; set; }
-
-        /// <summary>
-        /// 角色ID
-        /// </summary>
-        [Column("role_id")]
-        public string roleId { get; set; }
-
-        /// <summary>
-        /// 租户ID
-        /// </summary>
-        [Column("tenant_id")]
-        public string tenantId { get; set; }
-
-        /// <summary>
-        /// 模块ID
-        /// </summary>
-        [Column("user_id")]
-        public string userId { get; set; }
-
-        /// <summary>
-        /// 模式ID
-        /// </summary>
-        [Column("dept_id")]
-        public string deptId { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Insight.Utils.Entity;
 
-namespace Insight.Base.Common.Entity
+namespace Insight.Base.Common
 {
     /// <summary>
     /// Json接口返回值

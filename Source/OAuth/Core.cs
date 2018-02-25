@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Insight.Base.Common;
+using Insight.Base.Common.DTO;
 using Insight.Base.Common.Entity;
 using Insight.Utils.Common;
 using Insight.Utils.Redis;
@@ -331,6 +332,8 @@ namespace Insight.Base.OAuth
                 var functions = context.functions.Where(i => i.isVisible && i.navigatorId == moduleId).ToList();
                 var list = from f in functions
                     join p in permits on f.id equals p.id
+                    into temp
+                    from t in temp.DefaultIfEmpty()
                     orderby f.index
                     select new Permit
                     {
@@ -341,7 +344,7 @@ namespace Insight.Base.OAuth
                         icon = f.icon,
                         isBegin = f.isBegin,
                         isShowText = f.isShowText,
-                        permit = true
+                        permit = t != null
                     };
 
                 return list.ToList();
@@ -356,53 +359,62 @@ namespace Insight.Base.OAuth
         /// <returns>应用功能树</returns>
         public static List<AppTree> GetPermitAppTree(string tenantId, string userId)
         {
+            var list = new List<AppTree>();
             var permits = GetPermitFuncs(tenantId, userId, null, true);
             using (var context = new Entities())
             {
                 var funList = context.functions.ToList();
                 var navList = context.navigators.ToList();
                 var appList = context.applications.ToList();
-                var functions = from f in funList
-                    join p in permits on f.id equals p.id
-                    select new AppTree
-                    {
-                        id = f.id,
-                        parentId = f.navigatorId,
-                        index = f.index,
-                        nodeType = p.permit + 3,
-                        name = f.name,
-                        remark = p.permit == 1 ? "允许" : "拒绝"
-                    };
                 var mids = funList.Join(permits, f => f.id, p => p.id, (f, p) => f.navigatorId).Distinct().ToList();
-                var modules = from n in navList
-                    join p in mids on n.id equals p
-                    select new AppTree
-                    {
-                        id = n.id,
-                        parentId = n.parentId,
-                        index = n.index,
-                        nodeType = 2,
-                        name = n.name
-                    };
                 var gids = navList.Join(mids, f => f.id, p => p, (f, p) => f.parentId).Distinct().ToList();
+                var aids = navList.Join(gids, f => f.id, p => p, (f, p) => f.appId).Distinct().ToList();
+
+                var apps = from a in appList
+                    join p in aids on a.id equals p
+                    orderby a.createTime
+                    select new AppTree { id = a.id, name = a.alias };
+                list.AddRange(apps);
+
                 var groups = from n in navList
                     join p in gids on n.id equals p
+                    orderby n.index
                     select new AppTree
                     {
                         id = n.id,
                         parentId = n.appId,
-                        index = n.index,
                         nodeType = 1,
                         name = n.name
                     };
-                var aids = navList.Join(gids, f => f.id, p => p, (f, p) => f.appId).Distinct().ToList();
-                var apps = from a in appList
-                    join p in aids on a.id equals p
-                    select new AppTree {id = a.id, index = a.index, nodeType = 0, name = a.alias};
-                var list = apps.Union(groups).Union(modules).Union(functions);
+                list.AddRange(groups);
 
-                return list.OrderBy(i => i.nodeType).ThenBy(i => i.parentId).ThenBy(i => i.index).ToList();
+                var modules = from n in navList
+                    join p in mids on n.id equals p
+                    orderby n.index
+                    select new AppTree
+                    {
+                        id = n.id,
+                        parentId = n.parentId,
+                        nodeType = 2,
+                        name = n.name
+                    };
+                list.AddRange(modules);
+
+                var functions = from f in funList
+                    join p in permits on f.id equals p.id
+                    orderby f.index
+                    select new AppTree
+                    {
+                        id = f.id,
+                        parentId = f.navigatorId,
+                        nodeType = p.permit + 3,
+                        name = f.name,
+                        remark = p.permit == 1 ? "允许" : "拒绝"
+                    };
+                list.AddRange(functions);
             }
+
+            return list;
         }
 
         /// <summary>

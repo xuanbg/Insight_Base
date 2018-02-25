@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using Insight.Base.Common.DTO;
 
 namespace Insight.Base.Common.Entity
 {
@@ -45,7 +46,7 @@ namespace Insight.Base.Common.Entity
         public string appId { get; set; }
 
         /// <summary>
-        /// 应用名称
+        /// 名称
         /// </summary>
         public string name { get; set; }
 
@@ -71,21 +72,6 @@ namespace Insight.Base.Common.Entity
         /// </summary>
         [Column("created_time")]
         public DateTime createTime { get; set; }
-
-        /// <summary>
-        /// 角色成员
-        /// </summary>
-        public List<RoleMember> members { get; set; }
-
-        /// <summary>
-        /// 角色功能权限
-        /// </summary>
-        public List<AppTree> funcs { get; set; }
-
-        /// <summary>
-        /// 角色数据权限
-        /// </summary>
-        public List<AppTree> datas { get; set; }
     }
 
     [Table("ucr_role_member")]
@@ -207,6 +193,119 @@ namespace Insight.Base.Common.Entity
         /// </summary>
         [Column("creator_id")]
         public string creatorId { get; set; }
+
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        [Column("created_time")]
+        public DateTime createTime { get; set; }
+    }
+
+    /// <summary>
+    /// 用户角色表
+    /// </summary>
+    [Table("ucv_role_member")]
+    public class RoleMemberInfo
+    {
+        /// <summary>
+        /// ID，唯一标识
+        /// </summary>
+        public string id { get; set; }
+
+        /// <summary>
+        /// 角色ID
+        /// </summary>
+        [Column("role_id")]
+        public string roleId { get; set; }
+
+        /// <summary>
+        /// 成员类型
+        /// </summary>
+        [Column("member_type")]
+        public int memberType { get; set; }
+
+        /// <summary>
+        /// 成员ID
+        /// </summary>
+        [Column("member_id")]
+        public string memberId { get; set; }
+
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string name { get; set; }
+    }
+
+    /// <summary>
+    /// 用户角色表
+    /// </summary>
+    [Table("ucv_user_role")]
+    public class UserRole
+    {
+        /// <summary>
+        /// ID，唯一标识
+        /// </summary>
+        public string id { get; set; }
+
+        /// <summary>
+        /// 角色ID
+        /// </summary>
+        [Column("role_id")]
+        public string roleId { get; set; }
+
+        /// <summary>
+        /// 租户ID
+        /// </summary>
+        [Column("tenant_id")]
+        public string tenantId { get; set; }
+
+        /// <summary>
+        /// 模块ID
+        /// </summary>
+        [Column("user_id")]
+        public string userId { get; set; }
+
+        /// <summary>
+        /// 模式ID
+        /// </summary>
+        [Column("dept_id")]
+        public string deptId { get; set; }
+    }
+
+    [Table("ucv_role_user")]
+    public class RoleUser
+    {
+        /// <summary>
+        /// 唯一ID
+        /// </summary>
+        public string id { get; set; }
+
+        /// <summary>
+        /// 角色ID
+        /// </summary>
+        [Column("role_id")]
+        public string roleId { get; set; }
+
+        /// <summary>
+        /// 用户名
+        /// </summary>
+        public string name { get; set; }
+
+        /// <summary>
+        /// 用户登录名
+        /// </summary>
+        public string account { get; set; }
+
+        /// <summary>
+        /// 用户描述
+        /// </summary>
+        public string remark { get; set; }
+
+        /// <summary>
+        /// 是否有效
+        /// </summary>
+        [Column("is_invalid")]
+        public bool isInvalid { get; set; }
 
         /// <summary>
         /// 创建时间

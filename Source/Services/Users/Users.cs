@@ -2,6 +2,7 @@
 using System.Linq;
 using System.ServiceModel;
 using Insight.Base.Common;
+using Insight.Base.Common.DTO;
 using Insight.Base.Common.Entity;
 using Insight.Base.OAuth;
 using Insight.Utils.Common;
@@ -123,11 +124,9 @@ namespace Insight.Base.Services
             var data = Core.GetUserById(id);
             if (data == null) return result.NotFound();
 
-            data.password = null;
-            data.payPassword = null;
-            data.funcs = Core.GetPermitAppTree(tenantId, id);
+            var user = new UserInfo {funcs = Core.GetPermitAppTree(tenantId, id)};
 
-            return result.Success(data);
+            return result.Success(user);
         }
 
         /// <summary>
