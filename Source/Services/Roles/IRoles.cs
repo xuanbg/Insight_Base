@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ServiceModel;
 using System.ServiceModel.Web;
+using Insight.Base.Common.DTO;
 using Insight.Base.Common.Entity;
 using Insight.Utils.Entity;
 
@@ -19,11 +20,11 @@ namespace Insight.Base.Services
         /// <summary>
         /// 新增角色
         /// </summary>
-        /// <param name="role">RoleInfo</param>
+        /// <param name="info">RoleInfo</param>
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "roles", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> AddRole(Role role);
+        Result<object> AddRole(RoleInfo info);
 
         /// <summary>
         /// 根据ID删除角色
@@ -38,11 +39,11 @@ namespace Insight.Base.Services
         /// 编辑角色
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="role">RoleInfo</param>
+        /// <param name="info"></param>
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "roles/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> EditRole(string id, Role role);
+        Result<object> EditRole(string id, RoleInfo info);
 
         /// <summary>
         /// 获取指定角色
@@ -124,10 +125,11 @@ namespace Insight.Base.Services
         /// <summary>
         /// 获取可用的权限资源列表
         /// </summary>
-        /// <param name="id">角色ID（可为空）</param>
+        /// <param name="id">角色ID</param>
+        /// <param name="aid">应用ID（可为空）</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "roles/{id}/allperm", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "roles/{id}/allperm?appid={aid}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetAllPermission(string id);
+        Result<object> GetAppTree(string id, string aid);
     }
 }

@@ -21,6 +21,11 @@
         public int nodeType { get; set; }
 
         /// <summary>
+        /// 序号
+        /// </summary>
+        public int index { get; set; }
+
+        /// <summary>
         /// 节点名称
         /// </summary>
         public string name { get; set; }

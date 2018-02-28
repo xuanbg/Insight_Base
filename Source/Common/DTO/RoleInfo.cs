@@ -11,6 +11,11 @@ namespace Insight.Base.Common.DTO
         public string id { get; set; }
 
         /// <summary>
+        /// 是否预置：0、自定；1、预置
+        /// </summary>
+        public string appId { get; set; }
+
+        /// <summary>
         /// 所属应用名称
         /// </summary>
         public string appName { get; set; }

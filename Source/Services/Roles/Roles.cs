@@ -24,19 +24,16 @@ namespace Insight.Base.Services
         /// <summary>
         /// 新增角色
         /// </summary>
-        /// <param name="role">RoleInfo</param>
+        /// <param name="info">RoleInfo</param>
         /// <returns>Result</returns>
-        public Result<object> AddRole(Role role)
+        public Result<object> AddRole(RoleInfo info)
         {
             if (!Verify("newRole")) return result;
 
-            role.id = Util.NewId();
+            var role = InitRole(info);
             if (Existed(role)) return result.DataAlreadyExists();
 
-            role.creatorId = userId;
-            role.createTime = DateTime.Now;
-
-            return DbHelper.Insert(role) ? result.Created(role) : result.DataBaseError();
+            return DbHelper.Insert(role) ? result.Created(info) : result.DataBaseError();
         }
 
         /// <summary>
@@ -57,21 +54,20 @@ namespace Insight.Base.Services
         /// <summary>
         /// 编辑角色
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="role">RoleInfo</param>
+        /// <param name="id">角色ID</param>
+        /// <param name="info"></param>
         /// <returns>Result</returns>
-        public Result<object> EditRole(string id, Role role)
+        public Result<object> EditRole(string id, RoleInfo info)
         {
             if (!Verify("editRole")) return result;
 
-            var data = GetData(role.id);
+            var data = GetData(info.id);
             if (data == null) return result.NotFound();
 
-            data.name = role.name;
-            data.remark = role.remark;
-            if (Existed(data)) return result.DataAlreadyExists();
+            var role = InitRole(info);
+            if (Existed(role)) return result.DataAlreadyExists();
 
-            return DbHelper.Update(role) ? result.Success(role) : result.DataBaseError();
+            return DbHelper.Delete(data) && DbHelper.Insert(role) ? result.Success(info) : result.DataBaseError();
         }
 
         /// <summary>
@@ -108,6 +104,7 @@ namespace Insight.Base.Services
                 role.members.AddRange(members);
             }
             role.funcs = GetRoleFuncs(id, data.appId);
+            role.datas = new List<AppTree>();
 
             return result.Success(role);
         }
@@ -134,6 +131,7 @@ namespace Insight.Base.Services
                     select new RoleInfo
                     {
                         id = r.id,
+                        appId = r.appId,
                         appName = t.alias,
                         name = r.name,
                         remark = r.remark,
@@ -279,16 +277,77 @@ namespace Insight.Base.Services
         /// <summary>
         /// 获取可用的权限资源列表
         /// </summary>
-        /// <param name="id">角色ID（可为空）</param>
+        /// <param name="id">角色ID</param>
+        /// <param name="aid">应用ID（可为空）</param>
         /// <returns>Result</returns>
-        public Result<object> GetAllPermission(string id)
+        public Result<object> GetAppTree(string id, string aid)
         {
             if (!Verify("getRoles")) return result;
 
-            var data = GetData(id);
-            if (data == null) return result.NotFound();
+            var role = new RoleInfo {funcs = new List<AppTree>(), datas = new List<AppTree>()};
+            using (var context = new Entities())
+            {
+                var navList = context.navigators.ToList();
+                var funList = context.functions.ToList();
 
-            return result.Success(data);
+                var apps = from a in context.applications
+                    join r in context.tenantApps on a.id equals r.appId
+                    where r.tenantId == tenantId && (string.IsNullOrEmpty(aid) || a.id == aid)
+                    orderby a.createTime
+                    select new AppTree {id = a.id, index = a.index, name = a.alias};
+                role.funcs.AddRange(apps);
+
+                var groups = from n in navList
+                    join a in role.funcs on n.appId equals a.id
+                    where n.parentId == null
+                    orderby n.index
+                    select new AppTree
+                    {
+                        id = n.id,
+                        parentId = n.appId,
+                        nodeType = 1,
+                        index = n.index,
+                        name = n.name
+                    };
+                role.funcs.AddRange(groups);
+
+                var permits = from f in context.functions
+                    join r in context.roleFunctions on f.id equals r.functionId
+                    where r.roleId == id
+                    select new {f.id, f.navigatorId, r.permit};
+                var modules = from n in navList
+                    join g in role.funcs on n.parentId equals g.id
+                    let p = permits.Any(i => i.navigatorId == n.id)
+                    orderby n.index
+                    select new AppTree
+                    {
+                        id = n.id,
+                        parentId = n.parentId,
+                        nodeType = 2,
+                        index = n.index,
+                        name = n.name,
+                        permit = p ? (bool?) p : null
+                    };
+                role.funcs.AddRange(modules);
+
+                var functions = from f in funList
+                    join m in role.funcs on f.navigatorId equals m.id
+                    let p = permits.FirstOrDefault(i => i.id == f.id)?.permit
+                    orderby f.index
+                    select new AppTree
+                    {
+                        id = f.id,
+                        parentId = f.navigatorId,
+                        nodeType = 3,
+                        index = f.index,
+                        name = f.name,
+                        remark = p == null ? null : p == 1 ? "允许" : "拒绝",
+                        permit = p == null ? null : (bool?) (p == 1)
+                    };
+                role.funcs.AddRange(functions);
+            }
+
+            return result.Success(role);
         }
 
         /// <summary>
@@ -315,6 +374,55 @@ namespace Insight.Base.Services
             {
                 return context.roles.Any(i => i.id != role.id && i.tenantId == role.tenantId && i.name == role.name);
             }
+        }
+
+        /// <summary>
+        /// 构造角色数据
+        /// </summary>
+        /// <param name="info"></param>
+        /// <returns>Role 角色数据</returns>
+        private Role InitRole(RoleInfo info)
+        {
+            var role = new Role
+            {
+                id = info.id,
+                tenantId = tenantId,
+                appId = info.appId,
+                name = info.name,
+                remark = info.remark,
+            };
+
+            role.funcs = info.funcs.Where(i => i.nodeType > 2 && i.permit.HasValue).Select(i => new RoleFunction
+            {
+                id = Util.NewId(),
+                roleId = role.id,
+                functionId = i.id,
+                permit = i.permit.Value ? 1 : 0,
+                creatorId = userId,
+                createTime = DateTime.Now
+            }).ToList();
+
+            role.datas = info.datas.Where(i => i.nodeType > 2 && i.permit.HasValue).Select(i => new RoleData
+            {
+                id = Util.NewId(),
+                roleId = role.id,
+                moduleId = i.parentId,
+                modeId = i.id,
+                permit = i.permit.Value ? 1 : 0,
+                creatorId = userId,
+                createTime = DateTime.Now
+            }).ToList();
+
+            using (var context = new Entities())
+            {
+                var data = context.roles.SingleOrDefault(i => i.id == role.id);
+                role.isBuiltin = data?.isBuiltin ?? false;
+                role.creatorId = data?.creatorId ?? userId;
+                role.createTime = data?.createTime ?? DateTime.Now;
+                role.members = context.roleMembers.Where(i => i.roleId == role.id).ToList();
+            }
+
+            return role;
         }
 
         /// <summary>
@@ -371,7 +479,7 @@ namespace Insight.Base.Services
 
                 var functions = from f in context.functions
                     join m in mids on f.navigatorId equals m
-                    join p in context.roleFunctions on f.id equals p.functionId
+                    join p in context.roleFunctions.Where(i => i.roleId == id) on f.id equals p.functionId
                     into temp
                     from t in temp.DefaultIfEmpty()
                     orderby f.index

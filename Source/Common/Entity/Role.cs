@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using Insight.Base.Common.DTO;
 
 namespace Insight.Base.Common.Entity
 {
@@ -72,6 +71,21 @@ namespace Insight.Base.Common.Entity
         /// </summary>
         [Column("created_time")]
         public DateTime createTime { get; set; }
+
+        /// <summary>
+        /// 角色成员
+        /// </summary>
+        public List<RoleMember> members { get; set; }
+
+        /// <summary>
+        /// 功能权限
+        /// </summary>
+        public List<RoleFunction> funcs { get; set; }
+
+        /// <summary>
+        /// 数据权限
+        /// </summary>
+        public List<RoleData> datas { get; set; }
     }
 
     [Table("ucr_role_member")]
@@ -234,42 +248,6 @@ namespace Insight.Base.Common.Entity
         /// 名称
         /// </summary>
         public string name { get; set; }
-    }
-
-    /// <summary>
-    /// 用户角色表
-    /// </summary>
-    [Table("ucv_user_role")]
-    public class UserRole
-    {
-        /// <summary>
-        /// ID，唯一标识
-        /// </summary>
-        public string id { get; set; }
-
-        /// <summary>
-        /// 角色ID
-        /// </summary>
-        [Column("role_id")]
-        public string roleId { get; set; }
-
-        /// <summary>
-        /// 租户ID
-        /// </summary>
-        [Column("tenant_id")]
-        public string tenantId { get; set; }
-
-        /// <summary>
-        /// 模块ID
-        /// </summary>
-        [Column("user_id")]
-        public string userId { get; set; }
-
-        /// <summary>
-        /// 模式ID
-        /// </summary>
-        [Column("dept_id")]
-        public string deptId { get; set; }
     }
 
     [Table("ucv_role_user")]

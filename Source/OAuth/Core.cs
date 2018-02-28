@@ -224,23 +224,33 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 获取用户的全部已授权功能ID集合
         /// </summary>
+        /// <param name="tenantId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public static List<PermitFunc> GetPermitFuncs(string tenantId, string userId)
+        {
+            return GetPermitFuncs(tenantId, userId, null, true);
+        }
+
+        /// <summary>
+        /// 获取用户登录后可用功能ID集合
+        /// </summary>
         /// <param name="tenantId">租户ID</param>
         /// <param name="userId">用户ID</param>
         /// <param name="deptId">登录部门ID</param>
-        /// <param name="getInfo">是否获取信息，默认为否</param>
+        /// <param name="isAll">是否获取全部权限，默认为否</param>
         /// <returns>功能ID集合</returns>
-        public static List<PermitFunc> GetPermitFuncs(string tenantId, string userId, string deptId,
-            bool getInfo = false)
+        public static List<PermitFunc> GetPermitFuncs(string tenantId, string userId, string deptId, bool isAll = false)
         {
             using (var context = new Entities())
             {
-                var funcs = from f in context.roleFunctions
-                    join r in context.userRoles on f.roleId equals r.roleId
-                    where r.tenantId == tenantId && r.userId == userId &&
-                          (getInfo || r.deptId == null || r.deptId == deptId)
-                    group f by f.functionId
+                var funcs = from f in context.functions
+                    join p in context.roleFunctions on f.id equals p.functionId
+                    join r in context.userRoles on p.roleId equals r.roleId
+                    where r.tenantId == tenantId && r.userId == userId && (isAll || r.deptId == null || r.deptId == deptId)
+                    group p by new {f.id, f.navigatorId}
                     into g
-                    select new PermitFunc {id = g.Key, permit = g.Min(i => i.permit)};
+                    select new PermitFunc {id = g.Key.id, permit = g.Min(i => i.permit)};
 
                 return funcs.ToList();
             }
@@ -317,7 +327,7 @@ namespace Insight.Base.OAuth
         }
 
         /// <summary>
-        /// 获取指定模块的用户已授权功能集合
+        /// 获取指定模块的功能集合(含授权)
         /// </summary>
         /// <param name="tenantId">租户ID</param>
         /// <param name="userId">用户ID</param>
@@ -360,7 +370,7 @@ namespace Insight.Base.OAuth
         public static List<AppTree> GetPermitAppTree(string tenantId, string userId)
         {
             var list = new List<AppTree>();
-            var permits = GetPermitFuncs(tenantId, userId, null, true);
+            var permits = GetPermitFuncs(tenantId, userId);
             using (var context = new Entities())
             {
                 var funList = context.functions.ToList();
@@ -447,8 +457,7 @@ namespace Insight.Base.OAuth
         {
             using (var context = new Entities())
             {
-                return context.users.SingleOrDefault(u => u.account == account || u.mobile == account ||
-                                                          u.email == account);
+                return context.users.SingleOrDefault(u => u.account == account || u.mobile == account || u.email == account);
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using Insight.Base.Common;
@@ -124,7 +125,7 @@ namespace Insight.Base.Services
             var data = Core.GetUserById(id);
             if (data == null) return result.NotFound();
 
-            var user = new UserInfo {funcs = Core.GetPermitAppTree(tenantId, id)};
+            var user = new UserInfo {funcs = Core.GetPermitAppTree(tenantId, id), datas = new List<AppTree>()};
 
             return result.Success(user);
         }
