@@ -67,7 +67,12 @@ namespace Insight.Base.Services
             var role = InitRole(info);
             if (Existed(role)) return result.DataAlreadyExists();
 
-            return DbHelper.Delete(data) && DbHelper.Insert(role) ? result.Success(info) : result.DataBaseError();
+            if (!DbHelper.Delete(data) || !DbHelper.Insert(role)) return result.DataBaseError();
+
+            info.funcs = GetRoleFuncs(info.id, info.appId);
+            info.datas = new List<AppTree>();
+
+            return result.Success(info);
         }
 
         /// <summary>
@@ -82,29 +87,12 @@ namespace Insight.Base.Services
             var data = GetData(id);
             if (data == null) return result.NotFound();
 
-            var role = new RoleInfo {members = new List<MemberInfo>()};
-            using (var context = new Entities())
+            var role = new RoleInfo
             {
-                var list = context.roleMemberInfos.Where(i => i.roleId == id).ToList();
-                role.members.AddRange(list.Select(i => i.memberType)
-                    .Distinct()
-                    .Select(type => new MemberInfo
-                    {
-                        id = $"00000000-0000-0000-0000-00000000000{type}",
-                        nodeType = type,
-                        name = type == 1 ? "用户" : type == 2 ? "用户组" : "职位"
-                    }));
-                var members = list.Select(i => new MemberInfo
-                    {
-                        id = i.id,
-                        parentId = $"00000000-0000-0000-0000-00000000000{i.memberType}",
-                        memberId = i.memberId,
-                        name = i.name
-                    }).ToList();
-                role.members.AddRange(members);
-            }
-            role.funcs = GetRoleFuncs(id, data.appId);
-            role.datas = new List<AppTree>();
+                members = GetRoleMember(id),
+                funcs = GetRoleFuncs(id, data.appId),
+                datas = new List<AppTree>()
+            };
 
             return result.Success(role);
         }
@@ -161,12 +149,15 @@ namespace Insight.Base.Services
             members.ForEach(i =>
             {
                 i.id = Util.NewId();
-                i.roleId = data.id;
+                i.roleId = id;
                 i.creatorId = userId;
                 i.createTime = DateTime.Now;
             });
+            if (!DbHelper.Insert(members)) return result.DataBaseError();
 
-            return DbHelper.Insert(members) ? result : result.DataBaseError();
+            var role = new RoleInfo {members = GetRoleMember(id)};
+
+            return result.Success(role);
         }
 
         /// <summary>
@@ -178,10 +169,18 @@ namespace Insight.Base.Services
         {
             if (!Verify("removeRoleMember")) return result;
 
-            var data = GetData(id);
-            if (data == null) return result.NotFound();
+            using (var context = new Entities())
+            {
+                var member = context.roleMembers.SingleOrDefault(i => i.id == id);
+                if (member == null) return result.NotFound();
 
-            return result;
+                var roleId = member.roleId;
+                if (!DbHelper.Delete(member)) return result.DataBaseError();
+
+                var role = new RoleInfo { members = GetRoleMember(roleId) };
+
+                return result.Success(role);
+            }
         }
 
         /// <summary>
@@ -338,7 +337,7 @@ namespace Insight.Base.Services
                     {
                         id = f.id,
                         parentId = f.navigatorId,
-                        nodeType = 3,
+                        nodeType = (p ?? 2) + 3,
                         index = f.index,
                         name = f.name,
                         remark = p == null ? null : p == 1 ? "允许" : "拒绝",
@@ -423,6 +422,37 @@ namespace Insight.Base.Services
             }
 
             return role;
+        }
+
+        /// <summary>
+        /// 获取指定ID的角色的成员信息
+        /// </summary>
+        /// <param name="id">角色ID</param>
+        /// <returns>角色成员信息</returns>
+        private List<MemberInfo> GetRoleMember(string id)
+        {
+            var members = new List<MemberInfo>();
+            using (var context = new Entities())
+            {
+                var list = context.roleMemberInfos.Where(i => i.roleId == id).ToList();
+                members.AddRange(list.Select(i => i.memberType)
+                    .Distinct()
+                    .Select(type => new MemberInfo
+                    {
+                        id = $"00000000-0000-0000-0000-00000000000{type}",
+                        nodeType = type,
+                        name = type == 1 ? "用户" : type == 2 ? "用户组" : "职位"
+                    }));
+                members.AddRange(list.Select(i => new MemberInfo
+                {
+                    id = i.id,
+                    parentId = $"00000000-0000-0000-0000-00000000000{i.memberType}",
+                    memberId = i.memberId,
+                    name = i.name
+                }));
+            }
+
+            return members;
         }
 
         /// <summary>
