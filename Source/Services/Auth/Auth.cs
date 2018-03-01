@@ -54,16 +54,16 @@ namespace Insight.Base.Services
         /// 获取指定账户的AccessToken
         /// </summary>
         /// <param name="tid">租户ID</param>
-        /// <param name="appId">应用ID</param>
+        /// <param name="aid">应用ID</param>
         /// <param name="account">登录账号</param>
         /// <param name="signature">用户签名</param>
         /// <param name="deptid">登录部门ID（可为空）</param>
         /// <returns>Result</returns>
-        public Result<object> GetToken(string tid, string appId, string account, string signature, string deptid)
+        public Result<object> GetToken(string tid, string aid, string account, string signature, string deptid)
         {
-            // 限流,每用户每10秒可访问1次
-            var key = Util.Hash("GetCode" + account);
-            var surplus = Params.callManage.GetSurplus(key, 10);
+            // 限流,每用户每3秒可访问1次
+            var key = Util.Hash("GetToken" + account);
+            var surplus = Params.callManage.GetSurplus(key, 3);
             if (surplus > 0) return result.TooFrequent(surplus);
 
             var code = Core.GetCode(signature);
@@ -103,7 +103,7 @@ namespace Insight.Base.Services
             }
 
             // 创建令牌数据并返回
-            var tokens = token.CreatorKey(code, appId, tid);
+            var tokens = token.CreatorKey(code, aid, tid);
             Core.SetTokenCache(token);
 
             return result.Success(tokens);
@@ -131,9 +131,9 @@ namespace Insight.Base.Services
             token = verify.basis;
             tokenId = verify.tokenId;
 
-            // 限流,每令牌每24小时可刷新600次
+            // 限流,令牌在其有效期内可刷新60次
             var key = Util.Hash("RefreshToken" + tokenId);
-            var limited = Params.callManage.IsLimited(key, 3600 * 24, 60);
+            var limited = Params.callManage.IsLimited(key, token.life * 12, 60);
             if (limited) return result.BadRequest("刷新次数已用完,请合理刷新");
 
             result = verify.Compare();

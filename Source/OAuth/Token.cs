@@ -21,6 +21,8 @@ namespace Insight.Base.OAuth
         // 当前令牌对应的关键数据集
         private Keys currentKeys;
 
+        public int life => currentKeys?.tokenLife ?? 7200;
+
         /// <summary>
         /// 租户ID
         /// </summary>
