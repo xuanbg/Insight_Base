@@ -101,7 +101,7 @@ create table ucb_tenant(
 [remark]           nvarchar(max),                                                                                                          --描述
 [expire_date]      date not null,                                                                                                          --到期日期
 [is_builtin]       bit default 0 not null,                                                                                                 --是否预置：0、自定；1、预置
-[is_visible]       bit default 1 not null,                                                                                                 --是否可见：0、不可见；1、可见
+[is_invalid]       bit default 0 not null,                                                                                                 --是否失效：0、有效；1、失效
 [creator_id]       varchar(36) foreign key references ucb_user(id) default '00000000-0000-0000-0000-000000000000' not null,                --创建人ID
 [created_time]     datetime default getdate() not null                                                                                     --创建时间
 )
@@ -333,7 +333,7 @@ select '00000000-0000-0000-0000-000000000000', '系统管理员', 'admin', 1
 go
 
 /*****初始化租户：平台管理内置租户*****/
-insert ucb_tenant (id, name, expire_date, is_builtin, is_visible) select '2564cd55-9cd3-40f0-b814-09723fd8632a', '平台管理内置租户', '2800-01-01', 1, 0;
+insert ucb_tenant (id, name, expire_date, is_builtin) select '2564cd55-9cd3-40f0-b814-09723fd8632a', '平台管理内置租户', '2800-01-01', 1;
 insert ucb_tenant_user (id, tenant_id, user_id) select lower(newid()), '2564cd55-9cd3-40f0-b814-09723fd8632a', '00000000-0000-0000-0000-000000000000';
 go
 
