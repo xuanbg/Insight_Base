@@ -1,10 +1,10 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.Collections.Generic;
+using Insight.Base.Common.Entity;
 
-namespace Insight.Base.Common.Entity
+namespace Insight.Base.Common.DTO
 {
-    [Table("ucb_tenant")]
-    public class Tenant
+    public class TenantInfo
     {
         /// <summary>
         /// ID，唯一标识
@@ -69,97 +69,36 @@ namespace Insight.Base.Common.Entity
         /// <summary>
         /// 租户到期时间
         /// </summary>
-        [Column("expire_date")]
         public DateTime expireDate { get; set; }
 
         /// <summary>
         /// 是否预置：0、自定；1、预置
         /// </summary>
-        [Column("is_builtin")]
         public bool isBuiltin { get; set; }
 
         /// <summary>
         /// 是否失效：0、有效；1、失效
         /// </summary>
-        [Column("is_invalid")]
         public bool isInvalid { get; set; }
 
         /// <summary>
         /// 创建人ID
         /// </summary>
-        [Column("creator_id")]
         public string creatorId { get; set; }
 
         /// <summary>
         /// 创建时间
         /// </summary>
-        [Column("created_time")]
         public DateTime createTime { get; set; }
-    }
-
-    [Table("ucb_tenant_app")]
-    public class TenantApp
-    {
-        /// <summary>
-        /// ID，唯一标识
-        /// </summary>
-        public string id { get; set; }
 
         /// <summary>
-        /// 租户ID
+        /// 绑定应用
         /// </summary>
-        [Column("tenant_id")]
-        public string tenantId { get; set; }
+        public List<Application> apps { get; set; }
 
         /// <summary>
-        /// 应用ID
+        /// 关联用户
         /// </summary>
-        [Column("app_id")]
-        public string appId { get; set; }
-
-        /// <summary>
-        /// 创建人ID
-        /// </summary>
-        [Column("creator_id")]
-        public string creatorId { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        [Column("created_time")]
-        public DateTime createTime { get; set; }
-    }
-
-    [Table("ucb_tenant_user")]
-    public class TenantUser
-    {
-        /// <summary>
-        /// ID，唯一标识
-        /// </summary>
-        public string id { get; set; }
-
-        /// <summary>
-        /// 租户ID
-        /// </summary>
-        [Column("tenant_id")]
-        public string tenantId { get; set; }
-
-        /// <summary>
-        /// 用户ID
-        /// </summary>
-        [Column("user_id")]
-        public string userId { get; set; }
-
-        /// <summary>
-        /// 创建人ID
-        /// </summary>
-        [Column("creator_id")]
-        public string creatorId { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        [Column("created_time")]
-        public DateTime createTime { get; set; }
+        public List<User> users { get; set; }
     }
 }

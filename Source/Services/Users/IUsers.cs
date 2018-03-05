@@ -106,6 +106,24 @@ namespace Insight.Base.Services
         Result<object> ResetSignature(string appId, string account, string password, string code, string mobile = null);
 
         /// <summary>
+        /// 获取用户绑定租户集合
+        /// </summary>
+        /// <param name="account">用户登录名</param>
+        /// <returns>Result</returns>
+        [WebGet(UriTemplate = "users/{account}/tenants", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        Result<object> GetTenants(string account);
+
+        /// <summary>
+        /// 根据用户登录名获取可登录部门列表
+        /// </summary>
+        /// <param name="account">用户登录名</param>
+        /// <returns>Result</returns>
+        [WebGet(UriTemplate = "users/{account}/depts", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        Result<object> GetLoginDepts(string account);
+
+        /// <summary>
         /// 根据用户ID设置用户状态
         /// </summary>
         /// <param name="id">用户ID</param>

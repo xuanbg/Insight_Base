@@ -72,6 +72,11 @@
         public string id { get; set; }
 
         /// <summary>
+        /// 授权码
+        /// </summary>
+        public string key { get; set; }
+
+        /// <summary>
         /// 授权
         /// </summary>
         public int permit { get; set; }

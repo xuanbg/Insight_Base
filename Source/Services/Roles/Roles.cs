@@ -48,7 +48,7 @@ namespace Insight.Base.Services
             var data = GetData(id);
             if (data == null) return result.NotFound();
 
-            return DbHelper.Delete(data) ? result.Success(data) : result.DataBaseError();
+            return DbHelper.Delete(data) ? result.Success() : result.DataBaseError();
         }
 
         /// <summary>
@@ -293,7 +293,7 @@ namespace Insight.Base.Services
                     join r in context.tenantApps on a.id equals r.appId
                     where r.tenantId == tenantId && (string.IsNullOrEmpty(aid) || a.id == aid)
                     orderby a.createTime
-                    select new AppTree {id = a.id, index = a.index, name = a.alias};
+                    select new AppTree {id = a.id, index = a.createTime.Ticks, name = a.alias};
                 role.funcs.AddRange(apps);
 
                 var groups = from n in navList

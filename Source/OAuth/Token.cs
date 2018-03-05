@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Insight.Base.Common.Entity;
 using Insight.Utils.Common;
 using Insight.Utils.Entity;
+using Newtonsoft.Json;
 
 namespace Insight.Base.OAuth
 {
@@ -21,21 +23,28 @@ namespace Insight.Base.OAuth
         // 当前令牌对应的关键数据集
         private Keys currentKeys;
 
+        /// <summary>
+        /// 令牌生命周期(秒)
+        /// </summary>
+        [JsonIgnore]
         public int life => currentKeys?.tokenLife ?? 7200;
 
         /// <summary>
         /// 租户ID
         /// </summary>
+        [JsonIgnore]
         public string tenantId => currentKeys?.tenantId;
 
         /// <summary>
         /// 应用ID
         /// </summary>
+        [JsonIgnore]
         public string appId => currentKeys?.appId;
 
         /// <summary>
         /// 登录部门ID
         /// </summary>
+        [JsonIgnore]
         public string deptId => currentKeys?.deptId;
 
         /// <summary>
@@ -157,7 +166,11 @@ namespace Insight.Base.OAuth
                 break;
             }
 
-            currentKeys = new Keys(tid, aid);
+            currentKeys = new Keys(tid, aid)
+            {
+                permitFuncs = Core.GetPermitFuncs(tid, userId, deptId, false, aid)
+                    .Where(i => i.permit > 0).Select(i => i.key).ToList()
+            };
             keyMap.Add(code, currentKeys);
             isChanged = true;
 
@@ -211,6 +224,34 @@ namespace Insight.Base.OAuth
             if (currentKeys == null) return false;
 
             return (tokenType == TokenType.RefreshToken || currentKeys.hash == hash) && currentKeys.VerifyKey(key, tokenType);
+        }
+
+        /// <summary>
+        /// 验证操作码对应功能是否授权
+        /// </summary>
+        /// <param name="key">操作码</param>
+        /// <returns>bool 是否授权</returns>
+        public bool VerifyKeyInCache(string key)
+        {
+            return currentKeys?.permitFuncs != null && currentKeys.permitFuncs.Any(i => i.Contains(key));
+        }
+
+        /// <summary>
+        /// 验证用户是否拥有指定功能的授权
+        /// </summary>
+        /// <param name="key">操作码</param>
+        /// <returns>bool 是否通过验证</returns>
+        public bool VerifyKey(string key)
+        {
+            var permits = Core.GetPermitFuncs(tenantId, userId, deptId).Where(i => i.permit > 0);
+            using (var context = new Entities())
+            {
+                var list = from f in context.functions.ToList()
+                    join p in permits on f.id equals p.id
+                    select f.alias;
+
+                return list.Any(i => i.Contains(key));
+            }
         }
 
         /// <summary>

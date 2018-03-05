@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Insight.Base.Common.DTO;
 using Insight.Base.Common.Entity;
 using Insight.Utils.Common;
 using Insight.Utils.Entity;
@@ -21,11 +23,6 @@ namespace Insight.Base.OAuth
         /// 租户ID
         /// </summary>
         public string tenantId { get; set; }
-
-        /// <summary>
-        /// 登录部门ID
-        /// </summary>
-        public string deptId { get; set; }
 
         /// <summary>
         /// 应用ID
@@ -61,6 +58,21 @@ namespace Insight.Base.OAuth
         /// Token刷新密钥
         /// </summary>
         public string refreshKey { get; set; }
+
+        /// <summary>
+        /// 登录部门ID
+        /// </summary>
+        public string deptId { get; set; }
+
+        /// <summary>
+        /// 授权操作码集合
+        /// </summary>
+        public List<string> permitFuncs { get; set; }
+
+        /// <summary>
+        /// 授权数据信息集合
+        /// </summary>
+        public List<PermitData> permitDatas { get; set; }
 
         /// <summary>
         /// 构造函数

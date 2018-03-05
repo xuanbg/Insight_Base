@@ -18,19 +18,13 @@ namespace Insight.Base.Services
         /// <summary>
         /// 根据关键词查询全部租户集合
         /// </summary>
+        /// <param name="rows">每页行数</param>
+        /// <param name="page">当前页</param>
         /// <param name="key">查询关键词</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "tenants/all?key={key}", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "tenants?rows={rows}&page={page}&key={key}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetAllTenants(string key);
-
-        /// <summary>
-        /// 根据关键词查询租户绑定租户集合
-        /// </summary>
-        /// <returns>Result</returns>
-        [WebGet(UriTemplate = "tenants", ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        Result<object> GetTenants();
+        Result<object> GetAllTenants(int rows, int page, string key);
 
         /// <summary>
         /// 获取指定ID的租户

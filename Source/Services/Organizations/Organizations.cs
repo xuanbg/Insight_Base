@@ -168,28 +168,6 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 根据用户登录名获取可登录部门列表
-        /// </summary>
-        /// <param name="account">用户登录名</param>
-        /// <returns>Result</returns>
-        public Result<object> GetLoginDepts(string account)
-        {
-            if (!Verify()) return result;
-
-            using (var context = new Entities())
-            {
-                var user = context.users.SingleOrDefault(u => u.account == account || u.mobile == account || u.email == account);
-                if (user == null) return result.NotFound();
-
-                var list = from m in context.orgMembers.Where(m => m.userId == user.id)
-                           join t in context.organizations on m.orgId equals t.id
-                           join d in context.organizations on t.parentId equals d.id
-                           select new {d.id, Name = d.fullname, Description = d.code};
-                return list.Any() ? result.Success(list.ToList()) : result.NoContent(new List<object>());
-            }
-        }
-
-        /// <summary>
         /// 获取指定ID的用户组
         /// </summary>
         /// <param name="id">用户组ID</param>

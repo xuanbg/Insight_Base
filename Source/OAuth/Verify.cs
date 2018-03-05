@@ -13,9 +13,6 @@ namespace Insight.Base.OAuth
         private readonly TokenType tokenType;
         private readonly string secret;
         private readonly string hash;
-        private readonly string tenantId;
-        private readonly string userId;
-        private readonly string deptId;
 
         /// <summary>
         /// 用于验证的基准对象
@@ -49,13 +46,7 @@ namespace Insight.Base.OAuth
             secret = accessToken.secret;
             hash = Util.Hash(auth);
             basis = Core.GetToken(accessToken.userId);
-            if (basis == null) return;
-
-            userId = basis.userId;
-            if (!basis.SelectKeys(tokenId)) return;
-
-            tenantId = basis.tenantId;
-            deptId = basis.deptId;
+            basis?.SelectKeys(tokenId);
         }
 
         /// <summary>
@@ -84,7 +75,7 @@ namespace Insight.Base.OAuth
             // 如key为空，立即返回；否则进行鉴权
             if (string.IsNullOrEmpty(key)) return result;
 
-            return Core.VerifyKey(tenantId, userId, deptId, key) ? result : result.Forbidden();
+            return basis.VerifyKeyInCache(key) ? result : result.Forbidden();
         }
     }
 }

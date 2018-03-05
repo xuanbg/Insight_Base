@@ -239,18 +239,22 @@ namespace Insight.Base.OAuth
         /// <param name="userId">用户ID</param>
         /// <param name="deptId">登录部门ID</param>
         /// <param name="isAll">是否获取全部权限，默认为否</param>
+        /// <param name="appId">应用ID</param>
         /// <returns>功能ID集合</returns>
-        public static List<PermitFunc> GetPermitFuncs(string tenantId, string userId, string deptId, bool isAll = false)
+        public static List<PermitFunc> GetPermitFuncs(string tenantId, string userId, string deptId, bool isAll = false, string appId = null)
         {
             using (var context = new Entities())
             {
                 var funcs = from f in context.functions
+                    join m in context.navigators on f.navigatorId equals m.id
                     join p in context.roleFunctions on f.id equals p.functionId
                     join r in context.userRoles on p.roleId equals r.roleId
-                    where r.tenantId == tenantId && r.userId == userId && (isAll || r.deptId == null || r.deptId == deptId)
-                    group p by new {f.id, f.navigatorId}
+                    where r.tenantId == tenantId && r.userId == userId
+                          && (string.IsNullOrEmpty(appId) || m.appId == appId)
+                          && (isAll || r.deptId == null || r.deptId == deptId)
+                    group p by new {f.id, f.alias, f.navigatorId}
                     into g
-                    select new PermitFunc {id = g.Key.id, permit = g.Min(i => i.permit)};
+                    select new PermitFunc {id = g.Key.id, key = g.Key.alias, permit = g.Min(i => i.permit)};
 
                 return funcs.ToList();
             }
@@ -425,27 +429,6 @@ namespace Insight.Base.OAuth
             }
 
             return list;
-        }
-
-        /// <summary>
-        /// 验证用户是否拥有指定功能的授权
-        /// </summary>
-        /// <param name="tenantId">租户ID</param>
-        /// <param name="userId">用户ID</param>
-        /// <param name="deptId">登录部门ID</param>
-        /// <param name="key">操作码</param>
-        /// <returns>bool 是否通过验证</returns>
-        public static bool VerifyKey(string tenantId, string userId, string deptId, string key)
-        {
-            var permits = GetPermitFuncs(tenantId, userId, deptId).Where(i => i.permit > 0);
-            using (var context = new Entities())
-            {
-                var list = from f in context.functions.ToList()
-                    join p in permits on f.id equals p.id
-                    select f.alias;
-
-                return list.Any(i => i.Contains(key));
-            }
         }
 
         /// <summary>

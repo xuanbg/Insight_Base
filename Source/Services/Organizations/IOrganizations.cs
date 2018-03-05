@@ -88,14 +88,5 @@ namespace Insight.Base.Services
         [WebGet(UriTemplate = "orgs/{id}/other", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         Result<object> GetOtherOrgMember(string id);
-
-        /// <summary>
-        /// 根据用户登录名获取可登录部门列表
-        /// </summary>
-        /// <param name="account">用户登录名</param>
-        /// <returns>Result</returns>
-        [WebGet(UriTemplate = "orgs/logindept?account={account}", ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        Result<object> GetLoginDepts(string account);
     }
 }

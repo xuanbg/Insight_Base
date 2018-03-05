@@ -23,7 +23,7 @@
         /// <summary>
         /// 序号
         /// </summary>
-        public int index { get; set; }
+        public long index { get; set; }
 
         /// <summary>
         /// 节点名称

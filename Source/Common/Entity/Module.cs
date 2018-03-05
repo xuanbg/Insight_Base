@@ -12,11 +12,6 @@ namespace Insight.Base.Common.Entity
         public string id { get; set; }
 
         /// <summary>
-        /// 序号
-        /// </summary>
-        public int index { get; set; }
-
-        /// <summary>
         /// 应用名称
         /// </summary>
         public string name { get; set; }
