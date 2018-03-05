@@ -34,6 +34,9 @@ go
 if exists (select * from sysobjects where id = object_id('ibd_image') and objectproperty(id, 'isusertable') = 1)
 drop table ibd_image
 go
+if exists (select * from sysobjects where id = object_id('ibd_region') and objectproperty(id, 'isusertable') = 1)
+drop table ibd_region
+go
 if exists (select * from sysobjects where id = object_id('ibd_category') and objectproperty(id, 'isusertable') = 1)
 drop table ibd_category
 go
@@ -57,6 +60,19 @@ create table ibd_category(
 [creator_id]       varchar(36) foreign key references ucb_user(id) default '00000000-0000-0000-0000-000000000000' not null,                --创建人id
 [created_time]     datetime default getdate() not null                                                                                     --创建时间
 )
+create nonclustered index ix_ibd_category_parent_id on ibd_category(parent_id)
+go
+
+/*****行政区划表*****/
+create table ibd_region(
+[id]               varchar(36) constraint ix_ibd_region primary key,
+[parent_id]        varchar(36),                                                                                                            --父级ID
+[grade]            int not null,                                                                                                           --级别
+[code]             varchar(16),                                                                                                            --编码
+[name]             nvarchar(64) not null,                                                                                                  --名称
+[alias]            nvarchar(64),                                                                                                           --别名/简称
+)
+create nonclustered index ix_ibd_region_parent_id on ibd_region(parent_id)
 go
 
 /*****电子影像数据表*****/
@@ -82,7 +98,7 @@ create table ibd_image(
 [creator_id]       varchar(36) foreign key references ucb_user(id) default '00000000-0000-0000-0000-000000000000' not null,                --创建人id
 [created_time]     datetime default getdate() not null                                                                                     --创建时间
 )
-create nonclustered index ix_id_code on ibd_image(code)
+create nonclustered index ix_ibd_image_code on ibd_image(code)
 go
 
 
@@ -100,6 +116,7 @@ create table ibd_param(
 [creator_id]       varchar(36) foreign key references ucb_user(id) default '00000000-0000-0000-0000-000000000000' not null,                --创建人id
 [created_time]     datetime default getdate() not null                                                                                     --创建时间
 )
+create nonclustered index ix_ibd_param_module_id on ibd_param(module_id)
 go
 
 
