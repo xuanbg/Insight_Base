@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using System.ServiceModel;
+﻿using System.ServiceModel;
 using System.ServiceModel.Web;
-using Insight.Base.Common.Entity;
 using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
@@ -31,7 +29,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "modules/{id}/functions", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetAction(string id);
+        Result<object> GetFunctions(string id);
 
         /// <summary>
         /// 获取模块有效选项参数
@@ -59,5 +57,14 @@ namespace Insight.Base.Services
         [WebGet(UriTemplate = "modules/{id}/params/dept", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         Result<object> GetModuleDeptParam(string id);
+
+        /// <summary>
+        /// 获取行政区划
+        /// </summary>
+        /// <param name="id">上级区划ID</param>
+        /// <returns>Result</returns>
+        [WebGet(UriTemplate = "regions?pid={id}", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        Result<object> GetRegions(string id);
     }
 }

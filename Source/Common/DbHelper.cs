@@ -8,6 +8,21 @@ namespace Insight.Base.Common
     public class DbHelper
     {
         /// <summary>
+        /// 根据ID查询对象
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public static T Find<T>(string id) where T : class
+        {
+            using (var context = new Entities())
+            {
+                var obj = context.Set<T>();
+                return obj.Find(id);
+            }
+        }
+
+        /// <summary>
         /// 插入数据库记录
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>

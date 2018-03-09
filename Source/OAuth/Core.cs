@@ -321,7 +321,7 @@ namespace Insight.Base.OAuth
                         index = n.index,
                         name = n.name,
                         alias = n.alias,
-                        filePath = n.filePath,
+                        url = n.url,
                         icon = n.icon,
                         isDefault = n.isDefault
                     };

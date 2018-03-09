@@ -26,7 +26,7 @@ namespace Insight.Base.Services
         /// <param name="page">当前页</param>
         /// <param name="key">查询关键词</param>
         /// <returns>Result</returns>
-        public Result<object> GetAllTenants(int rows, int page, string key)
+        public Result<object> GetTenants(int rows, int page, string key)
         {
             if (!Verify("getTenants")) return result;
 
@@ -35,7 +35,7 @@ namespace Insight.Base.Services
             using (var context = new Entities())
             {
                 var list = from t in context.tenants
-                    where !t.isInvalid && !t.isBuiltin || (string.IsNullOrEmpty(key) || t.name.Contains(key) || t.alias.Contains(key) || t.contact.Contains(key))
+                    where !t.isInvalid && !t.isBuiltin && (string.IsNullOrEmpty(key) || t.name.Contains(key) || t.alias.Contains(key) || t.contact.Contains(key))
                     select new
                     {
                         t.id,
@@ -89,7 +89,16 @@ namespace Insight.Base.Services
         {
             if (!Verify("newTenant")) return result;
 
+            if (tenant == null) return result.BadRequest();
+
             if (Existed(tenant)) return result.DataAlreadyExists();
+
+            tenant.id = Util.NewId();
+            tenant.expireDate = DateTime.Now.AddDays(90);
+            tenant.isBuiltin = false;
+            tenant.isInvalid = false;
+            tenant.creatorId = userId;
+            tenant.createTime = DateTime.Now;
 
             return DbHelper.Insert(tenant) ? result.Created(tenant) : result.DataBaseError();
         }
@@ -97,11 +106,51 @@ namespace Insight.Base.Services
         /// <summary>
         /// 修改租户信息
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="tenant">租户实体数据</param>
         /// <returns>Result</returns>
-        public Result<object> EditTenant(Tenant tenant)
+        public Result<object> EditTenant(string id, Tenant tenant)
         {
-            throw new NotImplementedException();
+            if (!Verify("editTenant")) return result;
+
+            if (tenant == null) return result.BadRequest();
+
+            var data = GetData(tenant.id);
+            if (data == null) return result.NotFound();
+
+            data.name = tenant.name;
+            data.alias = tenant.alias;
+            data.icon = tenant.icon;
+            data.contact = tenant.contact;
+            data.mobile = tenant.mobile;
+            data.email = tenant.email;
+            data.province = tenant.province;
+            data.city = tenant.city;
+            data.county = tenant.county;
+            data.address = tenant.address;
+            data.remark = tenant.remark;
+
+            return DbHelper.Update(data) ? result.Success() : result.DataBaseError();
+        }
+
+        /// <summary>
+        /// 延长有效天数
+        /// </summary>
+        /// <param name="id">租户ID</param>
+        /// <param name="expire">续租天数</param>
+        /// <returns>Result</returns>
+        public Result<object> ExtendTenant(string id, int expire)
+        {
+            if (!Verify("extend")) return result;
+
+            if (expire < 30) return result.BadRequest("续租时间不能少于30天");
+
+            var data = GetData(id);
+            if (data == null) return result.NotFound();
+
+            data.expireDate = data.expireDate.AddDays(expire);
+
+            return DbHelper.Update(data) ? result.Success() : result.DataBaseError();
         }
 
         /// <summary>
@@ -114,6 +163,63 @@ namespace Insight.Base.Services
             if (!Verify("deleteTenant")) return result;
 
             var data = GetData(id);
+            if (data == null) return result.NotFound();
+
+            data.isInvalid = true;
+
+            return DbHelper.Update(data) ? result.Success() : result.DataBaseError();
+        }
+
+        /// <summary>
+        /// 为租户绑定应用
+        /// </summary>
+        /// <param name="tenant">租户-应用关系实体数据</param>
+        /// <returns>Result</returns>
+        public Result<object> BindApp(TenantApp tenant)
+        {
+            if (!Verify("bindApp")) return result;
+
+            var data = GetData(tenant.tenantId);
+            var app = DbHelper.Find<Application>(tenant.appId);
+            if (data == null || app == null) return result.NotFound();
+
+            tenant.id = Util.NewId();
+            tenant.creatorId = userId;
+            tenant.createTime = DateTime.Now;
+
+            return DbHelper.Insert(tenant) ? result.Success(app) : result.DataBaseError();
+        }
+
+        /// <summary>
+        /// 为租户关联用户
+        /// </summary>
+        /// <param name="tenant">租户-用户关系实体数据</param>
+        /// <returns>Result</returns>
+        public Result<object> AddTenantUser(TenantUser tenant)
+        {
+            if (!Verify()) return result;
+
+            var data = GetData(tenant.tenantId);
+            var user = DbHelper.Find<Application>(tenant.userId);
+            if (data == null || user == null) return result.NotFound();
+
+            tenant.id = Util.NewId();
+            tenant.creatorId = userId;
+            tenant.createTime = DateTime.Now;
+
+            return DbHelper.Insert(tenant) ? result.Success(user) : result.DataBaseError();
+        }
+
+        /// <summary>
+        /// 删除指定ID的租户和用户的绑定关系
+        /// </summary>
+        /// <param name="id">租户-用户关系ID</param>
+        /// <returns>Result</returns>
+        public Result<object> DeleteTenantUser(string id)
+        {
+            if (!Verify()) return result;
+
+            var data = DbHelper.Find<TenantUser>(id);
             if (data == null) return result.NotFound();
 
             return DbHelper.Delete(data) ? result.Success() : result.DataBaseError();

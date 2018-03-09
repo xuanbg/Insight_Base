@@ -30,6 +30,8 @@ namespace Insight.Base.Services
         {
             if (!Verify("newUser")) return result;
 
+            if (user == null) return result.BadRequest();
+
             if (Core.IsExisted(user)) return result.AccountExists();
 
             user.id = Util.NewId();
@@ -74,6 +76,8 @@ namespace Insight.Base.Services
         public Result<object> UpdateUserInfo(string id, User user)
         {
             if (!Verify("editUser")) return result;
+
+            if (user == null) return result.BadRequest();
 
             var data = Core.GetUserById(user.id);
             if (data == null) return result.NotFound();
@@ -180,6 +184,8 @@ namespace Insight.Base.Services
         public Result<object> SignUp(string aid, string code, User user)
         {
             if (!Verify()) return result;
+
+            if (user == null) return result.BadRequest();
 
             if (!Core.VerifySmsCode(1, user.mobile, code)) return result.SMSCodeError();
 

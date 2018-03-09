@@ -33,7 +33,7 @@
         /// <summary>
         /// 文件路径
         /// </summary>
-        public string filePath { get; set; }
+        public string url { get; set; }
 
         /// <summary>
         /// 图标

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.ServiceModel;
+using Insight.Base.Common.Entity;
 using Insight.Base.OAuth;
 using Insight.Utils.Common;
 using Insight.Utils.Entity;
@@ -34,7 +36,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">模块ID</param>
         /// <returns>Result</returns>
-        public Result<object> GetAction(string id)
+        public Result<object> GetFunctions(string id)
         {
             if (!Verify()) return result;
 
@@ -56,6 +58,20 @@ namespace Insight.Base.Services
         public Result<object> GetModuleDeptParam(string id)
         {
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// 获取行政区划
+        /// </summary>
+        /// <param name="id">上级区划ID</param>
+        /// <returns>Result</returns>
+        public Result<object> GetRegions(string id)
+        {
+            using (var context = new Entities())
+            {
+                var list = context.regions.Where(i => i.parentId == (id == "" ? null : id));
+                return result.Success(list.ToList());
+            }
         }
     }
 }

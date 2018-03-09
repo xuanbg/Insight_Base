@@ -12,6 +12,11 @@ namespace Insight.Base.Common.Entity
         public string id { get; set; }
 
         /// <summary>
+        /// 序号
+        /// </summary>
+        public int index { get; set; }
+
+        /// <summary>
         /// 应用名称
         /// </summary>
         public string name { get; set; }
@@ -46,6 +51,12 @@ namespace Insight.Base.Common.Entity
         /// 描述
         /// </summary>
         public string remark { get; set; }
+
+        /// <summary>
+        /// 是否预置：0、自定；1、预置
+        /// </summary>
+        [Column("is_builtin")]
+        public bool isBuiltin { get; set; }
 
         /// <summary>
         /// 创建人ID
@@ -99,12 +110,6 @@ namespace Insight.Base.Common.Entity
         /// 模块url
         /// </summary>
         public string url { get; set; }
-
-        /// <summary>
-        /// 文件路径
-        /// </summary>
-        [Column("file_path")]
-        public string filePath { get; set; }
 
         /// <summary>
         /// 图标url

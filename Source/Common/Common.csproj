@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DbHelper.cs" />
+    <Compile Include="DTO\App.cs" />
     <Compile Include="DTO\AppTree.cs" />
     <Compile Include="DTO\RoleInfo.cs" />
     <Compile Include="DTO\TenantInfo.cs" />
