@@ -129,7 +129,7 @@ namespace Insight.Base.Services
             var data = Core.GetUserById(id);
             if (data == null) return result.NotFound();
 
-            var user = new UserInfo {funcs = Core.GetPermitAppTree(tenantId, id), datas = new List<AppTree>()};
+            var user = new UserDto {funcs = Core.GetPermitAppTree(tenantId, id), datas = new List<AppTree>()};
 
             return result.Success(user);
         }
@@ -280,18 +280,32 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> GetLoginDepts(string account)
         {
-            if (!Verify()) return result;
-
             using (var context = new Entities())
             {
                 var user = context.users.SingleOrDefault(u => u.account == account || u.mobile == account || u.email == account);
                 if (user == null) return result.NotFound();
 
-                var list = from m in context.orgMembers.Where(m => m.userId == user.id)
-                    join t in context.organizations on m.orgId equals t.id
-                    join d in context.organizations on t.parentId equals d.id
-                    select new { d.id, Name = d.fullname, Description = d.code };
-                return list.Any() ? result.Success(list.ToList()) : result.NoContent(new List<object>());
+                var list = new List<Organization>();
+                var orgs = (from o in context.organizations
+                    join r in context.tenantUsers on o.tenantId equals r.tenantId
+                    where r.userId == user.id
+                    select o).ToList();
+                var ids = context.orgMembers.Where(m => m.userId == user.id).Select(i => i.orgId).ToList();
+                list.AddRange(orgs.Where(i => i.id == i.tenantId));
+                foreach (var id in ids)
+                {
+                    var org = orgs.Single(i => i.id == id);
+                    while (org.parentId != null)
+                    {
+                        org = orgs.Single(i => i.id == org.parentId);
+                        if (list.Any(i => i.id == org.id)) continue;
+
+                        org.remark = org.tenantId;
+                        list.Add(org);
+                    }
+                }
+
+                return result.Success(list);
             }
         }
 

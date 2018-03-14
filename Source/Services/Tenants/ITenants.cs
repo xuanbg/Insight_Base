@@ -1,4 +1,5 @@
-﻿using System.ServiceModel;
+﻿using System.Collections.Generic;
+using System.ServiceModel;
 using System.ServiceModel.Web;
 using Insight.Base.Common.Entity;
 using Insight.Utils.Entity;
@@ -76,20 +77,22 @@ namespace Insight.Base.Services
         /// <summary>
         /// 为租户绑定应用
         /// </summary>
-        /// <param name="tenant">租户-应用关系实体数据</param>
+        /// <param name="id">租户ID</param>
+        /// <param name="apps">绑定应用ID集合</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "tenants/app", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "tenants/{id}/apps", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> BindApp(TenantApp tenant);
+        Result<object> BindApp(string id, List<string> apps);
 
         /// <summary>
         /// 为租户关联用户
         /// </summary>
+        /// <param name="id">租户ID</param>
         /// <param name="tenant">租户-用户关系实体数据</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "tenants/user", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "tenants/{id}/user", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> AddTenantUser(TenantUser tenant);
+        Result<object> AddTenantUser(string id, TenantUser tenant);
 
         /// <summary>
         /// 删除指定ID的租户和用户的绑定关系

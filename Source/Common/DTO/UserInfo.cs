@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Insight.Base.Common.DTO
 {
-    public class UserInfo
+    public class UserDto
     {
         /// <summary>
         /// ID，唯一标识

@@ -93,14 +93,114 @@ namespace Insight.Base.Services
 
             if (Existed(tenant)) return result.DataAlreadyExists();
 
+            // 初始化管理员用户并持久化用户数据
+            var user = new User
+            {
+                id = Util.NewId(),
+                name = "管理员",
+                account = Params.Random.Next(0, 9999).ToString("D4"),
+                password = Util.Hash("123456"),
+                remark = tenant.name + "租户管理员",
+                creatorId = userId,
+                createTime = DateTime.Now
+            };
+
+            while (Core.IsExisted(user))
+            {
+                user.account = Params.Random.Next(0, 9999).ToString("D4");
+            }
+
+            if (!DbHelper.Insert(user)) return result.DataBaseError();
+
+            // 持久化租户数据
             tenant.id = Util.NewId();
             tenant.expireDate = DateTime.Now.AddDays(90);
             tenant.isBuiltin = false;
             tenant.isInvalid = false;
             tenant.creatorId = userId;
             tenant.createTime = DateTime.Now;
+            tenant.apps = new List<TenantApp>
+            {
+                new TenantApp
+                {
+                    id = Util.NewId(),
+                    tenantId = tenant.id,
+                    appId = "e46c0d4f-85f2-4f75-9ad4-d86b9505b1d4",
+                    creatorId = userId,
+                    createTime = DateTime.Now
+                }
+            };
+            tenant.users = new List<TenantUser>
+            {
+                new TenantUser
+                {
+                    id = Util.NewId(),
+                    tenantId = tenant.id,
+                    userId = user.id,
+                    creatorId = userId,
+                    createTime = DateTime.Now
+                }
+            };
+            if (!DbHelper.Insert(tenant)) return result.DataBaseError();
 
-            return DbHelper.Insert(tenant) ? result.Created(tenant) : result.DataBaseError();
+            // 初始化租户管理员角色并持久化角色数据
+            var role = new Role
+            {
+                id = Util.NewId(),
+                tenantId = tenant.id,
+                name = "管理员",
+                remark = "内置管理员角色",
+                isBuiltin = true,
+                creatorId = userId,
+                createTime = DateTime.Now
+            };
+            role.members = new List<RoleMember>
+            {
+                new RoleMember
+                {
+                    id = Util.NewId(),
+                    roleId = role.id,
+                    memberType = 1,
+                    memberId = user.id,
+                    creatorId = userId,
+                    createTime = DateTime.Now
+                }
+            };
+            using (var context = new Entities())
+            {
+                var list = from n in context.navigators
+                    join f in context.functions on n.id equals f.navigatorId
+                    where n.appId == "e46c0d4f-85f2-4f75-9ad4-d86b9505b1d4"
+                    select new
+                    {
+                        roleId = role.id,
+                        functionId = f.id,
+                        permit = 1,
+                        creatorId = userId,
+                        createTime = DateTime.Now
+                    };
+                role.funcs = Util.ConvertTo<List<RoleFunction>>(list.ToList());
+                role.funcs.ForEach(i => i.id = Util.NewId());
+            }
+            if (!DbHelper.Insert(role)) return result.DataBaseError();
+
+            // 初始化根机构并持久化组织机构数据
+            var org = new Organization
+            {
+                id = tenant.id,
+                tenantId = tenant.id,
+                nodeType = 1,
+                index = 0,
+                name = tenant.name,
+                creatorId = userId,
+                createTime = DateTime.Now
+            };
+            if (!DbHelper.Insert(org)) return result.DataBaseError();
+
+            tenant.apps = null;
+            tenant.users = null;
+
+            return result.Success(tenant);
         }
 
         /// <summary>
@@ -173,29 +273,41 @@ namespace Insight.Base.Services
         /// <summary>
         /// 为租户绑定应用
         /// </summary>
-        /// <param name="tenant">租户-应用关系实体数据</param>
+        /// <param name="id">租户ID</param>
+        /// <param name="apps">绑定应用ID集合</param>
         /// <returns>Result</returns>
-        public Result<object> BindApp(TenantApp tenant)
+        public Result<object> BindApp(string id, List<string> apps)
         {
             if (!Verify("bindApp")) return result;
 
-            var data = GetData(tenant.tenantId);
-            var app = DbHelper.Find<Application>(tenant.appId);
-            if (data == null || app == null) return result.NotFound();
+            var data = GetData(id);
+            if (data == null) return result.NotFound();
 
-            tenant.id = Util.NewId();
-            tenant.creatorId = userId;
-            tenant.createTime = DateTime.Now;
+            using (var context = new Entities())
+            {
+                var list = context.tenantApps.Where(i => i.tenantId == id && i.appId != "e46c0d4f-85f2-4f75-9ad4-d86b9505b1d4").ToList();
+                if (!DbHelper.Delete(list)) return result.DataBaseError();
 
-            return DbHelper.Insert(tenant) ? result.Success(app) : result.DataBaseError();
+                list = apps.Select(i => new TenantApp
+                {
+                    id = Util.NewId(),
+                    tenantId = id,
+                    appId = i,
+                    creatorId = userId,
+                    createTime = DateTime.Now
+                }).ToList();
+
+                return DbHelper.Insert(list) ? result.Success() : result.DataBaseError();
+            }
         }
 
         /// <summary>
         /// 为租户关联用户
         /// </summary>
+        /// <param name="id">租户ID</param>
         /// <param name="tenant">租户-用户关系实体数据</param>
         /// <returns>Result</returns>
-        public Result<object> AddTenantUser(TenantUser tenant)
+        public Result<object> AddTenantUser(string id, TenantUser tenant)
         {
             if (!Verify()) return result;
 
@@ -234,7 +346,7 @@ namespace Insight.Base.Services
         {
             using (var context = new Entities())
             {
-                return context.tenants.Any(i => i.id != tenant.id && i.name == tenant.name && i.alias == tenant.alias);
+                return context.tenants.Any(i => i.id != tenant.id && (i.name == tenant.name || i.alias == tenant.alias));
             }
         }
 
