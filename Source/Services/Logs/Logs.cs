@@ -56,7 +56,7 @@ namespace Insight.Base.Services
             var level = Convert.ToInt32(rule.code.Substring(0, 1));
             if (level <= 1 || level == 7) return result.EventWithoutConfig();
 
-            if (Rules.Any(r => r.code == rule.code)) return result.EventCodeUsed();
+            if (Params.rules.Any(r => r.code == rule.code)) return result.EventCodeUsed();
 
             rule.creatorId = userId;
             if (!Insert(rule)) return result.DataBaseError();
@@ -122,7 +122,7 @@ namespace Insight.Base.Services
         {
             if (!Verify("E3CFC5AA-CD7D-4A3C-8900-8132ADB7099F")) return result;
 
-            var rule = Rules.SingleOrDefault(r => r.id == id);
+            var rule = Params.rules.SingleOrDefault(r => r.id == id);
             return rule == null ? result.NotFound() : result.Success(rule);
         }
 
@@ -134,7 +134,7 @@ namespace Insight.Base.Services
         {
             if (!Verify("E3CFC5AA-CD7D-4A3C-8900-8132ADB7099F")) return result;
 
-            return Rules.Any() ? result.Success(Rules) : result.NoContent(new List<object>());
+            return Params.rules.Any() ? result.Success(Params.rules) : result.NoContent(new List<object>());
         }
     }
 }

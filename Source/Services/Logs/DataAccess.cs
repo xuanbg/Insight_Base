@@ -23,7 +23,7 @@ namespace Insight.Base.Services
 
                     return false;
                 }
-                Params.Rules.Add(rule);
+                Params.rules.Add(rule);
                 return true;
             }
         }
@@ -46,7 +46,7 @@ namespace Insight.Base.Services
                     return false;
                 }
 
-                Params.Rules.RemoveAll(r => r.id == id);
+                Params.rules.RemoveAll(r => r.id == id);
                 return true;
             }
         }
@@ -75,8 +75,8 @@ namespace Insight.Base.Services
                 }
             }
 
-            Params.Rules.RemoveAll(r => r.id == rule.id);
-            Params.Rules.Add(rule);
+            Params.rules.RemoveAll(r => r.id == rule.id);
+            Params.rules.Add(rule);
             return true;
         }
     }

@@ -3,16 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Insight.Base.Common.Entity;
+using Insight.Utils.Entity;
 using Insight.Utils.Redis;
 
 namespace Insight.Base.Common
 {
     public static class Params
     {
-        private static List<LogRule> _Rules;
+        public static Dictionary<string, ClientFile> fileList;
+        private static List<LogRule> ruleList;
 
         // 日志进程同步基元
-        public static readonly Mutex Mutex = new Mutex();
+        public static readonly Mutex mutex = new Mutex();
 
         // 访问管理器
         public static CallManage callManage { get; } = new CallManage();
@@ -20,18 +22,18 @@ namespace Insight.Base.Common
         /// <summary>
         /// 规则缓存
         /// </summary>
-        public static List<LogRule> Rules
+        public static List<LogRule> rules
         {
             get
             {
-                if (_Rules != null) return _Rules;
+                if (ruleList != null) return ruleList;
 
                 using (var context = new Entities())
                 {
-                    _Rules = context.logRules.ToList();
+                    ruleList = context.logRules.ToList();
                 }
 
-                return _Rules;
+                return ruleList;
             }
         }
 

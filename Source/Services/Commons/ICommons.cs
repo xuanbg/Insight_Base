@@ -5,7 +5,7 @@ using Insight.Utils.Entity;
 namespace Insight.Base.Services
 {
     [ServiceContract]
-    interface IModules
+    public interface ICommons
     {
         /// <summary>
         /// 为跨域请求设置响应头信息
@@ -66,5 +66,23 @@ namespace Insight.Base.Services
         [WebGet(UriTemplate = "regions?pid={id}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         Result<object> GetRegions(string id);
+
+        /// <summary>
+        /// 获取应用客户端文件信息集合
+        /// </summary>
+        /// <param name="id">应用ID</param>
+        /// <returns>Result</returns>
+        [WebGet(UriTemplate = "apps/{id}/files", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        Result<object> GetFiles(string id);
+
+        /// <summary>
+        /// 获取指定名称的文件
+        /// </summary>
+        /// <param name="id">文件ID</param>
+        /// <returns>Result</returns>
+        [WebGet(UriTemplate = "apps/files/{id}", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        Result<object> GetFile(string id);
     }
 }

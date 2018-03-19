@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.ServiceModel;
+using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Base.OAuth;
 using Insight.Utils.Common;
@@ -9,7 +11,7 @@ using Insight.Utils.Entity;
 namespace Insight.Base.Services
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
-    public partial class Modules : ServiceBase, IModules
+    public partial class Commons : ServiceBase, ICommons
     {
         /// <summary>
         /// 为跨域请求设置响应头信息
@@ -72,6 +74,43 @@ namespace Insight.Base.Services
                 var list = context.regions.Where(i => i.parentId == (id == "" ? null : id));
                 return result.Success(list.ToList());
             }
+        }
+
+        /// <summary>
+        /// 获取应用客户端文件信息集合
+        /// </summary>
+        /// <param name="id">应用ID</param>
+        /// <returns>Result</returns>
+        public Result<object> GetFiles(string id)
+        {
+            var list = Params.fileList.Where(i => i.Value.appId == id && i.Value.upDateTime < DateTime.Now.AddMinutes(30));
+            if (!list.Any())
+            {
+                var dirInfo = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+                var path = DbHelper.Find<Application>(id)?.alias;
+                Util.GetClientFiles(Params.fileList, id, $"{dirInfo.FullName}/Client/{path}", ".dll|.exe|.frl");
+                list = Params.fileList.Where(i => i.Value.appId == id && i.Value.upDateTime < DateTime.Now.AddMinutes(30));
+            }
+
+            return result.Success(list);
+        }
+
+        /// <summary>
+        /// 获取指定名称的文件
+        /// </summary>
+        /// <param name="id">文件ID</param>
+        /// <returns>Result</returns>
+        public Result<object> GetFile(string id)
+        {
+            if (!Verify()) return result;
+
+            if (!Params.fileList.ContainsKey(id)) return result.NotFound();
+
+            var file = Params.fileList[id];
+            var bytes = File.ReadAllBytes(file.fullPath);
+            var str = Convert.ToBase64String(Util.Compress(bytes));
+
+            return result.Success(str);
         }
     }
 }

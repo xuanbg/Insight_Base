@@ -5,7 +5,7 @@ using Insight.Base.OAuth;
 
 namespace Insight.Base.Services
 {
-    public partial class Modules
+    public partial class Commons
     {
 
         /// <summary>

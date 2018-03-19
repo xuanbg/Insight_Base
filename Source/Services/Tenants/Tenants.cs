@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel;
 using Insight.Base.Common;
 using Insight.Base.Common.DTO;
 using Insight.Base.Common.Entity;
@@ -10,6 +11,7 @@ using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
 {
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
     public class Tenants : ServiceBase, ITenants
     {
         /// <summary>
