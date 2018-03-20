@@ -37,7 +37,12 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 令牌生命周期(秒)
         /// </summary>
-        public int tokenLife { get; set; }
+        public int life { get; set; }
+
+        /// <summary>
+        /// 单点登录
+        /// </summary>
+        public bool signInOne { get; set; }
 
         /// <summary>
         /// 租户到期时间
@@ -91,12 +96,12 @@ namespace Insight.Base.OAuth
             this.tenantId = tenantId;
             this.appId = appId;
 
+            GetAppInfo();
             expireDate = GetExpireDate(tenantId);
-            tokenLife = GetTokenLife(appId);
             secretKey = Util.NewId("N");
             refreshKey = Util.NewId("N");
-            expiryTime = DateTime.Now.AddSeconds(tokenLife + TIME_OUT);
-            failureTime = DateTime.Now.AddSeconds(tokenLife * 12 + TIME_OUT);
+            expiryTime = DateTime.Now.AddSeconds(life + TIME_OUT);
+            failureTime = DateTime.Now.AddSeconds(life * 12 + TIME_OUT);
         }
 
         /// <summary>
@@ -108,10 +113,10 @@ namespace Insight.Base.OAuth
         public bool VerifyKey(string key, TokenType tokenType)
         {
             var passed = key == (tokenType == TokenType.AccessToken ? secretKey : refreshKey);
-            if (passed && tokenType == TokenType.AccessToken && tokenLife < 3600 && DateTime.Now.AddSeconds(tokenLife / 2 + TIME_OUT) > expiryTime)
+            if (passed && tokenType == TokenType.AccessToken && life < 3600 && DateTime.Now.AddSeconds(life / 2 + TIME_OUT) > expiryTime)
             {
-                expiryTime = DateTime.Now.AddSeconds(tokenLife + TIME_OUT);
-                failureTime = DateTime.Now.AddSeconds(tokenLife * 12 + TIME_OUT);
+                expiryTime = DateTime.Now.AddSeconds(life + TIME_OUT);
+                failureTime = DateTime.Now.AddSeconds(life * 12 + TIME_OUT);
             }
 
             return passed;
@@ -122,8 +127,8 @@ namespace Insight.Base.OAuth
         /// </summary>
         public void Refresh()
         {
-            expiryTime = DateTime.Now.AddSeconds(tokenLife + TIME_OUT);
-            failureTime = DateTime.Now.AddSeconds(tokenLife * 12 + TIME_OUT);
+            expiryTime = DateTime.Now.AddSeconds(life + TIME_OUT);
+            failureTime = DateTime.Now.AddSeconds(life * 12 + TIME_OUT);
             secretKey = Util.NewId("N");
         }
 
@@ -164,24 +169,30 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 查询指定ID的应用的令牌生命周期(秒)
         /// </summary>
-        /// <param name="appId">应用ID</param>
         /// <returns>应用的令牌生命周期(秒)</returns>
-        private static int GetTokenLife(string appId)
+        private void GetAppInfo()
         {
-            if (string.IsNullOrEmpty(appId)) return 7200;
+            if (string.IsNullOrEmpty(appId)) life = 7200;
 
-            // 从缓存读取应用的令牌生命周期
-            const string fiele = "TokenLife";
-            var val = RedisHelper.HashGet($"App:{appId}", fiele);
-            if (!string.IsNullOrEmpty(val)) return Convert.ToInt32(val);
+            var tokenLife = RedisHelper.HashGet($"App:{appId}", "TokenLife");
+            var type = RedisHelper.HashGet($"App:{appId}", "SignInType");
+            if (!string.IsNullOrEmpty(tokenLife) && !string.IsNullOrEmpty(type))
+            {
+                life = Convert.ToInt32(tokenLife);
+                signInOne = Convert.ToBoolean(type);
+
+                return;
+            }
 
             // 从数据库读取应用的令牌生命周期
             using (var context = new Entities())
             {
-                var life = context.applications.SingleOrDefault(i => i.id == appId)?.tokenLife ?? 7200;
-                RedisHelper.HashSet($"App:{appId}", fiele, life.ToString());
+                var app = context.applications.SingleOrDefault(i => i.id == appId);
+                life = app?.tokenLife ?? 7200;
+                RedisHelper.HashSet($"App:{appId}", "TokenLife", life.ToString());
 
-                return life;
+                signInOne = app?.isSigninOne ?? false;
+                RedisHelper.HashSet($"App:{appId}", "SignInType", signInOne.ToString());
             }
         }
     }

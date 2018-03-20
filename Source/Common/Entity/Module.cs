@@ -32,12 +32,6 @@ namespace Insight.Base.Common.Entity
         public string host { get; set; }
 
         /// <summary>
-        /// 令牌生存周期(小时)
-        /// </summary>
-        [Column("token_life")]
-        public int tokenLife { get; set; }
-
-        /// <summary>
         /// 图标url
         /// </summary>
         public string iconurl { get; set; }
@@ -51,6 +45,18 @@ namespace Insight.Base.Common.Entity
         /// 描述
         /// </summary>
         public string remark { get; set; }
+
+        /// <summary>
+        /// 令牌生存周期(小时)
+        /// </summary>
+        [Column("token_life")]
+        public int tokenLife { get; set; }
+
+        /// <summary>
+        /// 是否单点登录
+        /// </summary>
+        [Column("is_signin_one")]
+        public bool isSigninOne { get; set; }
 
         /// <summary>
         /// 是否预置：0、自定；1、预置

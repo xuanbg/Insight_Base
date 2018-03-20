@@ -21,31 +21,31 @@ namespace Insight.Base.OAuth
         private bool isChanged;
 
         // 当前令牌对应的关键数据集
-        private Token currentKeys;
+        private Token token;
 
         /// <summary>
         /// 令牌生命周期(秒)
         /// </summary>
         [JsonIgnore]
-        public int life => currentKeys?.tokenLife ?? 7200;
+        public int life => token?.life ?? 7200;
 
         /// <summary>
         /// 租户ID
         /// </summary>
         [JsonIgnore]
-        public string tenantId => currentKeys?.tenantId;
+        public string tenantId => token?.tenantId;
 
         /// <summary>
         /// 应用ID
         /// </summary>
         [JsonIgnore]
-        public string appId => currentKeys?.appId;
+        public string appId => token?.appId;
 
         /// <summary>
         /// 登录部门ID
         /// </summary>
         [JsonIgnore]
-        public string deptId => currentKeys?.deptId;
+        public string deptId => token?.deptId;
 
         /// <summary>
         /// 用户ID
@@ -137,9 +137,9 @@ namespace Insight.Base.OAuth
         /// <returns>bool 是否存在关键数据集</returns>
         public bool GetToken(string tokenId)
         {
-            currentKeys = RedisHelper.StringGet<Token>($"Token:{tokenId}");
+            token = RedisHelper.StringGet<Token>($"Token:{tokenId}");
 
-            return currentKeys != null;
+            return token != null;
         }
 
         /// <summary>
@@ -155,11 +155,12 @@ namespace Insight.Base.OAuth
                 .Where(i => i.permit > 0)
                 .Select(i => i.key)
                 .ToList();
-            currentKeys = new Token(tid, aid) {permitFuncs = funs};
-            var token = InitPackage(code);
-            RedisHelper.StringSet($"Token:{code}", currentKeys, currentKeys.failureTime);
+            token = new Token(tid, aid) {permitFuncs = funs};
+            var package = InitPackage(code);
+            RedisHelper.StringSet($"Token:{code}", token, token.failureTime);
+            RedisHelper.HashSet($"Apps:{userId}", aid, code);
 
-            return token;
+            return package;
         }
 
         /// <summary>
@@ -169,11 +170,11 @@ namespace Insight.Base.OAuth
         /// <returns>令牌数据包</returns>
         public TokenPackage Refresh(string tokenId)
         {
-            currentKeys.Refresh();
-            var token = InitPackage(tokenId);
-            RedisHelper.StringSet($"Token:{tokenId}", currentKeys, currentKeys.failureTime);
+            token.Refresh();
+            var package = InitPackage(tokenId);
+            RedisHelper.StringSet($"Token:{tokenId}", token, token.failureTime);
 
-            return token;
+            return package;
         }
 
         /// <summary>
@@ -194,17 +195,17 @@ namespace Insight.Base.OAuth
         /// <returns>令牌数据包</returns>
         private TokenPackage InitPackage(string code)
         {
-            var accessToken = new AccessToken {id = code, userId = userId, secret = currentKeys.secretKey};
-            var refreshToken = new AccessToken {id = code, userId = userId, secret = currentKeys.refreshKey};
+            var accessToken = new AccessToken {id = code, userId = userId, secret = token.secretKey};
+            var refreshToken = new AccessToken {id = code, userId = userId, secret = token.refreshKey};
             var tokenPackage = new TokenPackage
             {
                 accessToken = Util.Base64(accessToken),
                 refreshToken = Util.Base64(refreshToken),
-                expiryTime = currentKeys.tokenLife,
-                failureTime = currentKeys.tokenLife * 12
+                expiryTime = token.life,
+                failureTime = token.life * 12
             };
 
-            currentKeys.hash = Util.Hash(tokenPackage.accessToken);
+            token.hash = Util.Hash(tokenPackage.accessToken);
 
             return tokenPackage;
         }
@@ -218,9 +219,9 @@ namespace Insight.Base.OAuth
         /// <returns>Token是否合法</returns>
         public bool Verify(string hash, string key, TokenType tokenType)
         {
-            if (currentKeys == null) return false;
+            if (token == null) return false;
 
-            return (tokenType == TokenType.RefreshToken || currentKeys.hash == hash) && currentKeys.VerifyKey(key, tokenType);
+            return (tokenType == TokenType.RefreshToken || token.hash == hash) && token.VerifyKey(key, tokenType);
         }
 
         /// <summary>
@@ -230,7 +231,7 @@ namespace Insight.Base.OAuth
         /// <returns>bool 是否授权</returns>
         public bool VerifyKeyInCache(string key)
         {
-            return currentKeys?.permitFuncs != null && currentKeys.permitFuncs.Any(i => i.Contains(key));
+            return token?.permitFuncs != null && token.permitFuncs.Any(i => i.Contains(key));
         }
 
         /// <summary>
@@ -282,7 +283,7 @@ namespace Insight.Base.OAuth
         /// <returns>Token是否过期</returns>
         public bool TenantIsExpiry()
         {
-            return currentKeys == null || DateTime.Now > currentKeys.expireDate;
+            return token == null || DateTime.Now > token.expireDate;
         }
 
         /// <summary>
@@ -291,16 +292,19 @@ namespace Insight.Base.OAuth
         /// <returns>Token是否过期</returns>
         public bool IsExpiry()
         {
-            return currentKeys == null || currentKeys.IsExpiry();
+            return token == null || token.IsExpiry();
         }
 
         /// <summary>
         /// Token是否失效
         /// </summary>
+        /// <param name="tokenId"></param>
         /// <returns>Token是否失效</returns>
-        public bool IsFailure()
+        public bool IsFailure(string tokenId)
         {
-            return currentKeys == null || currentKeys.IsFailure();
+            var code = RedisHelper.HashGet(userId, appId);
+
+            return token == null || token.signInOne && code != tokenId || token.IsFailure();
         }
 
         /// <summary>

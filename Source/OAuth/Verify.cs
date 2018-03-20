@@ -59,7 +59,7 @@ namespace Insight.Base.OAuth
             if (manage == null) return result.InvalidToken();
 
             // 验证令牌
-            if (manage.IsFailure()) return result.Failured();
+            if (manage.IsFailure(tokenId)) return result.Failured();
 
             if (tokenType == TokenType.AccessToken && manage.IsExpiry()) return result.Expired();
 

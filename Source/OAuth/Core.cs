@@ -204,8 +204,7 @@ namespace Insight.Base.OAuth
             if (!token.IsChanged()) return;
 
             var key = $"User:{token.userId}";
-            var json = Util.Serialize(token);
-            RedisHelper.StringSet(key, json);
+            RedisHelper.StringSet(key, token);
         }
 
         /// <summary>
