@@ -5,7 +5,7 @@ namespace Insight.Base.OAuth
     public class ServiceBase
     {
         public Result<object> result = new Result<object>();
-        public Token token;
+        public TokenManage manage;
         public string tokenId;
         public string tenantId;
         public string appId;
@@ -23,14 +23,14 @@ namespace Insight.Base.OAuth
         {
             var verify = new Verify();
             tokenId = verify.tokenId;
-            token = verify.basis;
-            if (token == null) return false;
+            manage = verify.manage;
+            if (manage == null) return false;
 
-            tenantId = token.tenantId;
-            appId = token.appId;
-            userId = token.userId;
-            userName = token.userName;
-            deptId = token.deptId;
+            tenantId = manage.tenantId;
+            appId = manage.appId;
+            userId = manage.userId;
+            userName = manage.userName;
+            deptId = manage.deptId;
             result = verify.Compare(userId == id ? null : key);
 
             return result.successful;

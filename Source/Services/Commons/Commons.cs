@@ -69,6 +69,8 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> GetRegions(string id)
         {
+            if (!Verify()) return result;
+
             using (var context = new Entities())
             {
                 var list = context.regions.Where(i => i.parentId == (id == "" ? null : id));
@@ -83,13 +85,15 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> GetFiles(string id)
         {
-            var list = Params.fileList.Where(i => i.Value.appId == id && i.Value.upDateTime < DateTime.Now.AddMinutes(30));
+            if (!Verify()) return result;
+
+            var list = Params.fileList.Where(i => i.Value.appId == id && i.Value.upDateTime < DateTime.Now.AddMinutes(30)).ToDictionary(i => i.Key, i => i.Value);
             if (!list.Any())
             {
                 var dirInfo = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
                 var path = DbHelper.Find<Application>(id)?.alias;
                 Util.GetClientFiles(Params.fileList, id, $"{dirInfo.FullName}/Client/{path}", ".dll|.exe|.frl");
-                list = Params.fileList.Where(i => i.Value.appId == id && i.Value.upDateTime < DateTime.Now.AddMinutes(30));
+                list = Params.fileList.Where(i => i.Value.appId == id && i.Value.upDateTime < DateTime.Now.AddMinutes(30)).ToDictionary(i => i.Key, i => i.Value);
             }
 
             return result.Success(list);

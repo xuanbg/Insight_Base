@@ -37,15 +37,15 @@ namespace Insight.Base.Services
             userId = Core.GetUserId(account);
             if (userId == null) return result.NotExists();
 
-            token = Core.GetToken(userId);
-            if (token == null)
+            manage = Core.GetUserCache(userId);
+            if (manage == null)
             {
                 RedisHelper.Delete($"ID:{account}");
                 return result.ServerError("缓存异常，请重试");
             }
 
             // 生成Code
-            object code = Core.GenerateCode(token, account, type);
+            object code = Core.GenerateCode(manage, account, type);
 
             return result.Success(code);
         }
@@ -70,41 +70,41 @@ namespace Insight.Base.Services
             if (string.IsNullOrEmpty(code))
             {
                 userId = Core.GetUserId(account);
-                token = Core.GetToken(userId);
-                if (token != null)
+                manage = Core.GetUserCache(userId);
+                if (manage != null)
                 {
-                    token.AddFailureCount();
-                    Core.SetTokenCache(token);
+                    manage.AddFailureCount();
+                    Core.SetUserCache(manage);
                     var msg = $"账号 {account} 正在尝试使用错误的签名请求令牌!";
                     new Thread(() => Logger.Write("400101", msg)).Start();
                 }
 
-                return token.UserIsLocked() ? result.Locked() : result.InvalidAuth();
+                return manage.UserIsLocked() ? result.Locked() : result.InvalidAuth();
             }
 
             userId = RedisHelper.StringGet(code);
             if (string.IsNullOrEmpty(userId)) return result.ServerError("缓存异常，请重试");
 
             RedisHelper.Delete(code);
-            token = Core.GetToken(userId);
-            if (token == null)
+            manage = Core.GetUserCache(userId);
+            if (manage == null)
             {
                 RedisHelper.Delete($"ID:{account}");
                 return result.ServerError("缓存异常，请重试");
             }
 
             // 验证令牌
-            if (token.isInvalid) return result.Disabled();
+            if (manage.isInvalid) return result.Disabled();
 
-            if (token.UserIsLocked())
+            if (manage.UserIsLocked())
             {
-                Core.SetTokenCache(token);
+                Core.SetUserCache(manage);
                 return result.Locked();
             }
 
             // 创建令牌数据并返回
-            var tokens = token.CreatorKey(code, aid, tid);
-            Core.SetTokenCache(token);
+            var tokens = manage.Creator(code, aid, tid);
+            Core.SetUserCache(manage);
 
             return result.Success(tokens);
         }
@@ -128,20 +128,20 @@ namespace Insight.Base.Services
         public Result<object> RefreshToken()
         {
             var verify = new Verify(TokenType.RefreshToken);
-            token = verify.basis;
+            manage = verify.manage;
             tokenId = verify.tokenId;
 
             // 限流,令牌在其有效期内可刷新60次
             var key = Util.Hash("RefreshToken" + tokenId);
-            var limited = Params.callManage.IsLimited(key, token.life * 12, 60);
+            var limited = Params.callManage.IsLimited(key, manage.life * 12, 60);
             if (limited) return result.BadRequest("刷新次数已用完,请合理刷新");
 
             result = verify.Compare();
             if (!result.successful) return result;
 
             // 刷新令牌
-            var tokens = token.RefreshToken(tokenId);
-            Core.SetTokenCache(token);
+            var tokens = manage.Refresh(tokenId);
+            Core.SetUserCache(manage);
 
             return result.Success(tokens);
         }
@@ -154,8 +154,8 @@ namespace Insight.Base.Services
         {
             if (!Verify()) return result;
 
-            token.DeleteKeys(tokenId);
-            Core.SetTokenCache(token);
+            manage.Delete(tokenId);
+            Core.SetUserCache(manage);
 
             return result.Success();
         }
@@ -212,10 +212,10 @@ namespace Insight.Base.Services
             if (!Verify()) return result;
 
             // 验证短信验证码
-            if (!Core.VerifySmsCode(3, token.mobile, code)) return result.SMSCodeError();
+            if (!Core.VerifySmsCode(3, manage.mobile, code)) return result.SMSCodeError();
 
             var key = Util.Hash(userId + password);
-            if (token.payPassword == key) return result.Success();
+            if (manage.payPassword == key) return result.Success();
 
             // 保存支付密码到数据库
             var user = Core.GetUserById(userId);
@@ -223,9 +223,9 @@ namespace Insight.Base.Services
             if (!DbHelper.Update(user)) return result.DataBaseError();
 
             // 更新Token缓存
-            token.payPassword = key;
-            token.SetChanged();
-            Core.SetTokenCache(token);
+            manage.payPassword = key;
+            manage.SetChanged();
+            Core.SetUserCache(manage);
 
             return result.Success();
         }
@@ -239,7 +239,7 @@ namespace Insight.Base.Services
         {
             if (!Verify()) return result;
 
-            var success = token.VerifyPayPassword(password);
+            var success = manage.VerifyPayPassword(password);
             if (success == null) return result.BadRequest("未设置支付密码,请先设置支付密码!");
 
             return success.Value ? result : result.InvalidPayKey();

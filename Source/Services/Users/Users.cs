@@ -89,7 +89,7 @@ namespace Insight.Base.Services
             data.remark = user.remark;
             if (!DbHelper.Update(data)) return result.DataBaseError();
 
-            var session = Core.GetToken(user.id);
+            var session = Core.GetUserCache(user.id);
             if (session == null) return result;
 
             session.userName = user.name;
@@ -97,7 +97,7 @@ namespace Insight.Base.Services
             session.mobile = user.mobile;
             session.email = user.email;
             session.SetChanged();
-            Core.SetTokenCache(session);
+            Core.SetUserCache(session);
 
             return result;
         }
@@ -196,9 +196,9 @@ namespace Insight.Base.Services
             user.createTime = DateTime.Now;
             if (!DbHelper.Insert(user)) return result.DataBaseError();
 
-            var session = Core.GetToken(user.id);
-            var tokens = session.CreatorKey(Util.NewId("N"), aid);
-            Core.SetTokenCache(session);
+            var session = Core.GetUserCache(user.id);
+            var tokens = session.Creator(Util.NewId("N"), aid);
+            Core.SetUserCache(session);
 
             return result.Created(tokens);
         }
@@ -221,12 +221,12 @@ namespace Insight.Base.Services
             user.password = password;
             if (!DbHelper.Update(user)) return result.DataBaseError();
 
-            var session = Core.GetToken(id);
+            var session = Core.GetUserCache(id);
             if (session == null) return result;
 
             session.password = password;
             session.SetChanged();
-            Core.SetTokenCache(session);
+            Core.SetUserCache(session);
 
             return result;
         }
@@ -248,17 +248,17 @@ namespace Insight.Base.Services
             userId = Core.GetUserId(account);
             if (userId == null) return result.NotFound();
 
-            token = Core.GetToken(userId);
-            if (token.password != password)
+            manage = Core.GetUserCache(userId);
+            if (manage.password != password)
             {
                 var user = Core.GetUserById(userId);
                 user.password = password;
                 if (!DbHelper.Update(user)) return result.DataBaseError();
             }
 
-            token.password = password;
-            var tokens = token.CreatorKey(Util.NewId("N"), aid);
-            Core.SetTokenCache(token);
+            manage.password = password;
+            var tokens = manage.Creator(Util.NewId("N"), aid);
+            Core.SetUserCache(manage);
 
             return result.Created(tokens);
         }
@@ -328,12 +328,12 @@ namespace Insight.Base.Services
             user.isInvalid = invalid;
             if (!DbHelper.Update(user)) return result.DataBaseError();
 
-            var session = Core.GetToken(user.id);
+            var session = Core.GetUserCache(user.id);
             if (session == null) return result;
 
             session.isInvalid = invalid;
             session.SetChanged();
-            Core.SetTokenCache(session);
+            Core.SetUserCache(session);
 
             return result;
         }
@@ -347,7 +347,7 @@ namespace Insight.Base.Services
         {
             if (!Verify()) return result;
 
-            token.DeleteKeys(tokenId);
+            manage.Delete(tokenId);
             return result;
         }
 

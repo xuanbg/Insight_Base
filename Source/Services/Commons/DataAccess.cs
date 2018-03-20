@@ -30,7 +30,7 @@ namespace Insight.Base.Services
         /// <param name="deptId">登录部门ID</param>
         /// <param name="moduleId">模块ID</param>
         /// <returns>参数集合</returns>
-        public List<ModuleParam> GetModuleParam(Token session, string deptId, string moduleId)
+        public List<ModuleParam> GetModuleParam(TokenManage session, string deptId, string moduleId)
         {
             var ids = new List<string>();
             List<ModuleParam> mps;
@@ -61,7 +61,7 @@ namespace Insight.Base.Services
         /// <param name="session">Session对象实体</param>
         /// <param name="mid">模块ID</param>
         /// <returns>SYS_ModuleParam List 参数集合</returns>
-        public List<ModuleParam> GetModuleUserParam(Token session, string mid)
+        public List<ModuleParam> GetModuleUserParam(TokenManage session, string mid)
         {
             using (var context = new Entities())
             {
@@ -76,7 +76,7 @@ namespace Insight.Base.Services
         /// <param name="deptId">登录部门ID</param>
         /// <param name="moduleId">模块ID</param>
         /// <returns>参数集合</returns>
-        public List<ModuleParam> GetModuleDeptParam(Token session, string deptId, string moduleId)
+        public List<ModuleParam> GetModuleDeptParam(TokenManage session, string deptId, string moduleId)
         {
             using (var context = new Entities())
             {

@@ -10,7 +10,7 @@ namespace Insight.Base.Common
 {
     public static class Params
     {
-        public static Dictionary<string, ClientFile> fileList;
+        public static Dictionary<string, ClientFile> fileList = new Dictionary<string, ClientFile>();
         private static List<LogRule> ruleList;
 
         // 日志进程同步基元
