@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Insight.Base.Common.Entity
@@ -95,6 +96,16 @@ namespace Insight.Base.Common.Entity
         /// </summary>
         [Column("created_time")]
         public DateTime createTime { get; set; }
+
+        /// <summary>
+        /// 绑定应用
+        /// </summary>
+        public List<TenantApp> apps { get; set; }
+
+        /// <summary>
+        /// 关联用户
+        /// </summary>
+        public List<TenantUser> users { get; set; }
     }
 
     [Table("ucb_tenant_app")]

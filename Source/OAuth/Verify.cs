@@ -17,7 +17,7 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 用于验证的基准对象
         /// </summary>
-        public Token basis { get; }
+        public TokenManage manage { get; }
 
         /// <summary>
         /// 令牌ID
@@ -45,8 +45,8 @@ namespace Insight.Base.OAuth
             tokenId = accessToken.id;
             secret = accessToken.secret;
             hash = Util.Hash(auth);
-            basis = Core.GetToken(accessToken.userId);
-            basis?.SelectKeys(tokenId);
+            manage = Core.GetUserCache(accessToken.userId);
+            manage?.GetToken(tokenId);
         }
 
         /// <summary>
@@ -56,26 +56,26 @@ namespace Insight.Base.OAuth
         /// <returns>Result</returns>
         public Result<object> Compare(string key = null)
         {
-            if (basis == null) return result.InvalidToken();
+            if (manage == null) return result.InvalidToken();
 
             // 验证令牌
-            if (basis.IsFailure()) return result.Failured();
+            if (manage.IsFailure(tokenId)) return result.Failured();
 
-            if (tokenType == TokenType.AccessToken && basis.IsExpiry()) return result.Expired();
+            if (tokenType == TokenType.AccessToken && manage.IsExpiry()) return result.Expired();
 
-            if (basis.isInvalid) return result.Disabled();
+            if (manage.isInvalid) return result.Disabled();
 
-            if (basis.TenantIsExpiry()) return result.TenantIsExpiry();
+            if (manage.TenantIsExpiry()) return result.TenantIsExpiry();
 
-            if (!basis.VerifyToken(hash, secret, tokenType)) return result.InvalidAuth();
+            if (!manage.Verify(hash, secret, tokenType)) return result.InvalidAuth();
 
             if (tokenType == TokenType.RefreshToken) result.Success();
-            else result.Success(Util.ConvertTo<Session>(basis));
+            else result.Success(Util.ConvertTo<Session>(manage));
 
             // 如key为空，立即返回；否则进行鉴权
             if (string.IsNullOrEmpty(key)) return result;
 
-            return basis.VerifyKeyInCache(key) ? result : result.Forbidden();
+            return manage.VerifyKeyInCache(key) ? result : result.Forbidden();
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.ServiceProcess;
-using Insight.Utils.Common;
 using Insight.WCF;
 
 namespace Insight.Base.Server
@@ -22,7 +21,7 @@ namespace Insight.Base.Server
         /// <param name="args"></param>
         protected override void OnStart(string[] args)
         {
-            _Services.CreateHosts(Util.GetAppSetting("Address"), Util.GetAppSetting("AllowOrigin"));
+            _Services.CreateHosts();
             _Services.StartService();
         }
 

@@ -1,4 +1,5 @@
-﻿using System.ServiceModel;
+﻿using System.Collections.Generic;
+using System.ServiceModel;
 using System.ServiceModel.Web;
 using Insight.Base.Common.Entity;
 using Insight.Utils.Entity;
@@ -24,7 +25,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "tenants?rows={rows}&page={page}&key={key}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetAllTenants(int rows, int page, string key);
+        Result<object> GetTenants(int rows, int page, string key);
 
         /// <summary>
         /// 获取指定ID的租户
@@ -47,11 +48,22 @@ namespace Insight.Base.Services
         /// <summary>
         /// 修改租户信息
         /// </summary>
+        /// <param name="id">租户ID</param>
         /// <param name="tenant">租户实体数据</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "tenants", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "tenants/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> EditTenant(Tenant tenant);
+        Result<object> EditTenant(string id, Tenant tenant);
+
+        /// <summary>
+        /// 延长有效天数
+        /// </summary>
+        /// <param name="id">租户ID</param>
+        /// <param name="expire">续租天数</param>
+        /// <returns>Result</returns>
+        [WebInvoke(Method = "PUT", UriTemplate = "tenants/{id}/expire", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [OperationContract]
+        Result<object> ExtendTenant(string id, int expire);
 
         /// <summary>
         /// 删除指定ID的租户
@@ -61,5 +73,34 @@ namespace Insight.Base.Services
         [WebInvoke(Method = "DELETE", UriTemplate = "tenants/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> DeleteTenant(string id);
+
+        /// <summary>
+        /// 为租户绑定应用
+        /// </summary>
+        /// <param name="id">租户ID</param>
+        /// <param name="apps">绑定应用ID集合</param>
+        /// <returns>Result</returns>
+        [WebInvoke(Method = "PUT", UriTemplate = "tenants/{id}/apps", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [OperationContract]
+        Result<object> BindApp(string id, List<string> apps);
+
+        /// <summary>
+        /// 为租户关联用户
+        /// </summary>
+        /// <param name="id">租户ID</param>
+        /// <param name="tenant">租户-用户关系实体数据</param>
+        /// <returns>Result</returns>
+        [WebInvoke(Method = "POST", UriTemplate = "tenants/{id}/user", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [OperationContract]
+        Result<object> AddTenantUser(string id, TenantUser tenant);
+
+        /// <summary>
+        /// 删除指定ID的租户和用户的绑定关系
+        /// </summary>
+        /// <param name="id">租户-用户关系ID</param>
+        /// <returns>Result</returns>
+        [WebInvoke(Method = "DELETE", UriTemplate = "tenants/user/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [OperationContract]
+        Result<object> DeleteTenantUser(string id);
     }
 }

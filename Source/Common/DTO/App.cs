@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Insight.Base.Common.DTO
 {
-    public class UserDto
+    public class App
     {
         /// <summary>
         /// ID，唯一标识
@@ -11,39 +11,44 @@ namespace Insight.Base.Common.DTO
         public string id { get; set; }
 
         /// <summary>
-        /// 姓名/昵称
+        /// 序号
+        /// </summary>
+        public int index { get; set; }
+
+        /// <summary>
+        /// 应用名称
         /// </summary>
         public string name { get; set; }
 
         /// <summary>
-        /// 登录账号
+        /// 应用别名
         /// </summary>
-        public string account { get; set; }
+        public string alias { get; set; }
 
         /// <summary>
-        /// 手机号
+        /// 域名
         /// </summary>
-        public string mobile { get; set; }
+        public string host { get; set; }
 
         /// <summary>
-        /// 注册邮箱
+        /// 令牌生存周期(小时)
         /// </summary>
-        public string email { get; set; }
+        public int tokenLife { get; set; }
+
+        /// <summary>
+        /// 图标url
+        /// </summary>
+        public string iconurl { get; set; }
+
+        /// <summary>
+        /// 图标
+        /// </summary>
+        public byte[] icon { get; set; }
 
         /// <summary>
         /// 描述
         /// </summary>
         public string remark { get; set; }
-
-        /// <summary>
-        /// 是否预置：0、自定；1、预置
-        /// </summary>
-        public bool isBuiltin { get; set; }
-
-        /// <summary>
-        /// 是否失效：0、有效；1、失效
-        /// </summary>
-        public bool isInvalid { get; set; }
 
         /// <summary>
         /// 创建人ID
@@ -56,13 +61,8 @@ namespace Insight.Base.Common.DTO
         public DateTime createTime { get; set; }
 
         /// <summary>
-        /// 授予用户的功能权限
+        /// 导航
         /// </summary>
-        public List<AppTree> funcs { get; set; }
-
-        /// <summary>
-        /// 授予用户的数据权限
-        /// </summary>
-        public List<AppTree> datas { get; set; }
+        public List<AppTree> navs { get; set; }
     }
 }

@@ -58,8 +58,8 @@ namespace Insight.Base.OAuth
                 RedisHelper.StringSet(key, userId);
             }
 
-            var token = new Token(user);
-            SetTokenCache(token);
+            var token = new TokenManage(user);
+            SetUserCache(token);
             mutex.ReleaseMutex();
 
             return userId;
@@ -72,7 +72,7 @@ namespace Insight.Base.OAuth
         /// <param name="account">登录账号</param>
         /// <param name="type">登录类型(0:密码登录、1:验证码登录)</param>
         /// <returns>Code</returns>
-        public static string GenerateCode(Token token, string account, int type)
+        public static string GenerateCode(TokenManage token, string account, int type)
         {
             string key;
             var life = 5;
@@ -169,15 +169,15 @@ namespace Insight.Base.OAuth
         }
 
         /// <summary>
-        /// 根据用户ID获取Token缓存中的Token
+        /// 根据用户ID获取缓存中的用户数据
         /// </summary>
         /// <param name="userId">用户ID</param>
         /// <returns>Token(可能为null)</returns>
-        public static Token GetToken(string userId)
+        public static TokenManage GetUserCache(string userId)
         {
-            var key = "Token:" + userId;
+            var key = $"User:{userId}";
             var json = RedisHelper.StringGet(key);
-            return string.IsNullOrEmpty(json) ? null : Util.Deserialize<Token>(json);
+            return string.IsNullOrEmpty(json) ? null : Util.Deserialize<TokenManage>(json);
         }
 
         /// <summary>
@@ -196,16 +196,15 @@ namespace Insight.Base.OAuth
         }
 
         /// <summary>
-        /// 保存Token数据到缓存
+        /// 保存用户数据到缓存
         /// </summary>
         /// <param name="token">Token</param>
-        public static void SetTokenCache(Token token)
+        public static void SetUserCache(TokenManage token)
         {
             if (!token.IsChanged()) return;
 
-            var key = "Token:" + token.userId;
-            var json = Util.Serialize(token);
-            RedisHelper.StringSet(key, json);
+            var key = $"User:{token.userId}";
+            RedisHelper.StringSet(key, token);
         }
 
         /// <summary>
@@ -321,7 +320,7 @@ namespace Insight.Base.OAuth
                         index = n.index,
                         name = n.name,
                         alias = n.alias,
-                        filePath = n.filePath,
+                        url = n.url,
                         icon = n.icon,
                         isDefault = n.isDefault
                     };

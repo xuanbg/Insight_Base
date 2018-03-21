@@ -18,7 +18,7 @@ namespace Insight.Base.Common.Entity
         public string parentId { get; set; }
 
         /// <summary>
-        /// 上级分类ID
+        /// 业务模块ID
         /// </summary>
         [Column("module_id")]
         public string moduleId { get; set; }
@@ -82,6 +82,41 @@ namespace Insight.Base.Common.Entity
         /// </summary>
         [Column("created_time")]
         public DateTime createTime { get; set; }
+    }
+
+    [Table("ibd_region")]
+    public class Region
+    {
+        /// <summary>
+        /// ID，唯一标识
+        /// </summary>
+        public string id { get; set; }
+
+        /// <summary>
+        /// 上级区划ID
+        /// </summary>
+        [Column("parent_id")]
+        public string parentId { get; set; }
+
+        /// <summary>
+        /// 级别
+        /// </summary>
+        public int grade { get; set; }
+
+        /// <summary>
+        /// 编码
+        /// </summary>
+        public string code { get; set; }
+
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string name { get; set; }
+
+        /// <summary>
+        /// 别名/简称
+        /// </summary>
+        public string alias { get; set; }
     }
 
     [Table("ibd_image")]

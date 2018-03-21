@@ -30,6 +30,8 @@ namespace Insight.Base.Services
         {
             if (!Verify("newRole")) return result;
 
+            if (info == null) return result.BadRequest();
+
             var role = InitRole(info);
             if (Existed(role)) return result.DataAlreadyExists();
 
@@ -60,6 +62,8 @@ namespace Insight.Base.Services
         public Result<object> EditRole(string id, RoleInfo info)
         {
             if (!Verify("editRole")) return result;
+
+            if (info == null) return result.BadRequest();
 
             var data = GetData(info.id);
             if (data == null) return result.NotFound();
@@ -293,7 +297,7 @@ namespace Insight.Base.Services
                     join r in context.tenantApps on a.id equals r.appId
                     where r.tenantId == tenantId && (string.IsNullOrEmpty(aid) || a.id == aid)
                     orderby a.createTime
-                    select new AppTree {id = a.id, index = a.createTime.Ticks, name = a.alias};
+                    select new AppTree {id = a.id, index = a.index, name = a.alias};
                 role.funcs.AddRange(apps);
 
                 var groups = from n in navList

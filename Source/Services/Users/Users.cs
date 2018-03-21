@@ -30,6 +30,8 @@ namespace Insight.Base.Services
         {
             if (!Verify("newUser")) return result;
 
+            if (user == null) return result.BadRequest();
+
             if (Core.IsExisted(user)) return result.AccountExists();
 
             user.id = Util.NewId();
@@ -75,6 +77,8 @@ namespace Insight.Base.Services
         {
             if (!Verify("editUser")) return result;
 
+            if (user == null) return result.BadRequest();
+
             var data = Core.GetUserById(user.id);
             if (data == null) return result.NotFound();
 
@@ -85,7 +89,7 @@ namespace Insight.Base.Services
             data.remark = user.remark;
             if (!DbHelper.Update(data)) return result.DataBaseError();
 
-            var session = Core.GetToken(user.id);
+            var session = Core.GetUserCache(user.id);
             if (session == null) return result;
 
             session.userName = user.name;
@@ -93,7 +97,7 @@ namespace Insight.Base.Services
             session.mobile = user.mobile;
             session.email = user.email;
             session.SetChanged();
-            Core.SetTokenCache(session);
+            Core.SetUserCache(session);
 
             return result;
         }
@@ -125,7 +129,7 @@ namespace Insight.Base.Services
             var data = Core.GetUserById(id);
             if (data == null) return result.NotFound();
 
-            var user = new UserInfo {funcs = Core.GetPermitAppTree(tenantId, id), datas = new List<AppTree>()};
+            var user = new UserDto {funcs = Core.GetPermitAppTree(tenantId, id), datas = new List<AppTree>()};
 
             return result.Success(user);
         }
@@ -181,6 +185,8 @@ namespace Insight.Base.Services
         {
             if (!Verify()) return result;
 
+            if (user == null) return result.BadRequest();
+
             if (!Core.VerifySmsCode(1, user.mobile, code)) return result.SMSCodeError();
 
             if (Core.IsExisted(user)) return result.AccountExists();
@@ -190,9 +196,9 @@ namespace Insight.Base.Services
             user.createTime = DateTime.Now;
             if (!DbHelper.Insert(user)) return result.DataBaseError();
 
-            var session = Core.GetToken(user.id);
-            var tokens = session.CreatorKey(Util.NewId("N"), aid);
-            Core.SetTokenCache(session);
+            var session = Core.GetUserCache(user.id);
+            var tokens = session.Creator(Util.NewId("N"), aid);
+            Core.SetUserCache(session);
 
             return result.Created(tokens);
         }
@@ -215,12 +221,12 @@ namespace Insight.Base.Services
             user.password = password;
             if (!DbHelper.Update(user)) return result.DataBaseError();
 
-            var session = Core.GetToken(id);
+            var session = Core.GetUserCache(id);
             if (session == null) return result;
 
             session.password = password;
             session.SetChanged();
-            Core.SetTokenCache(session);
+            Core.SetUserCache(session);
 
             return result;
         }
@@ -242,17 +248,17 @@ namespace Insight.Base.Services
             userId = Core.GetUserId(account);
             if (userId == null) return result.NotFound();
 
-            token = Core.GetToken(userId);
-            if (token.password != password)
+            manage = Core.GetUserCache(userId);
+            if (manage.password != password)
             {
                 var user = Core.GetUserById(userId);
                 user.password = password;
                 if (!DbHelper.Update(user)) return result.DataBaseError();
             }
 
-            token.password = password;
-            var tokens = token.CreatorKey(Util.NewId("N"), aid);
-            Core.SetTokenCache(token);
+            manage.password = password;
+            var tokens = manage.Creator(Util.NewId("N"), aid);
+            Core.SetUserCache(manage);
 
             return result.Created(tokens);
         }
@@ -274,18 +280,32 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> GetLoginDepts(string account)
         {
-            if (!Verify()) return result;
-
             using (var context = new Entities())
             {
                 var user = context.users.SingleOrDefault(u => u.account == account || u.mobile == account || u.email == account);
                 if (user == null) return result.NotFound();
 
-                var list = from m in context.orgMembers.Where(m => m.userId == user.id)
-                    join t in context.organizations on m.orgId equals t.id
-                    join d in context.organizations on t.parentId equals d.id
-                    select new { d.id, Name = d.fullname, Description = d.code };
-                return list.Any() ? result.Success(list.ToList()) : result.NoContent(new List<object>());
+                var list = new List<Organization>();
+                var orgs = (from o in context.organizations
+                    join r in context.tenantUsers on o.tenantId equals r.tenantId
+                    where r.userId == user.id
+                    select o).ToList();
+                var ids = context.orgMembers.Where(m => m.userId == user.id).Select(i => i.orgId).ToList();
+                list.AddRange(orgs.Where(i => i.id == i.tenantId));
+                foreach (var id in ids)
+                {
+                    var org = orgs.Single(i => i.id == id);
+                    while (org.parentId != null)
+                    {
+                        org = orgs.Single(i => i.id == org.parentId);
+                        if (list.Any(i => i.id == org.id)) continue;
+
+                        org.remark = org.tenantId;
+                        list.Add(org);
+                    }
+                }
+
+                return result.Success(list);
             }
         }
 
@@ -308,12 +328,12 @@ namespace Insight.Base.Services
             user.isInvalid = invalid;
             if (!DbHelper.Update(user)) return result.DataBaseError();
 
-            var session = Core.GetToken(user.id);
+            var session = Core.GetUserCache(user.id);
             if (session == null) return result;
 
             session.isInvalid = invalid;
             session.SetChanged();
-            Core.SetTokenCache(session);
+            Core.SetUserCache(session);
 
             return result;
         }
@@ -327,7 +347,7 @@ namespace Insight.Base.Services
         {
             if (!Verify()) return result;
 
-            token.DeleteKeys(tokenId);
+            manage.Delete(tokenId);
             return result;
         }
 

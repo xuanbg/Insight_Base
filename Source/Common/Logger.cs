@@ -26,7 +26,7 @@ namespace Insight.Base.Common
             if (string.IsNullOrEmpty(code) || !Regex.IsMatch(code, @"^\d{6}$")) return null;
 
             var level = Convert.ToInt32(code.Substring(0, 1));
-            var rule = Params.Rules.SingleOrDefault(r => r.code == code);
+            var rule = Params.rules.SingleOrDefault(r => r.code == code);
             if (level > 1 && level < 7 && rule == null) return null;
 
             var log = new Log
@@ -66,7 +66,7 @@ namespace Insight.Base.Common
         /// <returns>bool 是否写入成功</returns>
         private static bool WriteToFile(Log log)
         {
-            Params.Mutex.WaitOne();
+            Params.mutex.WaitOne();
             var path = $"{Util.GetAppSetting("LogLocal")}\\{GetLevelName(log.level)}\\";
             if (!Directory.Exists(path))
             {
@@ -83,12 +83,12 @@ namespace Insight.Base.Common
                 {
                     stream.Write(buffer, 0, buffer.Length);
                 }
-                Params.Mutex.ReleaseMutex();
+                Params.mutex.ReleaseMutex();
                 return true;
             }
             catch (Exception)
             {
-                Params.Mutex.ReleaseMutex();
+                Params.mutex.ReleaseMutex();
                 return false;
             }
         }

@@ -20,6 +20,11 @@ namespace Insight.Base.Common.Entity
         }
 
         /// <summary>
+        /// 行政区划
+        /// </summary>
+        public virtual DbSet<Region> regions { get; set; }
+
+        /// <summary>
         /// 租户
         /// </summary>
         public virtual DbSet<Tenant> tenants { get; set; }
