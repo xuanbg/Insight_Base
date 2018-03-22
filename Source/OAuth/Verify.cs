@@ -72,10 +72,17 @@ namespace Insight.Base.OAuth
             if (tokenType == TokenType.RefreshToken) result.Success();
             else
             {
-                var session = Util.ConvertTo<Session>(manage);
-                session.tenantId = manage.tenantId;
-                session.deptId = manage.deptId;
-                result.Success(session);
+                var info = new UserInfo
+                {
+                    id = manage.userId,
+                    tenantId = manage.tenantId,
+                    deptId = manage.deptId,
+                    name = manage.userName,
+                    account = manage.account,
+                    mobile = manage.mobile,
+                    email = manage.email
+                };
+                result.Success(info);
             }
 
             // 如key为空，立即返回；否则进行鉴权
