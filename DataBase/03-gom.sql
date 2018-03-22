@@ -1,6 +1,13 @@
 use insight_gom
 go
 
+if exists (select * from sysobjects where id = object_id(N'obd_order_detail') and objectproperty(id, N'isusertable') = 1)
+drop table obd_order_detail
+go
+if exists (select * from sysobjects where id = object_id(N'obd_order') and objectproperty(id, N'isusertable') = 1)
+drop table obd_order
+go
+
 if exists (select * from sysobjects where id = object_id(N'obd_custom') and objectproperty(id, N'isusertable') = 1)
 drop table obd_custom
 go
@@ -11,16 +18,10 @@ if exists (select * from sysobjects where id = object_id(N'obd_goods') and objec
 drop table obd_goods
 go
 
-if exists (select * from sysobjects where id = object_id(N'obd_order_detail') and objectproperty(id, N'isusertable') = 1)
-drop table obd_order_detail
-go
-if exists (select * from sysobjects where id = object_id(N'obd_order') and objectproperty(id, N'isusertable') = 1)
-drop table obd_order
-go
-
 /*****客户表*****/
 create table obd_custom(
 [id]               varchar(36) constraint ix_obd_custom primary key,                                                                       --主键
+[tenant_id]        varchar(36) not null,                                                                                                   --租户ID
 [custom_name]      nvarchar(64) not null,                                                                                                  --名称
 [contact]          nvarchar(16) not null,                                                                                                  --联系人
 [mobile]           varchar(11),                                                                                                            --手机号
@@ -40,6 +41,7 @@ go
 /*****货品表*****/
 create table obd_goods(
 [id]               varchar(36) constraint ix_obd_goods primary key,                                                                        --主键
+[tenant_id]        varchar(36) not null,                                                                                                   --租户ID
 [code]             nvarchar(16) not null,                                                                                                  --编码
 [goods_no]         nvarchar(16) not null,                                                                                                  --货号
 [goods_name]       varchar(32) not null,                                                                                                   --名称
@@ -65,8 +67,9 @@ go
 /*****订单表*****/
 create table obd_order(
 [id]               varchar(36) constraint ix_obd_order primary key,                                                                        --主键
-[order_no]         nvarchar(64) not null,                                                                                                  --订单号
+[tenant_id]        varchar(36) not null,                                                                                                   --租户ID
 [custom_id]        varchar(36) foreign key references obd_custom(id) on delete cascade not null,                                           --客户ID
+[order_no]         nvarchar(64) not null,                                                                                                  --订单号
 [amount]           decimal(18, 2),                                                                                                         --总金额
 [remark]           nvarchar(max),                                                                                                          --描述
 [is_confirm]       bit default 0 not null,                                                                                                 --是否确认：0、未确认；1、已确认
@@ -112,7 +115,7 @@ select 'f5ec671e-03f3-11e8-8bd4-0242ac110006', 'f5ec66d5-03f3-11e8-8bd4-0242ac11
 go
 insert ucs_function([id], [navigator_id], [index], [is_begin], [is_show_text], [alias], [name], [is_visible], [icon])
 select lower(newid()), 'f5ec671e-03f3-11e8-8bd4-0242ac110006', 1, 1, 0, 'getReports', '刷新', 1, 0x89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff6100000027744558745469746c6500526566726573683b5265706561743b426172733b526962626f6e3b52656c6f6164cd4df6e90000037749444154785e65936b4c537718c69f73e885622f4069c9b02da1adb60c2133d471ddd451d8257c022661b3719912a3092163898bdbf8b06422db74612612cde64cdce2a698cc2da20c541c9918645bb701eb3414b99536e08022a597737ade71927e58c693bcffbcf9e5799e2fffbc0c364a64ffe794988de6cf6f55032034567433ef7596ab37e7a85ac0302fb22c1c448020d02f3c47bd8f3c4b9f76bc3314fce44a05ad330844585f80b3bdaf00007bb2cbe9bc70c73533e0f998bcf33f5030fa9b38343eff3df58f1ea7737d0db347cf943a456f44f06085bf87f7bf28054470a2ab72cfe5c143f4c07f999ec4876989fb891e477b6921da438bdc6d5a37d398ef22755edd4bcd271df5626689bb83b74e3920693ab643af516bcfe7659723439b0e6f6008d76f0f60e46f0f44e5db6d28dabe1df9d66750f8f4f3989b0f7c597dc0329026dd153878bc80d8ccec4d2dd9fadc145d8606ee078338fbf5377cffddc10fa7c717ac33138fad3f0f0d1fb976ebc798d7ef86c1900aab292f45a393be0d800dadc520e1e3f4b22e3d13abdc1cdc7f8d61666eaeadefccec31001c44011dca237266f88fb18f5277cb91ae27c438fe2500ef46c25c9ce5b9b84da10462f12798f64d63c5c79d17c3cbdc5d4a7c27ebee5bf86abd18e3c11e90f2112251ce044071e584572e0947f8c8c44a8f54a94843b24c0685542e88414e0893b3deacca2fd6fb08b4492661118afd038a876032ea5587db75cb828065361ce2a67d8100fc2137ac66234c76cd7e00529ddcc9dcbc34115e5e8c746ccbcd455dcd0b880b1c18098fc6fdb5d0e9b4181b9d6d4fb239b45b55aa9462953e0c8d3c0b6bab5462b02942aa34b94ffb540a3b726ffe7e7246ac9e74bf6b92a4045ee0f170e657f47c3735e5bebe788029adde6cde569239ba65475461b66402410ba6bc8b989cf46375758df38e2e952b53e5b6ad858a0bf93ba31075b32b04cff08acbdd1dbc240259952ba7f1607b01b575dbe9db87657463b281067ccd7471701fd535e7f603d0d734d9fbdb6ed8a8f5aa899ead4d1599120083c4935c5663a8af6bd9e26feab4d007d72c74eabe95ceb94be8707b1155bc96e372546595b85af3b8ca43199ca558510440e278550d54bd99932881d468571bca6a0d9fed6c308eecde6ba25daf9be8b93dc63f2bdfb0b4025057ed339f2ea8569e06a0103385752a301bcf1832b11d4052820b006200e2ff615c82e35fc02b8fd5cbc3aeeb0000000049454e44ae426082 union all
-select lower(newid()), 'f5ec671e-03f3-11e8-8bd4-0242ac110006', 2, 1, 1, 'export', '导出', 1, 0x89504E470D0A1A0A0000000D49484452000000100000001008060000001FF3FF610000025E4944415478DA7D934D4C134114C7FFB3DD2EED568227237EC48F78D20B898914116348342612E8D622159583DE0CEA995AE2018D0DE77AF062629416032D5D9BB61449142BA1894DD4709318316AC422010421D5EE8EB30BA5AD2DBE649237F3DEFCE63FF3DE10AC9B1C0ECF6715652B5555D0DCA2EE1170848010326BB7D9B6E11F233927303444590236B3743A8DC4F8B8DF61B7B797050C0683F4AC24E1E3F4A782658A7D7BF7E091CF874BEDEDF83E338357C964BF4392CE970006188005F0F9CB574DEEDA764AB17BD74EF4F9FD38D7DA0A23CFEB4AC62726024CADA318100850260FDFD82939804A55ECD85E8DD7A914DE4F4DB139D59504432130B5A42C209D9EDD006866B158208AE6A2F790E5306CB6E6F2801F73F3D0F61B3803045E00CF1959521E6814398C469FE3E499C6F28085C5455D81C9688647EE41F46D84CDB98D548EF926418058213E89B8E2CE12C0D2D2B29E643189A8751FC6DD8E0E64596FB06ED041942A3AC033F01451779C940056565675F9152601D6AE2370B735A3A9C68D8789EB884FDE83EFAA82C8BBDBF0861318EE1E29056432191DC01B79D475D5E28654CFCA21C069F5E041A213971BBCE84B5EC3E3D129062854B0DE070A93AB5D418B1C75D5E14AD321BC997E86BAFD6DB860EDD573EF272E421E9B43AC7B380F088442D4DED25254AE6337EBE13C5D8DCE86C1A2756F4242ECE56FF606D13C6048967FAAAA5AA9358BF67944DE82DED41D48A7AAF02BB30C45C9B2C6A6FAF52ACD5518799145D81529E818A0860D43E1498DB78EF78BC2960394127DF35ADD593D3882ECEA9FB1584FFC04C1FFED201BE64D620B6C7CF80B5646F91102DC928E0000000049454E44AE426082
+select lower(newid()), 'f5ec671e-03f3-11e8-8bd4-0242ac110006', 2, 1, 1, 'Export', '导出', 1, 0x89504E470D0A1A0A0000000D49484452000000100000001008060000001FF3FF610000025E4944415478DA7D934D4C134114C7FFB3DD2EED568227237EC48F78D20B898914116348342612E8D622159583DE0CEA995AE2018D0DE77AF062629416032D5D9BB61449142BA1894DD4709318316AC422010421D5EE8EB30BA5AD2DBE649237F3DEFCE63FF3DE10AC9B1C0ECF6715652B5555D0DCA2EE1170848010326BB7D9B6E11F233927303444590236B3743A8DC4F8B8DF61B7B797050C0683F4AC24E1E3F4A782658A7D7BF7E091CF874BEDEDF83E338357C964BF4392CE970006188005F0F9CB574DEEDA764AB17BD74EF4F9FD38D7DA0A23CFEB4AC62726024CADA318100850260FDFD82939804A55ECD85E8DD7A914DE4F4DB139D59504432130B5A42C209D9EDD006866B158208AE6A2F790E5306CB6E6F2801F73F3D0F61B3803045E00CF1959521E6814398C469FE3E499C6F28085C5455D81C9688647EE41F46D84CDB98D548EF926418058213E89B8E2CE12C0D2D2B29E643189A8751FC6DD8E0E64596FB06ED041942A3AC033F01451779C940056565675F9152601D6AE2370B735A3A9C68D8789EB884FDE83EFAA82C8BBDBF0861318EE1E29056432191DC01B79D475D5E28654CFCA21C069F5E041A213971BBCE84B5EC3E3D129062854B0DE070A93AB5D418B1C75D5E14AD321BC997E86BAFD6DB860EDD573EF272E421E9B43AC7B380F088442D4DED25254AE6337EBE13C5D8DCE86C1A2756F4242ECE56FF606D13C6048967FAAAA5AA9358BF67944DE82DED41D48A7AAF02BB30C45C9B2C6A6FAF52ACD5518799145D81529E818A0860D43E1498DB78EF78BC2960394127DF35ADD593D3882ECEA9FB1584FFC04C1FFED201BE64D620B6C7CF80B5646F91102DC928E0000000049454E44AE426082
 go
 
 /*****订单管理*****/
