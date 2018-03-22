@@ -224,7 +224,7 @@ namespace Insight.Base.Services
                 var list = from o in context.organizations
                     join r in context.roleMembers.Where(i => i.roleId == id && i.memberType == 3) on o.id equals r.memberId into temp
                     from t in temp.DefaultIfEmpty()
-                    where t == null
+                    where o.tenantId == tenantId && t == null
                     orderby o.index
                     select new {o.id, o.parentId, o.index, o.nodeType, o.name};
                 return list.Any() ? result.Success(list.ToList()) : result.NoContent(new List<object>());
@@ -243,11 +243,10 @@ namespace Insight.Base.Services
             using (var context = new Entities())
             {
                 var list = from g in context.groups
-                    join r in context.roleMembers.Where(r => r.roleId == id && r.memberType == 2) on g.id equals r
-                        .memberId
+                    join r in context.roleMembers.Where(r => r.roleId == id && r.memberType == 2) on g.id equals r.memberId
                     into temp
                     from t in temp.DefaultIfEmpty()
-                    where t == null
+                    where g.tenantId == tenantId && t == null
                     orderby g.createTime
                     select new {g.id, g.name, g.remark};
                 return list.Any() ? result.Success(list.ToList()) : result.NoContent(new List<object>());
@@ -266,11 +265,11 @@ namespace Insight.Base.Services
             using (var context = new Entities())
             {
                 var list = from u in context.users
-                    join r in context.roleMembers.Where(r => r.roleId == id && r.memberType == 1) on u.id equals r
-                        .memberId
+                    join r in context.tenantUsers on u.id equals r.userId
+                    join m in context.roleMembers.Where(i => i.roleId == id && i.memberType == 1) on u.id equals m.memberId
                     into temp
                     from t in temp.DefaultIfEmpty()
-                    where !u.isInvalid && t == null
+                    where r.tenantId == tenantId && !u.isInvalid && t == null
                     orderby u.createTime
                     select new {u.id, u.name, u.account, u.remark};
                 return list.Any() ? result.Success(list.ToList()) : result.NoContent(new List<object>());
