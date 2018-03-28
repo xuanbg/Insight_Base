@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Insight.Base.Common.Entity
 {
     [Table("ibd_category")]
-    public class Category
+    public class Catalog
     {
         /// <summary>
         /// ID，唯一标识
@@ -16,6 +16,12 @@ namespace Insight.Base.Common.Entity
         /// </summary>
         [Column("parent_id")]
         public string parentId { get; set; }
+
+        /// <summary>
+        /// 租户ID
+        /// </summary>
+        [Column("tenant_id")]
+        public string tenantId { get; set; }
 
         /// <summary>
         /// 业务模块ID
@@ -128,6 +134,12 @@ namespace Insight.Base.Common.Entity
         public string id { get; set; }
 
         /// <summary>
+        /// 租户ID
+        /// </summary>
+        [Column("tenant_id")]
+        public string tenantId { get; set; }
+
+        /// <summary>
         /// 分类ID
         /// </summary>
         [Column("category_id")]
@@ -222,6 +234,12 @@ namespace Insight.Base.Common.Entity
         /// ID，唯一标识
         /// </summary>
         public string id { get; set; }
+
+        /// <summary>
+        /// 租户ID
+        /// </summary>
+        [Column("tenant_id")]
+        public string tenantId { get; set; }
 
         /// <summary>
         /// 模块ID

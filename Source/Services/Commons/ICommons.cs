@@ -27,7 +27,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">模块ID</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "modules/{id}/functions", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "navigations/{id}/functions", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         Result<object> GetFunctions(string id);
 
@@ -36,7 +36,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id"></param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "modules/{id}/params", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "navigations/{id}/params", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         Result<object> GetModuleParam(string id);
 
@@ -45,7 +45,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">模块ID</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "modules/{id}/params/user", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "navigations/{id}/params/user", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         Result<object> GetModuleUserParam(string id);
 
@@ -54,7 +54,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">模块ID</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "modules/{id}/params/dept", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "navigations/{id}/params/dept", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         Result<object> GetModuleDeptParam(string id);
 
