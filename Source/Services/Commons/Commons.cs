@@ -11,7 +11,7 @@ using Insight.Utils.Entity;
 namespace Insight.Base.Services
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
-    public partial class Commons : ServiceBase, ICommons
+    public class Commons : ServiceBase, ICommons
     {
         /// <summary>
         /// 为跨域请求设置响应头信息

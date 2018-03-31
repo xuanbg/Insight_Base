@@ -2,6 +2,7 @@
 using System.ServiceModel.Web;
 using Insight.Base.Common.Entity;
 using Insight.Utils.Entity;
+using Function = Insight.Base.Common.Entity.Function;
 
 namespace Insight.Base.Services
 {

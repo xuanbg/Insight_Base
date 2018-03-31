@@ -4,11 +4,11 @@ using System.Runtime.InteropServices;
 // 有关程序集的一般信息由以下
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("Base Common")]
-[assembly: AssemblyDescription("基础公共库")]
+[assembly: AssemblyTitle("Reports Service")]
+[assembly: AssemblyDescription("报表服务库")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Insight Software Ltd.")]
-[assembly: AssemblyProduct("Insight Base Service")]
+[assembly: AssemblyProduct("WCF Service")]
 [assembly: AssemblyCopyright("Copyright © 2014 Insight Software Ltd.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -19,7 +19,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // 如果此项目向 COM 公开，则下列 GUID 用于类型库的 ID
-[assembly: Guid("c4f26dd1-de5a-4773-a789-7823e96ea166")]
+[assembly: Guid("6e25d308-bb66-45d7-8283-9d86ccb83962")]
 
 // 程序集的版本信息由下列四个值组成: 
 //
@@ -32,4 +32,4 @@ using System.Runtime.InteropServices;
 // 方法是按如下所示使用“*”: :
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.*")]
-//[assembly: AssemblyFileVersion("14.1.0622.12")]
+//[assembly: AssemblyFileVersion("1.0.0.0")]

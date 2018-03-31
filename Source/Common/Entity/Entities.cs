@@ -132,7 +132,7 @@ namespace Insight.Base.Common.Entity
         /// <summary>
         /// 分类
         /// </summary>
-        public virtual DbSet<Category> categories { get; set; }
+        public virtual DbSet<Catalog> categories { get; set; }
 
         /// <summary>
         /// 电子影像
@@ -143,5 +143,45 @@ namespace Insight.Base.Common.Entity
         /// 模块选项
         /// </summary>
         public virtual DbSet<ModuleParam> moduleParams { get; set; }
+
+        /// <summary>
+        /// 报表模板
+        /// </summary>
+        public virtual DbSet<Template> templates { get; set; }
+
+        /// <summary>
+        /// 分期规则
+        /// </summary>
+        public virtual DbSet<Rule> rules { get; set; }
+
+        /// <summary>
+        /// 报表定义
+        /// </summary>
+        public virtual DbSet<Definition> definitions { get; set; }
+
+        /// <summary>
+        /// 报表分期
+        /// </summary>
+        public virtual DbSet<Period> periods { get; set; }
+
+        /// <summary>
+        /// 会计主体
+        /// </summary>
+        public virtual DbSet<Entity> entitySet { get; set; }
+
+        /// <summary>
+        /// 主体成员
+        /// </summary>
+        public virtual DbSet<EntityMember> entityMembers { get; set; }
+
+        /// <summary>
+        /// 报表实例
+        /// </summary>
+        public virtual DbSet<Instance> instances { get; set; }
+
+        /// <summary>
+        /// 实例用户
+        /// </summary>
+        public virtual DbSet<InstancUser> instancUsers { get; set; }
     }
 }

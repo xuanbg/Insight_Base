@@ -8,6 +8,7 @@ using Insight.Base.Common.Entity;
 using Insight.Base.OAuth;
 using Insight.Utils.Common;
 using Insight.Utils.Entity;
+using Function = Insight.Base.Common.Entity.Function;
 
 namespace Insight.Base.Services
 {

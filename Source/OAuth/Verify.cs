@@ -70,7 +70,20 @@ namespace Insight.Base.OAuth
             if (!manage.Verify(hash, secret, tokenType)) return result.InvalidAuth();
 
             if (tokenType == TokenType.RefreshToken) result.Success();
-            else result.Success(Util.ConvertTo<Session>(manage));
+            else
+            {
+                var info = new UserInfo
+                {
+                    id = manage.userId,
+                    tenantId = manage.tenantId,
+                    deptId = manage.deptId,
+                    name = manage.userName,
+                    account = manage.account,
+                    mobile = manage.mobile,
+                    email = manage.email
+                };
+                result.Success(info);
+            }
 
             // 如key为空，立即返回；否则进行鉴权
             if (string.IsNullOrEmpty(key)) return result;

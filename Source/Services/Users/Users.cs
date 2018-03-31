@@ -211,7 +211,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> UpdateSignature(string id, string password)
         {
-            if (!Verify("reset", id)) return result;
+            if (!Verify("resetPassword", id)) return result;
 
             var user = Core.GetUserById(id);
             if (user == null) return result.NotFound();
@@ -317,7 +317,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> SetUserStatus(string id, bool invalid)
         {
-            var action = invalid ? "banned" : "release";
+            var action = invalid ? "bannedUser" : "releaseUser";
             if (!Verify(action)) return result;
 
             var user = Core.GetUserById(id);
