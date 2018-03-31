@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.ServiceModel;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
@@ -24,11 +25,20 @@ namespace Insight.Base.Services
         /// <param name="rows">每页行数</param>
         /// <param name="page">当前页</param>
         /// <returns>Result</returns>
-        public Result<object> GetRules(string rows, string page)
+        public Result<object> GetRules(int rows, int page)
         {
-            if (!Verify("17cb33e9-e9d4-4f22-824c-55cf627cd42a")) return result;
+            if (!Verify("getRules")) return result;
 
-            return null;
+            if (page < 1 || rows > 100) return result.BadRequest();
+
+            var skip = rows * (page - 1);
+            using (var context = new Entities())
+            {
+                var list = context.rules.Where(i => !i.isInvalid && (i.tenantId == null || i.tenantId == tenantId));
+                var rules = list.OrderBy(i => i.createTime).Skip(skip).Take(rows).ToList();
+
+                return result.Success(rules, list.Count());
+            }
         }
 
         /// <summary>
@@ -38,9 +48,11 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> GetRule(string id)
         {
-            if (!Verify("17cb33e9-e9d4-4f22-824c-55cf627cd42a")) return result;
+            if (!Verify("getRules")) return result;
 
-            return null;
+            var data = DbHelper.Find<Rule>(id);
+
+            return data == null ? result.NotFound() : result.Success(data);
         }
 
         /// <summary>
@@ -50,9 +62,18 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> AddRule(Rule rule)
         {
-            if (!Verify("49ca6a0f-00f8-40f8-aca4-4879cac9eb50")) return result;
+            if (!Verify("newRule")) return result;
 
-            return null;
+            rule.id = Util.NewId();
+            rule.tenantId = tenantId;
+            rule.isBuiltin = false;
+            rule.isInvalid = false;
+            rule.creatorDeptId = deptId;
+            rule.creator = userName;
+            rule.creatorId = userId;
+            rule.createTime = DateTime.Now;
+
+            return DbHelper.Insert(rule) ? result.Created(rule) : result.DataBaseError();
         }
 
         /// <summary>
@@ -63,9 +84,20 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> EditRule(string id, Rule rule)
         {
-            if (!Verify("37a8b851-4a97-4223-902f-2c08c737ba06")) return result;
+            if (!Verify("editRule")) return result;
 
-            return null;
+            var data = DbHelper.Find<Rule>(id);
+            if (data == null) return result.NotFound();
+
+            if (data.isBuiltin) return result.NotBeModified();
+
+            data.cycleType = rule.cycleType;
+            data.name = rule.name;
+            data.cycle = rule.cycle;
+            data.startTime = rule.startTime;
+            data.remark = rule.remark;
+
+            return DbHelper.Update(data) ? result.Success() : result.DataBaseError();
         }
 
         /// <summary>
@@ -75,9 +107,16 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> DeleteRule(string id)
         {
-            if (!Verify("e4790841-7893-4b28-8d48-aa3f06a42675")) return result;
+            if (!Verify("deleteRule")) return result;
 
-            return null;
+            var data = DbHelper.Find<Rule>(id);
+            if (data == null) return result.NotFound();
+
+            if (data.isBuiltin) return result.NotBeDeleted();
+
+            data.isInvalid = true;
+
+            return DbHelper.Update(data) ? result.Success() : result.DataBaseError();
         }
     }
 }

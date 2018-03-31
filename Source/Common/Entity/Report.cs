@@ -7,7 +7,7 @@ namespace Insight.Base.Common.Entity
     /// <summary>
     /// 分期规则
     /// </summary>
-    [Table("ibr_rules")]
+    [Table("ibr_rule")]
     public class Rule
     {
         /// <summary>
@@ -53,6 +53,12 @@ namespace Insight.Base.Common.Entity
         /// </summary>
         [Column("is_builtin")]
         public bool isBuiltin { get; set; }
+
+        /// <summary>
+        /// 是否失效：0、有效；1、失效
+        /// </summary>
+        [Column("is_invalid")]
+        public bool isInvalid { get; set; }
 
         /// <summary>
         /// 创建部门ID

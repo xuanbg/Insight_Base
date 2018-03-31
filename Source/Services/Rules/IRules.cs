@@ -23,7 +23,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "rules?rows={rows}&page={page}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetRules(string rows, string page);
+        Result<object> GetRules(int rows, int page);
 
         /// <summary>
         /// 获取报表分期

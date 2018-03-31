@@ -43,9 +43,12 @@ namespace Insight.Base.Services
             if (!Verify("newTempletCatalog")) return result;
 
             catalog.tenantId = tenantId;
+            catalog.creatorDeptId = deptId;
+            catalog.creator = userName;
+            catalog.creatorId = userId;
             if (CatalogHelper.Existed(catalog)) return result.DataAlreadyExists();
 
-            return CatalogHelper.Add(catalog) ? result : result.DataBaseError();
+            return CatalogHelper.Add(catalog) ? result.Success(catalog) : result.DataBaseError();
         }
 
         /// <summary>
@@ -56,12 +59,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> EditCategory(string id, Catalog catalog)
         {
-            if (!Verify("editTempletCatalog")) return result;
-
-            var data = DbHelper.Find<Catalog>(id);
-            if (data == null) return result.NotFound();
-
-            return CatalogHelper.Edit(data, catalog) ? result : result.DataBaseError();
+            return Verify("editTempletCatalog") ? CatalogHelper.Edit(id, catalog) : result;
         }
 
         /// <summary>
@@ -71,9 +69,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> DeleteCategory(string id)
         {
-            if (!Verify("deleteTempletCatalog")) return result;
-
-            return CatalogHelper.Delete(id) ? result : result.DataBaseError();
+            return Verify("deleteTempletCatalog") ? CatalogHelper.Delete(id) : result;
         }
 
         /// <summary>

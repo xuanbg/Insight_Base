@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Insight.Base.Common.Entity;
 using Insight.Utils.Common;
+using Insight.Utils.Entity;
 
 namespace Insight.Base.Common
 {
@@ -41,6 +42,17 @@ namespace Insight.Base.Common
         /// <returns>bool 是否成功</returns>
         public static bool Add(Catalog catalog)
         {
+            using (var context = new Entities())
+            {
+                var list = context.categories.Where(i => i.parentId == catalog.parentId && i.index >= catalog.index);
+                foreach (var item in list)
+                {
+                    item.index++;
+                }
+
+                context.SaveChanges();
+            }
+
             catalog.id = Util.NewId();
             catalog.isBuiltin = false;
             catalog.isInvalid = false;
@@ -52,19 +64,24 @@ namespace Insight.Base.Common
         /// <summary>
         /// 编辑分类
         /// </summary>
-        /// <param name="data">分类实体</param>
+        /// <param name="id">分类ID</param>
         /// <param name="catalog">分类对象实体</param>
         /// <returns>bool 是否成功</returns>
-        public static bool Edit(Catalog data, Catalog catalog)
+        public static Result<object> Edit(string id, Catalog catalog)
         {
+            var result = new Result<object>();
+            var data = DbHelper.Find<Catalog>(id);
+            if (data == null) return result.NotFound();
+
+            UpdateIndex(data, catalog);
+
             data.parentId = catalog.parentId;
             data.index = catalog.index;
             data.code = catalog.code;
             data.name = catalog.name;
             data.alias = catalog.alias;
             data.remark = catalog.remark;
-
-            return DbHelper.Update(data);
+            return DbHelper.Update(data) ? result.Success() : result.DataBaseError();
         }
 
         /// <summary>
@@ -72,14 +89,29 @@ namespace Insight.Base.Common
         /// </summary>
         /// <param name="id">分类ID</param>
         /// <returns>bool 是否成功</returns>
-        public static bool Delete(string id)
+        public static Result<object> Delete(string id)
         {
+            var result = new Result<object>();
             var data = DbHelper.Find<Catalog>(id);
-            if (data == null) return false;
+            if (data == null) return result.NotFound();
 
-            data.isInvalid = true;
+            using (var context = new Entities())
+            {
+                if (context.categories.Any(i => i.parentId == id))
+                {
+                    return result.BadRequest("请先删除下级分类");
+                }
 
-            return DbHelper.Update(data);
+                var list = context.categories.Where(i => i.parentId == data.parentId && i.index > data.index);
+                foreach (var item in list)
+                {
+                    item.index--;
+                }
+
+                context.SaveChanges();
+            }
+
+            return DbHelper.Delete(data) ? result.Success() : result.DataBaseError();
         }
 
         /// <summary>
@@ -93,7 +125,54 @@ namespace Insight.Base.Common
             {
                 return context.categories.Any(i => i.id != catalog.id && i.tenantId == catalog.tenantId &&
                                                    i.moduleId == catalog.moduleId && i.parentId == catalog.parentId &&
-                                                   (i.code == catalog.code || i.name == catalog.name));
+                                                   (!string.IsNullOrEmpty(catalog.code) && i.code == catalog.code || i.name == catalog.name));
+            }
+        }
+
+        /// <summary>
+        /// 自动调整相关分类下其他分类的索引值
+        /// </summary>
+        /// <param name="old"></param>
+        /// <param name="cat"></param>
+        private static void UpdateIndex(Catalog old, Catalog cat)
+        {
+            using (var context = new Entities())
+            {
+                if (cat.parentId == old.parentId)
+                {
+                    if (cat.index < old.index)
+                    {
+                        var list = context.categories.Where(i => i.index >= cat.index && i.index < old.index);
+                        foreach (var item in list)
+                        {
+                            item.index++;
+                        }
+                    }
+                    else if(cat.index > old.index)
+                    {
+                        var list = context.categories.Where(i => i.index > old.index && i.index <= cat.index);
+                        foreach (var item in list)
+                        {
+                            item.index--;
+                        }
+                    }
+                }
+                else
+                {
+                    var oldList = context.categories.Where(i => i.parentId == old.parentId && i.index >= old.index);
+                    foreach (var item in oldList)
+                    {
+                        item.index--;
+                    }
+
+                    var newList = context.categories.Where(i => i.parentId == cat.parentId && i.index >= cat.index);
+                    foreach (var item in newList)
+                    {
+                        item.index++;
+                    }
+                }
+
+                context.SaveChanges();
             }
         }
     }
