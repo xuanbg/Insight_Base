@@ -24,8 +24,8 @@ go
 if exists (select * from sysobjects where id = object_id('ibr_templates') and objectproperty(id, 'isusertable') = 1)
 drop table ibr_templates
 go
-if exists (select * from sysobjects where id = object_id('ibr_rules') and objectproperty(id, 'isusertable') = 1)
-drop table ibr_rules
+if exists (select * from sysobjects where id = object_id('ibr_rule') and objectproperty(id, 'isusertable') = 1)
+drop table ibr_rule
 go
 
 if exists (select * from sysobjects where id = object_id(N'ibd_param') and objectproperty(id, N'isusertable') = 1)
@@ -123,11 +123,11 @@ go
 /*****报表数据表*****/
 
 /*****分期规则表*****/
-create table ibr_rules(
-[id]               varchar(36) constraint ix_ibr_rules primary key,
+create table ibr_rule(
+[id]               varchar(36) constraint ix_ibr_rule primary key,
 [tenant_id]        varchar(36) foreign key references ucb_tenant(id),                                                                      --租户ID
-[name]             nvarchar(64) not null,                                                                                                  --规则名称
 [cycle_type]       int not null,                                                                                                           --报表周期类型：1、年；2、月；3、周；4、日
+[name]             nvarchar(64) not null,                                                                                                  --规则名称
 [cycle]            int,                                                                                                                    --周期数
 [start_time]       datetime,                                                                                                               --会计分期起始时间
 [remark]           nvarchar(max),                                                                                                          --描述
@@ -161,12 +161,12 @@ create table ibr_definition(
 [id]               varchar(36) constraint ix_ibr_definition primary key,
 [tenant_id]        varchar(36) foreign key references ucb_tenant(id) not null,                                                             --租户ID
 [category_id]      varchar(36) foreign key references ibd_category(id) on delete cascade not null,                                         --报表分类id,
-[name]             nvarchar(64) not null,                                                                                                  --报表名称
 [template_id]      varchar(36) foreign key references ibr_templates(id) not null,                                                          --报表模板id
+[name]             nvarchar(64) not null,                                                                                                  --报表名称
 [mode]             int default 1 not null,                                                                                                 --统计模式：1、时段；2、时点；3、当前
 [delay]            int default 2 not null,                                                                                                 --延时小时数（正数延后，负数提前）
 [report_type]      int default 1 not null,                                                                                                 --报表类型：1、组织机构；2、个人私有
-[datasource]       varchar(16),                                                                                                            --数据源
+[data_source]       varchar(16),                                                                                                            --数据源
 [remark]           nvarchar(max),                                                                                                          --描述
 [creator_dept_id]  varchar(36),                                                                                                            --创建部门id
 [creator]          nvarchar(32),                                                                                                           --创建人姓名
@@ -179,7 +179,7 @@ go
 create table ibr_period(
 [id]               varchar(36) constraint ix_ibr_period primary key,
 [report_id]        varchar(36) foreign key references ibr_definition(id) on delete cascade not null,                                       --报表定义id
-[rule_id]          varchar(36) foreign key references ibr_rules(id) not null                                                               --分期规则id
+[rule_id]          varchar(36) foreign key references ibr_rule(id) not null                                                               --分期规则id
 )
 go
 
@@ -205,7 +205,7 @@ go
 create table ibr_schedular(
 [id]               varchar(36) constraint ix_ibr_schedular primary key,
 [report_id]        varchar(36) foreign key references ibr_definition(id) on delete cascade not null,                                       --报表定义id
-[rule_id]          varchar(36) foreign key references ibr_rules(id) not null,                                                              --分期规则id
+[rule_id]          varchar(36) foreign key references ibr_rule(id) not null,                                                              --分期规则id
 [build_time]       datetime,                                                                                                               --报表计划生成时间
 )
 go
