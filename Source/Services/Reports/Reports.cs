@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.ServiceModel;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
@@ -103,8 +104,26 @@ namespace Insight.Base.Services
         {
             if (!Verify("getReports")) return result;
 
+            var data = DbHelper.Find<ReportDefinition>(id);
+            if (data == null) return result.NotFound();
 
-            return null;
+            var report = Util.ConvertTo<Definition>(data);
+            using (var context = new Entities())
+            {
+                var periods = from p in context.periods
+                    join r in context.rules on p.ruleId equals r.id
+                    where p.reportId == id
+                    select new Period {id = p.id, name = r.name};
+                var entities = from e in context.reportEntities
+                    join o in context.organizations on e.orgId equals o.id
+                    where e.reportId == id
+                    select new Entity {id = e.id, name = o.fullname};
+
+                report.periods = periods.ToList();
+                report.entities = entities.ToList();
+            }
+
+            return result.Success(report);
         }
 
         /// <summary>
@@ -116,7 +135,45 @@ namespace Insight.Base.Services
         {
             if (!Verify("newReport")) return result;
 
-            return null;
+            var data = Util.ConvertTo<ReportDefinition>(report);
+            data.id = Util.NewId();
+            data.tenantId = tenantId;
+            data.creatorDeptId = deptId;
+            data.creator = userName;
+            data.creatorId = userId;
+            data.createTime = DateTime.Now;
+            if (Existed(data)) return result.DataAlreadyExists();
+
+            data.periods = report.periods.Select(i => new ReportPeriod
+                {
+                    id = Util.NewId(),
+                    reportId = data.id,
+                    ruleId = i.ruleId
+                }).ToList();
+            data.entities = report.entities.Select(i => new ReportEntity
+                {
+                    id = Util.NewId(),
+                    reportId = data.id,
+                    orgId = i.orgId,
+                    name = i.name
+                }).ToList();
+            data.entities.ForEach(i =>
+            {
+                i.members = report.members.Where(m => m.entityId == i.id).Select(r => new EntityMember
+                    {
+                        id = Util.NewId(),
+                        entityId = i.id,
+                        roleId = r.roleId,
+                        name = r.name
+                    }).ToList();
+            });
+            if (!DbHelper.Insert(data)) return result.DataBaseError();
+
+            report.id = data.id;
+            report.creator = data.creator;
+            report.createTime = data.createTime;
+
+            return result.Created(report);
         }
 
         /// <summary>
@@ -125,11 +182,23 @@ namespace Insight.Base.Services
         /// <param name="id">报表ID</param>
         /// <param name="report">报表</param>
         /// <returns>Result</returns>
-        public Result<object> EditReport(string id, Definition report)
+        public Result<object> EditReport(string id, ReportDefinition report)
         {
             if (!Verify("editReport")) return result;
 
-            return null;
+            var data = DbHelper.Find<ReportDefinition>(id);
+            if (data == null) return result.NotFound();
+
+            data.categoryId = report.categoryId;
+            data.name = report.name;
+            data.mode = report.mode;
+            data.delay = report.delay;
+            data.reportType = report.reportType;
+            data.dataSource = report.dataSource;
+            data.remark = report.remark;
+            if (Existed(data)) return result.DataAlreadyExists();
+
+            return DbHelper.Update(data) ? result : result.DataBaseError();
         }
 
         /// <summary>
@@ -141,7 +210,24 @@ namespace Insight.Base.Services
         {
             if (!Verify("deleteReport")) return result;
 
-            return null;
+            var data = DbHelper.Find<ReportDefinition>(id);
+            if (data == null) return result.NotFound();
+
+            return DbHelper.Delete(data) ? result : result.DataBaseError();
+        }
+
+        /// <summary>
+        /// 定义是否存在
+        /// </summary>
+        /// <param name="definition"></param>
+        /// <returns>bool 是否存在</returns>
+        public static bool Existed(ReportDefinition definition)
+        {
+            using (var context = new Entities())
+            {
+                return context.definitions.Any(i => i.id != definition.id && i.tenantId == definition.tenantId 
+                && i.categoryId == definition.categoryId && i.name == definition.name);
+            }
         }
     }
 }

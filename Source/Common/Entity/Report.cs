@@ -8,7 +8,7 @@ namespace Insight.Base.Common.Entity
     /// 分期规则
     /// </summary>
     [Table("ibr_rule")]
-    public class Rule
+    public class ReportRule
     {
         /// <summary>
         /// 唯一ID
@@ -88,7 +88,7 @@ namespace Insight.Base.Common.Entity
     /// 报表模板
     /// </summary>
     [Table("ibr_templates")]
-    public class Template
+    public class ReportTemplet
     {
         /// <summary>
         /// 唯一ID
@@ -156,7 +156,7 @@ namespace Insight.Base.Common.Entity
     /// 报表定义
     /// </summary>
     [Table("ibr_definition")]
-    public class Definition
+    public class ReportDefinition
     {
         /// <summary>
         /// 唯一ID
@@ -206,7 +206,7 @@ namespace Insight.Base.Common.Entity
         /// 数据源
         /// </summary>
         [Column("data_source")]
-        public string dataSource { get; set; }
+        public int dataSource { get; set; }
 
         /// <summary>
         /// 描述
@@ -239,19 +239,19 @@ namespace Insight.Base.Common.Entity
         /// <summary>
         /// 报表分期
         /// </summary>
-        public List<Period> periods { get; set; }
+        public List<ReportPeriod> periods { get; set; }
 
         /// <summary>
         /// 会计主体
         /// </summary>
-        public List<Entity> entities { get; set; }
+        public List<ReportEntity> entities { get; set; }
     }
 
     /// <summary>
     /// 报表分期
     /// </summary>
     [Table("ibr_period")]
-    public class Period
+    public class ReportPeriod
     {
         /// <summary>
         /// 唯一ID
@@ -275,7 +275,7 @@ namespace Insight.Base.Common.Entity
     /// 会计主体
     /// </summary>
     [Table("ibr_entity")]
-    public class Entity
+    public class ReportEntity
     {
         /// <summary>
         /// 唯一ID

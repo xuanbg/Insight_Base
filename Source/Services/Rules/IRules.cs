@@ -41,7 +41,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "rules", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> AddRule(Rule rule);
+        Result<object> AddRule(ReportRule rule);
 
         /// <summary>
         /// 编辑报表分期
@@ -51,7 +51,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "rules/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> EditRule(string id, Rule rule);
+        Result<object> EditRule(string id, ReportRule rule);
 
         /// <summary>
         /// 删除报表分期
