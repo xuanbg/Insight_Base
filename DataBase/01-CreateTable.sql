@@ -163,10 +163,10 @@ create table ibr_definition(
 [category_id]      varchar(36) foreign key references ibd_category(id) on delete cascade not null,                                         --报表分类id,
 [template_id]      varchar(36) foreign key references ibr_templates(id) not null,                                                          --报表模板id
 [name]             nvarchar(64) not null,                                                                                                  --报表名称
-[mode]             int default 1 not null,                                                                                                 --统计模式：1、时段；2、时点；3、当前
+[mode]             int default 0 not null,                                                                                                 --统计模式：0、时段；1、时点；2、当前
 [delay]            int default 2 not null,                                                                                                 --延时小时数（正数延后，负数提前）
-[report_type]      int default 1 not null,                                                                                                 --报表类型：1、组织机构；2、个人私有
-[data_source]       varchar(16),                                                                                                            --数据源
+[report_type]      int default 0 not null,                                                                                                 --报表类型：0、组织机构；1、个人私有
+[data_source]      int default 0 not null,                                                                                                 --数据源：0、系统；1、模板
 [remark]           nvarchar(max),                                                                                                          --描述
 [creator_dept_id]  varchar(36),                                                                                                            --创建部门id
 [creator]          nvarchar(32),                                                                                                           --创建人姓名
