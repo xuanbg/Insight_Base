@@ -147,27 +147,27 @@ namespace Insight.Base.Common.Entity
         /// <summary>
         /// 报表模板
         /// </summary>
-        public virtual DbSet<Template> templates { get; set; }
+        public virtual DbSet<ReportTemplet> templates { get; set; }
 
         /// <summary>
         /// 分期规则
         /// </summary>
-        public virtual DbSet<Rule> rules { get; set; }
+        public virtual DbSet<ReportRule> rules { get; set; }
 
         /// <summary>
         /// 报表定义
         /// </summary>
-        public virtual DbSet<Definition> definitions { get; set; }
+        public virtual DbSet<ReportDefinition> definitions { get; set; }
 
         /// <summary>
         /// 报表分期
         /// </summary>
-        public virtual DbSet<Period> periods { get; set; }
+        public virtual DbSet<ReportPeriod> periods { get; set; }
 
         /// <summary>
         /// 会计主体
         /// </summary>
-        public virtual DbSet<Entity> entitySet { get; set; }
+        public virtual DbSet<ReportEntity> reportEntities { get; set; }
 
         /// <summary>
         /// 主体成员

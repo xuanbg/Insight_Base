@@ -79,7 +79,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "templates", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> ImportTemplate(Template template);
+        Result<object> ImportTemplate(ReportTemplet template);
 
         /// <summary>
         /// 复制报表模板
@@ -89,7 +89,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "templates/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> CopyTemplate(string id, Template template);
+        Result<object> CopyTemplate(string id, ReportTemplet template);
 
         /// <summary>
         /// 编辑报表模板
@@ -99,7 +99,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "templates/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> EditTemplate(string id, Template template);
+        Result<object> EditTemplate(string id, ReportTemplet template);
 
         /// <summary>
         /// 设计报表模板

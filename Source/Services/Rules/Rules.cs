@@ -50,7 +50,7 @@ namespace Insight.Base.Services
         {
             if (!Verify("getRules")) return result;
 
-            var data = DbHelper.Find<Rule>(id);
+            var data = DbHelper.Find<ReportRule>(id);
 
             return data == null ? result.NotFound() : result.Success(data);
         }
@@ -60,7 +60,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="rule">报表分期</param>
         /// <returns>Result</returns>
-        public Result<object> AddRule(Rule rule)
+        public Result<object> AddRule(ReportRule rule)
         {
             if (!Verify("newRule")) return result;
 
@@ -72,6 +72,7 @@ namespace Insight.Base.Services
             rule.creator = userName;
             rule.creatorId = userId;
             rule.createTime = DateTime.Now;
+            if (Existed(rule)) return result.DataAlreadyExists();
 
             return DbHelper.Insert(rule) ? result.Created(rule) : result.DataBaseError();
         }
@@ -82,11 +83,11 @@ namespace Insight.Base.Services
         /// <param name="id">报表分期ID</param>
         /// <param name="rule">报表分期</param>
         /// <returns>Result</returns>
-        public Result<object> EditRule(string id, Rule rule)
+        public Result<object> EditRule(string id, ReportRule rule)
         {
             if (!Verify("editRule")) return result;
 
-            var data = DbHelper.Find<Rule>(id);
+            var data = DbHelper.Find<ReportRule>(id);
             if (data == null) return result.NotFound();
 
             if (data.isBuiltin) return result.NotBeModified();
@@ -96,6 +97,7 @@ namespace Insight.Base.Services
             data.cycle = rule.cycle;
             data.startTime = rule.startTime;
             data.remark = rule.remark;
+            if (Existed(data)) return result.DataAlreadyExists();
 
             return DbHelper.Update(data) ? result.Success() : result.DataBaseError();
         }
@@ -109,7 +111,7 @@ namespace Insight.Base.Services
         {
             if (!Verify("deleteRule")) return result;
 
-            var data = DbHelper.Find<Rule>(id);
+            var data = DbHelper.Find<ReportRule>(id);
             if (data == null) return result.NotFound();
 
             if (data.isBuiltin) return result.NotBeDeleted();
@@ -117,6 +119,19 @@ namespace Insight.Base.Services
             data.isInvalid = true;
 
             return DbHelper.Update(data) ? result.Success() : result.DataBaseError();
+        }
+
+        /// <summary>
+        /// 规则是否存在
+        /// </summary>
+        /// <param name="rule"></param>
+        /// <returns>bool 是否存在</returns>
+        public static bool Existed(ReportRule rule)
+        {
+            using (var context = new Entities())
+            {
+                return context.rules.Any(i => i.id != rule.id && i.tenantId == rule.tenantId && i.name == rule.name);
+            }
         }
     }
 }

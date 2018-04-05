@@ -89,7 +89,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "reports/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> EditReport(string id, Definition report);
+        Result<object> EditReport(string id, ReportDefinition report);
 
         /// <summary>
         /// 删除报表

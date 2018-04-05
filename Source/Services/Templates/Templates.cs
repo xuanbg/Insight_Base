@@ -104,7 +104,7 @@ namespace Insight.Base.Services
         {
             if (!Verify("getTemplets")) return result;
 
-            var data = DbHelper.Find<Template>(id);
+            var data = DbHelper.Find<ReportTemplet>(id);
 
             return data == null ? result.NotFound() : result.Success(data);
         }
@@ -114,7 +114,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="template">报表模板</param>
         /// <returns>Result</returns>
-        public Result<object> ImportTemplate(Template template)
+        public Result<object> ImportTemplate(ReportTemplet template)
         {
             if (!Verify("importTemplet")) return result;
 
@@ -134,47 +134,47 @@ namespace Insight.Base.Services
         /// 复制报表模板
         /// </summary>
         /// <param name="id">报表模板ID</param>
-        /// <param name="template">报表模板</param>
+        /// <param name="templet">报表模板</param>
         /// <returns>Result</returns>
-        public Result<object> CopyTemplate(string id, Template template)
+        public Result<object> CopyTemplate(string id, ReportTemplet templet)
         {
             if (!Verify("copyTemplet")) return result;
 
-            var data = DbHelper.Find<Template>(id);
+            var data = DbHelper.Find<ReportTemplet>(id);
             if (data == null) return result.NotFound();
 
-            template.id = Util.NewId();
-            template.tenantId = tenantId;
-            template.content = data.content;
-            template.isBuiltin = false;
-            template.creatorDeptId = deptId;
-            template.creator = userName;
-            template.creatorId = userId;
-            template.createTime = DateTime.Now;
-            if (Existed(template)) return result.DataAlreadyExists();
+            templet.id = Util.NewId();
+            templet.tenantId = tenantId;
+            templet.content = data.content;
+            templet.isBuiltin = false;
+            templet.creatorDeptId = deptId;
+            templet.creator = userName;
+            templet.creatorId = userId;
+            templet.createTime = DateTime.Now;
+            if (Existed(templet)) return result.DataAlreadyExists();
 
-            return DbHelper.Insert(template) ? result.Success(template) : result.DataBaseError();
+            return DbHelper.Insert(templet) ? result.Success(templet) : result.DataBaseError();
         }
 
         /// <summary>
         /// 编辑报表模板
         /// </summary>
         /// <param name="id">报表模板ID</param>
-        /// <param name="template">报表模板</param>
+        /// <param name="templet">报表模板</param>
         /// <returns>Result</returns>
-        public Result<object> EditTemplate(string id, Template template)
+        public Result<object> EditTemplate(string id, ReportTemplet templet)
         {
             if (!Verify("editTemplet")) return result;
 
-            var data = DbHelper.Find<Template>(id);
+            var data = DbHelper.Find<ReportTemplet>(id);
             if (data == null) return result.NotFound();
 
-            data.categoryId = template.categoryId;
-            data.name = template.name;
-            data.remark = template.remark;
-            if (Existed(template)) return result.DataAlreadyExists();
+            data.categoryId = templet.categoryId;
+            data.name = templet.name;
+            data.remark = templet.remark;
+            if (Existed(data)) return result.DataAlreadyExists();
 
-            return DbHelper.Update(template) ? result : result.DataBaseError();
+            return DbHelper.Update(data) ? result : result.DataBaseError();
         }
 
         /// <summary>
@@ -187,12 +187,12 @@ namespace Insight.Base.Services
         {
             if (!Verify("designTemplet")) return result;
 
-            var data = DbHelper.Find<Template>(id);
+            var data = DbHelper.Find<ReportTemplet>(id);
             if (data == null) return result.NotFound();
 
             data.content = content;
 
-            return DbHelper.Update(content) ? result : result.DataBaseError();
+            return DbHelper.Update(data) ? result : result.DataBaseError();
         }
 
         /// <summary>
@@ -204,7 +204,7 @@ namespace Insight.Base.Services
         {
             if (!Verify("deleteTemplet")) return result;
 
-            var data = DbHelper.Find<Template>(id);
+            var data = DbHelper.Find<ReportTemplet>(id);
             if (data == null) return result.NotFound();
 
             return DbHelper.Delete(data) ? result : result.DataBaseError();
@@ -213,14 +213,14 @@ namespace Insight.Base.Services
         /// <summary>
         /// 模板是否存在
         /// </summary>
-        /// <param name="template"></param>
+        /// <param name="templet"></param>
         /// <returns>bool 是否存在</returns>
-        public static bool Existed(Template template)
+        public static bool Existed(ReportTemplet templet)
         {
             using (var context = new Entities())
             {
-                return context.templates.Any(i => i.id != template.id && i.tenantId == template.tenantId &&
-                                                  i.categoryId == template.categoryId && i.name == template.name);
+                return context.templates.Any(i => i.id != templet.id && i.tenantId == templet.tenantId &&
+                                                  i.categoryId == templet.categoryId && i.name == templet.name);
             }
         }
     }
