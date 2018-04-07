@@ -218,6 +218,7 @@ namespace Insight.Base.Services
             if (Existed(fun)) return result.DataAlreadyExists();
 
             fun.id = Util.NewId();
+            fun.isVisible = true;
             fun.creatorId = userId;
             fun.createTime = DateTime.Now;
 

@@ -92,7 +92,8 @@ namespace Insight.Base.Services
             {
                 var dirInfo = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
                 var path = DbHelper.Find<Application>(id)?.alias;
-                Util.GetClientFiles(Params.fileList, id, $"{dirInfo.FullName}/Client/{path}", ".dll|.exe|.frl");
+                var root = $"{dirInfo.FullName}Client\\{path}";
+                Util.GetClientFiles(Params.fileList, id, root, ".dll|.exe|.frl");
                 list = Params.fileList.Where(i => i.Value.appId == id && i.Value.upDateTime < DateTime.Now.AddMinutes(30)).ToDictionary(i => i.Key, i => i.Value);
             }
 
