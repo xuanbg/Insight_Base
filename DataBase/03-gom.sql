@@ -29,6 +29,7 @@ create table obd_custom(
 [city]             varchar(16),                                                                                                            --市
 [county]           varchar(32),                                                                                                            --县
 [address]          nvarchar(64),                                                                                                           --门牌号
+[is_new]           bit default 0 not null,                                                                                                 --是否新客户：0、老客户；1、新客户
 [is_invalid]       bit default 0 not null,                                                                                                 --是否失效：0、有效；1、失效
 [creator_id]       varchar(36) not null,                                                                                                   --创建人id
 [created_time]     datetime default getdate() not null                                                                                     --创建时间
