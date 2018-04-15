@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.ServiceModel;
@@ -47,19 +48,64 @@ namespace Insight.Base.Services
             return result.Success(functions);
         }
 
+        /// <summary>
+        /// 获取模块有效选项参数
+        /// </summary>
+        /// <param name="id">业务模块ID</param>
+        /// <returns>Result</returns>
         public Result<object> GetModuleParam(string id)
         {
-            throw new NotImplementedException();
+            if (!Verify()) return result;
+
+            using (var context = new Entities())
+            {
+                var list = context.moduleParams.Where(i => i.tenantId == tenantId && i.moduleId == id);
+                var param = list.Where(i => i.deptId == null || i.userId == null || i.deptId == deptId || i.userId == userId);
+
+                return result.Success(param.ToList());
+            }
         }
 
-        public Result<object> GetModuleUserParam(string id)
+        /// <summary>
+        /// 保存选项数据
+        /// </summary>
+        /// <param name="id">业务模块ID</param>
+        /// <param name="list">选项数据集合</param>
+        /// <returns>Result</returns>
+        public Result<object> SaveModuleParam(string id, List<Parameter> list)
         {
-            throw new NotImplementedException();
-        }
+            if (!Verify()) return result;
 
-        public Result<object> GetModuleDeptParam(string id)
-        {
-            throw new NotImplementedException();
+            using (var context = new Entities())
+            {
+                foreach (var param in list)
+                {
+                    var data = context.moduleParams.SingleOrDefault(i => i.id == param.id);
+                    if (data == null)
+                    {
+                        param.tenantId = tenantId;
+                        param.moduleId = id;
+                        param.creatorId = userId;
+                        param.createTime = DateTime.Now;
+
+                        context.Set<Parameter>().Add(param);
+                    }
+                    else
+                    {
+                        data.value = param.value;
+                    }
+                }
+
+                try
+                {
+                    context.SaveChanges();
+                    return result.Success();
+                }
+                catch (Exception)
+                {
+                    return result.DataBaseError();
+                }
+            }
         }
 
         /// <summary>
@@ -74,7 +120,9 @@ namespace Insight.Base.Services
             using (var context = new Entities())
             {
                 var list = context.regions.Where(i => i.parentId == (id == "" ? null : id));
-                return result.Success(list.ToList());
+                var regions = list.OrderBy(i => i.code).ToList();
+
+                return result.Success(regions);
             }
         }
 

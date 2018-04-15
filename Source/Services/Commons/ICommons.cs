@@ -1,5 +1,7 @@
-﻿using System.ServiceModel;
+﻿using System.Collections.Generic;
+using System.ServiceModel;
 using System.ServiceModel.Web;
+using Insight.Base.Common.Entity;
 using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
@@ -34,29 +36,21 @@ namespace Insight.Base.Services
         /// <summary>
         /// 获取模块有效选项参数
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">业务模块ID</param>
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "navigations/{id}/params", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         Result<object> GetModuleParam(string id);
 
         /// <summary>
-        /// 获取模块个人选项参数
+        /// 保存选项数据
         /// </summary>
-        /// <param name="id">模块ID</param>
+        /// <param name="id">业务模块ID</param>
+        /// <param name="list">选项数据集合</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "navigations/{id}/params/user", ResponseFormat = WebMessageFormat.Json)]
+        [WebInvoke(Method = "PUT", UriTemplate = "navigations/{id}/params", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> GetModuleUserParam(string id);
-
-        /// <summary>
-        /// 获取模块部门选项参数
-        /// </summary>
-        /// <param name="id">模块ID</param>
-        /// <returns>Result</returns>
-        [WebGet(UriTemplate = "navigations/{id}/params/dept", ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        Result<object> GetModuleDeptParam(string id);
+        Result<object> SaveModuleParam(string id, List<Parameter> list);
 
         /// <summary>
         /// 获取行政区划

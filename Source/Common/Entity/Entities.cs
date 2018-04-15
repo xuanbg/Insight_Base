@@ -142,7 +142,7 @@ namespace Insight.Base.Common.Entity
         /// <summary>
         /// 模块选项
         /// </summary>
-        public virtual DbSet<ModuleParam> moduleParams { get; set; }
+        public virtual DbSet<Parameter> moduleParams { get; set; }
 
         /// <summary>
         /// 报表模板

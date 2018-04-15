@@ -228,7 +228,7 @@ namespace Insight.Base.Common.Entity
     }
 
     [Table("ibd_param")]
-    public class ModuleParam
+    public class Parameter
     {
         /// <summary>
         /// ID，唯一标识
@@ -250,13 +250,7 @@ namespace Insight.Base.Common.Entity
         /// <summary>
         /// 选项ID
         /// </summary>
-        [Column("param_id")]
-        public string paramId { get; set; }
-
-        /// <summary>
-        /// 名称
-        /// </summary>
-        public string name { get; set; }
+        public string code { get; set; }
 
         /// <summary>
         /// 选项参数值
@@ -266,19 +260,14 @@ namespace Insight.Base.Common.Entity
         /// <summary>
         /// 生效机构ID
         /// </summary>
-        [Column("org_id")]
-        public string orgId { get; set; }
+        [Column("dept_id")]
+        public string deptId { get; set; }
 
         /// <summary>
-        /// 文件路径
+        /// 所属用户
         /// </summary>
         [Column("user_id")]
         public string userId { get; set; }
-
-        /// <summary>
-        /// 描述
-        /// </summary>
-        public string remark { get; set; }
 
         /// <summary>
         /// 创建人ID
