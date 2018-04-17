@@ -126,7 +126,7 @@ namespace Insight.Base.Common.Entity
     }
 
     [Table("ibd_image")]
-    public class ImageData
+    public class Image
     {
         /// <summary>
         /// ID，唯一标识

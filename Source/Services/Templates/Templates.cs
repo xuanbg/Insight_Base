@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.ServiceModel;
 using Insight.Base.Common;
@@ -239,7 +240,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="templet"></param>
         /// <returns>bool 是否存在</returns>
-        public static bool Existed(ReportTemplet templet)
+        private static bool Existed(ReportTemplet templet)
         {
             using (var context = new Entities())
             {

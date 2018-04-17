@@ -137,7 +137,7 @@ namespace Insight.Base.Common.Entity
         /// <summary>
         /// 电子影像
         /// </summary>
-        public virtual DbSet<ImageData> imageDatas { get; set; }
+        public virtual DbSet<Image> imageDatas { get; set; }
 
         /// <summary>
         /// 模块选项

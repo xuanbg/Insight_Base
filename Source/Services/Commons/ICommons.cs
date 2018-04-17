@@ -78,5 +78,25 @@ namespace Insight.Base.Services
         [WebGet(UriTemplate = "apps/files/{id}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         Result<object> GetFile(string id);
+
+        /// <summary>
+        /// 获取指定ID的电子影像数据
+        /// </summary>
+        /// <param name="id">影像ID</param>
+        /// <returns>Result</returns>
+        [WebGet(UriTemplate = "images/{id}", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        Result<object> GetImageData(string id);
+
+        /// <summary>
+        /// 生成指定业务数据ID的报表
+        /// </summary>
+        /// <param name="id">数据ID</param>
+        /// <param name="templateId">模板ID</param>
+        /// <param name="deptName">部门名称</param>
+        /// <returns>Result</returns>
+        [WebInvoke(Method = "POST", UriTemplate = "images/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [OperationContract]
+        Result<object> BuildImageData(string id, string templateId, string deptName);
     }
 }
