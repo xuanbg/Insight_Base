@@ -193,11 +193,11 @@ namespace Insight.Base.Services
             if (!Verify()) return result;
 
             var fr = new Report();
-            var template = DbHelper.Find<Template>(templateId);
+            var template = DbHelper.Find<ReportTemplet>(templateId);
             if (template == null) return result.NotExists();
 
             fr.LoadFromString(template.content);
-            fr.Dictionary.Connections[0].ConnectionString = new Entities().Database.Connection.ConnectionString;
+            //fr.Dictionary.Connections[0].ConnectionString = new Entities().Database.Connection.ConnectionString;
             fr.SetParameterValue("BusinessId", id);
             fr.SetParameterValue("DeptName", deptName);
             fr.SetParameterValue("UserName", userName);
