@@ -222,5 +222,19 @@ namespace Insight.Base.Services
 
             return result.Success(img);
         }
+
+        /// <summary>
+        /// 获取报表模板
+        /// </summary>
+        /// <param name="id">模板ID</param>
+        /// <returns>Result</returns>
+        public Result<object> GetTemplate(string id)
+        {
+            if (!Verify()) return result;
+
+            var data = DbHelper.Find<ReportTemplet>(id);
+
+            return data == null ? result.NotFound() : result.Success(data.content);
+        }
     }
 }

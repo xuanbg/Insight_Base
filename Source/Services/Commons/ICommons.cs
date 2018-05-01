@@ -98,5 +98,14 @@ namespace Insight.Base.Services
         [WebInvoke(Method = "POST", UriTemplate = "images/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> BuildImageData(string id, string templateId, string deptName);
+
+        /// <summary>
+        /// 获取报表模板
+        /// </summary>
+        /// <param name="id">模板ID</param>
+        /// <returns>Result</returns>
+        [WebGet(UriTemplate = "templates/{id}", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        Result<object> GetTemplate(string id);
     }
 }
