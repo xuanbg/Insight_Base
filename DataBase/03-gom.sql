@@ -2,6 +2,9 @@ use insight_gom
 go
 
 if exists (select * from sysobjects where id = object_id(N'obd_order_detail') and objectproperty(id, N'isusertable') = 1)
+drop table obd_detail_size
+go
+if exists (select * from sysobjects where id = object_id(N'obd_order_detail') and objectproperty(id, N'isusertable') = 1)
 drop table obd_order_detail
 go
 if exists (select * from sysobjects where id = object_id(N'obd_order') and objectproperty(id, N'isusertable') = 1)
@@ -16,6 +19,9 @@ drop table obd_goods_color
 go
 if exists (select * from sysobjects where id = object_id(N'obd_goods') and objectproperty(id, N'isusertable') = 1)
 drop table obd_goods
+go
+if exists (select * from sysobjects where id = object_id(N'obd_shoe_size') and objectproperty(id, N'isusertable') = 1)
+drop table obd_shoe_size
 go
 
 /*****客户表*****/
@@ -37,6 +43,14 @@ create table obd_custom(
 create nonclustered index idx_custom_custom_name on obd_custom ([custom_name] asc);
 create nonclustered index idx_custom_contact on obd_custom ([contact] asc);
 create nonclustered index idx_custom_mobile on obd_custom ([mobile] asc);
+go
+
+/*****鞋码表*****/
+create table obd_shoe_size(
+[id]               varchar(36) constraint ix_obd_shoe_size primary key,                                                                    --主键
+[type]             int not null,                                                                                                           --类型：0、女鞋；1、通用；2、男鞋
+[size]             nvarchar(8) not null,                                                                                                   --尺码
+);
 go
 
 /*****货品表*****/
@@ -91,7 +105,26 @@ create table obd_order_detail(
 create nonclustered index idx_order_detail_color_name on obd_order_detail ([color_name] asc);
 go
 
+/*****订单配码表*****/
+create table obd_detail_size(
+[id]               varchar(36) constraint ix_obd_detail_size primary key,                                                                  --主键
+[detail_id]        varchar(36) foreign key references obd_order_detail(id) on delete cascade not null,                                     --订单明细ID
+[size]             varchar(8) not null,                                                                                                    --鞋码
+[count]            int,                                                                                                                    --数量
+);
+go
 
+
+if exists (select * from sysobjects where id = object_id(N'obv_goods') and objectproperty(id, N'isview') = 1)
+drop view obv_goods
+go
+create view obv_goods as
+select distinct g.id, g.tenant_id, g.spec, g.code, g.goods_no, c.color_name, g.created_time
+from obd_goods g
+join obd_goods_color c on c.goods_id = g.id
+left join obd_order_detail d on d.goods_id = g.id
+left join obd_order o on o.id = d.order_id
+where g.is_invalid = 0 and (o.id is null or o.is_confirm = 0)
 use insight_base
 go
 

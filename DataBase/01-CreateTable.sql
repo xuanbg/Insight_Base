@@ -107,16 +107,15 @@ create table ibd_param(
 [id]               varchar(36) constraint ix_ibd_param primary key,
 [tenant_id]        varchar(36) foreign key references ucb_tenant(id) not null,                                                             --租户ID
 [module_id]        varchar(36) not null,                                                                                                   --模块注册id
-[param_id]         varchar(36) not null,                                                                                                   --选项id
-[name]             nvarchar(64) not null,                                                                                                  --选项名称
+[code]             varchar(32) not null,                                                                                                   --选项代码
 [value]            nvarchar(max),                                                                                                          --选项参数值
-[org_id]           varchar(36) foreign key references uco_organization(id),                                                                --生效机构id
+[dept_id]          varchar(36) foreign key references uco_organization(id),                                                                --生效机构id
 [user_id]          varchar(36) foreign key references ucb_user(id),                                                                        --生效用户id
-[remark]           nvarchar(max),                                                                                                          --描述
 [creator_id]       varchar(36) foreign key references ucb_user(id) default '00000000-0000-0000-0000-000000000000' not null,                --创建人id
 [created_time]     datetime default getdate() not null                                                                                     --创建时间
 )
 create nonclustered index ix_ibd_param_module_id on ibd_param(module_id)
+create nonclustered index ix_ibd_param_code on ibd_param(code)
 go
 
 
