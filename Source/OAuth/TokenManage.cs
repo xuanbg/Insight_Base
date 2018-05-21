@@ -156,6 +156,7 @@ namespace Insight.Base.OAuth
                 .Select(i => i.key)
                 .ToList();
             token = new Token(tid, aid) {permitFuncs = funs};
+
             var package = InitPackage(code);
             RedisHelper.StringSet($"Token:{code}", token, token.failureTime);
             RedisHelper.HashSet($"Apps:{userId}", aid, code);

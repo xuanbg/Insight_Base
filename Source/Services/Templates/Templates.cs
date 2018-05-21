@@ -88,10 +88,34 @@ namespace Insight.Base.Services
             var skip = rows * (page - 1);
             using (var context = new Entities())
             {
-                var list = context.templates.Where(i => i.tenantId == tenantId && i.categoryId == id);
+                var list = context.templates.Where(i => i.tenantId == tenantId && i.categoryId == id)
+                    .Select(i => new {i.id, i.tenantId, i.categoryId, i.name, i.remark, i.creator, i.createTime});
                 var templates = list.OrderBy(i => i.createTime).Skip(skip).Take(rows).ToList();
 
                 return result.Success(templates, list.Count());
+            }
+        }
+
+        /// <summary>
+        /// 获取所有报表模板
+        /// </summary>
+        /// <returns>Result</returns>
+        public Result<object> GetAllTemplates()
+        {
+            if (!Verify()) return result;
+
+            using (var context = new Entities())
+            {
+                const string moduleId = "ad0bd296-46f5-46b3-85b9-00b6941343e7";
+                var cats = from c in context.categories
+                    where !c.isInvalid && c.tenantId == tenantId && c.moduleId == moduleId
+                    select new {c.id, c.parentId, c.index, c.name};
+                var temps = from t in context.templates
+                    join c in cats on t.categoryId equals c.id
+                    select new {t.id, parentId = c.id, index = 0, t.name};
+                var list = cats.Union(temps).OrderBy(i => new {i.index, i.name}).ToList();
+
+                return result.Success(list);
             }
         }
 
@@ -215,7 +239,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="templet"></param>
         /// <returns>bool 是否存在</returns>
-        public static bool Existed(ReportTemplet templet)
+        private static bool Existed(ReportTemplet templet)
         {
             using (var context = new Entities())
             {

@@ -64,6 +64,14 @@ namespace Insight.Base.Services
         Result<object> GetTemplates(string id, int rows, int page);
 
         /// <summary>
+        /// 获取所有报表模板
+        /// </summary>
+        /// <returns>Result</returns>
+        [WebGet(UriTemplate = "templates/all", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        Result<object> GetAllTemplates();
+
+        /// <summary>
         /// 获取报表模板
         /// </summary>
         /// <param name="id">模板ID</param>
