@@ -40,6 +40,7 @@ create table obd_custom(
 [creator_id]       varchar(36) not null,                                                                                                   --创建人id
 [created_time]     datetime default getdate() not null                                                                                     --创建时间
 );
+create nonclustered index idx_custom_tenant_id on obd_custom ([tenant_id] asc);
 create nonclustered index idx_custom_custom_name on obd_custom ([custom_name] asc);
 create nonclustered index idx_custom_contact on obd_custom ([contact] asc);
 create nonclustered index idx_custom_mobile on obd_custom ([mobile] asc);
@@ -66,6 +67,7 @@ create table obd_goods(
 [creator_id]       varchar(36) not null,                                                                                                   --创建人id
 [created_time]     datetime default getdate() not null                                                                                     --创建时间
 );
+create nonclustered index idx_goods_tenant_id on obd_goods ([tenant_id] asc);
 create nonclustered index idx_goods_code on obd_goods ([code] asc);
 create nonclustered index idx_goods_goods_no on obd_goods ([goods_no] asc);
 create nonclustered index idx_goods_goods_name on obd_goods ([goods_name] asc);
@@ -74,16 +76,17 @@ go
 /*****货品颜色表*****/
 create table obd_goods_color(
 [id]               varchar(36) constraint ix_obd_goods_color primary key,                                                                  --主键
-[goods_id]         varchar(36) foreign key references obd_goods(id) on delete cascade not null,                                            --货品ID
+[goods_id]         varchar(36) not null,                                                                                                   --货品ID
 [color_name]       nvarchar(8) not null,                                                                                                   --颜色名称
 );
+create nonclustered index idx_goods_color_goods_id on obd_goods_color ([goods_id] asc);
 go
 
 /*****订单表*****/
 create table obd_order(
 [id]               varchar(36) constraint ix_obd_order primary key,                                                                        --主键
 [tenant_id]        varchar(36) not null,                                                                                                   --租户ID
-[custom_id]        varchar(36) foreign key references obd_custom(id) on delete cascade not null,                                           --客户ID
+[custom_id]        varchar(36) not null,                                                                                                   --客户ID
 [order_no]         nvarchar(64) not null,                                                                                                  --订单号
 [amount]           decimal(18, 2),                                                                                                         --总金额
 [remark]           nvarchar(max),                                                                                                          --描述
@@ -91,27 +94,32 @@ create table obd_order(
 [creator_id]       varchar(36) not null,                                                                                                   --创建人id
 [created_time]     datetime default getdate() not null                                                                                     --创建时间
 );
+create nonclustered index idx_order_tenant_id on obd_order ([tenant_id] asc);
+create nonclustered index idx_order_custom_id on obd_order ([custom_id] asc);
 create nonclustered index idx_order_order_no on obd_order ([order_no] asc);
 go
 
 /*****订单明细表*****/
 create table obd_order_detail(
 [id]               varchar(36) constraint ix_obd_order_detail primary key,                                                                 --主键
-[order_id]         varchar(36) foreign key references obd_order(id) on delete cascade not null,                                            --订单ID
-[goods_id]         varchar(36) foreign key references obd_goods(id) on delete cascade not null,                                            --货品ID
+[order_id]         varchar(36) not null,                                                                                                   --订单ID
+[goods_id]         varchar(36) not null,                                                                                                   --货品ID
 [color_name]       nvarchar(8),                                                                                                            --颜色
 [count]            int,                                                                                                                    --数量
 );
+create nonclustered index idx_order_detail_order_id on obd_order_detail ([order_id] asc);
+create nonclustered index idx_order_detail_goods_id on obd_order_detail ([goods_id] asc);
 create nonclustered index idx_order_detail_color_name on obd_order_detail ([color_name] asc);
 go
 
 /*****订单配码表*****/
 create table obd_detail_size(
 [id]               varchar(36) constraint ix_obd_detail_size primary key,                                                                  --主键
-[detail_id]        varchar(36) foreign key references obd_order_detail(id) on delete cascade not null,                                     --订单明细ID
+[detail_id]        varchar(36) not null,                                                                                                   --订单明细ID
 [size]             varchar(8) not null,                                                                                                    --鞋码
 [count]            int,                                                                                                                    --数量
 );
+create nonclustered index idx_detail_size_detail_id on obd_detail_size ([detail_id] asc);
 go
 
 
@@ -119,7 +127,7 @@ if exists (select * from sysobjects where id = object_id(N'obv_goods') and objec
 drop view obv_goods
 go
 create view obv_goods as
-select distinct g.id, g.tenant_id, g.spec, g.code, g.goods_no, c.color_name, g.created_time
+select distinct c.id, g.tenant_id, g.spec, g.code, g.goods_no, c.color_name, g.created_time
 from obd_goods g
 join obd_goods_color c on c.goods_id = g.id
 left join obd_order_detail d on d.goods_id = g.id
