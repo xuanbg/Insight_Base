@@ -133,6 +133,21 @@ join obd_goods_color c on c.goods_id = g.id
 left join obd_order_detail d on d.goods_id = g.id
 left join obd_order o on o.id = d.order_id
 where g.is_invalid = 0 and (o.id is null or o.is_confirm = 0)
+go
+
+if exists (select * from sysobjects where id = object_id(N'obv_statis') and objectproperty(id, N'isview') = 1)
+drop view obv_statis
+go
+create view obv_statis as
+select g.code, g.goods_no, d.color_name, sum(d.count) as count, c.custom_name
+from obd_order o
+join obd_order_detail d on d.order_id = o.id
+join obd_goods g on g.id = d.goods_id
+join obd_custom c on c.id = o.custom_id
+where o.is_confirm = 0
+group by g.code, g.goods_no, d.goods_id, d.color_name, c.custom_name
+go
+
 use insight_base
 go
 
