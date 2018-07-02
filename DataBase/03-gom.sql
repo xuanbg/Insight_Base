@@ -76,10 +76,9 @@ go
 /*****货品颜色表*****/
 create table obd_goods_color(
 [id]               varchar(36) constraint ix_obd_goods_color primary key,                                                                  --主键
-[goods_id]         varchar(36) not null,                                                                                                   --货品ID
+[goods_id]         varchar(36) foreign key references obd_goods(id) on delete cascade not null,                                            --货品ID
 [color_name]       nvarchar(8) not null,                                                                                                   --颜色名称
 );
-create nonclustered index idx_goods_color_goods_id on obd_goods_color ([goods_id] asc);
 go
 
 /*****订单表*****/
@@ -102,12 +101,11 @@ go
 /*****订单明细表*****/
 create table obd_order_detail(
 [id]               varchar(36) constraint ix_obd_order_detail primary key,                                                                 --主键
-[order_id]         varchar(36) not null,                                                                                                   --订单ID
+[order_id]         varchar(36) foreign key references obd_order(id) on delete cascade not null,                                            --订单ID
 [goods_id]         varchar(36) not null,                                                                                                   --货品ID
 [color_name]       nvarchar(8),                                                                                                            --颜色
 [count]            int,                                                                                                                    --数量
 );
-create nonclustered index idx_order_detail_order_id on obd_order_detail ([order_id] asc);
 create nonclustered index idx_order_detail_goods_id on obd_order_detail ([goods_id] asc);
 create nonclustered index idx_order_detail_color_name on obd_order_detail ([color_name] asc);
 go
@@ -115,11 +113,10 @@ go
 /*****订单配码表*****/
 create table obd_detail_size(
 [id]               varchar(36) constraint ix_obd_detail_size primary key,                                                                  --主键
-[detail_id]        varchar(36) not null,                                                                                                   --订单明细ID
+[detail_id]        varchar(36) foreign key references obd_order_detail(id) on delete cascade not null,                                     --订单明细ID
 [size]             varchar(8) not null,                                                                                                    --鞋码
 [count]            int,                                                                                                                    --数量
 );
-create nonclustered index idx_detail_size_detail_id on obd_detail_size ([detail_id] asc);
 go
 
 
