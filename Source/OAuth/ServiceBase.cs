@@ -1,4 +1,5 @@
-﻿using Insight.Utils.Entity;
+﻿using Insight.Utils.Common;
+using Insight.Utils.Entity;
 
 namespace Insight.Base.OAuth
 {
@@ -34,6 +35,17 @@ namespace Insight.Base.OAuth
             result = verify.Compare(userId == id ? null : key);
 
             return result.successful;
+        }
+
+        /// <summary>
+        /// 获取客户端特征指纹
+        /// </summary>
+        /// <returns>string 客户端特征指纹</returns>
+        public string GetFingerprint()
+        {
+            var verify = new Verify();
+
+            return Util.Hash(verify.ip + verify.userAgent);
         }
     }
 }

@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Insight.Base.Server</RootNamespace>
     <AssemblyName>BaseServer</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -38,13 +38,12 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.ServiceProcess" />
-    <Reference Include="Utils, Version=1.1.6620.17850, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Utility\Utils.dll</HintPath>
+    <Reference Include="Utils">
+      <HintPath>..\..\..\util\Utils.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="WCF, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\WCF\WCF.dll</HintPath>
+    <Reference Include="WCF">
+      <HintPath>..\..\..\util\WCF.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

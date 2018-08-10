@@ -3,6 +3,7 @@ using System.Linq;
 using System.ServiceModel;
 using System.Threading;
 using Insight.Base.Common;
+using Insight.Base.Common.DTO;
 using Insight.Base.Common.Entity;
 using Insight.Base.OAuth;
 using Insight.Utils.Common;
@@ -180,26 +181,6 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
-        /// 获取用户可登录部门
-        /// </summary>
-        /// <param name="account">登录账号</param>
-        /// <returns>Result</returns>
-        public Result<object> GetDepts(string account)
-        {
-            using (var context = new Entities())
-            {
-                var user = context.users.SingleOrDefault(u => u.account == account || u.mobile == account || u.email == account);
-                if (user == null) return result.NotFound();
-
-                var list = from m in context.orgMembers.Where(m => m.userId == user.id)
-                    join t in context.organizations on m.orgId equals t.id
-                    join d in context.organizations on t.parentId equals d.id
-                    select new { d.id, Name = d.fullname, remark = d.code };
-                return list.Any() ? result.Success(list.ToList()) : result.NoContent(new List<object>());
-            }
-        }
-
-        /// <summary>
         /// 设置支付密码
         /// </summary>
         /// <param name="code">短信验证码</param>
@@ -255,7 +236,10 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> NewCode(string mobile, int type, int life, int length)
         {
-            if (!Verify()) return result;
+            var fingerprint = GetFingerprint();
+            var limitKey = Util.Hash("GetSmsCode" + fingerprint + type);
+            var surplus = Params.callManage.GetSurplus(limitKey, 10);
+            if (surplus > 0) return result.TooFrequent(surplus);
 
             var code = Core.GenerateSmsCode(type, mobile, life, length);
 
@@ -265,16 +249,18 @@ namespace Insight.Base.Services
         /// <summary>
         /// 验证验证码是否正确
         /// </summary>
-        /// <param name="mobile">手机号</param>
-        /// <param name="code">验证码</param>
-        /// <param name="type">验证码类型</param>
-        /// <param name="remove">是否验证成功后删除记录</param>
+        /// <param name="code">验证码对象</param>
         /// <returns>Result</returns>
-        public Result<object> VerifyCode(string mobile, string code, int type, bool remove = true)
+        public Result<object> VerifyCode(SmsCode code)
         {
-            if (!Verify()) return result;
+            var fingerprint = GetFingerprint();
+            var limitKey = Util.Hash("VerifyCode" + fingerprint + Util.Serialize(code));
+            var surplus = Params.callManage.GetSurplus(limitKey, 600);
+            if (surplus > 0) return result.TooFrequent(surplus);
 
-            return Core.VerifySmsCode(type, mobile, code, !remove) ? result : result.SMSCodeError();
+            var verify = Core.VerifySmsCode(code.type, code.mobile, code.code, !code.remove);
+
+            return verify ? result.Success() : result.SMSCodeError();
         }
     }
 }

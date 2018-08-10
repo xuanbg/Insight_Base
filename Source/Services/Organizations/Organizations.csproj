@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Insight.Base.Services</RootNamespace>
     <AssemblyName>Organizations</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -43,9 +43,8 @@
     <Reference Include="System.Core" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Web" />
-    <Reference Include="Utils, Version=1.1.6625.37453, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Utility\Utils.dll</HintPath>
+    <Reference Include="Utils">
+      <HintPath>..\..\..\..\util\Utils.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>

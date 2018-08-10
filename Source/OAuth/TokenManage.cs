@@ -303,9 +303,11 @@ namespace Insight.Base.OAuth
         /// <returns>Token是否失效</returns>
         public bool IsFailure(string tokenId)
         {
+            if (token == null) return true;
+
             var code = RedisHelper.HashGet(userId, appId);
 
-            return token == null || token.signInOne && code != tokenId || token.IsFailure();
+            return token.signInOne && code != tokenId || token.IsFailure();
         }
 
         /// <summary>

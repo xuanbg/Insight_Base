@@ -1,5 +1,6 @@
 ﻿using System.ServiceModel;
 using System.ServiceModel.Web;
+using Insight.Base.Common.DTO;
 using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
@@ -23,7 +24,7 @@ namespace Insight.Base.Services
         /// <param name="account">登录账号</param>
         /// <param name="type">登录类型</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "{account}/codes?type={type}", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "tokens/codes?account={account}&type={type}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         Result<object> GetCode(string account, int type);
 
@@ -36,7 +37,7 @@ namespace Insight.Base.Services
         /// <param name="signature">用户签名</param>
         /// <param name="deptId">登录部门ID（可为空）</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "{account}/tokens?tenantid={tenantId}&appid={appId}&signature={signature}&deptid={deptId}", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "tokens?tenantid={tenantId}&appid={appId}&account={account}&signature={signature}&deptid={deptId}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         Result<object> GetToken(string tenantId, string appId, string account, string signature, string deptId);
 
@@ -45,7 +46,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="action">需要鉴权的操作ID</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "tokens/verify?action={action}", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "tokens/secret?action={action}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         Result<object> Verification(string action);
 
@@ -73,15 +74,6 @@ namespace Insight.Base.Services
         [WebGet(UriTemplate = "{account}/tenants", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         Result<object> GetTenants(string account);
-
-        /// <summary>
-        /// 获取用户可登录部门
-        /// </summary>
-        /// <param name="account">登录账号</param>
-        /// <returns>Result</returns>
-        [WebGet(UriTemplate = "{account}/depts", ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        Result<object> GetDepts(string account);
 
         /// <summary>
         /// 设置支付密码
@@ -121,14 +113,11 @@ namespace Insight.Base.Services
         /// <summary>
         /// 验证验证码是否正确
         /// </summary>
-        /// <param name="mobile">手机号</param>
-        /// <param name="code">验证码</param>
-        /// <param name="type">验证码类型</param>
-        /// <param name="remove">是否验证成功后删除记录</param>
+        /// <param name="code">验证码对象</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "smscodes/compare?mobile={mobile}&code={code}&type={type}&remove={remove}", ResponseFormat = WebMessageFormat.Json)]
+        [WebInvoke(Method = "DELETE", UriTemplate = "smscodes", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> VerifyCode(string mobile, string code, int type, bool remove);
+        Result<object> VerifyCode(SmsCode code);
         
         #endregion
 

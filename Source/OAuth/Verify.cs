@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Specialized;
+using System.Net;
 using System.ServiceModel.Web;
 using System.Threading;
 using Insight.Base.Common;
@@ -25,6 +26,16 @@ namespace Insight.Base.OAuth
         public string tokenId { get; }
 
         /// <summary>
+        /// 客户端IP地址
+        /// </summary>
+        public string ip { get; }
+
+        /// <summary>
+        /// 客户端信息
+        /// </summary>
+        public string userAgent { get; }
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="tokenType">令牌类型：1、访问令牌(默认)；2、刷新令牌</param>
@@ -33,6 +44,9 @@ namespace Insight.Base.OAuth
             this.tokenType = tokenType;
 
             var headers = WebOperationContext.Current.IncomingRequest.Headers;
+            ip = GetIp(headers);
+            userAgent = headers.Get("user-agent");
+
             var auth = headers[HttpRequestHeader.Authorization];
             var accessToken = Util.Base64ToAccessToken(auth);
             if (accessToken == null)
@@ -89,6 +103,32 @@ namespace Insight.Base.OAuth
             if (string.IsNullOrEmpty(key)) return result;
 
             return manage.VerifyKeyInCache(key) ? result : result.Forbidden();
+        }
+
+        /// <summary>
+        /// 获取客户端IP地址
+        /// </summary>
+        /// <param name="headers">请求头</param>
+        /// <returns>string IP地址</returns>
+        private static string GetIp(NameValueCollection headers)
+        {
+            var rip = headers.Get("X-Real-IP");
+            if (string.IsNullOrEmpty(rip))
+            {
+                rip = headers.Get("X-Forwarded-For");
+            }
+
+            if (string.IsNullOrEmpty(rip))
+            {
+                rip = headers.Get("Proxy-Client-IP");
+            }
+
+            if (string.IsNullOrEmpty(rip))
+            {
+                rip = headers.Get("WL-Proxy-Client-IP");
+            }
+
+            return rip;
         }
     }
 }

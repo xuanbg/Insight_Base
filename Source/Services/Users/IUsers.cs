@@ -78,7 +78,7 @@ namespace Insight.Base.Services
         /// <param name="code">验证码</param>
         /// <param name="user">用户对象</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "users/signup?code={code}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "users/signup?appid={appId}&code={code}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> SignUp(string appId, string code, User user);
 

@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Insight.Base.Common</RootNamespace>
     <AssemblyName>Common</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -40,7 +40,7 @@
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Redis">
-      <HintPath>..\..\..\WCF\Redis.dll</HintPath>
+      <HintPath>..\..\..\util\Redis.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -50,9 +50,8 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.Xml" />
-    <Reference Include="Utils, Version=1.1.6508.15058, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Utility\Utils.dll</HintPath>
+    <Reference Include="Utils">
+      <HintPath>..\..\..\util\Utils.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -61,6 +60,7 @@
     <Compile Include="DTO\App.cs" />
     <Compile Include="DTO\AppTree.cs" />
     <Compile Include="DTO\RoleInfo.cs" />
+    <Compile Include="DTO\SmsCode.cs" />
     <Compile Include="DTO\TenantInfo.cs" />
     <Compile Include="DTO\UserInfo.cs" />
     <Compile Include="Entity\BaseData.cs" />
