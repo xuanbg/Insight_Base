@@ -201,9 +201,10 @@ namespace Insight.Base.Services
             user.createTime = DateTime.Now;
             if (!DbHelper.Insert(user)) return result.DataBaseError();
 
-            var session = Core.GetUserCache(user.id);
-            var tokens = session.Creator(Util.NewId("N"), aid);
-            Core.SetUserCache(session);
+            var id = Core.GetUserId(user.account);
+            manage = Core.GetUserCache(id);
+            var tokens = manage.Creator(Util.NewId("N"), aid);
+            Core.SetUserCache(manage);
 
             return result.Created(tokens);
         }
@@ -226,12 +227,12 @@ namespace Insight.Base.Services
             user.password = password;
             if (!DbHelper.Update(user)) return result.DataBaseError();
 
-            var session = Core.GetUserCache(id);
-            if (session == null) return result;
+            manage = Core.GetUserCache(id);
+            if (manage == null) return result;
 
-            session.password = password;
-            session.SetChanged();
-            Core.SetUserCache(session);
+            manage.password = password;
+            manage.SetChanged();
+            Core.SetUserCache(manage);
 
             return result;
         }
@@ -247,6 +248,8 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> ResetSignature(string aid, string account, string password, string code, string mobile = null)
         {
+            if (string.IsNullOrEmpty(aid) || string.IsNullOrEmpty(password)) return result.InvalidValue();
+
             var fingerprint = GetFingerprint();
             var limitKey = Util.Hash("resetSignature" + fingerprint + Util.Serialize(code));
             var surplus = Params.callManage.GetSurplus(limitKey, 10);
