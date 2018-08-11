@@ -284,7 +284,7 @@ namespace Insight.Base.OAuth
         /// <returns>Token是否过期</returns>
         public bool TenantIsExpiry()
         {
-            return token == null || DateTime.Now > token.expireDate;
+            return token == null || tenantId != null && DateTime.Now > token.expireDate;
         }
 
         /// <summary>

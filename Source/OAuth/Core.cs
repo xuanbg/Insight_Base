@@ -116,6 +116,10 @@ namespace Insight.Base.OAuth
         /// <returns></returns>
         public static string GenerateSmsCode(int type, string mobile, int life, int length)
         {
+            if (life == 0) life = 15;
+
+            if (length == 0) length = 6;
+
             var max = Math.Pow(10, length);
             var code = Params.Random.Next(0, (int) max).ToString("D" + length);
             var msg = $"为手机号 {mobile} 生成了类型为 {type} 的验证码 {code}, 有效时间 {life} 分钟.";

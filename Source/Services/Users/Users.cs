@@ -194,7 +194,8 @@ namespace Insight.Base.Services
 
             if (Core.IsExisted(user)) return result.AccountExists();
 
-            user.id = Util.NewId();
+            if (string.IsNullOrEmpty(user.id)) user.id = Util.NewId();
+
             if (string.IsNullOrEmpty(user.password)) user.password = Util.Hash("123456");
 
             user.creatorId = user.id;

@@ -28,7 +28,7 @@ namespace Insight.Base.Services
         /// <param name="account">登录账号</param>
         /// <param name="type">登录类型</param>
         /// <returns>Result</returns>
-        public Result<object> GetCode(string account, int type = 0)
+        public Result<object> GetCode(string account, int type)
         {
             // 限流,每用户每天可访问100次
             var key = Util.Hash("GetCode" + account + type);
