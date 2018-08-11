@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using Insight.Base.Common.Entity;
@@ -23,7 +24,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="group">用户组对象</param>
         /// <returns>Result</returns>
-        public Result AddGroup(UserGroup group)
+        public Result<object> AddGroup(UserGroup group)
         {
             if (!Verify("6E80210E-6F80-4FF7-8520-B602934D635C")) return _Result;
             if (group.Existed) return group.Result;
@@ -40,7 +41,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">用户组ID</param>
         /// <returns>Result</returns>
-        public Result RemoveGroup(string id)
+        public Result<object> RemoveGroup(string id)
         {
             if (!Verify("E46B7A1C-A8B0-49B5-8494-BF1B09F43452")) return _Result;
 
@@ -57,7 +58,7 @@ namespace Insight.Base.Services
         /// <param name="id">用户组ID</param>
         /// <param name="group">用户组对象</param>
         /// <returns>Result</returns>
-        public Result UpdateGroup(string id, UserGroup group)
+        public Result<object> UpdateGroup(string id, UserGroup group)
         {
             if (!Verify("6910FD14-5654-4CF0-B159-8FE1DF68619F")) return _Result;
 
@@ -72,7 +73,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">用户组ID</param>
         /// <returns>Result</returns>
-        public Result GetGroup(string id)
+        public Result<object> GetGroup(string id)
         {
             if (!Verify("B5992AA3-4AD3-4795-A641-2ED37AC6425C")) return _Result;
 
@@ -89,7 +90,7 @@ namespace Insight.Base.Services
         /// <param name="rows">每页行数</param>
         /// <param name="page">当前页</param>
         /// <returns>Result</returns>
-        public Result GetGroups(string rows, string page)
+        public Result<object> GetGroups(string rows, string page)
         {
             if (!Verify("B5992AA3-4AD3-4795-A641-2ED37AC6425C")) return _Result;
 
@@ -108,13 +109,9 @@ namespace Insight.Base.Services
                            orderby g.SN
                            select new {g.ID, g.Name, g.Description, g.BuiltIn, g.CreatorUserId, g.CreateTime};
                 var skip = ipr.Value * (ipp.Value - 1);
-                var data = new
-                {
-                    Total = list.Count(),
-                    Items = list.Skip(skip).Take(ipr.Value).ToList()
-                };
+                var data = list.Skip(skip).Take(ipr.Value).ToList();
 
-                return _Result.Success(data);
+                return _Result.Success(data, list.Count().ToString());
             }
         }
 
@@ -124,7 +121,7 @@ namespace Insight.Base.Services
         /// <param name="id">用户组ID</param>
         /// <param name="group">UserGroup</param>
         /// <returns>Result</returns>
-        public Result AddGroupMember(string id, UserGroup group)
+        public Result<object> AddGroupMember(string id, UserGroup group)
         {
             if (!Verify("6C41724C-E118-4BCD-82AD-6B13D05C7894")) return _Result;
 
@@ -138,7 +135,7 @@ namespace Insight.Base.Services
         /// <param name="id"></param>
         /// <param name="group">UserGroup</param>
         /// <returns>Result</returns>
-        public Result RemoveMember(string id, UserGroup group)
+        public Result<object> RemoveMember(string id, UserGroup group)
         {
             if (!Verify("686C115A-CE2E-4E84-8F25-B63C15AC173C")) return _Result;
 
@@ -150,7 +147,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">用户组ID</param>
         /// <returns>Result</returns>
-        public Result GetOtherUser(string id)
+        public Result<object> GetOtherUser(string id)
         {
             if (!Verify("B5992AA3-4AD3-4795-A641-2ED37AC6425C")) return _Result;
 
@@ -165,11 +162,11 @@ namespace Insight.Base.Services
                            where t == null && u.Validity && u.Type > 0
                            orderby u.SN
                            select new {ID = Guid.NewGuid(), UserId = u.ID, u.Name, u.LoginName};
-                return list.Any() ? _Result.Success(list.ToList()) : _Result.NoContent();
+                return list.Any() ? _Result.Success(list.ToList()) : _Result.NoContent(new List<object>());
             }
         }
 
-        private Result _Result = new Result();
+        private Result<object> _Result = new Result<object>();
         private Guid _UserId;
 
         /// <summary>
@@ -179,9 +176,12 @@ namespace Insight.Base.Services
         /// <returns>bool 身份是否通过验证</returns>
         private bool Verify(string action = null)
         {
-            var verify = new Compare(action);
-            _UserId = verify.Basis.userId;
-            _Result = verify.Result;
+            var compare = new Compare();
+            _Result = compare.Result;
+            if (!_Result.successful) return false;
+
+            _UserId = compare.Basis.userId;
+            _Result = compare.Verify(action);
 
             return _Result.successful;
         }

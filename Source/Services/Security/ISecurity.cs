@@ -23,7 +23,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "test", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result Test();
+        Result<object> Test();
 
         /// <summary>
         /// 获取指定账户的Code
@@ -32,7 +32,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "tokens/codes?account={account}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result GetCode(string account);
+        Result<object> GetCode(string account);
 
         /// <summary>
         /// 获取指定账户的AccessToken
@@ -43,7 +43,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "tokens?account={account}&signature={signature}&deptid={deptid}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result GetToken(string account, string signature, string deptid);
+        Result<object> GetToken(string account, string signature, string deptid);
 
         /// <summary>
         /// 移除指定账户的AccessToken
@@ -51,7 +51,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "tokens", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result RemoveToken();
+        Result<object> RemoveToken();
 
         /// <summary>
         /// 刷新AccessToken，延长过期时间
@@ -59,7 +59,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "tokens", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result RefreshToken();
+        Result<object> RefreshToken();
 
         /// <summary>
         /// 带鉴权的会话合法性验证
@@ -68,7 +68,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "tokens/verify?action={action}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result Verification(string action);
+        Result<object> Verification(string action);
 
         #endregion
 
@@ -82,7 +82,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "paypws", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result SetPayPW(string code, string password);
+        Result<object> SetPayPW(string code, string password);
 
         /// <summary>
         /// 验证支付密码
@@ -91,7 +91,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "paypws?pw={password}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result VerifyPayPW(string password);
+        Result<object> VerifyPayPW(string password);
 
         #endregion
 
@@ -106,7 +106,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "smscodes?mobile={mobile}&type={type}&time={time}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result NewCode(string mobile, int type, int time);
+        Result<object> NewCode(string mobile, int type, int time);
 
         /// <summary>
         /// 验证验证码是否正确
@@ -118,7 +118,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "smscodes/compare?mobile={mobile}&code={code}&type={type}&remove={remove}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result VerifyCode(string mobile, string code, int type, bool remove);
+        Result<object> VerifyCode(string mobile, string code, int type, bool remove);
 
         /// <summary>
         /// 生成图形验证码
@@ -127,7 +127,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "piccodes/{id}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result GetPicCode(string id);
+        Result<object> GetPicCode(string id);
 
         /// <summary>
         /// 验证图形验证码是否正确
@@ -137,7 +137,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "smscodes/{id}/compare?code={code}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result VerifyPicCode(string id, string code);
+        Result<object> VerifyPicCode(string id, string code);
 
         #endregion
 

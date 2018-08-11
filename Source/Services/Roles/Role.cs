@@ -21,7 +21,7 @@ namespace Insight.Base.Services
         private IEnumerable<SYS_Role_Data> _DelDatas;
         private List<RoleAction> _RoleActions;
         private List<RoleData> _RoleDatas;
-        internal Result Result = new Result();
+        internal Result<object> Result = new Result<object>();
         internal Authority Authority;
 
         /// <summary>
@@ -47,8 +47,8 @@ namespace Insight.Base.Services
         /// </summary>
         public Guid ID
         {
-            get { return _Role.ID; }
-            set { _Role.ID = value; }
+            get => _Role.ID;
+            set => _Role.ID = value;
         }
 
         /// <summary>
@@ -56,8 +56,8 @@ namespace Insight.Base.Services
         /// </summary>
         public string Name
         {
-            get { return _Role.Name; }
-            set { _Role.Name = value; }
+            get => _Role.Name;
+            set => _Role.Name = value;
         }
 
         /// <summary>
@@ -65,8 +65,8 @@ namespace Insight.Base.Services
         /// </summary>
         public string Description
         {
-            get { return _Role.Description; }
-            set { _Role.Description = value; }
+            get => _Role.Description;
+            set => _Role.Description = value;
         }
 
         /// <summary>
@@ -74,8 +74,8 @@ namespace Insight.Base.Services
         /// </summary>
         public bool BuiltIn
         {
-            get { return _Role.BuiltIn; }
-            set { _Role.BuiltIn = value; }
+            get => _Role.BuiltIn;
+            set => _Role.BuiltIn = value;
         }
 
         /// <summary>
@@ -83,8 +83,8 @@ namespace Insight.Base.Services
         /// </summary>
         public bool Validity
         {
-            get { return _Role.Validity; }
-            set { _Role.Validity = value; }
+            get => _Role.Validity;
+            set => _Role.Validity = value;
         }
 
         /// <summary>
@@ -92,8 +92,8 @@ namespace Insight.Base.Services
         /// </summary>
         public Guid CreatorUserId
         {
-            get { return _Role.CreatorUserId; }
-            set { _Role.CreatorUserId = value; }
+            get => _Role.CreatorUserId;
+            set => _Role.CreatorUserId = value;
         }
 
         /// <summary>
@@ -101,8 +101,8 @@ namespace Insight.Base.Services
         /// </summary>
         public DateTime CreateTime
         {
-            get { return _Role.CreateTime; }
-            set { _Role.CreateTime = value; }
+            get => _Role.CreateTime;
+            set => _Role.CreateTime = value;
         }
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace Insight.Base.Services
         /// </summary>
         public List<RoleAction> Actions
         {
-            get { return _RoleActions ?? Authority?.GetActions(); }
+            get => _RoleActions ?? Authority?.GetActions();
             set
             {
                 var list = value?.Where(a => a.NodeType > 1 && a.Permit != a.Action).ToList();
@@ -137,7 +137,7 @@ namespace Insight.Base.Services
         /// </summary>
         public List<RoleData> Datas
         {
-            get { return _RoleDatas ?? Authority?.GetDatas(); }
+            get => _RoleDatas ?? Authority?.GetDatas();
             set
             {
                 var list = value?.Where(d => d.NodeType > 1 && d.Permit != d.Permission).ToList();

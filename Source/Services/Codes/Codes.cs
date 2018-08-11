@@ -20,47 +20,47 @@ namespace Insight.Base.Services
         {
         }
 
-        public Result AddScheme(SYS_Code_Scheme obj)
+        public Result<object> AddScheme(SYS_Code_Scheme obj)
         {
             throw new NotImplementedException();
         }
 
-        public Result DeleteScheme(string id)
+        public Result<object> DeleteScheme(string id)
         {
             throw new NotImplementedException();
         }
 
-        public Result UpdateScheme(string id, SYS_Code_Scheme scheme)
+        public Result<object> UpdateScheme(string id, SYS_Code_Scheme scheme)
         {
             throw new NotImplementedException();
         }
 
-        public Result EnableScheme(string id)
+        public Result<object> EnableScheme(string id)
         {
             throw new NotImplementedException();
         }
 
-        public Result GetScheme(string id)
+        public Result<object> GetScheme(string id)
         {
             throw new NotImplementedException();
         }
 
-        public Result GetSchemes()
+        public Result<object> GetSchemes()
         {
             throw new NotImplementedException();
         }
 
-        public Result GetSerialRecord()
+        public Result<object> GetSerialRecord()
         {
             throw new NotImplementedException();
         }
 
-        public Result GetAllotRecord()
+        public Result<object> GetAllotRecord()
         {
             throw new NotImplementedException();
         }
 
-        public Result GetCodePreview(string id, string code, string mark)
+        public Result<object> GetCodePreview(string id, string code, string mark)
         {
             throw new NotImplementedException();
         }
@@ -72,10 +72,10 @@ namespace Insight.Base.Services
         /// <param name="id">业务记录ID</param>
         /// <param name="mark">标识符</param>
         /// <returns>Result</returns>
-        public Result GetCode(string name, string id, string mark)
+        public Result<object> GetCode(string name, string id, string mark)
         {
             var verify = new Compare();
-            var result = Util.ConvertTo<Result>(verify.Result);
+            var result = verify.Result;
             if (!result.successful) return result;
 
             var bid = new GuidParse(id).Guid;

@@ -13,7 +13,7 @@ namespace Insight.Base.Services
     {
         private readonly SYS_Organization _Org;
         private List<SYS_OrgMember> _Members;
-        internal Result Result = new Result();
+        internal Result<object> Result = new Result<object>();
 
         /// <summary>
         /// 组织机构唯一ID

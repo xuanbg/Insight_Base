@@ -15,8 +15,16 @@ namespace Insight.Base.OAuth
     public class Session:AccessToken
     {
         // 进程同步基元
-        private static readonly Mutex _CodeMutex = new Mutex();
-        private static readonly Mutex _SecretMutex = new Mutex();
+        private static readonly Mutex _Mutex = new Mutex();
+
+        // 验证记录
+        private readonly List<Code> _Codes = new List<Code>();
+
+        // 上次连接时间
+        private DateTime _LastConnectTime;
+
+        // 连续失败次数
+        private int _FailureCount;
 
         // 用户签名
         private string _Signature;
@@ -26,18 +34,6 @@ namespace Insight.Base.OAuth
 
         // 刷新密码
         private string _RefreshKey;
-
-        // 连续失败次数
-        private int _FailureCount;
-
-        // 上次连接时间
-        private DateTime _LastConnectTime;
-
-        // 最后一次验证通过的TokenId
-        private Guid _LastConnectId;
-
-        // 有效Code集合
-        public Dictionary<string, Guid> Codes { get; } = new Dictionary<string, Guid>();
 
         /// <summary>
         /// Secret过期时间
@@ -65,73 +61,123 @@ namespace Insight.Base.OAuth
         public string Mobile { get; set; }
 
         /// <summary>
-        /// 用户状态
+        /// 用户状态，是否被禁止登录
         /// </summary>
         public bool Validity { get; set; }
 
         /// <summary>
         /// 构造方法，根据UserID构建对象
         /// </summary>
-        /// <param name="uid">UserID</param>
-        public Session(Guid uid)
+        /// <param name="user">用户实体</param>
+        public Session(SYS_User user)
         {
-            using (var context = new BaseEntities())
-            {
-                var user = context.SYS_User.SingleOrDefault(s => s.ID == uid);
-                if (user == null) return;
+            _Signature = Util.Decrypt(Params.RSAKey, user.Password);
+            _PayPassword = user.PayPassword;
 
-                _Signature = Util.Decrypt(Params.RSAKey, user.Password);
-                _PayPassword = user.PayPassword;
-
-                id = Guid.NewGuid();
-                UserType = user.Type;
-                account = user.LoginName;
-                Mobile = user.Mobile;
-                userId = user.ID;
-                userName = user.Name;
-                Validity = user.Validity;
-            }
+            UserType = user.Type;
+            account = user.LoginName;
+            Mobile = user.Mobile;
+            userId = user.ID;
+            userName = user.Name;
+            Validity = user.Validity;
         }
 
         /// <summary>
-        /// 产生Code
+        /// 生成Code
         /// </summary>
-        /// <returns>string Code</returns>
+        /// <returns>string 一个GUID字符串</returns>
         public string GenerateCode()
         {
-            _CodeMutex.WaitOne();
-            var tid = id;
-            id = Guid.NewGuid();
+            var now = DateTime.Now;
+            _Codes.RemoveAll(c => now > c.ExpiryTime);
+            if (_Codes.Count > 9) return null;
 
-            var code = tid.ToString("N");
-            var sign = Util.Hash(_Signature + code);
-            lock (Codes)
-            {
-                Codes.Add(sign, tid);
-            }
-            _CodeMutex.ReleaseMutex();
+            var code = new Code {Id = Guid.NewGuid(), ExpiryTime = now.AddMinutes(30)};
+            if (UserType != 0) _Codes.Add(code);
 
-            return code;
+            return code.ToString();
         }
 
         /// <summary>
-        /// 检验是否已经连续错误5次
+        /// 检查Session是否正常(未封禁、未锁定)
         /// </summary>
-        /// <param name="tokenId">TokenId</param>
-        /// <returns>bool 是否已经连续错误5次</returns>
-        public bool Ckeck(Guid tokenId)
+        /// <returns>bool 账户是否正常</returns>
+        public bool IsValidity()
         {
-            if (tokenId == _LastConnectId) return true;
-
             var now = DateTime.Now;
             var span = now - _LastConnectTime;
             if (span.TotalMinutes > 15) _FailureCount = 0;
 
             _LastConnectTime = now;
-            if (_FailureCount >= 5) return false;
+            return Validity && (UserType == 0 || _FailureCount < 5);
+        }
 
-            _LastConnectId = tokenId;
-            return true;
+        /// <summary>
+        /// 生成Token
+        /// </summary>
+        /// <param name="tid">TokenID</param>
+        /// <param name="did">登录部门ID，可为空</param>
+        /// <returns>string 序列化为Json的Token数据</returns>
+        public TokenResult CreatorKey(string tid, Guid? did = null)
+        {
+            _FailureCount = 0;
+            deptId = did;
+            InitSecret();
+            Refresh();
+
+            var access = new {id = tid, userId, deptId, account, userName, secret};
+            var refresh = new {id = tid, account, Secret = _RefreshKey};
+            var token = new TokenResult
+            {
+                accessToken = Util.Base64(access),
+                refreshToken = Util.Base64(refresh),
+                expiryTime = ExpiryTime,
+                failureTime = FailureTime
+            };
+
+            return token;
+        }
+
+        /// <summary>
+        /// 累计失败次数
+        /// </summary>
+        public void AddFailureCount()
+        {
+            _FailureCount++;
+        }
+
+        /// <summary>
+        /// 设置Secret及过期时间
+        /// </summary>
+        /// <param name="force">是否强制</param>
+        public void InitSecret(bool force = false)
+        {
+            var now = DateTime.Now;
+            if (!force && now < FailureTime) return;
+
+            _Mutex.WaitOne();
+            if (now < FailureTime)
+            {
+                _Mutex.ReleaseMutex();
+                return;
+            }
+
+            secret = Util.Hash(Guid.NewGuid() + _Signature + now);
+            _RefreshKey = Util.Hash(Guid.NewGuid() + secret);
+            ExpiryTime = now.AddHours(2);
+            FailureTime = now.AddHours(Core.Expired);
+            _Mutex.ReleaseMutex();
+        }
+
+        /// <summary>
+        /// 刷新Secret过期时间
+        /// </summary>
+        public void Refresh()
+        {
+            var now = DateTime.Now;
+            if (now < ExpiryTime) return;
+
+            ExpiryTime = now.AddHours(2);
         }
 
         /// <summary>
@@ -144,7 +190,7 @@ namespace Insight.Base.OAuth
         {
             if (type == 1 && secret == key || type == 2 && _RefreshKey == key) return true;
 
-            _FailureCount++;
+            AddFailureCount();
             return false;
         }
 
@@ -161,59 +207,25 @@ namespace Insight.Base.OAuth
         }
 
         /// <summary>
-        /// 设置Secret及过期时间
-        /// </summary>
-        /// <param name="force">是否强制</param>
-        public void InitSecret(bool force = false)
-        {
-            var now = DateTime.Now;
-            if (!force && now < FailureTime) return;
-
-            _SecretMutex.WaitOne();
-            if (now < FailureTime)
-            {
-                _SecretMutex.ReleaseMutex();
-                return;
-            }
-
-            secret = Util.Hash(Guid.NewGuid() + _Signature + now);
-            _RefreshKey = Util.Hash(Guid.NewGuid() + secret);
-            ExpiryTime = now.AddHours(2);
-            FailureTime = now.AddHours(Core.Expired);
-            _SecretMutex.ReleaseMutex();
-        }
-
-        /// <summary>
-        /// 刷新Secret过期时间
-        /// </summary>
-        public void Refresh()
-        {
-            var now = DateTime.Now;
-            if (now < ExpiryTime) return;
-
-            ExpiryTime = now.AddHours(2);
-        }
-
-        /// <summary>
         /// 使Session在线
         /// </summary>
+        /// <param name="tokenId">TokenID</param>
         /// <param name="did">用户登录部门ID</param>
-        public void Online(Guid? did)
+        public void Online(Guid tokenId, Guid? did)
         {
             deptId = did;
             OnlineStatus = true;
-            _FailureCount = 0;
         }
 
         /// <summary>
         /// 注销Session
         /// </summary>
-        public void SignOut()
+        /// <param name="tid">TokenID</param>
+        public void Offline(Guid tid)
         {
-            if (!Params.SignOut) return;
-
-            ExpiryTime = DateTime.Now;
-            FailureTime = DateTime.Now;
+            var now = DateTime.Now;
+            ExpiryTime = now;
+            FailureTime = now;
             secret = Guid.NewGuid().ToString();
             OnlineStatus = false;
         }
@@ -224,7 +236,19 @@ namespace Insight.Base.OAuth
         /// <param name="password">用户密码</param>
         public void Sign(string password)
         {
-            _Signature = Util.Hash(account.ToUpper() + password);
+            _Signature = Util.Decrypt(Params.RSAKey, password);
+        }
+
+        /// <summary>
+        /// 获取账号签名
+        /// </summary>
+        /// <param name="key">登录账号</param>
+        /// <param name="code">获取到的Code</param>
+        /// <returns>string 签名字符串</returns>
+        public string GetSign(string key, string code)
+        {
+            var sign = Util.Hash(key.ToUpper() + _Signature);
+            return Util.Hash(sign + code);
         }
 
         /// <summary>
@@ -249,26 +273,6 @@ namespace Insight.Base.OAuth
         }
 
         /// <summary>
-        /// 生成Token
-        /// </summary>
-        /// <param name="tid">TokenID</param>
-        /// <returns>string 序列化为Json的Token数据</returns>
-        public object CreatorKey(Guid? tid = null)
-        {
-            if (!tid.HasValue) tid = id;
-
-            var token = new
-            {
-                accessToken = Util.Base64(new {id = tid, userId, deptId, account, userName, secret}),
-                refreshToken = Util.Base64(new {id = tid, account, Secret = _RefreshKey}),
-                expiryTime = ExpiryTime,
-                failureTime = FailureTime
-            };
-
-            return token;
-        }
-
-        /// <summary>
         /// 根据Account判断用户是否相同
         /// </summary>
         /// <param name="loginName">用户账号</param>
@@ -276,6 +280,31 @@ namespace Insight.Base.OAuth
         public bool UserIsSame(string loginName)
         {
             return Util.StringCompare(account, loginName);
+        }
+
+        /// <summary>
+        /// Token记录
+        /// </summary>
+        private class Code
+        {
+            /// <summary>
+            /// TokenID
+            /// </summary>
+            public Guid Id { private get; set; }
+
+            /// <summary>
+            /// 失效时间
+            /// </summary>
+            public DateTime ExpiryTime { get; set; }
+
+            /// <summary>
+            /// 返回此实例的ID的字符串表示形式
+            /// </summary>
+            /// <returns>string 实例的ID的字符串表示形式</returns>
+            public override string ToString()
+            {
+                return Id.ToString();
+            }
         }
     }
 }

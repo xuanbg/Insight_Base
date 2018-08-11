@@ -27,7 +27,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "logs", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result WriteToLog(string code, string message, string source, string action, string key, string userid);
+        Result<object> WriteToLog(string code, string message, string source, string action, string key, string userid);
 
         /// <summary>
         /// 新增日志规则
@@ -36,7 +36,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "rules", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result AddRule(SYS_Logs_Rules rule);
+        Result<object> AddRule(SYS_Logs_Rules rule);
 
         /// <summary>
         /// 删除日志规则
@@ -45,7 +45,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "rules/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result RemoveRule(string id);
+        Result<object> RemoveRule(string id);
 
         /// <summary>
         /// 编辑日志规则
@@ -54,7 +54,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "rules", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result EditRule(SYS_Logs_Rules rule);
+        Result<object> EditRule(SYS_Logs_Rules rule);
 
         /// <summary>
         /// 获取日志规则
@@ -63,7 +63,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "rules/{id}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result GetRule(string id);
+        Result<object> GetRule(string id);
 
         /// <summary>
         /// 获取全部日志规则
@@ -71,7 +71,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "rules", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result GetRules();
+        Result<object> GetRules();
 
     }
 }

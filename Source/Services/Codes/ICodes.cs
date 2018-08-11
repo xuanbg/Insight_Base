@@ -22,7 +22,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result AddScheme(SYS_Code_Scheme obj);
+        Result<object> AddScheme(SYS_Code_Scheme obj);
 
         /// <summary>
         /// 根据ID删除编码方案或设为不可用
@@ -31,7 +31,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result DeleteScheme(string id);
+        Result<object> DeleteScheme(string id);
 
         /// <summary>
         /// 更新编码方案
@@ -41,7 +41,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result UpdateScheme(string id, SYS_Code_Scheme scheme);
+        Result<object> UpdateScheme(string id, SYS_Code_Scheme scheme);
 
         /// <summary>
         /// 根据ID更新编码方案状态
@@ -50,7 +50,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "{id}/validity", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result EnableScheme(string id);
+        Result<object> EnableScheme(string id);
 
         /// <summary>
         /// 根据ID获取编码方案对象实体
@@ -59,7 +59,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "{id}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result GetScheme(string id);
+        Result<object> GetScheme(string id);
 
         /// <summary>
         /// 获取全部编码方案
@@ -67,7 +67,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result GetSchemes();
+        Result<object> GetSchemes();
 
         /// <summary>
         /// 获取全部流水码使用记录
@@ -75,7 +75,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "serials", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result GetSerialRecord();
+        Result<object> GetSerialRecord();
 
         /// <summary>
         /// 获取全部流水码分配记录
@@ -83,7 +83,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "allots", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result GetAllotRecord();
+        Result<object> GetAllotRecord();
 
         /// <summary>
         /// 根据传入参数获取编码方案预览
@@ -94,7 +94,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "{id}/preview?code={code}&mark={mark}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result GetCodePreview(string id, string code, string mark);
+        Result<object> GetCodePreview(string id, string code, string mark);
 
         /// <summary>
         /// 根据传入参数获取编码方案预览
@@ -105,7 +105,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "{name}/newcode?id={id}&mark={mark}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result GetCode(string name, string id, string mark);
+        Result<object> GetCode(string name, string id, string mark);
 
     }
 }

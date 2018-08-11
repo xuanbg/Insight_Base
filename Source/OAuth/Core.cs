@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Insight.Base.Common;
 using Insight.Base.Common.Entity;
 using Insight.Utils.Common;
 
@@ -10,6 +9,9 @@ namespace Insight.Base.OAuth
 {
     public static class Core
     {
+        // Account缓存
+        private static readonly Dictionary<string, Guid> _Accounts = new Dictionary<string, Guid>();
+
         // Session缓存
         private static readonly Dictionary<Guid, Session> _Sessions = new Dictionary<Guid, Session>();
 
@@ -22,16 +24,43 @@ namespace Insight.Base.OAuth
         public static int Expired { get; } = int.Parse(Util.GetAppSetting("Expired"));
 
         /// <summary>
-        /// 根据登录账号获取用户ID
+        /// 在账号缓存中获取UserID
         /// </summary>
-        /// <param name="account">登录账号</param>
-        /// <returns>Guid 用户ID</returns>
-        public static Guid? GetUserId(string account)
+        /// <param name="key">登录账号</param>
+        /// <param name="initSession">是否初始化Session，默认为是</param>
+        /// <returns>Guid? UserID(未查询到用户数据时返回Null)</returns>
+        public static Guid? GetUserId(string key, bool initSession = true)
         {
-            using (var context = new BaseEntities())
+            if (_Accounts.ContainsKey(key)) return _Accounts[key];
+
+            if (!initSession) return null;
+
+            _Mutex.WaitOne();
+            if (_Accounts.ContainsKey(key))
             {
-                return context.SYS_User.SingleOrDefault(u => u.LoginName == account || u.Mobile == account)?.ID;
+                _Mutex.ReleaseMutex();
+                return _Accounts[key];
             }
+
+            var user = GetUser(key);
+            if (user == null)
+            {
+                _Mutex.ReleaseMutex();
+                return null;
+            }
+
+            _Accounts.Add(key, user.ID);
+            if (_Sessions.ContainsKey(user.ID))
+            {
+                _Mutex.ReleaseMutex();
+                return user.ID;
+            }
+
+            var session = new Session(user);
+            _Sessions.Add(user.ID, session);
+
+            _Mutex.ReleaseMutex();
+            return user.ID;
         }
 
         /// <summary>
@@ -41,41 +70,19 @@ namespace Insight.Base.OAuth
         /// <returns>Session(可能为null)</returns>
         public static Session GetSession(Guid uid)
         {
-            return _Sessions.ContainsKey(uid) ? _Sessions[uid] : FindSession(uid);
+            return _Sessions.ContainsKey(uid) ? _Sessions[uid] : null;
         }
 
         /// <summary>
-        /// 根据用户ID查询数据库构建Session并缓存
+        /// 根据登录账号获取用户实体
         /// </summary>
-        /// <param name="uid">UserID</param>
-        /// <returns>Session(可能为null)</returns>
-        internal static Session FindSession(Guid uid)
+        /// <param name="account">登录账号</param>
+        /// <returns>用户实体</returns>
+        private static SYS_User GetUser(string account)
         {
-            try
+            using (var context = new BaseEntities())
             {
-                _Mutex.WaitOne();
-                if (_Sessions.ContainsKey(uid))
-                {
-                    _Mutex.ReleaseMutex();
-                    return _Sessions[uid];
-                }
-
-                var session = new Session(uid);
-                if (session.id == Guid.Empty)
-                {
-                    _Mutex.ReleaseMutex();
-                    return null;
-                }
-
-                _Sessions.Add(uid, session);
-                _Mutex.ReleaseMutex();
-                return session;
-            }
-            catch (Exception ex)
-            {
-                new Logger("000000", $"UserId is {uid}, Exception:{ex.Message}", "OAuth", "GetSession").Write();
-                _Mutex.ReleaseMutex();
-                return null;
+                return context.SYS_User.SingleOrDefault(u => u.LoginName == account || u.Mobile == account);
             }
         }
     }

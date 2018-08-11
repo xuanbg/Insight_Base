@@ -22,7 +22,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "navigations", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result GetNavigation();
+        Result<object> GetNavigation();
 
         /// <summary>
         /// 获取用户启动模块的工具栏操作信息
@@ -31,7 +31,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "modules/{id}/actions", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result GetAction(string id);
+        Result<object> GetAction(string id);
 
         /// <summary>
         /// 获取模块有效选项参数
@@ -40,7 +40,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "modules/{id}/params", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result GetModuleParam(string id);
+        Result<object> GetModuleParam(string id);
 
         /// <summary>
         /// 获取模块个人选项参数
@@ -49,7 +49,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "modules/{id}/params/user", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result GetModuleUserParam(string id);
+        Result<object> GetModuleUserParam(string id);
 
         /// <summary>
         /// 获取模块部门选项参数
@@ -58,7 +58,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "modules/{id}/params/dept", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result GetModuleDeptParam(string id);
+        Result<object> GetModuleDeptParam(string id);
 
         /// <summary>
         /// 保存模块选项参数
@@ -69,7 +69,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "modules/{id}/params", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result SaveModuleParam(string id, List<SYS_ModuleParam> apl, List<SYS_ModuleParam> upl);
+        Result<object> SaveModuleParam(string id, List<SYS_ModuleParam> apl, List<SYS_ModuleParam> upl);
 
     }
 }
