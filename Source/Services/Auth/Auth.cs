@@ -131,6 +131,7 @@ namespace Insight.Base.Services
             var verify = new Verify(TokenType.RefreshToken);
             manage = verify.manage;
             tokenId = verify.tokenId;
+            if (manage == null) return result.InvalidToken();
 
             // 限流,令牌在其有效期内可刷新60次
             var key = Util.Hash("RefreshToken" + tokenId);

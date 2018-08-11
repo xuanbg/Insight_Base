@@ -38,12 +38,15 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.ServiceProcess" />
-    <Reference Include="Utils">
-      <HintPath>..\..\..\util\Utils.dll</HintPath>
+    <Reference Include="Utils, Version=1.1.6795.38509, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Utility\Utils.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="WCF">
-      <HintPath>..\..\..\util\WCF.dll</HintPath>
+    <Reference Include="WCF, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\WCF\WCF.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>

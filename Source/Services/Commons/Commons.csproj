@@ -50,12 +50,10 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Web" />
-    <Reference Include="System.Xml" />
     <Reference Include="Utils">
-      <HintPath>..\..\..\..\util\Utils.dll</HintPath>
+      <HintPath>..\..\..\..\Utility\Utils.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>

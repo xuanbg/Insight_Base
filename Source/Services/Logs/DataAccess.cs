@@ -1,9 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using Insight.Base.Common;
 using Insight.Base.Common.Entity;
-using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
 {

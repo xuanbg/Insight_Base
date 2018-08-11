@@ -183,15 +183,20 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> SignUp(string aid, string code, User user)
         {
-            if (!Verify()) return result;
-
             if (user == null) return result.BadRequest();
+
+            var fingerprint = GetFingerprint();
+            var limitKey = Util.Hash("signUp" + fingerprint + Util.Serialize(code));
+            var surplus = Params.callManage.GetSurplus(limitKey, 60);
+            if (surplus > 0) return result.TooFrequent(surplus);
 
             if (!Core.VerifySmsCode(1, user.mobile, code)) return result.SMSCodeError();
 
             if (Core.IsExisted(user)) return result.AccountExists();
 
             user.id = Util.NewId();
+            if (string.IsNullOrEmpty(user.password)) user.password = Util.Hash("123456");
+
             user.creatorId = user.id;
             user.createTime = DateTime.Now;
             if (!DbHelper.Insert(user)) return result.DataBaseError();
@@ -240,9 +245,13 @@ namespace Insight.Base.Services
         /// <param name="code">短信验证码</param>
         /// <param name="mobile">手机号，默认为空。如为空，则使用account</param>
         /// <returns>Result</returns>
-        public Result<object> ResetSignature(string aid, string account, string password, string code,
-            string mobile = null)
+        public Result<object> ResetSignature(string aid, string account, string password, string code, string mobile = null)
         {
+            var fingerprint = GetFingerprint();
+            var limitKey = Util.Hash("resetSignature" + fingerprint + Util.Serialize(code));
+            var surplus = Params.callManage.GetSurplus(limitKey, 10);
+            if (surplus > 0) return result.TooFrequent(surplus);
+
             if (!Core.VerifySmsCode(2, mobile ?? account, code)) return result.SMSCodeError();
 
             userId = Core.GetUserId(account);
