@@ -1,5 +1,6 @@
 ﻿using System.ServiceModel;
 using System.ServiceModel.Web;
+using Insight.Base.Common.Entity;
 using Insight.Utils.Entity;
 
 namespace Insight.Base.Services
@@ -35,12 +36,20 @@ namespace Insight.Base.Services
         /// <summary>
         /// 根据用户ID更新用户信息
         /// </summary>
-        /// <param name="id">用户ID</param>
+        /// <param name="id"></param>
         /// <param name="user">用户数据对象</param>
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "users/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> UpdateUserInfo(string id, User user);
+
+        /// <summary>
+        /// 根据ID获取用户对象实体
+        /// </summary>
+        /// <returns>Result</returns>
+        [WebGet(UriTemplate = "users/myself", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        Result<object> GetMyself();
 
         /// <summary>
         /// 根据ID获取用户对象实体
@@ -60,31 +69,33 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "users?rows={rows}&page={page}&key={key}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetUsers(string rows, string page, string key);
+        Result<object> GetUsers(int rows, int page, string key);
 
         /// <summary>
         /// 根据对象实体数据注册一个用户
         /// </summary>
+        /// <param name="appId">应用ID</param>
         /// <param name="code">验证码</param>
         /// <param name="user">用户对象</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "users/signup?code={code}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "users/signup?appid={appId}&code={code}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> SignUp(string code, User user);
+        Result<object> SignUp(string appId, string code, User user);
 
         /// <summary>
         /// 更新指定用户Session的签名
         /// </summary>
-        /// <param name="account">登录账号</param>
+        /// <param name="id">用户ID</param>
         /// <param name="password">新密码</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "users/{account}/signature", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "users/{id}/signature", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> UpdateSignature(string account, string password);
+        Result<object> UpdateSignature(string id, string password);
 
         /// <summary>
         /// 用户重置登录密码
         /// </summary>
+        /// <param name="appId">应用ID</param>
         /// <param name="account">登录账号</param>
         /// <param name="password">新密码</param>
         /// <param name="code">短信验证码</param>
@@ -92,26 +103,44 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "users/{account}/resetpw", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> ResetSignature(string account, string password, string code, string mobile = null);
+        Result<object> ResetSignature(string appId, string account, string password, string code, string mobile = null);
+
+        /// <summary>
+        /// 获取用户绑定租户集合
+        /// </summary>
+        /// <param name="account">用户登录名</param>
+        /// <returns>Result</returns>
+        [WebGet(UriTemplate = "users/{account}/tenants", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        Result<object> GetTenants(string account);
+
+        /// <summary>
+        /// 根据用户登录名获取可登录部门列表
+        /// </summary>
+        /// <param name="account">用户登录名</param>
+        /// <returns>Result</returns>
+        [WebGet(UriTemplate = "users/{account}/depts", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        Result<object> GetLoginDepts(string account);
 
         /// <summary>
         /// 根据用户ID设置用户状态
         /// </summary>
-        /// <param name="account">登录账号</param>
-        /// <param name="validity">可用状态</param>
+        /// <param name="id">用户ID</param>
+        /// <param name="invalid">可用状态</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "users/{account}/validity", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "users/{id}/validity", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> SetUserStatus(string account, bool validity);
+        Result<object> SetUserStatus(string id, bool invalid);
 
         /// <summary>
         /// 设置指定用户的登录状态为离线
         /// </summary>
-        /// <param name="account">用户账号</param>
+        /// <param name="id">用户账号</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "DELETE", UriTemplate = "users/{account}/token", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "DELETE", UriTemplate = "users/{id}/token", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> UserSignOut(string account);
+        Result<object> UserSignOut(string id);
 
         /// <summary>
         /// 根据ID获取用户对象实体

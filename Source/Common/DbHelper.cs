@@ -8,6 +8,21 @@ namespace Insight.Base.Common
     public class DbHelper
     {
         /// <summary>
+        /// 根据ID查询对象
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public static T Find<T>(string id) where T : class
+        {
+            using (var context = new Entities())
+            {
+                var obj = context.Set<T>();
+                return obj.Find(id);
+            }
+        }
+
+        /// <summary>
         /// 插入数据库记录
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
@@ -15,7 +30,7 @@ namespace Insight.Base.Common
         /// <returns>bool 是否成功</returns>
         public static bool Insert<T>(T entry) where T : class
         {
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 var obj = context.Set<T>();
                 obj.Add(entry);
@@ -39,7 +54,7 @@ namespace Insight.Base.Common
         /// <returns>bool 是否成功</returns>
         public static bool Insert<T>(List<T> entrys) where T : class
         {
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 var obj = context.Set<T>();
                 obj.AddRange(entrys);
@@ -63,7 +78,7 @@ namespace Insight.Base.Common
         /// <returns>bool 是否成功</returns>
         public static bool Delete<T>(T entry) where T : class
         {
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 var obj = context.Set<T>();
                 obj.Attach(entry);
@@ -88,7 +103,7 @@ namespace Insight.Base.Common
         /// <returns>bool 是否成功</returns>
         public static bool Delete<T>(List<T> entrys) where T : class
         {
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 entrys.ForEach(i =>
                 {
@@ -116,7 +131,7 @@ namespace Insight.Base.Common
         /// <returns>bool 是否成功</returns>
         public static bool Update<T>(T entry) where T : class
         {
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
                 var obj = context.Set<T>();
                 obj.Attach(entry);

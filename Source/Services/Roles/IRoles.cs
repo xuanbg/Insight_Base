@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ServiceModel;
 using System.ServiceModel.Web;
+using Insight.Base.Common.DTO;
 using Insight.Base.Common.Entity;
 using Insight.Utils.Entity;
 
@@ -19,11 +20,11 @@ namespace Insight.Base.Services
         /// <summary>
         /// 新增角色
         /// </summary>
-        /// <param name="role">RoleInfo</param>
+        /// <param name="info">RoleInfo</param>
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "roles", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> AddRole(Role role);
+        Result<object> AddRole(RoleInfo info);
 
         /// <summary>
         /// 根据ID删除角色
@@ -37,12 +38,12 @@ namespace Insight.Base.Services
         /// <summary>
         /// 编辑角色
         /// </summary>
-        /// <param name="id">角色ID</param>
-        /// <param name="role">RoleInfo</param>
+        /// <param name="id"></param>
+        /// <param name="info"></param>
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "roles/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> EditRole(string id, Role role);
+        Result<object> EditRole(string id, RoleInfo info);
 
         /// <summary>
         /// 获取指定角色
@@ -58,10 +59,11 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="rows">每页行数</param>
         /// <param name="page">当前页</param>
+        /// <param name="key">查询关键词</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "roles?rows={rows}&page={page}", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "roles?rows={rows}&page={page}&key={key}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetRoles(string rows, string page);
+        Result<object> GetRoles(int rows, int page, string key);
 
         /// <summary>
         /// 根据参数组集合插入角色成员关系
@@ -91,7 +93,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "roles/{id}/users?rows={rows}&page={page}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetMemberUsers(string id, string rows, string page);
+        Result<object> GetMemberUsers(string id, int rows, int page);
 
         /// <summary>
         /// 根据角色ID获取可用的成员集合
@@ -123,10 +125,11 @@ namespace Insight.Base.Services
         /// <summary>
         /// 获取可用的权限资源列表
         /// </summary>
-        /// <param name="id">角色ID（可为空）</param>
+        /// <param name="id">角色ID</param>
+        /// <param name="aid">应用ID（可为空）</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "roles/{id}/allperm", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "roles/{id}/allperm?appid={aid}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetAllPermission(string id);
+        Result<object> GetAppTree(string id, string aid);
     }
 }

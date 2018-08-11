@@ -7,3 +7,4 @@ Debug
 Insight Setup
 *.user
 packages
+/Source/.vs/Insight_Base

@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using Insight.Base.Common;
+using Insight.Base.Common.DTO;
 using Insight.Base.Common.Entity;
 using Insight.Base.OAuth;
 using Insight.Utils.Common;
@@ -10,7 +12,7 @@ using Insight.Utils.Entity;
 namespace Insight.Base.Services
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
-    public class Users : IUsers
+    public class Users : ServiceBase, IUsers
     {
         /// <summary>
         /// 为跨域请求设置响应头信息
@@ -26,16 +28,28 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> AddUser(User user)
         {
-            if (!Verify("60D5BE64-0102-4189-A999-96EDAD3DA1B5")) return _Result;
+            if (!Verify("newUser")) return result;
 
-            if (user.existed) return user.Result;
+            if (user == null) return result.BadRequest();
 
-            user.password = Util.Encrypt(Params.RSAKey, Util.Hash("123456"));
-            user.validity = true;
-            user.creatorUserId = _UserId;
+            if (Core.IsExisted(user)) return result.AccountExists();
+
+            user.id = Util.NewId();
+            user.password = Util.Hash("123456");
+            user.creatorId = userId;
             user.createTime = DateTime.Now;
+            if (!DbHelper.Insert(user)) return result.DataBaseError();
 
-            return user.Add() ? _Result.Created(user) : user.Result;
+            var tu = new TenantUser
+            {
+                id = Util.NewId(),
+                tenantId = tenantId,
+                userId = user.id,
+                creatorId = userId,
+                createTime = DateTime.Now
+            };
+
+            return DbHelper.Insert(tu) ? result.Created(user) : result.DataBaseError();
         }
 
         /// <summary>
@@ -45,42 +59,62 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> RemoveUser(string id)
         {
-            if (!Verify("BE2DE9AB-C109-418D-8626-236DEF8E8504")) return _Result;
+            if (!Verify("deleteUser")) return result;
 
-            var parse = new GuidParse(id);
-            if (!parse.Result.successful) return parse.Result;
+            var user = Core.GetUserById(id);
+            if (user == null) return result.NotFound();
 
-            var user = new User(parse.Value);
-            return user.Result.successful && user.Delete() ? _Result : user.Result;
+            return DbHelper.Delete(user) ? result : result.DataBaseError();
         }
 
         /// <summary>
         /// 更新用户信息
         /// </summary>
-        /// <param name="id">用户ID</param>
+        /// <param name="id"></param>
         /// <param name="user">用户数据对象</param>
         /// <returns>Result</returns>
         public Result<object> UpdateUserInfo(string id, User user)
         {
-            var parse = new GuidParse(id);
-            if (!parse.Result.successful) return parse.Result;
+            if (!Verify("editUser")) return result;
 
-            if (!Verify("3BC17B61-327D-4EAA-A0D7-7F825A6C71DB")) return _Result;
+            if (user == null) return result.BadRequest();
 
-            var data = new User(parse.Value);
-            if (!data.Result.successful) return data.Result;
+            var data = Core.GetUserById(user.id);
+            if (data == null) return result.NotFound();
 
             data.name = user.name;
-            data.description = user.description;
-            if (!data.Update()) return data.Result;
+            data.account = user.account;
+            data.mobile = user.mobile;
+            data.email = user.email;
+            data.remark = user.remark;
+            if (!DbHelper.Update(data)) return result.DataBaseError();
 
-            _Result.Success(data);
-            var session = Core.GetSession(user.id);
-            if (session == null) return _Result;
+            var session = Core.GetUserCache(user.id);
+            if (session == null) return result;
 
             session.userName = user.name;
-            session.UserType = user.type;
-            return _Result;
+            session.account = user.account;
+            session.mobile = user.mobile;
+            session.email = user.email;
+            session.SetChanged();
+            Core.SetUserCache(session);
+
+            return result;
+        }
+
+        /// <summary>
+        /// 获取登录用户的用户对象实体
+        /// </summary>
+        /// <returns>Result</returns>
+        public Result<object> GetMyself()
+        {
+            if (!Verify()) return result;
+
+            var data = Core.GetUserById(userId);
+            data.password = null;
+            data.payPassword = null;
+
+            return data == null ? result.NotFound() : result.Success(data);
         }
 
         /// <summary>
@@ -90,16 +124,14 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> GetUser(string id)
         {
-            var parse = new GuidParse(id);
-            if (!parse.Result.successful) return parse.Result;
+            if (!Verify("getUsers", id)) return result;
 
-            if (!Verify("B5992AA3-4AD3-4795-A641-2ED37AC6425C")) return _Result;
+            var data = Core.GetUserById(id);
+            if (data == null) return result.NotFound();
 
-            var data = new User(parse.Value);
-            if (!data.Result.successful) return data.Result;
+            var user = new UserDto {funcs = Core.GetPermitAppTree(tenantId, id), datas = new List<AppTree>()};
 
-            data.Authority = new Authority(parse.Value, null, InitType.Permission, true);
-            return _Result.Success(data);
+            return result.Success(user);
         }
 
         /// <summary>
@@ -109,149 +141,227 @@ namespace Insight.Base.Services
         /// <param name="page">当前页</param>
         /// <param name="key">关键词</param>
         /// <returns>Result</returns>
-        public Result<object> GetUsers(string rows, string page, string key)
+        public Result<object> GetUsers(int rows, int page, string key)
         {
-            if (!Verify("B5992AA3-4AD3-4795-A641-2ED37AC6425C")) return _Result;
+            if (!Verify("getUsers")) return result;
 
-            var ipr = new IntParse(rows);
-            if (!ipr.Result.successful) return ipr.Result;
+            if (page < 1 || rows > 100) return result.BadRequest();
 
-            var ipp = new IntParse(page);
-            if (!ipp.Result.successful) return ipp.Result;
-
-            if (ipr.Value > 500 || ipp.Value < 1) return _Result.BadRequest();
-
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
-                var filter = !string.IsNullOrEmpty(key);
-                var list = from u in context.SYS_User
-                        .Where(u => u.Type > 0 && (!filter || u.Name.Contains(key) || u.LoginName.Contains(key)))
-                        .OrderBy(u => u.SN)
+                var list = from u in context.users
+                    join r in context.tenantUsers on u.id equals r.userId
+                    where r.tenantId == tenantId && (string.IsNullOrEmpty(key) || u.name.Contains(key) ||
+                                                     u.account.Contains(key) || u.mobile.Contains(key) ||
+                                                     u.email.Contains(key))
                     select new
                     {
-                        id = u.ID,
-                        name = u.Name,
-                        loginName = u.LoginName,
-                        mobile =u.Mobile,
-                        description = u.Description,
-                        type = u.Type,
-                        builtIn = u.BuiltIn,
-                        validity = u.Validity,
-                        creatorUserId = u.CreatorUserId,
-                        createTime = u.CreateTime
+                        u.id,
+                        u.name,
+                        u.account,
+                        u.mobile,
+                        u.email,
+                        u.remark,
+                        u.isBuiltin,
+                        u.isInvalid,
+                        u.creatorId,
+                        u.createTime
                     };
-                var skip = ipr.Value*(ipp.Value - 1);
-                var users = list.Skip(skip).Take(ipr.Value).ToList();
+                var skip = rows * (page - 1);
+                var users = list.OrderBy(u => u.createTime).Skip(skip).Take(rows).ToList();
 
-                return _Result.Success(users, list.Count().ToString());
+                return result.Success(users, list.Count());
             }
         }
 
         /// <summary>
         /// 根据对象实体数据注册一个用户
         /// </summary>
+        /// <param name="aid">应用ID</param>
         /// <param name="code">验证码</param>
         /// <param name="user">用户对象</param>
         /// <returns>Result</returns>
-        public Result<object> SignUp(string code, User user)
+        public Result<object> SignUp(string aid, string code, User user)
         {
-            if (!Verify()) return _Result;
+            if (user == null) return result.BadRequest();
 
-            if (!Params.VerifySmsCode(1 + user.mobile, code)) return _Result.SMSCodeError();
+            var fingerprint = GetFingerprint();
+            var limitKey = Util.Hash("signUp" + fingerprint + Util.Serialize(code));
+            var surplus = Params.callManage.GetSurplus(limitKey, 60);
+            if (surplus > 0) return result.TooFrequent(surplus);
 
-            if (user.existed) return user.Result;
+            if (!Core.VerifySmsCode(1, user.mobile, code)) return result.SMSCodeError();
 
-            user.validity = true;
+            if (Core.IsExisted(user)) return result.AccountExists();
+
+            if (string.IsNullOrEmpty(user.id)) user.id = Util.NewId();
+
+            if (string.IsNullOrEmpty(user.password)) user.password = Util.Hash("123456");
+
+            user.creatorId = user.id;
             user.createTime = DateTime.Now;
-            if (!user.Add()) return user.Result;
+            if (!DbHelper.Insert(user)) return result.DataBaseError();
 
-            var session = Core.GetSession(user.id);
-            session.InitSecret();
+            var id = Core.GetUserId(user.account);
+            manage = Core.GetUserCache(id);
+            var tokens = manage.Creator(Util.NewId("N"), aid);
+            Core.SetUserCache(manage);
 
-            var tid = session.GenerateCode();
-            return _Result.Created(session.CreatorKey(tid));
+            return result.Created(tokens);
         }
 
         /// <summary>
         /// 更新指定用户Session的签名
         /// </summary>
-        /// <param name="account">登录账号</param>
+        /// <param name="id">用户ID</param>
         /// <param name="password">新密码（RSA加密）</param>
         /// <returns>Result</returns>
-        public Result<object> UpdateSignature(string account, string password)
+        public Result<object> UpdateSignature(string id, string password)
         {
-            if (!Verify("26481E60-0917-49B4-BBAA-2265E71E7B3F", 0, null, account)) return _Result;
+            if (!Verify("resetPassword", id)) return result;
 
-            var user = new User(account) {password = password};
-            if (!user.Result.successful || !user.Update()) return user.Result;
+            var user = Core.GetUserById(id);
+            if (user == null) return result.NotFound();
 
-            var session = _Session.UserIsSame(account) ? _Session : Core.GetSession(user.id);
+            if (user.password == password) result.BadRequest("密码不能与原密码相同");
 
-            if (session == null) return _Result;
+            user.password = password;
+            if (!DbHelper.Update(user)) return result.DataBaseError();
 
-            session.Sign(password);
-            return _Result;
+            manage = Core.GetUserCache(id);
+            if (manage == null) return result;
+
+            manage.password = password;
+            manage.SetChanged();
+            Core.SetUserCache(manage);
+
+            return result;
         }
 
         /// <summary>
         /// 用户重置登录密码
         /// </summary>
+        /// <param name="aid">应用ID</param>
         /// <param name="account">登录账号</param>
         /// <param name="password">新密码（RSA加密）</param>
         /// <param name="code">短信验证码</param>
         /// <param name="mobile">手机号，默认为空。如为空，则使用account</param>
         /// <returns>Result</returns>
-        public Result<object> ResetSignature(string account, string password, string code, string mobile = null)
+        public Result<object> ResetSignature(string aid, string account, string password, string code, string mobile = null)
         {
-            if (!Verify()) return _Result;
+            if (string.IsNullOrEmpty(aid) || string.IsNullOrEmpty(password)) return result.InvalidValue();
 
-            // 验证短信验证码
-            if (!Params.VerifySmsCode(2 + (mobile ?? account), code)) return _Result.SMSCodeError();
+            var fingerprint = GetFingerprint();
+            var limitKey = Util.Hash("resetSignature" + fingerprint + Util.Serialize(code));
+            var surplus = Params.callManage.GetSurplus(limitKey, 10);
+            if (surplus > 0) return result.TooFrequent(surplus);
 
-            var user = new User(account) {password = password};
-            if (!user.Result.successful || !user.Update()) return user.Result;
+            if (!Core.VerifySmsCode(2, mobile ?? account, code)) return result.SMSCodeError();
 
-            var session = Core.GetSession(user.id);
-            if (session == null) return _Result.NotFound();
+            userId = Core.GetUserId(account);
+            if (userId == null) return result.NotFound();
 
-            session.Sign(password);
-            session.InitSecret(true);
+            manage = Core.GetUserCache(userId);
+            if (manage.password != password)
+            {
+                var user = Core.GetUserById(userId);
+                user.password = password;
+                if (!DbHelper.Update(user)) return result.DataBaseError();
+            }
 
-            var tid = session.GenerateCode();
-            return _Result.Success(session.CreatorKey(tid));
+            manage.password = password;
+            var tokens = manage.Creator(Util.NewId("N"), aid);
+            Core.SetUserCache(manage);
+
+            return result.Created(tokens);
+        }
+
+        /// <summary>
+        /// 获取用户绑定租户集合
+        /// </summary>
+        /// <param name="account">用户登录名</param>
+        /// <returns>Result</returns>
+        public Result<object> GetTenants(string account)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// 根据用户登录名获取可登录部门列表
+        /// </summary>
+        /// <param name="account">用户登录名</param>
+        /// <returns>Result</returns>
+        public Result<object> GetLoginDepts(string account)
+        {
+            using (var context = new Entities())
+            {
+                var user = context.users.SingleOrDefault(u => u.account == account || u.mobile == account || u.email == account);
+                if (user == null) return result.NotFound();
+
+                var list = new List<Organization>();
+                var orgs = (from o in context.organizations
+                    join r in context.tenantUsers on o.tenantId equals r.tenantId
+                    where r.userId == user.id
+                    select o).ToList();
+                var ids = context.orgMembers.Where(m => m.userId == user.id).Select(i => i.orgId).ToList();
+                list.AddRange(orgs.Where(i => i.id == i.tenantId));
+                foreach (var id in ids)
+                {
+                    var org = orgs.Single(i => i.id == id);
+                    while (org.parentId != null)
+                    {
+                        org = orgs.Single(i => i.id == org.parentId);
+                        if (list.Any(i => i.id == org.id)) continue;
+
+                        org.remark = org.tenantId;
+                        list.Add(org);
+                    }
+                }
+
+                return result.Success(list);
+            }
         }
 
         /// <summary>
         /// 为指定的登录账号设置用户状态
         /// </summary>
-        /// <param name="account">登录账号</param>
-        /// <param name="validity">可用状态</param>
+        /// <param name="id">用户ID</param>
+        /// <param name="invalid">失效状态</param>
         /// <returns>Result</returns>
-        public Result<object> SetUserStatus(string account, bool validity)
+        public Result<object> SetUserStatus(string id, bool invalid)
         {
-            var action = validity ? "369548E9-C8DB-439B-A604-4FDC07F3CCDD" : "0FA34D43-2C52-4968-BDDA-C9191D7FCE80";
-            if (!Verify(action)) return _Result;
+            var action = invalid ? "bannedUser" : "releaseUser";
+            if (!Verify(action)) return result;
 
-            var user = new User(account) {validity = validity};
-            if (!user.Result.successful || !user.Update()) return user.Result;
+            var user = Core.GetUserById(id);
+            if (user == null) return result.NotFound();
 
-            var session = Core.GetSession(user.id);
-            if (session != null) session.Validity = validity;
+            if (user.isInvalid == invalid) return result;
 
-            return _Result;
+            user.isInvalid = invalid;
+            if (!DbHelper.Update(user)) return result.DataBaseError();
+
+            var session = Core.GetUserCache(user.id);
+            if (session == null) return result;
+
+            session.isInvalid = invalid;
+            session.SetChanged();
+            Core.SetUserCache(session);
+
+            return result;
         }
 
         /// <summary>
         /// 设置指定用户的登录状态为离线
         /// </summary>
-        /// <param name="account">用户账号</param>
+        /// <param name="id">用户账号</param>
         /// <returns>Result</returns>
-        public Result<object> UserSignOut(string account)
+        public Result<object> UserSignOut(string id)
         {
-            if (!Verify()) return _Result;
+            if (!Verify()) return result;
 
-            _Session.Offline(_Token.id);
-            return _Result;
+            manage.Delete(tokenId);
+            return result;
         }
 
         /// <summary>
@@ -262,45 +372,13 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> GetUserRoles(string id, string deptid)
         {
-            if (!Verify()) return _Result;
+            if (!Verify()) return result;
 
-            var parse = new GuidParse(id);
-            if (!parse.Result.successful) return parse.Result;
-
-            var dept = new GuidParse(deptid, true);
-            if (!parse.Result.successful) return parse.Result;
-
-            var auth = new Authority(parse.Value, dept.Guid);
-            return _Result.Success(auth.RoleList);
-        }
-
-        private Result<object> _Result = new Result<object>();
-        private Session _Session;
-        private AccessToken _Token;
-        private Guid _UserId;
-
-        /// <summary>
-        /// 会话合法性验证
-        /// </summary>
-        /// <param name="action">操作权限代码，默认为空，即不进行鉴权</param>
-        /// <param name="limit">单位时间(秒)内限制调用，默认为0：不限制</param>
-        /// <param name="uid">用户ID，默认为空，如用户ID与SessionID一致，则不进行鉴权</param>
-        /// <param name="account"></param>
-        /// <returns>bool 身份是否通过验证</returns>
-        private bool Verify(string action = null, int limit = 0, Guid? uid = null, string account = null)
-        {
-            var compare = new Compare(limit);
-            _Result = compare.Result;
-            if (!_Result.successful) return false;
-
-            _Session = compare.Basis;
-            _Token = compare.Token;
-            _UserId = _Session.userId;
-            if (uid == _Session.userId || _Session.UserIsSame(account)) action = null;
-
-            _Result = compare.Verify(action);
-
-            return _Result.successful;
+            using (var context = new Entities())
+            {
+                var list = context.userRoles.ToList();
+                return result.Success(list);
+            }
         }
     }
 }

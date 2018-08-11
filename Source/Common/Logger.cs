@@ -5,87 +5,44 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Insight.Base.Common.Entity;
 using Insight.Utils.Common;
+using Insight.Utils.Entity;
 
 namespace Insight.Base.Common
 {
-    public class Logger
+    public static class Logger
     {
         /// <summary>
-        /// 事件代码
-        /// </summary>
-        private readonly string Code;
-
-        /// <summary>
-        /// 事件消息
-        /// </summary>
-        private readonly string Message;
-
-        /// <summary>
-        /// 事件源
-        /// </summary>
-        private readonly string Source;
-
-        /// <summary>
-        /// 事件名称
-        /// </summary>
-        private readonly string Action;
-
-        /// <summary>
-        /// 查询关键字
-        /// </summary>
-        private readonly string Key;
-
-        /// <summary>
-        /// 事件源用户ID
-        /// </summary>
-        private readonly Guid? UserId;
-
-        /// <summary>
-        /// 写入日志
+        /// 构造SYS_Logs数据并写入
         /// </summary>
         /// <param name="code">事件代码</param>
         /// <param name="message">事件消息</param>
         /// <param name="source">事件来源</param>
         /// <param name="action">操作名称</param>
         /// <param name="key">查询关键字</param>
-        /// <param name="uid">事件源用户ID</param>
+        /// <param name="userId">事件源用户ID</param>
         /// <returns>bool 是否写入成功</returns>
-        public Logger(string code, string message = null, string source = null, string action = null, string key = null, Guid? uid = null)
+        public static bool? Write(string code, string message = null, string source = null, string action = null, string key = null, string userId = null)
         {
-            Code = code;
-            Message = message;
-            Source = source;
-            Action = action;
-            Key = key;
-            UserId = uid;
-        }
+            if (string.IsNullOrEmpty(code) || !Regex.IsMatch(code, @"^\d{6}$")) return null;
 
-        /// <summary>
-        /// 构造SYS_Logs数据并写入
-        /// </summary>
-        /// <returns>bool 是否写入成功</returns>
-        public bool? Write()
-        {
-            if (string.IsNullOrEmpty(Code) || !Regex.IsMatch(Code, @"^\d{6}$")) return null;
-
-            var level = Convert.ToInt32(Code.Substring(0, 1));
-            var rule = Params.Rules.SingleOrDefault(r => r.Code == Code);
+            var level = Convert.ToInt32(code.Substring(0, 1));
+            var rule = Params.rules.SingleOrDefault(r => r.code == code);
             if (level > 1 && level < 7 && rule == null) return null;
 
-            var log = new SYS_Logs
+            var log = new Log
             {
-                ID = Guid.NewGuid(),
-                Code = Code,
-                Level = level,
-                Source = rule?.Source ?? Source,
-                Action = rule?.Action ?? Action,
-                Message = string.IsNullOrEmpty(Message) ? rule?.Message : Message,
-                Key = Key,
-                SourceUserId = UserId,
-                CreateTime = DateTime.Now
+                id = Util.NewId(),
+                code = code,
+                level = level,
+                source = rule?.source ?? source,
+                action = rule?.action ?? action,
+                message = string.IsNullOrEmpty(message) ? rule?.message : message,
+                key = key,
+                userId = userId,
+                createTime = DateTime.Now
             };
 
-            return (rule?.ToDataBase ?? false) ? WriteToDB(log) : WriteToFile(log);
+            return (rule?.isFile ?? true) ? WriteToFile(log) : WriteToDB(log);
         }
 
         /// <summary>
@@ -93,11 +50,11 @@ namespace Insight.Base.Common
         /// </summary>
         /// <param name="log"></param>
         /// <returns>bool 是否写入成功</returns>
-        public static bool WriteToDB(SYS_Logs log)
+        private static bool WriteToDB(Log log)
         {
-            using (var context = new BaseEntities())
+            using (var context = new Entities())
             {
-                context.SYS_Logs.Add(log);
+                context.logs.Add(log);
                 return context.SaveChanges() > 0;
             }
         }
@@ -107,18 +64,18 @@ namespace Insight.Base.Common
         /// </summary>
         /// <param name="log"></param>
         /// <returns>bool 是否写入成功</returns>
-        public static bool WriteToFile(SYS_Logs log)
+        private static bool WriteToFile(Log log)
         {
-            Params.Mutex.WaitOne();
-            var path = $"{Util.GetAppSetting("LogLocal")}\\{GetLevelName(log.Level)}\\";
+            Params.mutex.WaitOne();
+            var path = $"{Util.GetAppSetting("LogLocal")}\\{GetLevelName(log.level)}\\";
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
             }
 
             path += $"{DateTime.Today:yyyy-MM-dd}.log";
-            var time = log.CreateTime.ToString("O");
-            var text = $"[{log.CreateTime.Kind} {time}] [{log.Code}] [{log.Source}] [{log.Action}] Message:{log.Message}\r\n";
+            var time = log.createTime.ToString("O");
+            var text = $"[{log.createTime.Kind} {time}] [{log.code}] [{log.source}] [{log.action}] Message:{log.message}\r\n";
             var buffer = Encoding.UTF8.GetBytes(text);
             try
             {
@@ -126,12 +83,12 @@ namespace Insight.Base.Common
                 {
                     stream.Write(buffer, 0, buffer.Length);
                 }
-                Params.Mutex.ReleaseMutex();
+                Params.mutex.ReleaseMutex();
                 return true;
             }
             catch (Exception)
             {
-                Params.Mutex.ReleaseMutex();
+                Params.mutex.ReleaseMutex();
                 return false;
             }
         }
