@@ -77,7 +77,7 @@ URL：authapi/v1.0/tokens/codes
 
 |属性|数据类型|属性说明|
 | ------------ | ------------ | ------------ |
-|无|string|用以在获取Token时加密数据，5秒内有效|
+|无|string|用以在获取Token时加密数据，5秒内有效|
 
 返回数据示例：
 ```
@@ -106,7 +106,7 @@ URL：authapi/v1.0/tokens
 |属性|数据类型|属性说明|
 | ------------ | ------------ | ------------ |
 |account|string|登录账号|
-|tenantid|string|租户ID|
+|tenantid|string|租户ID，令牌无需鉴权时可为空|
 |appid|string|应用ID|
 |signature|string|用户签名：md5(md5(account + md5(password)) + code)|
 |deptid|string|登录部门ID(可为空)|
@@ -117,8 +117,8 @@ URL：authapi/v1.0/tokens
 | ------------ | ------------ | ------------ |
 |accessToken|string|在接口调用时附加在请求头|
 |refreshToken|string|刷新令牌时使用|
-|expiryTime|int|accessToken过期秒数，过期后可调用刷新接口刷新令牌|
-|failureTime|int|accessToken失效秒数，失效后必须重新获取令牌|
+|expiryTime|int|accessToken过期秒数，过期后可调用刷新接口刷新令牌|
+|failureTime|int|accessToken失效秒数，失效后必须重新获取令牌|
 
 返回数据示例：
 ```
@@ -155,8 +155,8 @@ URL：authapi/v1.0/tokens
 | ------------ | ------------ | ------------ |
 |accessToken|string|在接口调用时附加在请求头|
 |refreshToken|string|刷新令牌时使用|
-|expiryTime|int|accessToken过期秒数，过期后可调用刷新接口刷新令牌|
-|failureTime|int|accessToken失效秒数，失效后必须重新获取令牌|
+|expiryTime|int|accessToken过期秒数，过期后可调用刷新接口刷新令牌|
+|failureTime|int|accessToken失效秒数，失效后必须重新获取令牌|
 
 返回数据示例：
 ```
@@ -224,9 +224,9 @@ URL：authapi/v1.0/tokens/secret
 |id|string|用户ID|
 |tenantId|string|租户ID|
 |deptId|string|用户当前登录部门ID|
-|name|string|用户名称|
+|name|string|用户名称|
 |account|string|注册账号|
-|mobile|string|绑定手机号|
+|mobile|string|绑定手机号|
 |email|string|绑定邮箱|
 |remark|string|用户备注|
 
@@ -269,8 +269,8 @@ URL：authapi/v1.0/smscodes
 | ------------ | ------------ | ------------ |
 |mobile|string|手机号|
 |type|int|类型：0、验证手机号;1、注册用户账号;2、重置密码;3、修改支付密码;4、登录验证码|
-|life|int|过期时间(分钟)|
-|length|int|验证码位数|
+|life|int|过期时间(分钟)，默认15分钟|
+|length|int|验证码位数，默认6位|
 
 返回数据：短信验证码
 
@@ -363,6 +363,7 @@ URL：userapi/v1.0/users/signup
 
 |属性|数据类型|属性说明|
 | ------------ | ------------ | ------------ |
+|id|string|用户ID，可为空，或传长度不超过36位的字符串|
 |name|string|用户名，不可为空|
 |account|string|登录账号，不可为空，唯一|
 |mobile|string|绑定手机号，可为空，唯一|
@@ -391,8 +392,8 @@ URL：userapi/v1.0/users/signup
 | ------------ | ------------ | ------------ |
 |accessToken|string|在接口调用时附加在请求头|
 |refreshToken|string|刷新令牌时使用|
-|expiryTime|int|accessToken过期秒数，过期后可调用刷新接口刷新令牌|
-|failureTime|int|accessToken失效秒数，失效后必须重新获取令牌|
+|expiryTime|int|accessToken过期秒数，过期后可调用刷新接口刷新令牌|
+|failureTime|int|accessToken失效秒数，失效后必须重新获取令牌|
 
 返回数据示例：
 ```
@@ -447,9 +448,9 @@ URL：userapi/v1.0/users/{id}/signature
 |id|string|用户ID|
 |tenantId|string|租户ID|
 |deptId|string|用户当前登录部门ID|
-|name|string|用户名称|
+|name|string|用户名称|
 |account|string|注册账号|
-|mobile|string|绑定手机号|
+|mobile|string|绑定手机号|
 |email|string|绑定邮箱|
 |remark|string|用户备注|
 
@@ -515,8 +516,8 @@ URL：userapi/v1.0/users/{account}/resetpw
 | ------------ | ------------ | ------------ |
 |accessToken|string|在接口调用时附加在请求头|
 |refreshToken|string|刷新令牌时使用|
-|expiryTime|int|accessToken过期秒数，过期后可调用刷新接口刷新令牌|
-|failureTime|int|accessToken失效秒数，失效后必须重新获取令牌|
+|expiryTime|int|accessToken过期秒数，过期后可调用刷新接口刷新令牌|
+|failureTime|int|accessToken失效秒数，失效后必须重新获取令牌|
 
 返回数据示例：
 ```
