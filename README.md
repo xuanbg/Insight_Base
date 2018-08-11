@@ -10,6 +10,8 @@
   - [刷新Token](#刷新token)
   - [注销Token](#注销token)
   - [验证身份和权限](#验证身份和权限)
+  - [设置支付密码](#设置支付密码)
+  - [验证支付密码](#验证支付密码)
 - [短信接口](#短信接口)
   - [获取短信验证码](#获取短信验证码)
   - [验证短信验证码](#验证短信验证码)
@@ -18,7 +20,6 @@
   - [获取用户信息](#获取用户信息)
   - [修改密码](#修改密码)
   - [重置密码](#重置密码)
-  - [设置支付密码](#设置支付密码)
 
 # 概述
 
@@ -216,6 +217,95 @@ URL：authapi/v1.0/tokens/secret
 |属性|数据类型|属性说明|
 | ------------ | ------------ | ------------ |
 |action|string|权限代码|
+
+返回数据：用户信息
+
+|属性|数据类型|属性说明|
+| ------------ | ------------ | ------------ |
+|id|string|用户ID|
+|tenantId|string|租户ID|
+|deptId|string|用户当前登录部门ID|
+|name|string|用户名称|
+|account|string|注册账号|
+|mobile|string|绑定手机号|
+|email|string|绑定邮箱|
+|remark|string|用户备注|
+
+返回数据示例：
+```
+{
+  "successful": true,
+  "code": "200",
+  "name": "OK",
+  "message": "接口调用成功",
+  "option": null,
+  "data": {
+    "id": "71f94cb6-9247-40f8-aaef-e771b9a0961d",
+    "tenantId": "30a1307b-b85c-4cc5-b12f-be6a708311f4",
+    "deptId": null,
+    "name": "管理员",
+    "account": "2810",
+    "mobile": null,
+    "email": null,
+    "remark": null
+  }
+}
+```
+
+[回目录](#目录)
+
+### 设置支付密码
+
+方法：POST
+
+URL：authapi/v1.0/paypws
+
+令牌：accessToken
+
+参数：BODY
+
+|属性|数据类型|属性说明|
+| ------------ | ------------ | ------------ |
+|code|string|短信验证码|
+|password|string|支付密码(MD5)|
+
+请求数据示例：
+```
+{
+  "code": "123456"
+  "password": "e10adc3949ba59abbe56e057f20f883e"
+}
+```
+
+返回数据：无
+
+返回数据示例：
+```
+{
+  "successful": true,
+  "code": "200",
+  "name": "OK",
+  "message": "接口调用成功",
+  "option": null,
+  "data": null
+}
+```
+
+[回目录](#目录)
+
+### 验证支付密码
+
+方法：GET
+
+URL：authapi/v1.0/paypws
+
+令牌：accessToken
+
+参数：URL
+
+|属性|数据类型|属性说明|
+| ------------ | ------------ | ------------ |
+|pw|string|支付密码(MD5)|
 
 返回数据：用户信息
 
