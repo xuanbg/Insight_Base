@@ -101,7 +101,7 @@ namespace Insight.Base.Services
 
             using (var context = new Entities())
             {
-                var list = context.organizations.ToList();
+                var list = context.organizations.Where(i => i.tenantId == tenantId).ToList();
 
                 return list.Any() ? result.Success(list) : result.NoContent(new List<object>());
             }
