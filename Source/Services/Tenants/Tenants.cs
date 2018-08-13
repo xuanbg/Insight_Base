@@ -187,7 +187,7 @@ namespace Insight.Base.Services
             if (!DbHelper.Insert(role)) return result.DataBaseError();
 
             // 初始化根机构并持久化组织机构数据
-            var org = new Organization
+            var org = new Org
             {
                 id = tenant.id,
                 tenantId = tenant.id,

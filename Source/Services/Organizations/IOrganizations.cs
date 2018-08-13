@@ -1,4 +1,5 @@
-﻿using System.ServiceModel;
+﻿using System.Collections.Generic;
+using System.ServiceModel;
 using System.ServiceModel.Web;
 using Insight.Base.Common.Entity;
 using Insight.Utils.Entity;
@@ -22,7 +23,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "orgs", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> AddOrg(Organization org);
+        Result<object> AddOrg(Org org);
 
         /// <summary>
         /// 根据ID删除组织机构节点
@@ -41,7 +42,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "orgs/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> UpdateOrg(string id, Organization org);
+        Result<object> UpdateOrg(string id, Org org);
 
         /// <summary>
         /// 根据ID获取机构对象实体
@@ -64,21 +65,21 @@ namespace Insight.Base.Services
         /// 新增职位成员关系
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="org">组织节点对象</param>
+        /// <param name="members">成员集合</param>
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "orgs/{id}/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> AddOrgMember(string id, Organization org);
+        Result<object> AddOrgMember(string id, List<string> members);
 
         /// <summary>
         /// 根删除职位成员关系
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="org">组织节点对象</param>
+        /// <param name="members">成员集合</param>
         /// <returns>Result</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "orgs/{id}/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> RemoveOrgMember(string id, Organization org);
+        Result<object> RemoveOrgMember(string id, List<string> members);
 
         /// <summary>
         /// 获取职位成员之外的所有用户

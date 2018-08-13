@@ -299,8 +299,8 @@ namespace Insight.Base.Services
                 var user = context.users.SingleOrDefault(u => u.account == account || u.mobile == account || u.email == account);
                 if (user == null) return result.NotFound();
 
-                var list = new List<Organization>();
-                var orgs = (from o in context.organizations
+                var list = new List<Org>();
+                var orgs = (from o in context.orgs
                     join r in context.tenantUsers on o.tenantId equals r.tenantId
                     where r.userId == user.id
                     select o).ToList();

@@ -221,7 +221,7 @@ namespace Insight.Base.Services
 
             using (var context = new Entities())
             {
-                var list = from o in context.organizations
+                var list = from o in context.orgs
                     join r in context.roleMembers.Where(i => i.roleId == id && i.memberType == 3) on o.id equals r.memberId into temp
                     from t in temp.DefaultIfEmpty()
                     where o.tenantId == tenantId && t == null

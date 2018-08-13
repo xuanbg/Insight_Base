@@ -57,7 +57,7 @@ namespace Insight.Base.Common.Entity
         /// <summary>
         /// 组织机构
         /// </summary>
-        public virtual DbSet<Organization> organizations { get; set; }
+        public virtual DbSet<Org> orgs { get; set; }
 
         /// <summary>
         /// 组织机构成员

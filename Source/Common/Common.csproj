@@ -57,6 +57,8 @@
     <Compile Include="DbHelper.cs" />
     <Compile Include="DTO\App.cs" />
     <Compile Include="DTO\AppTree.cs" />
+    <Compile Include="DTO\MemberUser.cs" />
+    <Compile Include="DTO\OrgDTO.cs" />
     <Compile Include="DTO\RoleInfo.cs" />
     <Compile Include="DTO\SmsCode.cs" />
     <Compile Include="DTO\TenantInfo.cs" />

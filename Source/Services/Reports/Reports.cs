@@ -115,7 +115,7 @@ namespace Insight.Base.Services
                     where p.reportId == id
                     select new Period {id = p.id, name = r.name};
                 var entities = from e in context.reportEntities
-                    join o in context.organizations on e.orgId equals o.id
+                    join o in context.orgs on e.orgId equals o.id
                     where e.reportId == id
                     select new Entity {id = e.id, name = o.fullname};
 

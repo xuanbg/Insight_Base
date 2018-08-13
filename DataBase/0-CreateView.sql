@@ -26,7 +26,7 @@ select
 from ucr_role_member m
     join ucr_role r on r.id = m.role_id
     join uco_org_member o on o.org_id = m.member_id
-    join uco_organization d on d.id = o.org_id
+    join uco_org d on d.id = o.org_id
 where
     m.member_type = 3
 
@@ -60,7 +60,7 @@ select
     lower(newid()) as id, m.role_id, u.name, u.account, u.remark, u.is_invalid, u.created_time
 from
 	ucr_role_member m
-	join uco_organization o on o.id = m.member_id 
+	join uco_org o on o.id = m.member_id 
 	join uco_org_member r on r.org_id = o.id
 	join ucb_user u on u.id = r.user_id
 where
@@ -94,7 +94,7 @@ select
     m.id, m.role_id, m.member_type, m.member_id, o.alias as name
 from
 	ucr_role_member m
-	join uco_organization o on o.id = m.member_id 
+	join uco_org o on o.id = m.member_id 
 where
 	m.member_type = 3
 
