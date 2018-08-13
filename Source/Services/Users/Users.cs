@@ -270,6 +270,7 @@ namespace Insight.Base.Services
             }
 
             manage.password = password;
+            manage.SetChanged();
             var tokens = manage.Creator(Util.NewId("N"), aid);
             Core.SetUserCache(manage);
 
