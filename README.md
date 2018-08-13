@@ -593,7 +593,7 @@ URL：userapi/v1.0/users/{account}/resetpw
 
 |属性|数据类型|属性说明|
 | ------------ | ------------ | ------------ |
-|appid|string|应用ID|
+|appId|string|应用ID|
 |password|string|新密码|
 |code|string|短信验证码|
 |mobile|string|手机号|
@@ -601,7 +601,7 @@ URL：userapi/v1.0/users/{account}/resetpw
 请求数据示例：
 ```
 {
-  "appid": "b4e8dff6-a2eb-46c6-982d-ee395a4261e0"
+  "appId": "b4e8dff6-a2eb-46c6-982d-ee395a4261e0"
   "password": "e10adc3949ba59abbe56e057f20f883e"
   "code": "1c320d4fc1614f54800d34b86a53941e"
   "mobile": "13958085903"
