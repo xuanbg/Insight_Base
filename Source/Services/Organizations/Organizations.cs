@@ -253,9 +253,10 @@ namespace Insight.Base.Services
             using (var context = new Entities())
             {
                 return context.orgs.Any(i => i.id != org.id && i.tenantId == org.tenantId 
-                                                                     && (!string.IsNullOrEmpty(org.code) && i.code == org.code 
-                                                                         || !string.IsNullOrEmpty(org.alias) && i.alias == org.alias 
-                                                                         || !string.IsNullOrEmpty(org.fullname) && i.fullname == org.fullname));
+                                             && (i.parentId == org.parentId && i.name == org.name 
+                                                 || !string.IsNullOrEmpty(org.code) && i.code == org.code
+                                                 || !string.IsNullOrEmpty(org.alias) && i.alias == org.alias
+                                                 || !string.IsNullOrEmpty(org.fullname) && i.fullname == org.fullname));
             }
         }
     }
