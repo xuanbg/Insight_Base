@@ -43,7 +43,7 @@ namespace Insight.Base.OAuth
         /// <returns>string 客户端特征指纹</returns>
         public string GetFingerprint()
         {
-            var verify = new Verify();
+            var verify = new Verify(false);
 
             return Util.Hash(verify.ip + verify.userAgent);
         }

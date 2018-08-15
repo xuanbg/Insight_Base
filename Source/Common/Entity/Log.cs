@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Insight.Base.Common.Entity
@@ -104,5 +105,46 @@ namespace Insight.Base.Common.Entity
         /// </summary>
         [Column("created_time")]
         public DateTime createTime { get; set; }
+    }
+
+    /// <summary>
+    /// 请求对象实体
+    /// </summary>
+    public class RequestEntity
+    {
+        /// <summary>
+        /// 来源IP
+        /// </summary>
+        public string source { get; set; }
+
+        /// <summary>
+        /// 请求方法
+        /// </summary>
+        public string method { get; set; }
+
+        /// <summary>
+        /// 目标接口
+        /// </summary>
+        public string url { get; set; }
+
+        /// <summary>
+        /// 令牌
+        /// </summary>
+        public string token { get; set; }
+
+        /// <summary>
+        /// 请求头
+        /// </summary>
+        public Dictionary<string, string> headers { get; set; }
+
+        /// <summary>
+        /// URL参数集合
+        /// </summary>
+        public Dictionary<string, string> urlParams { get; set; }
+
+        /// <summary>
+        /// 请求体内容
+        /// </summary>
+        public object body { get; set; }
     }
 }

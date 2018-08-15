@@ -30,8 +30,8 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> GetCode(string account, int type)
         {
-            // 限流,每用户每天可访问100次
-            var key = Util.Hash("GetCode" + account + type);
+            // 限流,每客户端每天可访问100次
+            var key = Util.Hash("GetCode" + GetFingerprint());
             var limited = Params.callManage.IsLimited(key, 3600 * 24, 100);
             if (limited) return result.BadRequest("当天获取Code次数已用完,请合理使用接口");
 
@@ -62,10 +62,10 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> GetToken(string tid, string aid, string account, string signature, string deptid)
         {
-            // 限流,每用户每3秒可访问1次
-            var key = Util.Hash("GetToken" + account);
-            var surplus = Params.callManage.GetSurplus(key, 3);
-            if (surplus > 0) return result.TooFrequent(surplus);
+            // 限流,每客户端每天可访问100次
+            var key = Util.Hash("GetToken" + GetFingerprint());
+            var limited = Params.callManage.IsLimited(key, 3600 * 24, 100);
+            if (limited) return result.BadRequest("当天获取Token次数已用完,请合理使用接口");
 
             var code = Core.GetCode(signature);
             if (string.IsNullOrEmpty(code))
@@ -128,7 +128,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> RefreshToken()
         {
-            var verify = new Verify(TokenType.RefreshToken);
+            var verify = new Verify(true, TokenType.RefreshToken);
             manage = verify.manage;
             tokenId = verify.tokenId;
             if (manage == null) return result.InvalidToken();
