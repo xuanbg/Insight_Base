@@ -50,11 +50,15 @@ namespace Insight.Base.OAuth
 
             var auth = requst.Headers[HttpRequestHeader.Authorization];
             var accessToken = Util.Base64ToAccessToken(auth);
-            if (accessToken == null && checkAuth)
+            switch (accessToken)
             {
-                var msg = $"提取验证信息失败。Token is:{auth ?? "null"}";
-                new Thread(() => Logger.Write("500101", msg)).Start();
-                return;
+                case null when checkAuth:
+                    var msg = $"提取验证信息失败。Token is:{auth ?? "null"}";
+                    new Thread(() => Logger.Write("500101", msg)).Start();
+                    return;
+
+                case null:
+                    return;
             }
 
             tokenId = accessToken.id;
