@@ -216,15 +216,12 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 验证Token是否合法
         /// </summary>
-        /// <param name="hash">令牌哈希值</param>
         /// <param name="key">密钥</param>
         /// <param name="tokenType">令牌类型</param>
         /// <returns>Token是否合法</returns>
-        public bool Verify(string hash, string key, TokenType tokenType)
+        public bool Verify(string key, TokenType tokenType)
         {
-            if (token == null) return false;
-
-            return (token.hash == hash || tokenType == TokenType.RefreshToken) && token.VerifyKey(key, tokenType);
+            return token != null && token.VerifyKey(key, tokenType);
         }
 
         /// <summary>
@@ -301,11 +298,13 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// Token是否失效
         /// </summary>
-        /// <param name="tokenId"></param>
+        /// <param name="tokenId">令牌ID</param>
+        /// <param name="hash">令牌哈希值</param>
+        /// <param name="type">令牌类型</param>
         /// <returns>Token是否失效</returns>
-        public bool IsFailure(string tokenId)
+        public bool IsFailure(string tokenId, string hash, TokenType type)
         {
-            if (token == null) return true;
+            if (token == null || token.hash != hash && type == TokenType.AccessToken) return true;
 
             var code = RedisHelper.HashGet($"Apps:{userId}", appId);
 

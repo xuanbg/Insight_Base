@@ -78,7 +78,7 @@ namespace Insight.Base.OAuth
             if (manage == null) return result.InvalidToken();
 
             // 验证令牌
-            if (manage.IsFailure(tokenId)) return result.Failured();
+            if (manage.IsFailure(tokenId, hash, tokenType)) return result.Failured();
 
             if (tokenType == TokenType.AccessToken && manage.IsExpiry()) return result.Expired();
 
@@ -86,7 +86,7 @@ namespace Insight.Base.OAuth
 
             if (manage.TenantIsExpiry()) return result.TenantIsExpiry();
 
-            if (!manage.Verify(hash, secret, tokenType)) return result.InvalidAuth();
+            if (!manage.Verify(secret, tokenType)) return result.InvalidAuth();
 
             if (tokenType == TokenType.RefreshToken) result.Success();
             else
