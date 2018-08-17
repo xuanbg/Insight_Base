@@ -307,7 +307,7 @@ namespace Insight.Base.OAuth
         {
             if (token == null) return true;
 
-            var code = RedisHelper.HashGet(userId, appId);
+            var code = RedisHelper.HashGet($"Apps:{userId}", appId);
 
             return token.signInOne && code != tokenId || token.IsFailure();
         }
