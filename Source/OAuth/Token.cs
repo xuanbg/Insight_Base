@@ -181,9 +181,9 @@ namespace Insight.Base.OAuth
             if (string.IsNullOrEmpty(appId)) life = 7200;
 
             var tokenLife = RedisHelper.HashGet(key, "TokenLife");
-            var type = RedisHelper.HashGet(key, "SignInType");
-            var auto = RedisHelper.HashGet(key, "RefreshType");
-            if (!string.IsNullOrEmpty(tokenLife) && !string.IsNullOrEmpty(type))
+            var type = RedisHelper.HashGet(key, "SignInOne");
+            var auto = RedisHelper.HashGet(key, "AutoRefresh");
+            if (!string.IsNullOrEmpty(tokenLife) && !string.IsNullOrEmpty(type) && !string.IsNullOrEmpty(auto))
             {
                 life = Convert.ToInt32(tokenLife);
                 signInOne = Convert.ToBoolean(type);
@@ -200,10 +200,10 @@ namespace Insight.Base.OAuth
                 RedisHelper.HashSet(key, "TokenLife", life.ToString());
 
                 signInOne = app?.isSigninOne ?? false;
-                RedisHelper.HashSet(key, "SignInType", signInOne.ToString());
+                RedisHelper.HashSet(key, "SignInOne", signInOne.ToString());
 
                 autoRefresh = app?.isAutoRefresh ?? false;
-                RedisHelper.HashSet(key, "RefreshType", autoRefresh.ToString());
+                RedisHelper.HashSet(key, "AutoRefresh", autoRefresh.ToString());
             }
         }
     }
