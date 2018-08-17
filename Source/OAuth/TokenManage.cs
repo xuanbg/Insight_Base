@@ -149,8 +149,10 @@ namespace Insight.Base.OAuth
         /// <param name="aid">应用ID</param>
         /// <param name="tid">租户ID</param>
         /// <returns>令牌数据包</returns>
-        public TokenPackage Creator(string code, string aid = "Default APP", string tid = null)
+        public TokenPackage Creator(string code, string aid, string tid = null)
         {
+            if (string.IsNullOrEmpty(aid)) aid = "Default APP";
+
             var funs = Core.GetPermitFuncs(tid, userId, deptId, false, aid)
                 .Where(i => i.permit > 0)
                 .Select(i => i.key)

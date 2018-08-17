@@ -32,7 +32,7 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 应用ID
         /// </summary>
-        public string appId { get; set; } = "Default APP";
+        public string appId { get; set; }
 
         /// <summary>
         /// 令牌生命周期(秒)
@@ -177,9 +177,9 @@ namespace Insight.Base.OAuth
         /// <returns>应用的令牌生命周期(秒)</returns>
         private void GetAppInfo()
         {
-            var key = $"App:{appId}";
-            if (string.IsNullOrEmpty(appId)) life = 7200;
+            if (string.IsNullOrEmpty(appId)) appId = "Default APP";
 
+            var key = $"App:{appId}";
             var tokenLife = RedisHelper.HashGet(key, "TokenLife");
             var type = RedisHelper.HashGet(key, "SignInOne");
             var auto = RedisHelper.HashGet(key, "AutoRefresh");
@@ -196,13 +196,13 @@ namespace Insight.Base.OAuth
             using (var context = new Entities())
             {
                 var app = context.applications.SingleOrDefault(i => i.id == appId);
-                life = app?.tokenLife ?? 7200;
+                life = app?.tokenLife ?? 1296000;
                 RedisHelper.HashSet(key, "TokenLife", life.ToString());
 
                 signInOne = app?.isSigninOne ?? false;
                 RedisHelper.HashSet(key, "SignInOne", signInOne.ToString());
 
-                autoRefresh = app?.isAutoRefresh ?? false;
+                autoRefresh = app?.isAutoRefresh ?? true;
                 RedisHelper.HashSet(key, "AutoRefresh", autoRefresh.ToString());
             }
         }
