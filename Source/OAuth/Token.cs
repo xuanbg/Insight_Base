@@ -32,7 +32,7 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 应用ID
         /// </summary>
-        public string appId { get; set; }
+        public string appId { get; set; } = "Default APP";
 
         /// <summary>
         /// 令牌生命周期(秒)
@@ -43,6 +43,11 @@ namespace Insight.Base.OAuth
         /// 单点登录
         /// </summary>
         public bool signInOne { get; set; }
+
+        /// <summary>
+        /// 服务端自动刷新，客户端无需实现
+        /// </summary>
+        public bool autoRefresh { get; set; }
 
         /// <summary>
         /// 租户到期时间
@@ -113,7 +118,7 @@ namespace Insight.Base.OAuth
         public bool VerifyKey(string key, TokenType tokenType)
         {
             var passed = key == (tokenType == TokenType.AccessToken ? secretKey : refreshKey);
-            if (passed && tokenType == TokenType.AccessToken && life < 3600 && DateTime.Now.AddSeconds(life / 2 + TIME_OUT) > expiryTime)
+            if (passed && tokenType == TokenType.AccessToken && autoRefresh && DateTime.Now.AddSeconds(life / 2 + TIME_OUT) > expiryTime)
             {
                 expiryTime = DateTime.Now.AddSeconds(life + TIME_OUT);
                 failureTime = DateTime.Now.AddSeconds(life * 12 + TIME_OUT);
@@ -172,14 +177,17 @@ namespace Insight.Base.OAuth
         /// <returns>应用的令牌生命周期(秒)</returns>
         private void GetAppInfo()
         {
+            var key = $"App:{appId}";
             if (string.IsNullOrEmpty(appId)) life = 7200;
 
-            var tokenLife = RedisHelper.HashGet($"App:{appId}", "TokenLife");
-            var type = RedisHelper.HashGet($"App:{appId}", "SignInType");
+            var tokenLife = RedisHelper.HashGet(key, "TokenLife");
+            var type = RedisHelper.HashGet(key, "SignInType");
+            var auto = RedisHelper.HashGet(key, "RefreshType");
             if (!string.IsNullOrEmpty(tokenLife) && !string.IsNullOrEmpty(type))
             {
                 life = Convert.ToInt32(tokenLife);
                 signInOne = Convert.ToBoolean(type);
+                autoRefresh = Convert.ToBoolean(auto);
 
                 return;
             }
@@ -189,10 +197,13 @@ namespace Insight.Base.OAuth
             {
                 var app = context.applications.SingleOrDefault(i => i.id == appId);
                 life = app?.tokenLife ?? 7200;
-                RedisHelper.HashSet($"App:{appId}", "TokenLife", life.ToString());
+                RedisHelper.HashSet(key, "TokenLife", life.ToString());
 
                 signInOne = app?.isSigninOne ?? false;
-                RedisHelper.HashSet($"App:{appId}", "SignInType", signInOne.ToString());
+                RedisHelper.HashSet(key, "SignInType", signInOne.ToString());
+
+                autoRefresh = app?.isAutoRefresh ?? false;
+                RedisHelper.HashSet(key, "RefreshType", autoRefresh.ToString());
             }
         }
     }

@@ -59,6 +59,12 @@ namespace Insight.Base.Common.Entity
         public bool isSigninOne { get; set; }
 
         /// <summary>
+        /// 是否服务端自动刷新令牌
+        /// </summary>
+        [Column("is_auto_refresh")]
+        public bool isAutoRefresh { get; set; }
+
+        /// <summary>
         /// 是否预置：0、自定；1、预置
         /// </summary>
         [Column("is_builtin")]

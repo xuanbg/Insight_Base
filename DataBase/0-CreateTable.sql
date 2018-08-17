@@ -170,6 +170,7 @@ create table ucs_application(
 [remark]           nvarchar(max),                                                                                                          --描述
 [token_life]       int default 24 not null,                                                                                                --令牌生存周期(小时)
 [is_signin_one]    bit default 0 not null,                                                                                                 --是否单点登录：0、允许多点登录；1、单点登录
+[is_auto_refresh]  bit default 0 not null,                                                                                                 --是否自动刷新令牌：0、不自动刷新；1、自动刷新
 [is_builtin]       bit default 0 not null,                                                                                                 --是否预置：0、自定；1、预置
 [creator_id]       varchar(36) foreign key references ucb_user(id) default '00000000-0000-0000-0000-000000000000' not null,                --创建人id
 [created_time]     datetime default getdate() not null                                                                                     --创建时间
