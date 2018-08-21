@@ -193,9 +193,9 @@ namespace Insight.Base.OAuth
         {
             using (var context = new Entities())
             {
-                return context.users.Any(u => u.account == user.account 
-                || !string.IsNullOrEmpty(user.mobile) && u.mobile == user.mobile
-                || !string.IsNullOrEmpty(user.email) && u.email == user.email);
+                return context.users.Any(u => u.account == user.account
+                                              || !string.IsNullOrEmpty(user.mobile) && u.mobile == user.mobile
+                                              || !string.IsNullOrEmpty(user.email) && u.email == user.email);
             }
         }
 
@@ -244,7 +244,8 @@ namespace Insight.Base.OAuth
         /// <param name="isAll">是否获取全部权限，默认为否</param>
         /// <param name="appId">应用ID</param>
         /// <returns>功能ID集合</returns>
-        public static List<PermitFunc> getPermitFuncs(string tenantId, string userId, string deptId, bool isAll = false, string appId = null)
+        public static List<PermitFunc> getPermitFuncs(string tenantId, string userId, string deptId, bool isAll = false,
+            string appId = null)
         {
             using (var context = new Entities())
             {
@@ -253,8 +254,8 @@ namespace Insight.Base.OAuth
                     join p in context.roleFunctions on f.id equals p.functionId
                     join r in context.userRoles on p.roleId equals r.roleId
                     where r.tenantId == tenantId && r.userId == userId
-                          && (string.IsNullOrEmpty(appId) || m.appId == appId)
-                          && (isAll || r.deptId == null || r.deptId == deptId)
+                                                 && (string.IsNullOrEmpty(appId) || m.appId == appId)
+                                                 && (isAll || r.deptId == null || r.deptId == deptId)
                     group p by new {f.id, f.alias, f.navigatorId}
                     into g
                     select new PermitFunc {id = g.Key.id, key = g.Key.alias, permit = g.Min(i => i.permit)};
@@ -349,7 +350,7 @@ namespace Insight.Base.OAuth
                 var functions = context.functions.Where(i => i.isVisible && i.navigatorId == moduleId).ToList();
                 var list = from f in functions
                     join p in permits on f.id equals p.id
-                    into temp
+                        into temp
                     from t in temp.DefaultIfEmpty()
                     orderby f.index
                     select new Permit
@@ -390,7 +391,7 @@ namespace Insight.Base.OAuth
                 var apps = from a in appList
                     join p in aids on a.id equals p
                     orderby a.createTime
-                    select new AppTree { id = a.id, name = a.alias };
+                    select new AppTree {id = a.id, name = a.alias};
                 list.AddRange(apps);
 
                 var groups = from n in navList
@@ -443,7 +444,8 @@ namespace Insight.Base.OAuth
         {
             using (var context = new Entities())
             {
-                return context.users.SingleOrDefault(u => u.account == account || u.mobile == account || u.email == account);
+                return context.users.SingleOrDefault(u =>
+                    u.account == account || u.mobile == account || u.email == account);
             }
         }
     }

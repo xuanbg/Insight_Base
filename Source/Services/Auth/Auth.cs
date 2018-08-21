@@ -171,12 +171,13 @@ namespace Insight.Base.Services
         {
             using (var context = new Entities())
             {
-                var user = context.users.SingleOrDefault(u => u.account == account || u.mobile == account || u.email == account);
+                var user = context.users.SingleOrDefault(u =>
+                    u.account == account || u.mobile == account || u.email == account);
                 if (user == null) return result.notFound();
 
                 var list = from m in context.tenantUsers.Where(m => m.userId == user.id)
                     join t in context.tenants on m.tenantId equals t.id
-                    select new { t.id, Name = t.alias, remark = t.name };
+                    select new {t.id, Name = t.alias, remark = t.name};
                 return list.Any() ? result.success(list.ToList()) : result.noContent(new List<object>());
             }
         }

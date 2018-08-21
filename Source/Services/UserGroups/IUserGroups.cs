@@ -11,7 +11,8 @@ namespace Insight.Base.Services
         /// <summary>
         /// 为跨域请求设置响应头信息
         /// </summary>
-        [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         void responseOptions();
 
@@ -20,7 +21,8 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="group">用户组对象</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "groups", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "groups", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> addGroup(Group group);
 
@@ -29,7 +31,8 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">用户组ID</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "DELETE", UriTemplate = "groups/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "DELETE", UriTemplate = "groups/{id}", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> removeGroup(string id);
 
@@ -39,7 +42,8 @@ namespace Insight.Base.Services
         /// <param name="id"></param>
         /// <param name="group">用户组对象</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "groups/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "groups/{id}", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> updateGroup(string id, Group group);
 
@@ -69,7 +73,8 @@ namespace Insight.Base.Services
         /// <param name="id"></param>
         /// <param name="group">UserGroup</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "groups/{id}/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "groups/{id}/members", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> addGroupMember(string id, Group group);
 
@@ -79,7 +84,8 @@ namespace Insight.Base.Services
         /// <param name="id"></param>
         /// <param name="group">UserGroup</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "DELETE", UriTemplate = "groups/{id}/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "DELETE", UriTemplate = "groups/{id}/members", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> removeMember(string id, Group group);
 

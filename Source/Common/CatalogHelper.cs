@@ -19,7 +19,8 @@ namespace Insight.Base.Common
         {
             using (var context = new Entities())
             {
-                var list = context.categories.Where(i => !i.isInvalid && i.tenantId == tenantId && i.moduleId == moduleId);
+                var list = context.categories.Where(i =>
+                    !i.isInvalid && i.tenantId == tenantId && i.moduleId == moduleId);
 
                 return list.OrderBy(i => i.index).ToList();
             }
@@ -125,7 +126,8 @@ namespace Insight.Base.Common
             {
                 return context.categories.Any(i => i.id != catalog.id && i.tenantId == catalog.tenantId &&
                                                    i.moduleId == catalog.moduleId && i.parentId == catalog.parentId &&
-                                                   (!string.IsNullOrEmpty(catalog.code) && i.code == catalog.code || i.name == catalog.name));
+                                                   (!string.IsNullOrEmpty(catalog.code) && i.code == catalog.code ||
+                                                    i.name == catalog.name));
             }
         }
 
@@ -148,7 +150,7 @@ namespace Insight.Base.Common
                             item.index++;
                         }
                     }
-                    else if(cat.index > old.index)
+                    else if (cat.index > old.index)
                     {
                         var list = context.categories.Where(i => i.index > old.index && i.index <= cat.index);
                         foreach (var item in list)

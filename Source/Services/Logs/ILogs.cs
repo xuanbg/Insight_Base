@@ -11,7 +11,8 @@ namespace Insight.Base.Services
         /// <summary>
         /// 为跨域请求设置响应头信息
         /// </summary>
-        [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         void responseOptions();
 
@@ -25,7 +26,8 @@ namespace Insight.Base.Services
         /// <param name="key">查询用的关键字段</param>
         /// <param name="userid">事件源用户ID（可为空）</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "logs", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "logs", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> writeToLog(string code, string message, string source, string action, string key, string userid);
 
@@ -34,7 +36,8 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="rule">日志规则数据对象</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "rules", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "rules", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> addRule(LogRule rule);
 
@@ -43,7 +46,8 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">日志规则ID</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "DELETE", UriTemplate = "rules/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "DELETE", UriTemplate = "rules/{id}", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> removeRule(string id);
 
@@ -52,7 +56,8 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="rule">日志规则数据对象</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "rules", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "rules", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> editRule(LogRule rule);
 

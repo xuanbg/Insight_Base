@@ -37,7 +37,9 @@ namespace Insight.Base.Services
             using (var context = new Entities())
             {
                 var list = from t in context.tenants
-                    where !t.isInvalid && !t.isBuiltin && (string.IsNullOrEmpty(key) || t.name.Contains(key) || t.alias.Contains(key) || t.contact.Contains(key))
+                    where !t.isInvalid && !t.isBuiltin &&
+                          (string.IsNullOrEmpty(key) || t.name.Contains(key) || t.alias.Contains(key) ||
+                           t.contact.Contains(key))
                     select new
                     {
                         t.id,
@@ -184,6 +186,7 @@ namespace Insight.Base.Services
                 role.funcs = Util.convertTo<List<RoleFunction>>(list.ToList());
                 role.funcs.ForEach(i => i.id = Util.newId());
             }
+
             if (!DbHelper.insert(role)) return result.dataBaseError();
 
             // 初始化根机构并持久化组织机构数据
@@ -287,7 +290,8 @@ namespace Insight.Base.Services
 
             using (var context = new Entities())
             {
-                var list = context.tenantApps.Where(i => i.tenantId == id && i.appId != "e46c0d4f-85f2-4f75-9ad4-d86b9505b1d4").ToList();
+                var list = context.tenantApps
+                    .Where(i => i.tenantId == id && i.appId != "e46c0d4f-85f2-4f75-9ad4-d86b9505b1d4").ToList();
                 if (!DbHelper.delete(list)) return result.dataBaseError();
 
                 list = apps.Select(i => new TenantApp
@@ -348,7 +352,8 @@ namespace Insight.Base.Services
         {
             using (var context = new Entities())
             {
-                return context.tenants.Any(i => i.id != tenant.id && (i.name == tenant.name || i.alias == tenant.alias));
+                return context.tenants.Any(i =>
+                    i.id != tenant.id && (i.name == tenant.name || i.alias == tenant.alias));
             }
         }
 

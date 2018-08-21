@@ -10,9 +10,9 @@ namespace Insight.Base.Server
         // ReSharper disable once InconsistentNaming
         static void Main()
         {
-            var servicesToRun = new ServiceBase[] 
-            { 
-                new BaseServer() 
+            var servicesToRun = new ServiceBase[]
+            {
+                new BaseServer()
             };
             ServiceBase.Run(servicesToRun);
         }

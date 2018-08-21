@@ -103,7 +103,9 @@ namespace Insight.Base.Services
             using (var context = new Entities())
             {
                 var skip = rows * (page - 1);
-                var list = context.groups.Where(i => i.tenantId == tenantId && (string.IsNullOrEmpty(key) || i.name.Contains(key) || i.remark.Contains(key)));
+                var list = context.groups.Where(i =>
+                    i.tenantId == tenantId &&
+                    (string.IsNullOrEmpty(key) || i.name.Contains(key) || i.remark.Contains(key)));
                 var data = list.OrderBy(i => i.createTime).Skip(skip).Take(rows).ToList();
 
                 return result.success(data, list.Count());
@@ -161,12 +163,13 @@ namespace Insight.Base.Services
             using (var context = new Entities())
             {
                 var list = from u in context.users
-                           join r in context.tenantUsers.Where(i => i.tenantId == tenantId) on u.id equals r.userId
-                           join m in context.groupMembers.Where(i => i.groupId == id) on u.id equals m.userId
-                           into temp from t in temp.DefaultIfEmpty()
-                           where t == null && !u.isInvalid
-                           orderby u.createTime
-                           select new {u.id, u.name, u.account};
+                    join r in context.tenantUsers.Where(i => i.tenantId == tenantId) on u.id equals r.userId
+                    join m in context.groupMembers.Where(i => i.groupId == id) on u.id equals m.userId
+                        into temp
+                    from t in temp.DefaultIfEmpty()
+                    where t == null && !u.isInvalid
+                    orderby u.createTime
+                    select new {u.id, u.name, u.account};
                 return list.Any() ? result.success(list.ToList()) : result.noContent(new List<object>());
             }
         }
@@ -193,7 +196,8 @@ namespace Insight.Base.Services
         {
             using (var context = new Entities())
             {
-                return context.groups.Any(i => i.id != group.id && i.tenantId == group.tenantId && i.name == group.name);
+                return context.groups.Any(i =>
+                    i.id != group.id && i.tenantId == group.tenantId && i.name == group.name);
             }
         }
     }

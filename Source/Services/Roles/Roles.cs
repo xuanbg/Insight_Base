@@ -119,7 +119,8 @@ namespace Insight.Base.Services
                 var list = from r in context.roles
                     join a in context.applications on r.appId equals a.id into temp
                     from t in temp.DefaultIfEmpty()
-                    where r.tenantId == tenantId && (string.IsNullOrEmpty(key) || r.name.Contains(key) || r.remark.Contains(key))
+                    where r.tenantId == tenantId &&
+                          (string.IsNullOrEmpty(key) || r.name.Contains(key) || r.remark.Contains(key))
                     select new RoleInfo
                     {
                         id = r.id,
@@ -181,7 +182,7 @@ namespace Insight.Base.Services
                 var roleId = member.roleId;
                 if (!DbHelper.delete(member)) return result.dataBaseError();
 
-                var role = new RoleInfo { members = getRoleMember(roleId) };
+                var role = new RoleInfo {members = getRoleMember(roleId)};
 
                 return result.success(role);
             }
@@ -222,7 +223,8 @@ namespace Insight.Base.Services
             using (var context = new Entities())
             {
                 var list = from o in context.orgs
-                    join r in context.roleMembers.Where(i => i.roleId == id && i.memberType == 3) on o.id equals r.memberId into temp
+                    join r in context.roleMembers.Where(i => i.roleId == id && i.memberType == 3) on o.id equals
+                        r.memberId into temp
                     from t in temp.DefaultIfEmpty()
                     where o.tenantId == tenantId && t == null
                     orderby o.index
@@ -243,8 +245,9 @@ namespace Insight.Base.Services
             using (var context = new Entities())
             {
                 var list = from g in context.groups
-                    join r in context.roleMembers.Where(r => r.roleId == id && r.memberType == 2) on g.id equals r.memberId
-                    into temp
+                    join r in context.roleMembers.Where(r => r.roleId == id && r.memberType == 2) on g.id equals r
+                            .memberId
+                        into temp
                     from t in temp.DefaultIfEmpty()
                     where g.tenantId == tenantId && t == null
                     orderby g.createTime
@@ -266,8 +269,9 @@ namespace Insight.Base.Services
             {
                 var list = from u in context.users
                     join r in context.tenantUsers on u.id equals r.userId
-                    join m in context.roleMembers.Where(i => i.roleId == id && i.memberType == 1) on u.id equals m.memberId
-                    into temp
+                    join m in context.roleMembers.Where(i => i.roleId == id && i.memberType == 1) on u.id equals m
+                            .memberId
+                        into temp
                     from t in temp.DefaultIfEmpty()
                     where r.tenantId == tenantId && !u.isInvalid && t == null
                     orderby u.createTime
@@ -472,11 +476,11 @@ namespace Insight.Base.Services
                 var navList = context.navigators.ToList();
                 var appList = context.applications.ToList();
                 var mids = (from f in context.functions
-                        join p in context.roleFunctions on f.id equals p.functionId
-                        join n in context.navigators on f.navigatorId equals n.id
-                        join r in context.tenantApps on n.appId equals r.appId
-                        where p.roleId == id && (string.IsNullOrEmpty(aid) || n.appId == aid) && r.tenantId == tenantId
-                        select f.navigatorId).Distinct().ToList();
+                    join p in context.roleFunctions on f.id equals p.functionId
+                    join n in context.navigators on f.navigatorId equals n.id
+                    join r in context.tenantApps on n.appId equals r.appId
+                    where p.roleId == id && (string.IsNullOrEmpty(aid) || n.appId == aid) && r.tenantId == tenantId
+                    select f.navigatorId).Distinct().ToList();
                 var gids = navList.Join(mids, f => f.id, p => p, (f, p) => f.parentId).Distinct().ToList();
                 var aids = navList.Join(gids, f => f.id, p => p, (f, p) => f.appId).Distinct().ToList();
 
@@ -513,7 +517,7 @@ namespace Insight.Base.Services
                 var functions = from f in context.functions
                     join m in mids on f.navigatorId equals m
                     join p in context.roleFunctions.Where(i => i.roleId == id) on f.id equals p.functionId
-                    into temp
+                        into temp
                     from t in temp.DefaultIfEmpty()
                     orderby f.index
                     select new AppTree

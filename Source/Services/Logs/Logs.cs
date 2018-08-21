@@ -32,7 +32,8 @@ namespace Insight.Base.Services
         /// <param name="key">查询用的关键字段</param>
         /// <param name="userid">事件源用户ID（可为空）</param>
         /// <returns>Result</returns>
-        public Result<object> writeToLog(string code, string message, string source, string action, string key, string userid)
+        public Result<object> writeToLog(string code, string message, string source, string action, string key,
+            string userid)
         {
             if (!verify()) return result;
 
@@ -50,7 +51,8 @@ namespace Insight.Base.Services
         {
             if (!verify("60A97A33-0E6E-4856-BB2B-322FEEEFD96A")) return result;
 
-            if (string.IsNullOrEmpty(rule.code) || !Regex.IsMatch(rule.code, @"^\d{6}$")) return result.invalidEventCode();
+            if (string.IsNullOrEmpty(rule.code) || !Regex.IsMatch(rule.code, @"^\d{6}$"))
+                return result.invalidEventCode();
 
             var level = Convert.ToInt32(rule.code.Substring(0, 1));
             if (level <= 1 || level == 7) return result.eventWithoutConfig();

@@ -61,7 +61,8 @@ namespace Insight.Base.Services
             using (var context = new Entities())
             {
                 var list = context.moduleParams.Where(i => i.tenantId == tenantId && i.moduleId == id);
-                var param = list.Where(i => i.deptId == null || i.userId == null || i.deptId == deptId || i.userId == userId);
+                var param = list.Where(i =>
+                    i.deptId == null || i.userId == null || i.deptId == deptId || i.userId == userId);
 
                 return result.success(param.ToList());
             }
@@ -136,7 +137,9 @@ namespace Insight.Base.Services
         {
             if (!verify()) return result;
 
-            var list = Params.fileList.Where(i => i.Value.appId == id && i.Value.updateTime.AddMinutes(30) > DateTime.Now).ToDictionary(i => i.Key, i => i.Value);
+            var list = Params.fileList
+                .Where(i => i.Value.appId == id && i.Value.updateTime.AddMinutes(30) > DateTime.Now)
+                .ToDictionary(i => i.Key, i => i.Value);
             if (!list.Any())
             {
                 var dirInfo = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);

@@ -11,7 +11,8 @@ namespace Insight.Base.Services
         /// <summary>
         /// 为跨域请求设置响应头信息
         /// </summary>
-        [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         void responseOptions();
 
@@ -39,7 +40,8 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="rule">报表分期</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "rules", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "rules", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> addRule(ReportRule rule);
 
@@ -49,7 +51,8 @@ namespace Insight.Base.Services
         /// <param name="id">报表分期ID</param>
         /// <param name="rule">报表分期</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "rules/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "rules/{id}", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> editRule(string id, ReportRule rule);
 
@@ -58,7 +61,8 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">报表分期ID</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "DELETE", UriTemplate = "rules/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "DELETE", UriTemplate = "rules/{id}", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> deleteRule(string id);
     }

@@ -13,7 +13,8 @@ namespace Insight.Base.Services
         /// <summary>
         /// 为跨域请求设置响应头信息
         /// </summary>
-        [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         void responseOptions();
 
@@ -22,7 +23,8 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="info">RoleInfo</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "roles", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "roles", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> addRole(RoleInfo info);
 
@@ -31,7 +33,8 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">角色ID</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "DELETE", UriTemplate = "roles/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "DELETE", UriTemplate = "roles/{id}", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> removeRole(string id);
 
@@ -41,7 +44,8 @@ namespace Insight.Base.Services
         /// <param name="id"></param>
         /// <param name="info"></param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "roles/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "roles/{id}", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> editRole(string id, RoleInfo info);
 
@@ -71,7 +75,8 @@ namespace Insight.Base.Services
         /// <param name="id">角色ID</param>
         /// <param name="members">成员对象集合</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "roles/{id}/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "roles/{id}/members", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> addRoleMember(string id, List<RoleMember> members);
 
@@ -80,7 +85,8 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">角色成员ID</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "DELETE", UriTemplate = "roles/members/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "DELETE", UriTemplate = "roles/members/{id}", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> removeRoleMember(string id);
 

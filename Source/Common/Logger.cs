@@ -21,7 +21,8 @@ namespace Insight.Base.Common
         /// <param name="key">查询关键字</param>
         /// <param name="userId">事件源用户ID</param>
         /// <returns>bool 是否写入成功</returns>
-        public static bool? write(string code, string message = null, string source = null, string action = null, string key = null, string userId = null)
+        public static bool? write(string code, string message = null, string source = null, string action = null,
+            string key = null, string userId = null)
         {
             if (string.IsNullOrEmpty(code) || !Regex.IsMatch(code, @"^\d{6}$")) return null;
 
@@ -75,7 +76,8 @@ namespace Insight.Base.Common
 
             path += $"{DateTime.Today:yyyy-MM-dd}.log";
             var time = log.createTime.ToString("O");
-            var text = $"[{log.createTime.Kind} {time}] [{log.code}] [{log.source}] [{log.action}] Message:{log.message}\r\n";
+            var text =
+                $"[{log.createTime.Kind} {time}] [{log.code}] [{log.source}] [{log.action}] Message:{log.message}\r\n";
             var buffer = Encoding.UTF8.GetBytes(text);
             try
             {
@@ -83,6 +85,7 @@ namespace Insight.Base.Common
                 {
                     stream.Write(buffer, 0, buffer.Length);
                 }
+
                 Params.mutex.ReleaseMutex();
                 return true;
             }
@@ -100,7 +103,7 @@ namespace Insight.Base.Common
         /// <returns></returns>
         private static string getLevelName(int level)
         {
-            var name = (Level)level;
+            var name = (Level) level;
             return name.ToString();
         }
     }

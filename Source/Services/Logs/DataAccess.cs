@@ -21,6 +21,7 @@ namespace Insight.Base.Services
 
                     return false;
                 }
+
                 Params.rules.Add(rule);
                 return true;
             }

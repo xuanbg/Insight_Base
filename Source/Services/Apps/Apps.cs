@@ -323,7 +323,8 @@ namespace Insight.Base.Services
         {
             using (var context = new Entities())
             {
-                return context.navigators.Any(i => i.id != nav.id && i.appId == nav.appId && i.parentId == nav.parentId && i.name == nav.name);
+                return context.navigators.Any(i =>
+                    i.id != nav.id && i.appId == nav.appId && i.parentId == nav.parentId && i.name == nav.name);
             }
         }
 
@@ -336,7 +337,8 @@ namespace Insight.Base.Services
         {
             using (var context = new Entities())
             {
-                return context.functions.Any(i => i.id != fun.id && i.navigatorId == fun.navigatorId && i.name == fun.name);
+                return context.functions.Any(i =>
+                    i.id != fun.id && i.navigatorId == fun.navigatorId && i.name == fun.name);
             }
         }
     }

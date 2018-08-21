@@ -11,7 +11,8 @@ namespace Insight.Base.Services
         /// <summary>
         /// 为跨域请求设置响应头信息
         /// </summary>
-        [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         void responseOptions();
 
@@ -29,7 +30,8 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="catalog"></param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "templates/categorys", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "templates/categorys", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> addCategory(Catalog catalog);
 
@@ -39,7 +41,8 @@ namespace Insight.Base.Services
         /// <param name="id">报表分类ID</param>
         /// <param name="catalog"></param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "templates/categorys/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "templates/categorys/{id}", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> editCategory(string id, Catalog catalog);
 
@@ -48,7 +51,8 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">报表分类ID</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "DELETE", UriTemplate = "templates/categorys/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "DELETE", UriTemplate = "templates/categorys/{id}", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> deleteCategory(string id);
 
@@ -85,7 +89,8 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="template">报表模板</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "templates", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "templates", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> importTemplate(ReportTemplet template);
 
@@ -95,7 +100,8 @@ namespace Insight.Base.Services
         /// <param name="id">报表模板ID</param>
         /// <param name="template">报表模板</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "templates/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "templates/{id}", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> copyTemplate(string id, ReportTemplet template);
 
@@ -105,7 +111,8 @@ namespace Insight.Base.Services
         /// <param name="id">报表模板ID</param>
         /// <param name="template">报表模板</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "templates/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "templates/{id}", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> editTemplate(string id, ReportTemplet template);
 
@@ -115,7 +122,8 @@ namespace Insight.Base.Services
         /// <param name="id">报表模板ID</param>
         /// <param name="content">模板内容</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "templates/{id}/content", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "templates/{id}/content", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> designTemplet(string id, string content);
 
@@ -124,7 +132,8 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">报表模板ID</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "DELETE", UriTemplate = "templates/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "DELETE", UriTemplate = "templates/{id}", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> deleteTemplate(string id);
     }

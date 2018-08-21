@@ -145,27 +145,27 @@ namespace Insight.Base.Services
             if (existed(data)) return result.dataAlreadyExists();
 
             data.periods = report.periods.Select(i => new ReportPeriod
-                {
-                    id = Util.newId(),
-                    reportId = data.id,
-                    ruleId = i.ruleId
-                }).ToList();
+            {
+                id = Util.newId(),
+                reportId = data.id,
+                ruleId = i.ruleId
+            }).ToList();
             data.entities = report.entities.Select(i => new ReportEntity
-                {
-                    id = Util.newId(),
-                    reportId = data.id,
-                    orgId = i.orgId,
-                    name = i.name
-                }).ToList();
+            {
+                id = Util.newId(),
+                reportId = data.id,
+                orgId = i.orgId,
+                name = i.name
+            }).ToList();
             data.entities.ForEach(i =>
             {
                 i.members = report.members.Where(m => m.entityId == i.id).Select(r => new EntityMember
-                    {
-                        id = Util.newId(),
-                        entityId = i.id,
-                        roleId = r.roleId,
-                        name = r.name
-                    }).ToList();
+                {
+                    id = Util.newId(),
+                    entityId = i.id,
+                    roleId = r.roleId,
+                    name = r.name
+                }).ToList();
             });
             if (!DbHelper.insert(data)) return result.dataBaseError();
 
@@ -225,8 +225,9 @@ namespace Insight.Base.Services
         {
             using (var context = new Entities())
             {
-                return context.definitions.Any(i => i.id != definition.id && i.tenantId == definition.tenantId 
-                && i.categoryId == definition.categoryId && i.name == definition.name);
+                return context.definitions.Any(i => i.id != definition.id && i.tenantId == definition.tenantId
+                                                                          && i.categoryId == definition.categoryId &&
+                                                                          i.name == definition.name);
             }
         }
     }

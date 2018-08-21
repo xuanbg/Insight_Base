@@ -12,7 +12,8 @@ namespace Insight.Base.Services
         /// <summary>
         /// 为跨域请求设置响应头信息
         /// </summary>
-        [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         void responseOptions();
 
@@ -48,7 +49,8 @@ namespace Insight.Base.Services
         /// <param name="id">业务模块ID</param>
         /// <param name="list">选项数据集合</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "navigations/{id}/params", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "navigations/{id}/params", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> saveModuleParam(string id, List<Parameter> list);
 
@@ -95,7 +97,8 @@ namespace Insight.Base.Services
         /// <param name="templateId">模板ID</param>
         /// <param name="deptName">部门名称</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "images/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "images/{id}", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> buildImageData(string id, string templateId, string deptName);
 

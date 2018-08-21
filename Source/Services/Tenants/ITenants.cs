@@ -12,7 +12,8 @@ namespace Insight.Base.Services
         /// <summary>
         /// 为跨域请求设置响应头信息
         /// </summary>
-        [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         void responseOptions();
 
@@ -41,7 +42,8 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="tenant">租户实体数据</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "tenants", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "tenants", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> addTenant(Tenant tenant);
 
@@ -51,7 +53,8 @@ namespace Insight.Base.Services
         /// <param name="id">租户ID</param>
         /// <param name="tenant">租户实体数据</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "tenants/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "tenants/{id}", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> editTenant(string id, Tenant tenant);
 
@@ -61,7 +64,8 @@ namespace Insight.Base.Services
         /// <param name="id">租户ID</param>
         /// <param name="expire">续租天数</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "tenants/{id}/expire", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "tenants/{id}/expire", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> extendTenant(string id, int expire);
 
@@ -70,7 +74,8 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">租户ID</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "DELETE", UriTemplate = "tenants/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "DELETE", UriTemplate = "tenants/{id}", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> deleteTenant(string id);
 
@@ -80,7 +85,8 @@ namespace Insight.Base.Services
         /// <param name="id">租户ID</param>
         /// <param name="apps">绑定应用ID集合</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "tenants/{id}/apps", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "tenants/{id}/apps", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> bindApp(string id, List<string> apps);
 
@@ -90,7 +96,8 @@ namespace Insight.Base.Services
         /// <param name="id">租户ID</param>
         /// <param name="tenant">租户-用户关系实体数据</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "tenants/{id}/user", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "tenants/{id}/user", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> addTenantUser(string id, TenantUser tenant);
 
@@ -99,7 +106,8 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">租户-用户关系ID</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "DELETE", UriTemplate = "tenants/user/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "DELETE", UriTemplate = "tenants/user/{id}", ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> deleteTenantUser(string id);
     }
