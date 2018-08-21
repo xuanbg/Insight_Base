@@ -13,7 +13,7 @@ namespace Insight.Base.Common
         /// <typeparam name="T"></typeparam>
         /// <param name="id"></param>
         /// <returns></returns>
-        public static T Find<T>(string id) where T : class
+        public static T find<T>(string id) where T : class
         {
             using (var context = new Entities())
             {
@@ -28,7 +28,7 @@ namespace Insight.Base.Common
         /// <typeparam name="T">实体类型</typeparam>
         /// <param name="entry">数据实体</param>
         /// <returns>bool 是否成功</returns>
-        public static bool Insert<T>(T entry) where T : class
+        public static bool insert<T>(T entry) where T : class
         {
             using (var context = new Entities())
             {
@@ -52,7 +52,7 @@ namespace Insight.Base.Common
         /// <typeparam name="T">实体类型</typeparam>
         /// <param name="entrys">数据实体集合</param>
         /// <returns>bool 是否成功</returns>
-        public static bool Insert<T>(List<T> entrys) where T : class
+        public static bool insert<T>(List<T> entrys) where T : class
         {
             using (var context = new Entities())
             {
@@ -76,7 +76,7 @@ namespace Insight.Base.Common
         /// <typeparam name="T">实体类型</typeparam>
         /// <param name="entry">数据实体</param>
         /// <returns>bool 是否成功</returns>
-        public static bool Delete<T>(T entry) where T : class
+        public static bool delete<T>(T entry) where T : class
         {
             using (var context = new Entities())
             {
@@ -101,7 +101,7 @@ namespace Insight.Base.Common
         /// <typeparam name="T">实体类型</typeparam>
         /// <param name="entrys">数据实体集合</param>
         /// <returns>bool 是否成功</returns>
-        public static bool Delete<T>(List<T> entrys) where T : class
+        public static bool delete<T>(List<T> entrys) where T : class
         {
             using (var context = new Entities())
             {
@@ -129,7 +129,7 @@ namespace Insight.Base.Common
         /// <typeparam name="T">实体类型</typeparam>
         /// <param name="entry">数据实体</param>
         /// <returns>bool 是否成功</returns>
-        public static bool Update<T>(T entry) where T : class
+        public static bool update<T>(T entry) where T : class
         {
             using (var context = new Entities())
             {

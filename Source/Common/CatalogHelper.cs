@@ -15,7 +15,7 @@ namespace Insight.Base.Common
         /// <param name="tenantId">租户ID</param>
         /// <param name="moduleId">业务模块ID</param>
         /// <returns>分类集合</returns>
-        public static List<Catalog> GetCatalogs(string tenantId, string moduleId)
+        public static List<Catalog> getCatalogs(string tenantId, string moduleId)
         {
             using (var context = new Entities())
             {
@@ -30,9 +30,9 @@ namespace Insight.Base.Common
         /// </summary>
         /// <param name="id">分类ID</param>
         /// <returns>Catalog 分类对象实体</returns>
-        public static Catalog GetCatalog(string id)
+        public static Catalog getCatalog(string id)
         {
-            return DbHelper.Find<Catalog>(id);
+            return DbHelper.find<Catalog>(id);
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Insight.Base.Common
         /// </summary>
         /// <param name="catalog">分类对象实体</param>
         /// <returns>bool 是否成功</returns>
-        public static bool Add(Catalog catalog)
+        public static bool add(Catalog catalog)
         {
             using (var context = new Entities())
             {
@@ -53,12 +53,12 @@ namespace Insight.Base.Common
                 context.SaveChanges();
             }
 
-            catalog.id = Util.NewId();
+            catalog.id = Util.newId();
             catalog.isBuiltin = false;
             catalog.isInvalid = false;
             catalog.createTime = DateTime.Now;
 
-            return DbHelper.Insert(catalog);
+            return DbHelper.insert(catalog);
         }
 
         /// <summary>
@@ -67,13 +67,13 @@ namespace Insight.Base.Common
         /// <param name="id">分类ID</param>
         /// <param name="catalog">分类对象实体</param>
         /// <returns>bool 是否成功</returns>
-        public static Result<object> Edit(string id, Catalog catalog)
+        public static Result<object> edit(string id, Catalog catalog)
         {
             var result = new Result<object>();
-            var data = DbHelper.Find<Catalog>(id);
-            if (data == null) return result.NotFound();
+            var data = DbHelper.find<Catalog>(id);
+            if (data == null) return result.notFound();
 
-            UpdateIndex(data, catalog);
+            updateIndex(data, catalog);
 
             data.parentId = catalog.parentId;
             data.index = catalog.index;
@@ -81,7 +81,7 @@ namespace Insight.Base.Common
             data.name = catalog.name;
             data.alias = catalog.alias;
             data.remark = catalog.remark;
-            return DbHelper.Update(data) ? result.Success() : result.DataBaseError();
+            return DbHelper.update(data) ? result.success() : result.dataBaseError();
         }
 
         /// <summary>
@@ -89,17 +89,17 @@ namespace Insight.Base.Common
         /// </summary>
         /// <param name="id">分类ID</param>
         /// <returns>bool 是否成功</returns>
-        public static Result<object> Delete(string id)
+        public static Result<object> delete(string id)
         {
             var result = new Result<object>();
-            var data = DbHelper.Find<Catalog>(id);
-            if (data == null) return result.NotFound();
+            var data = DbHelper.find<Catalog>(id);
+            if (data == null) return result.notFound();
 
             using (var context = new Entities())
             {
                 if (context.categories.Any(i => i.parentId == id))
                 {
-                    return result.BadRequest("请先删除下级分类");
+                    return result.badRequest("请先删除下级分类");
                 }
 
                 var list = context.categories.Where(i => i.parentId == data.parentId && i.index > data.index);
@@ -111,7 +111,7 @@ namespace Insight.Base.Common
                 context.SaveChanges();
             }
 
-            return DbHelper.Delete(data) ? result.Success() : result.DataBaseError();
+            return DbHelper.delete(data) ? result.success() : result.dataBaseError();
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace Insight.Base.Common
         /// </summary>
         /// <param name="catalog"></param>
         /// <returns>bool 是否存在</returns>
-        public static bool Existed(Catalog catalog)
+        public static bool existed(Catalog catalog)
         {
             using (var context = new Entities())
             {
@@ -134,7 +134,7 @@ namespace Insight.Base.Common
         /// </summary>
         /// <param name="old"></param>
         /// <param name="cat"></param>
-        private static void UpdateIndex(Catalog old, Catalog cat)
+        private static void updateIndex(Catalog old, Catalog cat)
         {
             using (var context = new Entities())
             {

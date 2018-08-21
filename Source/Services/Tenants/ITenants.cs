@@ -14,7 +14,7 @@ namespace Insight.Base.Services
         /// </summary>
         [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        void ResponseOptions();
+        void responseOptions();
 
         /// <summary>
         /// 根据关键词查询全部租户集合
@@ -25,7 +25,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "tenants?rows={rows}&page={page}&key={key}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetTenants(int rows, int page, string key);
+        Result<object> getTenants(int rows, int page, string key);
 
         /// <summary>
         /// 获取指定ID的租户
@@ -34,7 +34,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "tenants/{id}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetTenant(string id);
+        Result<object> getTenant(string id);
 
         /// <summary>
         /// 新增租户信息
@@ -43,7 +43,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "tenants", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> AddTenant(Tenant tenant);
+        Result<object> addTenant(Tenant tenant);
 
         /// <summary>
         /// 修改租户信息
@@ -53,7 +53,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "tenants/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> EditTenant(string id, Tenant tenant);
+        Result<object> editTenant(string id, Tenant tenant);
 
         /// <summary>
         /// 延长有效天数
@@ -63,7 +63,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "tenants/{id}/expire", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> ExtendTenant(string id, int expire);
+        Result<object> extendTenant(string id, int expire);
 
         /// <summary>
         /// 删除指定ID的租户
@@ -72,7 +72,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "tenants/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> DeleteTenant(string id);
+        Result<object> deleteTenant(string id);
 
         /// <summary>
         /// 为租户绑定应用
@@ -82,7 +82,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "tenants/{id}/apps", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> BindApp(string id, List<string> apps);
+        Result<object> bindApp(string id, List<string> apps);
 
         /// <summary>
         /// 为租户关联用户
@@ -92,7 +92,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "tenants/{id}/user", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> AddTenantUser(string id, TenantUser tenant);
+        Result<object> addTenantUser(string id, TenantUser tenant);
 
         /// <summary>
         /// 删除指定ID的租户和用户的绑定关系
@@ -101,6 +101,6 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "tenants/user/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> DeleteTenantUser(string id);
+        Result<object> deleteTenantUser(string id);
     }
 }

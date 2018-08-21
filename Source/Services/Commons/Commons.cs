@@ -18,7 +18,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 为跨域请求设置响应头信息
         /// </summary>
-        public void ResponseOptions()
+        public void responseOptions()
         {
         }
 
@@ -26,13 +26,13 @@ namespace Insight.Base.Services
         /// 获取登录用户的导航信息
         /// </summary>
         /// <returns>Result</returns>
-        public Result<object> GetNavigation()
+        public Result<object> getNavigation()
         {
-            if (!Verify()) return result;
+            if (!verify()) return result;
 
-            var permits = Core.GetNavigation(tenantId, appId, userId, deptId);
+            var permits = Core.getNavigation(tenantId, appId, userId, deptId);
 
-            return result.Success(permits);
+            return result.success(permits);
         }
 
         /// <summary>
@@ -40,13 +40,13 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">模块ID</param>
         /// <returns>Result</returns>
-        public Result<object> GetFunctions(string id)
+        public Result<object> getFunctions(string id)
         {
-            if (!Verify()) return result;
+            if (!verify()) return result;
 
-            var functions = Core.GetFunctions(tenantId, userId, deptId, id);
+            var functions = Core.getFunctions(tenantId, userId, deptId, id);
 
-            return result.Success(functions);
+            return result.success(functions);
         }
 
         /// <summary>
@@ -54,16 +54,16 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">业务模块ID</param>
         /// <returns>Result</returns>
-        public Result<object> GetModuleParam(string id)
+        public Result<object> getModuleParam(string id)
         {
-            if (!Verify()) return result;
+            if (!verify()) return result;
 
             using (var context = new Entities())
             {
                 var list = context.moduleParams.Where(i => i.tenantId == tenantId && i.moduleId == id);
                 var param = list.Where(i => i.deptId == null || i.userId == null || i.deptId == deptId || i.userId == userId);
 
-                return result.Success(param.ToList());
+                return result.success(param.ToList());
             }
         }
 
@@ -73,9 +73,9 @@ namespace Insight.Base.Services
         /// <param name="id">业务模块ID</param>
         /// <param name="list">选项数据集合</param>
         /// <returns>Result</returns>
-        public Result<object> SaveModuleParam(string id, List<Parameter> list)
+        public Result<object> saveModuleParam(string id, List<Parameter> list)
         {
-            if (!Verify()) return result;
+            if (!verify()) return result;
 
             using (var context = new Entities())
             {
@@ -100,11 +100,11 @@ namespace Insight.Base.Services
                 try
                 {
                     context.SaveChanges();
-                    return result.Success();
+                    return result.success();
                 }
                 catch (Exception)
                 {
-                    return result.DataBaseError();
+                    return result.dataBaseError();
                 }
             }
         }
@@ -114,16 +114,16 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">上级区划ID</param>
         /// <returns>Result</returns>
-        public Result<object> GetRegions(string id)
+        public Result<object> getRegions(string id)
         {
-            if (!Verify()) return result;
+            if (!verify()) return result;
 
             using (var context = new Entities())
             {
                 var list = context.regions.Where(i => i.parentId == (id == "" ? null : id));
                 var regions = list.OrderBy(i => i.code).ToList();
 
-                return result.Success(regions);
+                return result.success(regions);
             }
         }
 
@@ -132,21 +132,21 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">应用ID</param>
         /// <returns>Result</returns>
-        public Result<object> GetFiles(string id)
+        public Result<object> getFiles(string id)
         {
-            if (!Verify()) return result;
+            if (!verify()) return result;
 
             var list = Params.fileList.Where(i => i.Value.appId == id && i.Value.updateTime.AddMinutes(30) > DateTime.Now).ToDictionary(i => i.Key, i => i.Value);
             if (!list.Any())
             {
                 var dirInfo = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-                var path = DbHelper.Find<Application>(id)?.alias;
+                var path = DbHelper.find<Application>(id)?.alias;
                 var root = $"{dirInfo.FullName}Client\\{path}";
-                Util.GetClientFiles(Params.fileList, id, root, ".dll|.exe|.frl");
+                Util.getClientFiles(Params.fileList, id, root, ".dll|.exe|.frl");
                 list = Params.fileList.Where(i => i.Value.appId == id).ToDictionary(i => i.Key, i => i.Value);
             }
 
-            return result.Success(list);
+            return result.success(list);
         }
 
         /// <summary>
@@ -154,17 +154,17 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">文件ID</param>
         /// <returns>Result</returns>
-        public Result<object> GetFile(string id)
+        public Result<object> getFile(string id)
         {
-            if (!Verify()) return result;
+            if (!verify()) return result;
 
-            if (!Params.fileList.ContainsKey(id)) return result.NotFound();
+            if (!Params.fileList.ContainsKey(id)) return result.notFound();
 
             var file = Params.fileList[id];
             var bytes = File.ReadAllBytes(file.fullPath);
-            var str = Convert.ToBase64String(Util.Compress(bytes));
+            var str = Convert.ToBase64String(Util.compress(bytes));
 
-            return result.Success(str);
+            return result.success(str);
         }
 
         /// <summary>
@@ -172,13 +172,13 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">影像ID</param>
         /// <returns>Result</returns>
-        public Result<object> GetImageData(string id)
+        public Result<object> getImageData(string id)
         {
-            if (!Verify()) return result;
+            if (!verify()) return result;
 
-            var image = DbHelper.Find<Image>(id);
+            var image = DbHelper.find<Image>(id);
 
-            return image == null ? result.NotExists() : result.Success(image);
+            return image == null ? result.notExists() : result.success(image);
         }
 
         /// <summary>
@@ -188,13 +188,13 @@ namespace Insight.Base.Services
         /// <param name="templateId">模板ID</param>
         /// <param name="deptName">部门名称</param>
         /// <returns>Result</returns>
-        public Result<object> BuildImageData(string id, string templateId, string deptName)
+        public Result<object> buildImageData(string id, string templateId, string deptName)
         {
-            if (!Verify()) return result;
+            if (!verify()) return result;
 
             var fr = new Report();
-            var template = DbHelper.Find<ReportTemplet>(templateId);
-            if (template == null) return result.NotExists();
+            var template = DbHelper.find<ReportTemplet>(templateId);
+            if (template == null) return result.notExists();
 
             fr.LoadFromString(template.content);
             //fr.Dictionary.Connections[0].ConnectionString = new Entities().Database.Connection.ConnectionString;
@@ -203,7 +203,7 @@ namespace Insight.Base.Services
             fr.SetParameterValue("UserName", userName);
             fr.SetParameterValue("DeptId", deptId);
             fr.SetParameterValue("UserId", userId);
-            if (!fr.Prepare()) return result.BadRequest("生成报表失败");
+            if (!fr.Prepare()) return result.badRequest("生成报表失败");
 
             Stream stream = new MemoryStream();
             fr.SavePrepared(stream);
@@ -220,7 +220,7 @@ namespace Insight.Base.Services
                 image = bytes
             };
 
-            return result.Success(img);
+            return result.success(img);
         }
 
         /// <summary>
@@ -228,13 +228,13 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">模板ID</param>
         /// <returns>Result</returns>
-        public Result<object> GetTemplate(string id)
+        public Result<object> getTemplate(string id)
         {
-            if (!Verify()) return result;
+            if (!verify()) return result;
 
-            var data = DbHelper.Find<ReportTemplet>(id);
+            var data = DbHelper.find<ReportTemplet>(id);
 
-            return data == null ? result.NotFound() : result.Success(data.content);
+            return data == null ? result.notFound() : result.success(data.content);
         }
     }
 }

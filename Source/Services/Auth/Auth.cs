@@ -18,7 +18,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 为跨域请求设置响应头信息
         /// </summary>
-        public void ResponseOptions()
+        public void responseOptions()
         {
         }
 
@@ -28,27 +28,27 @@ namespace Insight.Base.Services
         /// <param name="account">登录账号</param>
         /// <param name="type">登录类型</param>
         /// <returns>Result</returns>
-        public Result<object> GetCode(string account, int type)
+        public Result<object> getCode(string account, int type)
         {
             // 限流,每客户端每天可访问100次
-            var key = Util.Hash("GetCode" + GetFingerprint());
-            var limited = Params.callManage.IsLimited(key, 3600 * 24, 100);
-            if (limited) return result.BadRequest("当天获取Code次数已用完,请合理使用接口");
+            var key = Util.hash("GetCode" + getFingerprint());
+            var limited = Params.callManage.isLimited(key, 3600 * 24, 100);
+            if (limited) return result.badRequest("当天获取Code次数已用完,请合理使用接口");
 
-            userId = Core.GetUserId(account);
-            if (userId == null) return result.NotExists();
+            userId = Core.getUserId(account);
+            if (userId == null) return result.notExists();
 
-            manage = Core.GetUserCache(userId);
+            manage = Core.getUserCache(userId);
             if (manage == null)
             {
-                RedisHelper.Delete($"ID:{account}");
-                return result.ServerError("缓存异常，请重试");
+                RedisHelper.delete($"ID:{account}");
+                return result.serverError("缓存异常，请重试");
             }
 
             // 生成Code
-            object code = Core.GenerateCode(manage, account, type);
+            object code = Core.generateCode(manage, account, type);
 
-            return result.Success(code);
+            return result.success(code);
         }
 
         /// <summary>
@@ -60,54 +60,54 @@ namespace Insight.Base.Services
         /// <param name="signature">用户签名</param>
         /// <param name="deptid">登录部门ID（可为空）</param>
         /// <returns>Result</returns>
-        public Result<object> GetToken(string tid, string aid, string account, string signature, string deptid)
+        public Result<object> getToken(string tid, string aid, string account, string signature, string deptid)
         {
             // 限流,每客户端每天可访问100次
-            var key = Util.Hash("GetToken" + GetFingerprint());
-            var limited = Params.callManage.IsLimited(key, 3600 * 24, 100);
-            if (limited) return result.BadRequest("当天获取Token次数已用完,请合理使用接口");
+            var key = Util.hash("GetToken" + getFingerprint());
+            var limited = Params.callManage.isLimited(key, 3600 * 24, 100);
+            if (limited) return result.badRequest("当天获取Token次数已用完,请合理使用接口");
 
-            var code = Core.GetCode(signature);
+            var code = Core.getCode(signature);
             if (string.IsNullOrEmpty(code))
             {
-                userId = Core.GetUserId(account);
-                manage = Core.GetUserCache(userId);
+                userId = Core.getUserId(account);
+                manage = Core.getUserCache(userId);
                 if (manage != null)
                 {
-                    manage.AddFailureCount();
-                    Core.SetUserCache(manage);
+                    manage.addFailureCount();
+                    Core.setUserCache(manage);
                     var msg = $"账号 {account} 正在尝试使用错误的签名请求令牌!";
-                    new Thread(() => Logger.Write("400101", msg)).Start();
+                    new Thread(() => Logger.write("400101", msg)).Start();
                 }
 
-                return manage.UserIsLocked() ? result.Locked() : result.InvalidAuth();
+                return manage.userIsLocked() ? result.locked() : result.invalidAuth();
             }
 
-            userId = RedisHelper.StringGet(code);
-            if (string.IsNullOrEmpty(userId)) return result.ServerError("缓存异常，请重试");
+            userId = RedisHelper.stringGet(code);
+            if (string.IsNullOrEmpty(userId)) return result.serverError("缓存异常，请重试");
 
-            RedisHelper.Delete(code);
-            manage = Core.GetUserCache(userId);
+            RedisHelper.delete(code);
+            manage = Core.getUserCache(userId);
             if (manage == null)
             {
-                RedisHelper.Delete($"ID:{account}");
-                return result.ServerError("缓存异常，请重试");
+                RedisHelper.delete($"ID:{account}");
+                return result.serverError("缓存异常，请重试");
             }
 
             // 验证令牌
-            if (manage.isInvalid) return result.Disabled();
+            if (manage.isInvalid) return result.disabled();
 
-            if (manage.UserIsLocked())
+            if (manage.userIsLocked())
             {
-                Core.SetUserCache(manage);
-                return result.Locked();
+                Core.setUserCache(manage);
+                return result.locked();
             }
 
             // 创建令牌数据并返回
-            var tokens = manage.Creator(code, aid, tid);
-            Core.SetUserCache(manage);
+            var tokens = manage.creator(code, aid, tid);
+            Core.setUserCache(manage);
 
-            return result.Success(tokens);
+            return result.success(tokens);
         }
 
         /// <summary>
@@ -115,9 +115,9 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="action">需要鉴权的操作ID</param>
         /// <returns>Result</returns>
-        public Result<object> Verification(string action)
+        public Result<object> verification(string action)
         {
-            Verify(action);
+            verify(action);
 
             return result;
         }
@@ -126,40 +126,40 @@ namespace Insight.Base.Services
         /// 刷新AccessToken，延长过期时间
         /// </summary>
         /// <returns>Result</returns>
-        public Result<object> RefreshToken()
+        public Result<object> refreshToken()
         {
-            var verify = new Verify(true, TokenType.RefreshToken);
+            var verify = new Verify(true, TokenType.REFRESH_TOKEN);
             manage = verify.manage;
             tokenId = verify.tokenId;
-            if (manage == null) return result.InvalidToken();
+            if (manage == null) return result.invalidToken();
 
             // 限流,令牌在其有效期内可刷新60次
-            var key = Util.Hash("RefreshToken" + tokenId);
-            var limited = Params.callManage.IsLimited(key, manage.life * 12, 60);
-            if (limited) return result.BadRequest("刷新次数已用完,请合理刷新");
+            var key = Util.hash("RefreshToken" + tokenId);
+            var limited = Params.callManage.isLimited(key, manage.life * 12, 60);
+            if (limited) return result.badRequest("刷新次数已用完,请合理刷新");
 
-            result = verify.Compare();
+            result = verify.compare();
             if (!result.successful) return result;
 
             // 刷新令牌
-            var tokens = manage.Refresh(tokenId);
-            Core.SetUserCache(manage);
+            var tokens = manage.refresh(tokenId);
+            Core.setUserCache(manage);
 
-            return result.Success(tokens);
+            return result.success(tokens);
         }
 
         /// <summary>
         /// 移除指定账户的AccessToken
         /// </summary>
         /// <returns>Result</returns>
-        public Result<object> RemoveToken()
+        public Result<object> removeToken()
         {
-            if (!Verify()) return result;
+            if (!verify()) return result;
 
-            manage.Delete(tokenId);
-            Core.SetUserCache(manage);
+            TokenManage.delete(tokenId);
+            Core.setUserCache(manage);
 
-            return result.Success();
+            return result.success();
         }
 
         /// <summary>
@@ -167,17 +167,17 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="account">登录账号</param>
         /// <returns>Result</returns>
-        public Result<object> GetTenants(string account)
+        public Result<object> getTenants(string account)
         {
             using (var context = new Entities())
             {
                 var user = context.users.SingleOrDefault(u => u.account == account || u.mobile == account || u.email == account);
-                if (user == null) return result.NotFound();
+                if (user == null) return result.notFound();
 
                 var list = from m in context.tenantUsers.Where(m => m.userId == user.id)
                     join t in context.tenants on m.tenantId equals t.id
                     select new { t.id, Name = t.alias, remark = t.name };
-                return list.Any() ? result.Success(list.ToList()) : result.NoContent(new List<object>());
+                return list.Any() ? result.success(list.ToList()) : result.noContent(new List<object>());
             }
         }
 
@@ -187,29 +187,29 @@ namespace Insight.Base.Services
         /// <param name="code">短信验证码</param>
         /// <param name="password">支付密码</param>
         /// <returns>Result</returns>
-        public Result<object> SetPayPW(string code, string password)
+        public Result<object> setPayPw(string code, string password)
         {
-            if (string.IsNullOrEmpty(password)) return result.BadRequest("密码不能为空");
+            if (string.IsNullOrEmpty(password)) return result.badRequest("密码不能为空");
 
-            if (!Verify()) return result;
+            if (!verify()) return result;
 
             // 验证短信验证码
-            if (!Core.VerifySmsCode(3, manage.mobile, code)) return result.SMSCodeError();
+            if (!Core.verifySmsCode(3, manage.mobile, code)) return result.smsCodeError();
 
-            var key = Util.Hash(userId + password);
-            if (manage.payPassword == key) return result.Success();
+            var key = Util.hash(userId + password);
+            if (manage.payPassword == key) return result.success();
 
             // 保存支付密码到数据库
-            var user = Core.GetUserById(userId);
+            var user = Core.getUserById(userId);
             user.payPassword = key;
-            if (!DbHelper.Update(user)) return result.DataBaseError();
+            if (!DbHelper.update(user)) return result.dataBaseError();
 
             // 更新Token缓存
             manage.payPassword = key;
-            manage.SetChanged();
-            Core.SetUserCache(manage);
+            manage.setChanged();
+            Core.setUserCache(manage);
 
-            return result.Success();
+            return result.success();
         }
 
         /// <summary>
@@ -217,14 +217,14 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="password">支付密码</param>
         /// <returns>Result</returns>
-        public Result<object> VerifyPayPW(string password)
+        public Result<object> verifyPayPw(string password)
         {
-            if (!Verify()) return result;
+            if (!verify()) return result;
 
-            var success = manage.VerifyPayPassword(password);
-            if (success == null) return result.BadRequest("未设置支付密码,请先设置支付密码!");
+            var success = manage.verifyPayPassword(password);
+            if (success == null) return result.badRequest("未设置支付密码,请先设置支付密码!");
 
-            return success.Value ? result : result.InvalidPayKey();
+            return success.Value ? result : result.invalidPayKey();
         }
 
         /// <summary>
@@ -235,16 +235,16 @@ namespace Insight.Base.Services
         /// <param name="life">过期时间（分钟）</param>
         /// <param name="length">字符长度</param>
         /// <returns>Result</returns>
-        public Result<object> NewCode(string mobile, int type, int life, int length)
+        public Result<object> newCode(string mobile, int type, int life, int length)
         {
-            var fingerprint = GetFingerprint();
-            var limitKey = Util.Hash("GetSmsCode" + fingerprint + type);
-            var surplus = Params.callManage.GetSurplus(limitKey, 10);
-            if (surplus > 0) return result.TooFrequent(surplus);
+            var fingerprint = getFingerprint();
+            var limitKey = Util.hash("GetSmsCode" + fingerprint + type);
+            var surplus = Params.callManage.getSurplus(limitKey, 10);
+            if (surplus > 0) return result.tooFrequent(surplus);
 
-            var code = Core.GenerateSmsCode(type, mobile, life, length);
+            var code = Core.generateSmsCode(type, mobile, life, length);
 
-            return result.Created(code);
+            return result.created(code);
         }
 
         /// <summary>
@@ -252,16 +252,16 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="code">验证码对象</param>
         /// <returns>Result</returns>
-        public Result<object> VerifyCode(SmsCode code)
+        public Result<object> verifyCode(SmsCode code)
         {
-            var fingerprint = GetFingerprint();
-            var limitKey = Util.Hash("VerifyCode" + fingerprint + Util.Serialize(code));
-            var surplus = Params.callManage.GetSurplus(limitKey, 600);
-            if (surplus > 0) return result.TooFrequent(surplus);
+            var fingerprint = getFingerprint();
+            var limitKey = Util.hash("VerifyCode" + fingerprint + Util.serialize(code));
+            var surplus = Params.callManage.getSurplus(limitKey, 600);
+            if (surplus > 0) return result.tooFrequent(surplus);
 
-            var verify = Core.VerifySmsCode(code.type, code.mobile, code.code, !code.remove);
+            var verify = Core.verifySmsCode(code.type, code.mobile, code.code, !code.remove);
 
-            return verify ? result.Success() : result.SMSCodeError();
+            return verify ? result.success() : result.smsCodeError();
         }
     }
 }

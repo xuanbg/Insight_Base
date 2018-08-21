@@ -5,7 +5,7 @@ namespace Insight.Base.Server
 {
     public partial class BaseServer : ServiceBase
     {
-        private static readonly Service _Services = new Service();
+        private static readonly Service services = new Service();
 
         /// <summary>
         /// 构造方法
@@ -21,8 +21,8 @@ namespace Insight.Base.Server
         /// <param name="args"></param>
         protected override void OnStart(string[] args)
         {
-            _Services.CreateHosts();
-            _Services.StartService();
+            services.createHosts();
+            services.startService();
         }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace Insight.Base.Server
         /// </summary>
         protected override void OnStop()
         {
-            _Services.StopService();
+            services.stopService();
         }
     }
 }

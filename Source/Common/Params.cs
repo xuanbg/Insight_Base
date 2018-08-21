@@ -40,11 +40,11 @@ namespace Insight.Base.Common
         /// <summary>
         /// 用于生成短信验证码的随机数发生器
         /// </summary>
-        public static readonly Random Random = new Random(Environment.TickCount);
+        public static readonly Random random = new Random(Environment.TickCount);
 
         /// <summary>
         /// 日志接口URL
         /// </summary>
-        public static string LogUrl;
+        public static string logUrl;
     }
 }

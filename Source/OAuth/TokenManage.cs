@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Threading;
 using Insight.Base.Common.Entity;
 using Insight.Utils.Common;
 using Insight.Utils.Entity;
@@ -14,11 +13,8 @@ namespace Insight.Base.OAuth
     /// </summary>
     public class TokenManage
     {
-        // 进程同步基元
-        private static readonly Mutex mutex = new Mutex();
-
         // Token属性是否已改变
-        private bool isChanged;
+        private bool changed;
 
         // 当前令牌对应的关键数据集
         private Token token;
@@ -127,19 +123,16 @@ namespace Insight.Base.OAuth
 
             lastFailureTime = DateTime.Now;
             failureCount = 0;
-            isChanged = true;
+            changed = true;
         }
 
         /// <summary>
         /// 获取缓存中的令牌数据
         /// </summary>
         /// <param name="tokenId">令牌ID</param>
-        /// <returns>bool 是否存在关键数据集</returns>
-        public bool GetToken(string tokenId)
+        public void getToken(string tokenId)
         {
-            token = RedisHelper.StringGet<Token>($"Token:{tokenId}");
-
-            return token != null;
+            token = RedisHelper.stringGet<Token>($"Token:{tokenId}");
         }
 
         /// <summary>
@@ -149,19 +142,19 @@ namespace Insight.Base.OAuth
         /// <param name="aid">应用ID</param>
         /// <param name="tid">租户ID</param>
         /// <returns>令牌数据包</returns>
-        public TokenPackage Creator(string code, string aid, string tid = null)
+        public TokenPackage creator(string code, string aid, string tid = null)
         {
             if (string.IsNullOrEmpty(aid)) aid = "Default APP";
 
-            var funs = Core.GetPermitFuncs(tid, userId, deptId, false, aid)
+            var funs = Core.getPermitFuncs(tid, userId, deptId, false, aid)
                 .Where(i => i.permit > 0)
                 .Select(i => i.key)
                 .ToList();
             token = new Token(tid, aid) {permitFuncs = funs};
 
-            var package = InitPackage(code);
-            RedisHelper.StringSet($"Token:{code}", token, token.failureTime);
-            RedisHelper.HashSet($"Apps:{userId}", aid, code);
+            var package = initPackage(code);
+            RedisHelper.stringSet($"Token:{code}", token, token.failureTime);
+            RedisHelper.hashSet($"Apps:{userId}", aid, code);
 
             return package;
         }
@@ -171,11 +164,11 @@ namespace Insight.Base.OAuth
         /// </summary>
         /// <param name="tokenId">令牌ID</param>
         /// <returns>令牌数据包</returns>
-        public TokenPackage Refresh(string tokenId)
+        public TokenPackage refresh(string tokenId)
         {
-            token.Refresh();
-            var package = InitPackage(tokenId);
-            RedisHelper.StringSet($"Token:{tokenId}", token, token.failureTime);
+            token.refresh();
+            var package = initPackage(tokenId);
+            RedisHelper.stringSet($"Token:{tokenId}", token, token.failureTime);
 
             return package;
         }
@@ -184,11 +177,11 @@ namespace Insight.Base.OAuth
         /// 使用户离线
         /// </summary>
         /// <param name="tokenId">令牌ID</param>
-        public void Delete(string tokenId)
+        public static void delete(string tokenId)
         {
-            if (!RedisHelper.HasKey($"Token:{tokenId}")) return;
+            if (!RedisHelper.hasKey($"Token:{tokenId}")) return;
 
-            RedisHelper.Delete($"Token:{tokenId}");
+            RedisHelper.delete($"Token:{tokenId}");
         }
 
         /// <summary>
@@ -196,19 +189,19 @@ namespace Insight.Base.OAuth
         /// </summary>
         /// <param name="code">Code</param>
         /// <returns>令牌数据包</returns>
-        private TokenPackage InitPackage(string code)
+        private TokenPackage initPackage(string code)
         {
             var accessToken = new AccessToken {id = code, userId = userId, secret = token.secretKey};
             var refreshToken = new AccessToken {id = code, userId = userId, secret = token.refreshKey};
             var tokenPackage = new TokenPackage
             {
-                accessToken = Util.Base64(accessToken),
-                refreshToken = Util.Base64(refreshToken),
+                accessToken = Util.base64(accessToken),
+                refreshToken = Util.base64(refreshToken),
                 expiryTime = token.life,
                 failureTime = token.life * 12
             };
 
-            token.hash = Util.Hash(tokenPackage.accessToken);
+            token.hash = Util.hash(tokenPackage.accessToken);
 
             return tokenPackage;
         }
@@ -219,9 +212,9 @@ namespace Insight.Base.OAuth
         /// <param name="key">密钥</param>
         /// <param name="tokenType">令牌类型</param>
         /// <returns>Token是否合法</returns>
-        public bool Verify(string key, TokenType tokenType)
+        public bool verify(string key, TokenType tokenType)
         {
-            return token != null && token.VerifyKey(key, tokenType);
+            return token != null && token.verifyKey(key, tokenType);
         }
 
         /// <summary>
@@ -229,7 +222,7 @@ namespace Insight.Base.OAuth
         /// </summary>
         /// <param name="key">操作码</param>
         /// <returns>bool 是否授权</returns>
-        public bool VerifyKeyInCache(string key)
+        public bool verifyKeyInCache(string key)
         {
             return token?.permitFuncs != null && token.permitFuncs.Any(i => i.Contains(key));
         }
@@ -239,9 +232,9 @@ namespace Insight.Base.OAuth
         /// </summary>
         /// <param name="key">操作码</param>
         /// <returns>bool 是否通过验证</returns>
-        public bool VerifyKey(string key)
+        public bool verifyKey(string key)
         {
-            var permits = Core.GetPermitFuncs(tenantId, userId, deptId).Where(i => i.permit > 0);
+            var permits = Core.getPermitFuncs(tenantId, userId, deptId).Where(i => i.permit > 0);
             using (var context = new Entities())
             {
                 var list = from f in context.functions.ToList()
@@ -255,13 +248,13 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 累计失败次数(有效时)
         /// </summary>
-        public void AddFailureCount()
+        public void addFailureCount()
         {
-            if (UserIsLocked()) return;
+            if (userIsLocked()) return;
 
             lastFailureTime = DateTime.Now;
             failureCount++;
-            isChanged = true;
+            changed = true;
         }
 
         /// <summary>
@@ -269,11 +262,11 @@ namespace Insight.Base.OAuth
         /// </summary>
         /// <param name="key">支付密码</param>
         /// <returns>支付密码是否通过验证</returns>
-        public bool? VerifyPayPassword(string key)
+        public bool? verifyPayPassword(string key)
         {
             if (payPassword == null) return null;
 
-            var pw = Util.Hash(userId + key);
+            var pw = Util.hash(userId + key);
             return payPassword == pw;
         }
 
@@ -281,7 +274,7 @@ namespace Insight.Base.OAuth
         /// Token是否过期
         /// </summary>
         /// <returns>Token是否过期</returns>
-        public bool TenantIsExpiry()
+        public bool tenantIsExpiry()
         {
             return token == null || tenantId != null && DateTime.Now > token.expireDate;
         }
@@ -290,9 +283,9 @@ namespace Insight.Base.OAuth
         /// Token是否过期
         /// </summary>
         /// <returns>Token是否过期</returns>
-        public bool IsExpiry()
+        public bool isExpiry()
         {
-            return token == null || token.IsExpiry();
+            return token == null || token.isExpiry();
         }
 
         /// <summary>
@@ -302,27 +295,27 @@ namespace Insight.Base.OAuth
         /// <param name="hash">令牌哈希值</param>
         /// <param name="type">令牌类型</param>
         /// <returns>Token是否失效</returns>
-        public bool IsFailure(string tokenId, string hash, TokenType type)
+        public bool isFailure(string tokenId, string hash, TokenType type)
         {
-            if (token == null || token.hash != hash && type == TokenType.AccessToken) return true;
+            if (token == null || token.hash != hash && type == TokenType.ACCESS_TOKEN) return true;
 
-            var code = RedisHelper.HashGet($"Apps:{userId}", appId);
+            var code = RedisHelper.hashGet($"Apps:{userId}", appId);
 
-            return token.signInOne && code != tokenId || token.IsFailure();
+            return token.signInOne && code != tokenId || token.isFailure();
         }
 
         /// <summary>
         /// 用户是否失效状态
         /// </summary>
         /// <returns>用户是否失效状态</returns>
-        public bool UserIsLocked()
+        public bool userIsLocked()
         {
             var now = DateTime.Now;
             var resetTime = lastFailureTime.AddMinutes(10);
             if (failureCount > 0 && now > resetTime)
             {
                 failureCount = 0;
-                isChanged = true;
+                changed = true;
             }
 
             return failureCount > 5;
@@ -332,17 +325,17 @@ namespace Insight.Base.OAuth
         /// 是否已修改
         /// </summary>
         /// <returns></returns>
-        public bool IsChanged()
+        public bool isChanged()
         {
-            return isChanged;
+            return changed;
         }
 
         /// <summary>
         /// 设置修改标志位为真值
         /// </summary>
-        public void SetChanged()
+        public void setChanged()
         {
-            isChanged = true;
+            changed = true;
         }
     }
 }

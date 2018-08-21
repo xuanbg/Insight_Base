@@ -16,7 +16,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 为跨域请求设置响应头信息
         /// </summary>
-        public void ResponseOptions()
+        public void responseOptions()
         {
         }
 
@@ -25,18 +25,18 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="group">用户组对象</param>
         /// <returns>Result</returns>
-        public Result<object> AddGroup(Group group)
+        public Result<object> addGroup(Group group)
         {
-            if (!Verify("newGroup")) return result;
+            if (!verify("newGroup")) return result;
 
-            group.id = Util.NewId();
+            group.id = Util.newId();
             group.tenantId = tenantId;
-            if (Existed(group)) return result.DataAlreadyExists();
+            if (existed(group)) return result.dataAlreadyExists();
 
             group.creatorId = userId;
             group.createTime = DateTime.Now;
 
-            return DbHelper.Insert(group) ? result.Created(group) : result.DataBaseError();
+            return DbHelper.insert(group) ? result.created(group) : result.dataBaseError();
         }
 
         /// <summary>
@@ -44,14 +44,14 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">用户组ID</param>
         /// <returns>Result</returns>
-        public Result<object> RemoveGroup(string id)
+        public Result<object> removeGroup(string id)
         {
-            if (!Verify("deleteGroup")) return result;
+            if (!verify("deleteGroup")) return result;
 
-            var data = GetData(id);
-            if (data == null) return result.NotFound();
+            var data = getData(id);
+            if (data == null) return result.notFound();
 
-            return DbHelper.Delete(data) ? result : result.DataBaseError();
+            return DbHelper.delete(data) ? result : result.dataBaseError();
         }
 
         /// <summary>
@@ -60,18 +60,18 @@ namespace Insight.Base.Services
         /// <param name="id"></param>
         /// <param name="group">用户组对象</param>
         /// <returns>Result</returns>
-        public Result<object> UpdateGroup(string id, Group @group)
+        public Result<object> updateGroup(string id, Group @group)
         {
-            if (!Verify("editGroup")) return result;
+            if (!verify("editGroup")) return result;
 
-            var data = GetData(group.id);
-            if (data == null) return result.NotFound();
+            var data = getData(group.id);
+            if (data == null) return result.notFound();
 
             data.name = group.name;
             data.remark = group.remark;
-            if (Existed(data)) return result.DataAlreadyExists();
+            if (existed(data)) return result.dataAlreadyExists();
 
-            return DbHelper.Update(data) ? result : result.DataBaseError();
+            return DbHelper.update(data) ? result : result.dataBaseError();
         }
 
         /// <summary>
@@ -79,12 +79,12 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">用户组ID</param>
         /// <returns>Result</returns>
-        public Result<object> GetGroup(string id)
+        public Result<object> getGroup(string id)
         {
-            if (!Verify("getGroups")) return result;
+            if (!verify("getGroups")) return result;
 
-            var data = GetData(id);
-            return data == null ? result.NotFound() : result.Success(data);
+            var data = getData(id);
+            return data == null ? result.notFound() : result.success(data);
         }
 
         /// <summary>
@@ -94,11 +94,11 @@ namespace Insight.Base.Services
         /// <param name="page">当前页</param>
         /// <param name="key">查询关键词</param>
         /// <returns>Result</returns>
-        public Result<object> GetGroups(int rows, int page, string key)
+        public Result<object> getGroups(int rows, int page, string key)
         {
-            if (!Verify("getGroups")) return result;
+            if (!verify("getGroups")) return result;
 
-            if (page < 1 || rows > 100) return result.BadRequest();
+            if (page < 1 || rows > 100) return result.badRequest();
 
             using (var context = new Entities())
             {
@@ -106,7 +106,7 @@ namespace Insight.Base.Services
                 var list = context.groups.Where(i => i.tenantId == tenantId && (string.IsNullOrEmpty(key) || i.name.Contains(key) || i.remark.Contains(key)));
                 var data = list.OrderBy(i => i.createTime).Skip(skip).Take(rows).ToList();
 
-                return result.Success(data, list.Count());
+                return result.success(data, list.Count());
             }
         }
 
@@ -116,12 +116,12 @@ namespace Insight.Base.Services
         /// <param name="id"></param>
         /// <param name="group">UserGroup</param>
         /// <returns>Result</returns>
-        public Result<object> AddGroupMember(string id, Group @group)
+        public Result<object> addGroupMember(string id, Group @group)
         {
-            if (!Verify("addGroupMember")) return result;
+            if (!verify("addGroupMember")) return result;
 
-            var data = GetData(group.id);
-            if (data == null) return result.NotFound();
+            var data = getData(group.id);
+            if (data == null) return result.notFound();
 
             group.members.ForEach(i =>
             {
@@ -130,7 +130,7 @@ namespace Insight.Base.Services
                 i.createTime = DateTime.Now;
             });
 
-            return DbHelper.Insert(group.members) ? result.Success(group) : result.DataBaseError();
+            return DbHelper.insert(group.members) ? result.success(group) : result.dataBaseError();
         }
 
         /// <summary>
@@ -139,14 +139,14 @@ namespace Insight.Base.Services
         /// <param name="id"></param>
         /// <param name="group">UserGroup</param>
         /// <returns>Result</returns>
-        public Result<object> RemoveMember(string id, Group @group)
+        public Result<object> removeMember(string id, Group @group)
         {
-            if (!Verify("removeGroupMember")) return result;
+            if (!verify("removeGroupMember")) return result;
 
-            var data = GetData(group.id);
-            if (data == null) return result.NotFound();
+            var data = getData(group.id);
+            if (data == null) return result.notFound();
 
-            return DbHelper.Delete(group.members) ? result.Success(group) : result.DataBaseError();
+            return DbHelper.delete(group.members) ? result.success(group) : result.dataBaseError();
         }
 
         /// <summary>
@@ -154,9 +154,9 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">用户组ID</param>
         /// <returns>Result</returns>
-        public Result<object> GetOtherUser(string id)
+        public Result<object> getOtherUser(string id)
         {
-            if (!Verify("getGroups")) return result;
+            if (!verify("getGroups")) return result;
 
             using (var context = new Entities())
             {
@@ -167,7 +167,7 @@ namespace Insight.Base.Services
                            where t == null && !u.isInvalid
                            orderby u.createTime
                            select new {u.id, u.name, u.account};
-                return list.Any() ? result.Success(list.ToList()) : result.NoContent(new List<object>());
+                return list.Any() ? result.success(list.ToList()) : result.noContent(new List<object>());
             }
         }
 
@@ -176,7 +176,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">用户组ID</param>
         /// <returns>用户组</returns>
-        private static Group GetData(string id)
+        private static Group getData(string id)
         {
             using (var context = new Entities())
             {
@@ -189,7 +189,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="group">用户组</param>
         /// <returns>是否已存在</returns>
-        private static bool Existed(Group group)
+        private static bool existed(Group group)
         {
             using (var context = new Entities())
             {

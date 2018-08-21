@@ -20,21 +20,21 @@ namespace Insight.Base.OAuth
         /// </summary>
         /// <param name="account">登录账号(账号、手机号、E-mail)</param>
         /// <returns>用户ID</returns>
-        public static string GetUserId(string account)
+        public static string getUserId(string account)
         {
             var key = "ID:" + account;
-            var userId = RedisHelper.StringGet(key);
+            var userId = RedisHelper.stringGet(key);
             if (!string.IsNullOrEmpty(userId)) return userId;
 
             mutex.WaitOne();
-            userId = RedisHelper.StringGet(account);
+            userId = RedisHelper.stringGet(account);
             if (!string.IsNullOrEmpty(userId))
             {
                 mutex.ReleaseMutex();
                 return userId;
             }
 
-            var user = GetUser(account);
+            var user = getUser(account);
             if (user == null)
             {
                 mutex.ReleaseMutex();
@@ -44,22 +44,22 @@ namespace Insight.Base.OAuth
             // 缓存用户ID到Redis
             userId = user.id;
             key = "ID:" + user.account;
-            RedisHelper.StringSet(key, userId);
+            RedisHelper.stringSet(key, userId);
 
             if (!string.IsNullOrEmpty(user.mobile))
             {
                 key = "ID:" + user.mobile;
-                RedisHelper.StringSet(key, userId);
+                RedisHelper.stringSet(key, userId);
             }
 
             if (!string.IsNullOrEmpty(user.email))
             {
                 key = "ID:" + user.email;
-                RedisHelper.StringSet(key, userId);
+                RedisHelper.stringSet(key, userId);
             }
 
             var token = new TokenManage(user);
-            SetUserCache(token);
+            setUserCache(token);
             mutex.ReleaseMutex();
 
             return userId;
@@ -72,14 +72,14 @@ namespace Insight.Base.OAuth
         /// <param name="account">登录账号</param>
         /// <param name="type">登录类型(0:密码登录、1:验证码登录)</param>
         /// <returns>Code</returns>
-        public static string GenerateCode(TokenManage token, string account, int type)
+        public static string generateCode(TokenManage token, string account, int type)
         {
             string key;
             var life = 60;
             switch (type)
             {
                 case 0:
-                    key = Util.Hash(account + token.password);
+                    key = Util.hash(account + token.password);
                     break;
                 case 1:
                     // 生成短信验证码(5分钟内有效)并发送
@@ -87,21 +87,21 @@ namespace Insight.Base.OAuth
                     if (string.IsNullOrEmpty(mobile)) return null;
 
                     life = 60 * 5;
-                    var smsCode = GenerateSmsCode(4, mobile, 5, 4);
-                    key = Util.Hash(mobile + Util.Hash(smsCode));
+                    var smsCode = generateSmsCode(4, mobile, 5, 4);
+                    key = Util.hash(mobile + Util.hash(smsCode));
                     break;
                 default:
                     // Invalid type! You guess, you guess, you guess. (≧∇≦)
-                    key = Util.NewId("N");
+                    key = Util.newId("N");
                     break;
             }
 
-            var code = Util.NewId("N");
-            var signature = Util.Hash(key + code);
+            var code = Util.newId("N");
+            var signature = Util.hash(key + code);
 
             // 缓存签名-Code,以及Code-用户ID.
-            RedisHelper.StringSet(signature, code, TimeSpan.FromSeconds(life));
-            RedisHelper.StringSet(code, token.userId, TimeSpan.FromSeconds(life));
+            RedisHelper.stringSet(signature, code, TimeSpan.FromSeconds(life));
+            RedisHelper.stringSet(code, token.userId, TimeSpan.FromSeconds(life));
 
             return code;
         }
@@ -114,20 +114,20 @@ namespace Insight.Base.OAuth
         /// <param name="life">验证码有效时长(分钟)</param>
         /// <param name="length">验证码长度</param>
         /// <returns></returns>
-        public static string GenerateSmsCode(int type, string mobile, int life, int length)
+        public static string generateSmsCode(int type, string mobile, int life, int length)
         {
             if (life == 0) life = 15;
 
             if (length == 0) length = 6;
 
             var max = Math.Pow(10, length);
-            var code = Params.Random.Next(0, (int) max).ToString("D" + length);
+            var code = Params.random.Next(0, (int) max).ToString("D" + length);
             var msg = $"为手机号 {mobile} 生成了类型为 {type} 的验证码 {code}, 有效时间 {life} 分钟.";
-            new Thread(() => Logger.Write("600501", msg)).Start();
-            var key = Util.Hash(type + mobile + code);
+            new Thread(() => Logger.write("600501", msg)).Start();
+            var key = Util.hash(type + mobile + code);
             if (type == 4) return code;
 
-            RedisHelper.StringSet(key, code, TimeSpan.FromMinutes(life));
+            RedisHelper.stringSet(key, code, TimeSpan.FromMinutes(life));
             return code;
         }
 
@@ -136,7 +136,7 @@ namespace Insight.Base.OAuth
         /// </summary>
         /// <param name="mobile">手机号</param>
         /// <param name="message">短信内容</param>
-        public static void SendMessage(string mobile, string message)
+        public static void sendMessage(string mobile, string message)
         {
         }
 
@@ -148,13 +148,13 @@ namespace Insight.Base.OAuth
         /// <param name="code">验证码</param>
         /// <param name="isCheck">是否检验模式(true:检验模式,验证后验证码不失效;false:验证模式,验证后验证码失效)</param>
         /// <returns>是否通过验证</returns>
-        public static bool VerifySmsCode(int type, string mobile, string code, bool isCheck = false)
+        public static bool verifySmsCode(int type, string mobile, string code, bool isCheck = false)
         {
-            var key = Util.Hash(type + mobile + code);
-            var isExisted = RedisHelper.HasKey(key);
+            var key = Util.hash(type + mobile + code);
+            var isExisted = RedisHelper.hasKey(key);
             if (!isExisted || isCheck) return isExisted;
 
-            RedisHelper.Delete(key);
+            RedisHelper.delete(key);
             return true;
         }
 
@@ -163,12 +163,12 @@ namespace Insight.Base.OAuth
         /// </summary>
         /// <param name="sign">签名</param>
         /// <returns>签名对应的Code</returns>
-        public static string GetCode(string sign)
+        public static string getCode(string sign)
         {
-            var code = RedisHelper.StringGet(sign);
+            var code = RedisHelper.stringGet(sign);
             if (string.IsNullOrEmpty(code)) return null;
 
-            RedisHelper.Delete(sign);
+            RedisHelper.delete(sign);
             return code;
         }
 
@@ -177,11 +177,11 @@ namespace Insight.Base.OAuth
         /// </summary>
         /// <param name="userId">用户ID</param>
         /// <returns>Token(可能为null)</returns>
-        public static TokenManage GetUserCache(string userId)
+        public static TokenManage getUserCache(string userId)
         {
             var key = $"User:{userId}";
-            var json = RedisHelper.StringGet(key);
-            return string.IsNullOrEmpty(json) ? null : Util.Deserialize<TokenManage>(json);
+            var json = RedisHelper.stringGet(key);
+            return string.IsNullOrEmpty(json) ? null : Util.deserialize<TokenManage>(json);
         }
 
         /// <summary>
@@ -189,7 +189,7 @@ namespace Insight.Base.OAuth
         /// </summary>
         /// <param name="user">User数据</param>
         /// <returns>用户是否存在</returns>
-        public static bool IsExisted(User user)
+        public static bool isExisted(User user)
         {
             using (var context = new Entities())
             {
@@ -203,12 +203,12 @@ namespace Insight.Base.OAuth
         /// 保存用户数据到缓存
         /// </summary>
         /// <param name="token">Token</param>
-        public static void SetUserCache(TokenManage token)
+        public static void setUserCache(TokenManage token)
         {
-            if (!token.IsChanged()) return;
+            if (!token.isChanged()) return;
 
             var key = $"User:{token.userId}";
-            RedisHelper.StringSet(key, token);
+            RedisHelper.stringSet(key, token);
         }
 
         /// <summary>
@@ -216,7 +216,7 @@ namespace Insight.Base.OAuth
         /// </summary>
         /// <param name="userId">用户ID</param>
         /// <returns>用户实体</returns>
-        public static User GetUserById(string userId)
+        public static User getUserById(string userId)
         {
             using (var context = new Entities())
             {
@@ -230,9 +230,9 @@ namespace Insight.Base.OAuth
         /// <param name="tenantId"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public static List<PermitFunc> GetPermitFuncs(string tenantId, string userId)
+        public static List<PermitFunc> getPermitFuncs(string tenantId, string userId)
         {
-            return GetPermitFuncs(tenantId, userId, null, true);
+            return getPermitFuncs(tenantId, userId, null, true);
         }
 
         /// <summary>
@@ -244,7 +244,7 @@ namespace Insight.Base.OAuth
         /// <param name="isAll">是否获取全部权限，默认为否</param>
         /// <param name="appId">应用ID</param>
         /// <returns>功能ID集合</returns>
-        public static List<PermitFunc> GetPermitFuncs(string tenantId, string userId, string deptId, bool isAll = false, string appId = null)
+        public static List<PermitFunc> getPermitFuncs(string tenantId, string userId, string deptId, bool isAll = false, string appId = null)
         {
             using (var context = new Entities())
             {
@@ -271,7 +271,7 @@ namespace Insight.Base.OAuth
         /// <param name="deptId">登录部门ID</param>
         /// <param name="getInfo">是否获取信息，默认为否</param>
         /// <returns>数据ID集合</returns>
-        public static List<PermitData> GetPermitDatas(string tenantId, string userId, string deptId,
+        public static List<PermitData> getPermitDatas(string tenantId, string userId, string deptId,
             bool getInfo = false)
         {
             using (var context = new Entities())
@@ -302,9 +302,9 @@ namespace Insight.Base.OAuth
         /// <param name="userId">用户ID</param>
         /// <param name="deptId">登录部门ID</param>
         /// <returns>导航集合</returns>
-        public static List<Permit> GetNavigation(string tenantId, string appId, string userId, string deptId)
+        public static List<Permit> getNavigation(string tenantId, string appId, string userId, string deptId)
         {
-            var permits = GetPermitFuncs(tenantId, userId, deptId).Where(i => i.permit > 0);
+            var permits = getPermitFuncs(tenantId, userId, deptId).Where(i => i.permit > 0);
             using (var context = new Entities())
             {
                 var navigators = context.navigators.Where(i => i.appId == appId).ToList();
@@ -341,9 +341,9 @@ namespace Insight.Base.OAuth
         /// <param name="deptId">登录部门ID</param>
         /// <param name="moduleId">模块ID</param>
         /// <returns>功能集合</returns>
-        public static List<Permit> GetFunctions(string tenantId, string userId, string deptId, string moduleId)
+        public static List<Permit> getFunctions(string tenantId, string userId, string deptId, string moduleId)
         {
-            var permits = GetPermitFuncs(tenantId, userId, deptId).Where(i => i.permit > 0);
+            var permits = getPermitFuncs(tenantId, userId, deptId).Where(i => i.permit > 0);
             using (var context = new Entities())
             {
                 var functions = context.functions.Where(i => i.isVisible && i.navigatorId == moduleId).ToList();
@@ -374,10 +374,10 @@ namespace Insight.Base.OAuth
         /// <param name="tenantId">租户ID</param>
         /// <param name="userId">用户ID</param>
         /// <returns>应用功能树</returns>
-        public static List<AppTree> GetPermitAppTree(string tenantId, string userId)
+        public static List<AppTree> getPermitAppTree(string tenantId, string userId)
         {
             var list = new List<AppTree>();
-            var permits = GetPermitFuncs(tenantId, userId);
+            var permits = getPermitFuncs(tenantId, userId);
             using (var context = new Entities())
             {
                 var funList = context.functions.ToList();
@@ -439,7 +439,7 @@ namespace Insight.Base.OAuth
         /// </summary>
         /// <param name="account">登录账号</param>
         /// <returns>用户实体</returns>
-        private static User GetUser(string account)
+        private static User getUser(string account)
         {
             using (var context = new Entities())
             {

@@ -14,7 +14,7 @@ namespace Insight.Base.Services
         /// </summary>
         [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        void ResponseOptions();
+        void responseOptions();
 
         /// <summary>
         /// 查询全部应用集合
@@ -22,7 +22,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "apps/all", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetAllApps();
+        Result<object> getAllApps();
 
         /// <summary>
         /// 查询租户绑定应用集合
@@ -30,7 +30,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "apps", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetApps();
+        Result<object> getApps();
 
         /// <summary>
         /// 获取指定ID的应用
@@ -39,7 +39,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "apps/{id}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetApp(string id);
+        Result<object> getApp(string id);
 
         /// <summary>
         /// 新增应用信息
@@ -48,7 +48,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "apps", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> AddApp(Application app);
+        Result<object> addApp(Application app);
 
         /// <summary>
         /// 修改应用信息
@@ -58,7 +58,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "apps/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> EditApp(string id, Application app);
+        Result<object> editApp(string id, Application app);
 
         /// <summary>
         /// 删除指定ID的应用
@@ -67,7 +67,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "apps/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> DeleteApp(string id);
+        Result<object> deleteApp(string id);
 
         /// <summary>
         /// 新增导航信息
@@ -76,7 +76,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "apps/navigations", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> AddNav(Navigator nav);
+        Result<object> addNav(Navigator nav);
 
         /// <summary>
         /// 修改导航信息
@@ -86,7 +86,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "apps/navigations/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> EditNav(string id, Navigator nav);
+        Result<object> editNav(string id, Navigator nav);
 
         /// <summary>
         /// 删除指定ID的导航
@@ -95,7 +95,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "apps/navigations/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> DeleteNav(string id);
+        Result<object> deleteNav(string id);
 
         /// <summary>
         /// 新增功能信息
@@ -104,7 +104,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "apps/navigations/functions", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> AddFun(Function fun);
+        Result<object> addFun(Function fun);
 
         /// <summary>
         /// 修改功能信息
@@ -114,7 +114,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "apps/navigations/functions/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> EditFun(string id, Function fun);
+        Result<object> editFun(string id, Function fun);
 
         /// <summary>
         /// 删除指定ID的功能
@@ -123,7 +123,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "apps/navigations/functions/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> DeleteFun(string id);
+        Result<object> deleteFun(string id);
 
         /// <summary>
         /// 获取指定应用ID的导航数据
@@ -132,7 +132,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "apps/{id}/navigations", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetNavigations(string id);
+        Result<object> getNavigations(string id);
 
         /// <summary>
         /// 获取指定导航ID的功能集合
@@ -141,6 +141,6 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "apps/navigations/{id}/functions", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetFunctions(string id);
+        Result<object> getFunctions(string id);
     }
 }

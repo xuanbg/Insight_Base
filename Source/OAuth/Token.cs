@@ -12,7 +12,7 @@ namespace Insight.Base.OAuth
     public class Token
     {
         // Token允许的超时毫秒数(300秒)
-        private const int TIME_OUT = 300;
+        private const int timeOut = 300;
 
         /// <summary>
         /// 访问令牌MD5摘要
@@ -101,12 +101,12 @@ namespace Insight.Base.OAuth
             this.tenantId = tenantId;
             this.appId = appId;
 
-            GetAppInfo();
-            expireDate = GetExpireDate(tenantId);
-            secretKey = Util.NewId("N");
-            refreshKey = Util.NewId("N");
-            expiryTime = DateTime.Now.AddSeconds(life + TIME_OUT);
-            failureTime = DateTime.Now.AddSeconds(life * 12 + TIME_OUT);
+            getAppInfo();
+            expireDate = getExpireDate(tenantId);
+            secretKey = Util.newId("N");
+            refreshKey = Util.newId("N");
+            expiryTime = DateTime.Now.AddSeconds(life + timeOut);
+            failureTime = DateTime.Now.AddSeconds(life * 12 + timeOut);
         }
 
         /// <summary>
@@ -115,13 +115,14 @@ namespace Insight.Base.OAuth
         /// <param name="key">密钥</param>
         /// <param name="tokenType">令牌类型</param>
         /// <returns>是否通过验证</returns>
-        public bool VerifyKey(string key, TokenType tokenType)
+        public bool verifyKey(string key, TokenType tokenType)
         {
-            var passed = key == (tokenType == TokenType.AccessToken ? secretKey : refreshKey);
-            if (passed && tokenType == TokenType.AccessToken && autoRefresh && DateTime.Now.AddSeconds(life / 2 + TIME_OUT) > expiryTime)
+            var passed = key == (tokenType == TokenType.ACCESS_TOKEN ? secretKey : refreshKey);
+            if (passed && tokenType == TokenType.ACCESS_TOKEN && autoRefresh &&
+                DateTime.Now.AddSeconds(life / 2 + timeOut) > expiryTime)
             {
-                expiryTime = DateTime.Now.AddSeconds(life + TIME_OUT);
-                failureTime = DateTime.Now.AddSeconds(life * 12 + TIME_OUT);
+                expiryTime = DateTime.Now.AddSeconds(life + timeOut);
+                failureTime = DateTime.Now.AddSeconds(life * 12 + timeOut);
             }
 
             return passed;
@@ -130,11 +131,11 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 刷新令牌关键数据
         /// </summary>
-        public void Refresh()
+        public void refresh()
         {
-            expiryTime = DateTime.Now.AddSeconds(life + TIME_OUT);
-            failureTime = DateTime.Now.AddSeconds(life * 12 + TIME_OUT);
-            secretKey = Util.NewId("N");
+            expiryTime = DateTime.Now.AddSeconds(life + timeOut);
+            failureTime = DateTime.Now.AddSeconds(life * 12 + timeOut);
+            secretKey = Util.newId("N");
         }
 
         /// <summary>
@@ -142,10 +143,10 @@ namespace Insight.Base.OAuth
         /// </summary>
         /// <param name="isReal">是否实际过期时间</param>
         /// <returns>Token是否过期</returns>
-        public bool IsExpiry(bool isReal = false)
+        public bool isExpiry(bool isReal = false)
         {
             var now = DateTime.Now;
-            var expiry = expiryTime.AddSeconds(isReal ? -TIME_OUT : 0);
+            var expiry = expiryTime.AddSeconds(isReal ? -timeOut : 0);
             return now > expiry;
         }
 
@@ -153,7 +154,7 @@ namespace Insight.Base.OAuth
         /// Token是否失效
         /// </summary>
         /// <returns>Token是否失效</returns>
-        public bool IsFailure()
+        public bool isFailure()
         {
             return DateTime.Now > failureTime;
         }
@@ -163,7 +164,7 @@ namespace Insight.Base.OAuth
         /// </summary>
         /// <param name="tenantId">租户ID</param>
         /// <returns>租户的过期时间</returns>
-        private static DateTime GetExpireDate(string tenantId)
+        private static DateTime getExpireDate(string tenantId)
         {
             using (var context = new Entities())
             {
@@ -175,14 +176,14 @@ namespace Insight.Base.OAuth
         /// 查询指定ID的应用的令牌生命周期(秒)
         /// </summary>
         /// <returns>应用的令牌生命周期(秒)</returns>
-        private void GetAppInfo()
+        private void getAppInfo()
         {
             if (string.IsNullOrEmpty(appId)) appId = "Default APP";
 
             var key = $"App:{appId}";
-            var tokenLife = RedisHelper.HashGet(key, "TokenLife");
-            var type = RedisHelper.HashGet(key, "SignInOne");
-            var auto = RedisHelper.HashGet(key, "AutoRefresh");
+            var tokenLife = RedisHelper.hashGet(key, "TokenLife");
+            var type = RedisHelper.hashGet(key, "SignInOne");
+            var auto = RedisHelper.hashGet(key, "AutoRefresh");
             if (!string.IsNullOrEmpty(tokenLife) && !string.IsNullOrEmpty(type) && !string.IsNullOrEmpty(auto))
             {
                 life = Convert.ToInt32(tokenLife);
@@ -197,13 +198,13 @@ namespace Insight.Base.OAuth
             {
                 var app = context.applications.SingleOrDefault(i => i.id == appId);
                 life = app?.tokenLife ?? 1296000;
-                RedisHelper.HashSet(key, "TokenLife", life.ToString());
+                RedisHelper.hashSet(key, "TokenLife", life.ToString());
 
                 signInOne = app?.isSigninOne ?? false;
-                RedisHelper.HashSet(key, "SignInOne", signInOne.ToString());
+                RedisHelper.hashSet(key, "SignInOne", signInOne.ToString());
 
                 autoRefresh = app?.isAutoRefresh ?? true;
-                RedisHelper.HashSet(key, "AutoRefresh", autoRefresh.ToString());
+                RedisHelper.hashSet(key, "AutoRefresh", autoRefresh.ToString());
             }
         }
     }

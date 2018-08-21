@@ -17,7 +17,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 为跨域请求设置响应头信息
         /// </summary>
-        public void ResponseOptions()
+        public void responseOptions()
         {
         }
 
@@ -26,18 +26,18 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="org">组织节点对象</param>
         /// <returns>Result</returns>
-        public Result<object> AddOrg(Org org)
+        public Result<object> addOrg(Org org)
         {
-            if (!Verify("newOrg")) return result;
+            if (!verify("newOrg")) return result;
 
-            org.id = Util.NewId();
+            org.id = Util.newId();
             org.tenantId = tenantId;
-            if (Existed(org)) return result.DataAlreadyExists();
+            if (existed(org)) return result.dataAlreadyExists();
 
             org.creatorId = userId;
             org.createTime = DateTime.Now;
 
-            return DbHelper.Insert(org) ? result.Created(org) : result.DataBaseError();
+            return DbHelper.insert(org) ? result.created(org) : result.dataBaseError();
         }
 
         /// <summary>
@@ -45,14 +45,14 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">节点ID</param>
         /// <returns>Result</returns>
-        public Result<object> RemoveOrg(string id)
+        public Result<object> removeOrg(string id)
         {
-            if (!Verify("deleteOrg")) return result;
+            if (!verify("deleteOrg")) return result;
 
-            var data = GetData(id);
-            if (data == null) return result.NotFound();
+            var data = getData(id);
+            if (data == null) return result.notFound();
 
-            return DbHelper.Delete(data) ? result : result.DataBaseError();
+            return DbHelper.delete(data) ? result : result.dataBaseError();
         }
 
         /// <summary>
@@ -61,12 +61,12 @@ namespace Insight.Base.Services
         /// <param name="id"></param>
         /// <param name="org">组织节点对象</param>
         /// <returns>Result</returns>
-        public Result<object> UpdateOrg(string id, Org org)
+        public Result<object> updateOrg(string id, Org org)
         {
-            if (!Verify("editOrg")) return result;
+            if (!verify("editOrg")) return result;
 
-            var data = GetData(org.id);
-            if (data == null) return result.NotFound();
+            var data = getData(org.id);
+            if (data == null) return result.notFound();
 
             data.nodeType = org.nodeType;
             data.code = org.code;
@@ -74,7 +74,7 @@ namespace Insight.Base.Services
             data.alias = org.alias;
             data.fullname = org.fullname;
 
-            return DbHelper.Update(data) ? result : result.DataBaseError();
+            return DbHelper.update(data) ? result : result.dataBaseError();
         }
 
         /// <summary>
@@ -82,16 +82,16 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">节点ID</param>
         /// <returns>Result</returns>
-        public Result<object> GetOrg(string id)
+        public Result<object> getOrg(string id)
         {
-            if (!Verify("getOrgs")) return result;
+            if (!verify("getOrgs")) return result;
 
             using (var context = new Entities())
             {
                 var data = context.orgs.SingleOrDefault(i => !i.isInvalid && i.tenantId == tenantId && i.id == id);
-                if (data == null) return result.NotFound();
+                if (data == null) return result.notFound();
 
-                var org = Util.ConvertTo<OrgDTO>(data);
+                var org = Util.convertTo<OrgDto>(data);
                 var list = from m in context.orgMembers
                     join u in context.users on m.userId equals u.id
                     where m.orgId == id
@@ -106,7 +106,7 @@ namespace Insight.Base.Services
                     };
                 org.members = list.ToList();
 
-                return result.Success(org);
+                return result.success(org);
             }
         }
 
@@ -114,15 +114,15 @@ namespace Insight.Base.Services
         /// 获取组织机构树
         /// </summary>
         /// <returns>Result</returns>
-        public Result<object> GetOrgs()
+        public Result<object> getOrgs()
         {
-            if (!Verify("getOrgs")) return result;
+            if (!verify("getOrgs")) return result;
 
             using (var context = new Entities())
             {
                 var list = context.orgs.Where(i => i.tenantId == tenantId).ToList();
 
-                return list.Any() ? result.Success(list) : result.NoContent(new List<object>());
+                return list.Any() ? result.success(list) : result.noContent(new List<object>());
             }
         }
 
@@ -132,21 +132,21 @@ namespace Insight.Base.Services
         /// <param name="id"></param>
         /// <param name="members">成员集合</param>
         /// <returns>Result</returns>
-        public Result<object> AddOrgMember(string id, List<string> members)
+        public Result<object> addOrgMember(string id, List<string> members)
         {
-            if (!Verify("addOrgMember")) return result;
+            if (!verify("addOrgMember")) return result;
 
             using (var context = new Entities())
             {
                 var data = context.orgs.SingleOrDefault(i => !i.isInvalid && i.tenantId == tenantId && i.id == id);
-                if (data == null) return result.NotFound();
+                if (data == null) return result.notFound();
 
                 data.members = new List<OrgMember>();
                 members.ForEach(i =>
                 {
                     var member = new OrgMember
                     {
-                        id = Util.NewId(),
+                        id = Util.newId(),
                         orgId = id,
                         userId = i,
                         creatorId = userId,
@@ -154,7 +154,7 @@ namespace Insight.Base.Services
                     };
                     data.members.Add(member);
                 });
-                if (!DbHelper.Insert(data.members)) return result.DataBaseError();
+                if (!DbHelper.insert(data.members)) return result.dataBaseError();
 
                 var list = from m in context.orgMembers
                     join u in context.users on m.userId equals u.id
@@ -169,7 +169,7 @@ namespace Insight.Base.Services
                         isInvalid = u.isInvalid
                     };
 
-                return result.Success(list.ToList());
+                return result.success(list.ToList());
             }
         }
 
@@ -179,17 +179,17 @@ namespace Insight.Base.Services
         /// <param name="id"></param>
         /// <param name="members">成员集合</param>
         /// <returns>Result</returns>
-        public Result<object> RemoveOrgMember(string id, List<string> members)
+        public Result<object> removeOrgMember(string id, List<string> members)
         {
-            if (!Verify("removeOrgMember")) return result;
+            if (!verify("removeOrgMember")) return result;
 
             using (var context = new Entities())
             {
                 var data = context.orgs.SingleOrDefault(i => !i.isInvalid && i.tenantId == tenantId && i.id == id);
-                if (data == null) return result.NotFound();
+                if (data == null) return result.notFound();
 
                 data.members = context.orgMembers.Where(i => members.Any(m => m == i.id)).ToList();
-                if (!DbHelper.Delete(data.members)) return result.DataBaseError();
+                if (!DbHelper.delete(data.members)) return result.dataBaseError();
 
                 var list = from m in context.orgMembers
                     join u in context.users on m.userId equals u.id
@@ -204,7 +204,7 @@ namespace Insight.Base.Services
                         isInvalid = u.isInvalid
                     };
 
-                return result.Success(list.ToList());
+                return result.success(list.ToList());
             }
         }
 
@@ -212,9 +212,9 @@ namespace Insight.Base.Services
         /// 获取职位成员之外的所有用户
         /// </summary>
         /// <param name="id">节点ID</param>
-        public Result<object> GetOtherOrgMember(string id)
+        public Result<object> getOtherOrgMember(string id)
         {
-            if (!Verify("getOrgs")) return result;
+            if (!verify("getOrgs")) return result;
 
             using (var context = new Entities())
             {
@@ -226,7 +226,7 @@ namespace Insight.Base.Services
                     where !u.isInvalid && r.tenantId == tenantId && t == null
                     orderby u.createTime
                     select new {u.id, u.name, u.account};
-                return list.Any() ? result.Success(list.ToList()) : result.NoContent(new List<object>());
+                return list.Any() ? result.success(list.ToList()) : result.noContent(new List<object>());
             }
         }
 
@@ -235,7 +235,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">用户组ID</param>
         /// <returns>用户组</returns>
-        private static Org GetData(string id)
+        private static Org getData(string id)
         {
             using (var context = new Entities())
             {
@@ -248,7 +248,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="org">用户组</param>
         /// <returns>是否已存在</returns>
-        private static bool Existed(Org org)
+        private static bool existed(Org org)
         {
             using (var context = new Entities())
             {

@@ -7,6 +7,7 @@ namespace Insight.Base.Server
         /// <summary>
         /// 应用程序的主入口点。
         /// </summary>
+        // ReSharper disable once InconsistentNaming
         static void Main()
         {
             var servicesToRun = new ServiceBase[] 

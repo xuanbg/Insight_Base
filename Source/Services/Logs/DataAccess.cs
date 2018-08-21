@@ -10,14 +10,14 @@ namespace Insight.Base.Services
         /// <summary>
         /// 保存日志规则到数据库
         /// </summary>
-        private static bool Insert(LogRule rule)
+        private static bool insert(LogRule rule)
         {
             using (var context = new Entities())
             {
                 context.logRules.Add(rule);
                 if (context.SaveChanges() <= 0)
                 {
-                    new Thread(() => Logger.Write("300601")).Start();
+                    new Thread(() => Logger.write("300601")).Start();
 
                     return false;
                 }
@@ -29,7 +29,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 删除日志规则
         /// </summary>
-        private bool DeleteRule(string id)
+        private bool deleteRule(string id)
         {
             using (var context = new Entities())
             {
@@ -39,7 +39,7 @@ namespace Insight.Base.Services
                 context.logRules.Remove(rule);
                 if (context.SaveChanges() <= 0)
                 {
-                    new Thread(() => Logger.Write("300602")).Start();
+                    new Thread(() => Logger.write("300602")).Start();
 
                     return false;
                 }
@@ -52,7 +52,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 编辑日志规则
         /// </summary>
-        private bool Update(LogRule rule)
+        private bool update(LogRule rule)
         {
             using (var context = new Entities())
             {
@@ -67,7 +67,7 @@ namespace Insight.Base.Services
                 data.message = rule.message;
                 if (context.SaveChanges() <= 0)
                 {
-                    new Thread(() => Logger.Write("300603")).Start();
+                    new Thread(() => Logger.write("300603")).Start();
 
                     return false;
                 }

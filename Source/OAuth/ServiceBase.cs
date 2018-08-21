@@ -5,14 +5,14 @@ namespace Insight.Base.OAuth
 {
     public class ServiceBase
     {
-        public Result<object> result = new Result<object>();
-        public TokenManage manage;
-        public string tokenId;
-        public string tenantId;
-        public string appId;
-        public string userId;
-        public string userName;
-        public string deptId;
+        protected Result<object> result = new Result<object>();
+        protected TokenManage manage;
+        protected string tokenId;
+        protected string tenantId;
+        protected string appId;
+        protected string userId;
+        protected string userName;
+        protected string deptId;
 
         /// <summary>
         /// 会话合法性验证
@@ -20,7 +20,7 @@ namespace Insight.Base.OAuth
         /// <param name="key">操作权限代码，默认为空，即不进行鉴权</param>
         /// <param name="id">用户ID</param>
         /// <returns>bool 身份是否通过验证</returns>
-        public bool Verify(string key = null, string id = null)
+        protected bool verify(string key = null, string id = null)
         {
             var verify = new Verify();
             tokenId = verify.tokenId;
@@ -32,7 +32,7 @@ namespace Insight.Base.OAuth
             userId = manage.userId;
             userName = manage.userName;
             deptId = manage.deptId;
-            result = verify.Compare(userId == id ? null : key);
+            result = verify.compare(userId == id ? null : key);
 
             return result.successful;
         }
@@ -41,11 +41,11 @@ namespace Insight.Base.OAuth
         /// 获取客户端特征指纹
         /// </summary>
         /// <returns>string 客户端特征指纹</returns>
-        public string GetFingerprint()
+        protected static string getFingerprint()
         {
             var verify = new Verify(false);
 
-            return Util.Hash(verify.ip + verify.userAgent);
+            return Util.hash(verify.ip + verify.userAgent);
         }
     }
 }

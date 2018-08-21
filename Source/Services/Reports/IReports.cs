@@ -13,7 +13,7 @@ namespace Insight.Base.Services
         /// </summary>
         [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        void ResponseOptions();
+        void responseOptions();
 
         /// <summary>
         /// 获取报表分类
@@ -22,7 +22,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "reports/categorys?mid={id}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetCategorys(string id);
+        Result<object> getCategorys(string id);
 
         /// <summary>
         /// 新建报表分类
@@ -31,7 +31,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "reports/categorys", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> AddCategory(Catalog catalog);
+        Result<object> addCategory(Catalog catalog);
 
         /// <summary>
         /// 编辑报表分类
@@ -41,7 +41,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "reports/categorys/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> EditCategory(string id, Catalog catalog);
+        Result<object> editCategory(string id, Catalog catalog);
 
         /// <summary>
         /// 删除报表分类
@@ -50,7 +50,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "reports/categorys/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> DeleteCategory(string id);
+        Result<object> deleteCategory(string id);
 
         /// <summary>
         /// 获取分类下全部报表
@@ -61,7 +61,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "reports?cid={id}&rows={rows}&page={page}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetReports(string id, int rows, int page);
+        Result<object> getReports(string id, int rows, int page);
 
         /// <summary>
         /// 获取报表
@@ -70,7 +70,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "reports/{id}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetReport(string id);
+        Result<object> getReport(string id);
 
         /// <summary>
         /// 新建报表
@@ -79,7 +79,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "reports", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> AddReport(Definition report);
+        Result<object> addReport(Definition report);
 
         /// <summary>
         /// 编辑报表
@@ -89,7 +89,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "reports/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> EditReport(string id, ReportDefinition report);
+        Result<object> editReport(string id, ReportDefinition report);
 
         /// <summary>
         /// 删除报表
@@ -98,6 +98,6 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "reports/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> DeleteReport(string id);
+        Result<object> deleteReport(string id);
     }
 }

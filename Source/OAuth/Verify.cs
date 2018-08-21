@@ -40,21 +40,21 @@ namespace Insight.Base.OAuth
         /// </summary>
         /// <param name="checkAuth"></param>
         /// <param name="tokenType">令牌类型：1、访问令牌(默认)；2、刷新令牌</param>
-        public Verify(bool checkAuth = true, TokenType tokenType = TokenType.AccessToken)
+        public Verify(bool checkAuth = true, TokenType tokenType = TokenType.ACCESS_TOKEN)
         {
             this.tokenType = tokenType;
 
             var requst = WebOperationContext.Current.IncomingRequest;
-            ip = GetIp(requst.Headers);
+            ip = getIp(requst.Headers);
             userAgent = requst.UserAgent;
 
             var auth = requst.Headers[HttpRequestHeader.Authorization];
-            var accessToken = Util.Base64ToAccessToken(auth);
+            var accessToken = Util.base64ToAccessToken(auth);
             switch (accessToken)
             {
                 case null when checkAuth:
                     var msg = $"提取验证信息失败。Token is:{auth ?? "null"}";
-                    new Thread(() => Logger.Write("500101", msg)).Start();
+                    new Thread(() => Logger.write("500101", msg)).Start();
                     return;
 
                 case null:
@@ -63,9 +63,9 @@ namespace Insight.Base.OAuth
 
             tokenId = accessToken.id;
             secret = accessToken.secret;
-            hash = Util.Hash(auth);
-            manage = Core.GetUserCache(accessToken.userId);
-            manage?.GetToken(tokenId);
+            hash = Util.hash(auth);
+            manage = Core.getUserCache(accessToken.userId);
+            manage?.getToken(tokenId);
         }
 
         /// <summary>
@@ -73,22 +73,22 @@ namespace Insight.Base.OAuth
         /// </summary>
         /// <param name="key">操作码，默认为空</param>
         /// <returns>Result</returns>
-        public Result<object> Compare(string key = null)
+        public Result<object> compare(string key = null)
         {
-            if (manage == null) return result.InvalidToken();
+            if (manage == null) return result.invalidToken();
 
             // 验证令牌
-            if (manage.IsFailure(tokenId, hash, tokenType)) return result.Failured();
+            if (manage.isFailure(tokenId, hash, tokenType)) return result.failured();
 
-            if (tokenType == TokenType.AccessToken && manage.IsExpiry()) return result.Expired();
+            if (tokenType == TokenType.ACCESS_TOKEN && manage.isExpiry()) return result.expired();
 
-            if (manage.isInvalid) return result.Disabled();
+            if (manage.isInvalid) return result.disabled();
 
-            if (manage.TenantIsExpiry()) return result.TenantIsExpiry();
+            if (manage.tenantIsExpiry()) return result.tenantIsExpiry();
 
-            if (!manage.Verify(secret, tokenType)) return result.InvalidAuth();
+            if (!manage.verify(secret, tokenType)) return result.invalidAuth();
 
-            if (tokenType == TokenType.RefreshToken) result.Success();
+            if (tokenType == TokenType.REFRESH_TOKEN) result.success();
             else
             {
                 var info = new UserInfo
@@ -101,13 +101,13 @@ namespace Insight.Base.OAuth
                     mobile = manage.mobile,
                     email = manage.email
                 };
-                result.Success(info);
+                result.success(info);
             }
 
             // 如key为空，立即返回；否则进行鉴权
             if (string.IsNullOrEmpty(key)) return result;
 
-            return manage.VerifyKeyInCache(key) ? result : result.Forbidden();
+            return manage.verifyKeyInCache(key) ? result : result.forbidden();
         }
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace Insight.Base.OAuth
         /// </summary>
         /// <param name="headers">请求头</param>
         /// <returns>string IP地址</returns>
-        private static string GetIp(NameValueCollection headers)
+        private static string getIp(NameValueCollection headers)
         {
             var rip = headers.Get("X-Real-IP");
             if (string.IsNullOrEmpty(rip))

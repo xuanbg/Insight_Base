@@ -17,7 +17,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 为跨域请求设置响应头信息
         /// </summary>
-        public void ResponseOptions()
+        public void responseOptions()
         {
         }
 
@@ -26,16 +26,16 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="info">RoleInfo</param>
         /// <returns>Result</returns>
-        public Result<object> AddRole(RoleInfo info)
+        public Result<object> addRole(RoleInfo info)
         {
-            if (!Verify("newRole")) return result;
+            if (!verify("newRole")) return result;
 
-            if (info == null) return result.BadRequest();
+            if (info == null) return result.badRequest();
 
-            var role = InitRole(info);
-            if (Existed(role)) return result.DataAlreadyExists();
+            var role = initRole(info);
+            if (existed(role)) return result.dataAlreadyExists();
 
-            return DbHelper.Insert(role) ? result.Created(info) : result.DataBaseError();
+            return DbHelper.insert(role) ? result.created(info) : result.dataBaseError();
         }
 
         /// <summary>
@@ -43,14 +43,14 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">角色ID</param>
         /// <returns>Result</returns>
-        public Result<object> RemoveRole(string id)
+        public Result<object> removeRole(string id)
         {
-            if (!Verify("deleteRole")) return result;
+            if (!verify("deleteRole")) return result;
 
-            var data = GetData(id);
-            if (data == null) return result.NotFound();
+            var data = getData(id);
+            if (data == null) return result.notFound();
 
-            return DbHelper.Delete(data) ? result.Success() : result.DataBaseError();
+            return DbHelper.delete(data) ? result.success() : result.dataBaseError();
         }
 
         /// <summary>
@@ -59,24 +59,24 @@ namespace Insight.Base.Services
         /// <param name="id">角色ID</param>
         /// <param name="info"></param>
         /// <returns>Result</returns>
-        public Result<object> EditRole(string id, RoleInfo info)
+        public Result<object> editRole(string id, RoleInfo info)
         {
-            if (!Verify("editRole")) return result;
+            if (!verify("editRole")) return result;
 
-            if (info == null) return result.BadRequest();
+            if (info == null) return result.badRequest();
 
-            var data = GetData(info.id);
-            if (data == null) return result.NotFound();
+            var data = getData(info.id);
+            if (data == null) return result.notFound();
 
-            var role = InitRole(info);
-            if (Existed(role)) return result.DataAlreadyExists();
+            var role = initRole(info);
+            if (existed(role)) return result.dataAlreadyExists();
 
-            if (!DbHelper.Delete(data) || !DbHelper.Insert(role)) return result.DataBaseError();
+            if (!DbHelper.delete(data) || !DbHelper.insert(role)) return result.dataBaseError();
 
-            info.funcs = GetRoleFuncs(info.id, info.appId);
+            info.funcs = getRoleFuncs(info.id, info.appId);
             info.datas = new List<AppTree>();
 
-            return result.Success(info);
+            return result.success(info);
         }
 
         /// <summary>
@@ -84,21 +84,21 @@ namespace Insight.Base.Services
         /// </summary>ID
         /// <param name="id">角色</param>
         /// <returns>Result</returns>
-        public Result<object> GetRole(string id)
+        public Result<object> getRole(string id)
         {
-            if (!Verify("getRoles")) return result;
+            if (!verify("getRoles")) return result;
 
-            var data = GetData(id);
-            if (data == null) return result.NotFound();
+            var data = getData(id);
+            if (data == null) return result.notFound();
 
             var role = new RoleInfo
             {
-                members = GetRoleMember(id),
-                funcs = GetRoleFuncs(id, data.appId),
+                members = getRoleMember(id),
+                funcs = getRoleFuncs(id, data.appId),
                 datas = new List<AppTree>()
             };
 
-            return result.Success(role);
+            return result.success(role);
         }
 
         /// <summary>
@@ -108,11 +108,11 @@ namespace Insight.Base.Services
         /// <param name="page">当前页</param>
         /// <param name="key">查询关键词</param>
         /// <returns>Result</returns>
-        public Result<object> GetRoles(int rows, int page, string key)
+        public Result<object> getRoles(int rows, int page, string key)
         {
-            if (!Verify("getRoles")) return result;
+            if (!verify("getRoles")) return result;
 
-            if (page < 1 || rows > 100) return result.BadRequest();
+            if (page < 1 || rows > 100) return result.badRequest();
 
             using (var context = new Entities())
             {
@@ -133,7 +133,7 @@ namespace Insight.Base.Services
                 var skip = rows * (page - 1);
                 var roles = list.OrderBy(i => i.createTime).Skip(skip).Take(rows).ToList();
 
-                return result.Success(roles, list.Count());
+                return result.success(roles, list.Count());
             }
         }
 
@@ -143,25 +143,25 @@ namespace Insight.Base.Services
         /// <param name="id">角色ID</param>
         /// <param name="members">成员对象集合</param>
         /// <returns>Result</returns>
-        public Result<object> AddRoleMember(string id, List<RoleMember> members)
+        public Result<object> addRoleMember(string id, List<RoleMember> members)
         {
-            if (!Verify("addRoleMember")) return result;
+            if (!verify("addRoleMember")) return result;
 
-            var data = GetData(id);
-            if (data == null) return result.NotFound();
+            var data = getData(id);
+            if (data == null) return result.notFound();
 
             members.ForEach(i =>
             {
-                i.id = Util.NewId();
+                i.id = Util.newId();
                 i.roleId = id;
                 i.creatorId = userId;
                 i.createTime = DateTime.Now;
             });
-            if (!DbHelper.Insert(members)) return result.DataBaseError();
+            if (!DbHelper.insert(members)) return result.dataBaseError();
 
-            var role = new RoleInfo {members = GetRoleMember(id)};
+            var role = new RoleInfo {members = getRoleMember(id)};
 
-            return result.Success(role);
+            return result.success(role);
         }
 
         /// <summary>
@@ -169,21 +169,21 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">角色成员ID</param>
         /// <returns>Result</returns>
-        public Result<object> RemoveRoleMember(string id)
+        public Result<object> removeRoleMember(string id)
         {
-            if (!Verify("removeRoleMember")) return result;
+            if (!verify("removeRoleMember")) return result;
 
             using (var context = new Entities())
             {
                 var member = context.roleMembers.SingleOrDefault(i => i.id == id);
-                if (member == null) return result.NotFound();
+                if (member == null) return result.notFound();
 
                 var roleId = member.roleId;
-                if (!DbHelper.Delete(member)) return result.DataBaseError();
+                if (!DbHelper.delete(member)) return result.dataBaseError();
 
-                var role = new RoleInfo { members = GetRoleMember(roleId) };
+                var role = new RoleInfo { members = getRoleMember(roleId) };
 
-                return result.Success(role);
+                return result.success(role);
             }
         }
 
@@ -194,11 +194,11 @@ namespace Insight.Base.Services
         /// <param name="rows">每页行数</param>
         /// <param name="page">当前页</param>
         /// <returns>Result</returns>
-        public Result<object> GetMemberUsers(string id, int rows, int page)
+        public Result<object> getMemberUsers(string id, int rows, int page)
         {
-            if (!Verify("getRoles")) return result;
+            if (!verify("getRoles")) return result;
 
-            if (page < 1 || rows > 100) return result.BadRequest();
+            if (page < 1 || rows > 100) return result.badRequest();
 
             using (var context = new Entities())
             {
@@ -206,7 +206,7 @@ namespace Insight.Base.Services
                 var list = context.roleUsers.Where(u => u.roleId == id);
                 var members = list.OrderBy(m => m.createTime).Skip(skip).Take(rows).ToList();
 
-                return result.Success(members, list.Count());
+                return result.success(members, list.Count());
             }
         }
 
@@ -215,9 +215,9 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">角色ID</param>
         /// <returns>Result</returns>
-        public Result<object> GetMemberOfTitle(string id)
+        public Result<object> getMemberOfTitle(string id)
         {
-            if (!Verify("getRoles")) return result;
+            if (!verify("getRoles")) return result;
 
             using (var context = new Entities())
             {
@@ -227,7 +227,7 @@ namespace Insight.Base.Services
                     where o.tenantId == tenantId && t == null
                     orderby o.index
                     select new {o.id, o.parentId, o.index, o.nodeType, o.name};
-                return list.Any() ? result.Success(list.ToList()) : result.NoContent(new List<object>());
+                return list.Any() ? result.success(list.ToList()) : result.noContent(new List<object>());
             }
         }
 
@@ -236,9 +236,9 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">角色ID</param>
         /// <returns>Result</returns>
-        public Result<object> GetMemberOfGroup(string id)
+        public Result<object> getMemberOfGroup(string id)
         {
-            if (!Verify("getRoles")) return result;
+            if (!verify("getRoles")) return result;
 
             using (var context = new Entities())
             {
@@ -249,7 +249,7 @@ namespace Insight.Base.Services
                     where g.tenantId == tenantId && t == null
                     orderby g.createTime
                     select new {g.id, g.name, g.remark};
-                return list.Any() ? result.Success(list.ToList()) : result.NoContent(new List<object>());
+                return list.Any() ? result.success(list.ToList()) : result.noContent(new List<object>());
             }
         }
 
@@ -258,9 +258,9 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">角色ID</param>
         /// <returns>Result</returns>
-        public Result<object> GetMemberOfUser(string id)
+        public Result<object> getMemberOfUser(string id)
         {
-            if (!Verify("getRoles")) return result;
+            if (!verify("getRoles")) return result;
 
             using (var context = new Entities())
             {
@@ -272,7 +272,7 @@ namespace Insight.Base.Services
                     where r.tenantId == tenantId && !u.isInvalid && t == null
                     orderby u.createTime
                     select new {u.id, u.name, u.account, u.remark};
-                return list.Any() ? result.Success(list.ToList()) : result.NoContent(new List<object>());
+                return list.Any() ? result.success(list.ToList()) : result.noContent(new List<object>());
             }
         }
 
@@ -282,9 +282,9 @@ namespace Insight.Base.Services
         /// <param name="id">角色ID</param>
         /// <param name="aid">应用ID（可为空）</param>
         /// <returns>Result</returns>
-        public Result<object> GetAppTree(string id, string aid)
+        public Result<object> getAppTree(string id, string aid)
         {
-            if (!Verify("getRoles")) return result;
+            if (!verify("getRoles")) return result;
 
             var role = new RoleInfo {funcs = new List<AppTree>(), datas = new List<AppTree>()};
             using (var context = new Entities())
@@ -349,7 +349,7 @@ namespace Insight.Base.Services
                 role.funcs.AddRange(functions);
             }
 
-            return result.Success(role);
+            return result.success(role);
         }
 
         /// <summary>
@@ -357,7 +357,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">角色ID</param>
         /// <returns>角色</returns>
-        private static Role GetData(string id)
+        private static Role getData(string id)
         {
             using (var context = new Entities())
             {
@@ -370,7 +370,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="role">角色</param>
         /// <returns>是否已存在</returns>
-        private static bool Existed(Role role)
+        private static bool existed(Role role)
         {
             using (var context = new Entities())
             {
@@ -383,7 +383,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="info"></param>
         /// <returns>Role 角色数据</returns>
-        private Role InitRole(RoleInfo info)
+        private Role initRole(RoleInfo info)
         {
             var role = new Role
             {
@@ -396,7 +396,7 @@ namespace Insight.Base.Services
 
             role.funcs = info.funcs.Where(i => i.nodeType > 2 && i.permit.HasValue).Select(i => new RoleFunction
             {
-                id = Util.NewId(),
+                id = Util.newId(),
                 roleId = role.id,
                 functionId = i.id,
                 permit = i.permit.Value ? 1 : 0,
@@ -406,7 +406,7 @@ namespace Insight.Base.Services
 
             role.datas = info.datas.Where(i => i.nodeType > 2 && i.permit.HasValue).Select(i => new RoleData
             {
-                id = Util.NewId(),
+                id = Util.newId(),
                 roleId = role.id,
                 moduleId = i.parentId,
                 modeId = i.id,
@@ -432,7 +432,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">角色ID</param>
         /// <returns>角色成员信息</returns>
-        private List<MemberInfo> GetRoleMember(string id)
+        private List<MemberInfo> getRoleMember(string id)
         {
             var members = new List<MemberInfo>();
             using (var context = new Entities())
@@ -464,7 +464,7 @@ namespace Insight.Base.Services
         /// <param name="id">角色ID</param>
         /// <param name="aid">角色所属应用ID</param>
         /// <returns>Result</returns>
-        private List<AppTree> GetRoleFuncs(string id, string aid)
+        private List<AppTree> getRoleFuncs(string id, string aid)
         {
             var list = new List<AppTree>();
             using (var context = new Entities())

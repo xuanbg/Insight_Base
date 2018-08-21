@@ -13,7 +13,7 @@ namespace Insight.Base.Services
         /// </summary>
         [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        void ResponseOptions();
+        void responseOptions();
 
         /// <summary>
         /// 根据对象实体数据新增一个用户
@@ -22,7 +22,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "users", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> AddUser(User user);
+        Result<object> addUser(User user);
 
         /// <summary>
         /// 根据ID删除用户
@@ -31,7 +31,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "users/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> RemoveUser(string id);
+        Result<object> removeUser(string id);
 
         /// <summary>
         /// 根据用户ID更新用户信息
@@ -41,7 +41,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "users/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> UpdateUserInfo(string id, User user);
+        Result<object> updateUserInfo(string id, User user);
 
         /// <summary>
         /// 根据ID获取用户对象实体
@@ -49,7 +49,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "users/myself", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetMyself();
+        Result<object> getMyself();
 
         /// <summary>
         /// 根据ID获取用户对象实体
@@ -58,7 +58,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "users/{id}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetUser(string id);
+        Result<object> getUser(string id);
 
         /// <summary>
         /// 获取全部用户
@@ -69,7 +69,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "users?rows={rows}&page={page}&key={key}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetUsers(int rows, int page, string key);
+        Result<object> getUsers(int rows, int page, string key);
 
         /// <summary>
         /// 根据对象实体数据注册一个用户
@@ -80,7 +80,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "users/signup?appid={appId}&code={code}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> SignUp(string appId, string code, User user);
+        Result<object> signUp(string appId, string code, User user);
 
         /// <summary>
         /// 更新指定用户Session的签名
@@ -90,7 +90,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "users/{id}/signature", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> UpdateSignature(string id, string password);
+        Result<object> updateSignature(string id, string password);
 
         /// <summary>
         /// 用户重置登录密码
@@ -103,7 +103,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "users/{account}/resetpw", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> ResetSignature(string appId, string account, string password, string code, string mobile = null);
+        Result<object> resetSignature(string appId, string account, string password, string code, string mobile = null);
 
         /// <summary>
         /// 获取用户绑定租户集合
@@ -112,7 +112,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "users/{account}/tenants", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetTenants(string account);
+        Result<object> getTenants(string account);
 
         /// <summary>
         /// 根据用户登录名获取可登录部门列表
@@ -121,7 +121,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "users/{account}/depts", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetLoginDepts(string account);
+        Result<object> getLoginDepts(string account);
 
         /// <summary>
         /// 根据用户ID设置用户状态
@@ -131,7 +131,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "users/{id}/validity", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> SetUserStatus(string id, bool invalid);
+        Result<object> setUserStatus(string id, bool invalid);
 
         /// <summary>
         /// 设置指定用户的登录状态为离线
@@ -140,7 +140,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "users/{id}/token", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> UserSignOut(string id);
+        Result<object> userSignOut(string id);
 
         /// <summary>
         /// 根据ID获取用户对象实体
@@ -150,6 +150,6 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "users/{id}/roles?deptid={deptid}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetUserRoles(string id, string deptid);
+        Result<object> getUserRoles(string id, string deptid);
     }
 }

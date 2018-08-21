@@ -13,7 +13,7 @@ namespace Insight.Base.Services
         /// </summary>
         [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        void ResponseOptions();
+        void responseOptions();
 
         /// <summary>
         /// 写入日志
@@ -27,7 +27,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "logs", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> WriteToLog(string code, string message, string source, string action, string key, string userid);
+        Result<object> writeToLog(string code, string message, string source, string action, string key, string userid);
 
         /// <summary>
         /// 新增日志规则
@@ -36,7 +36,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "rules", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> AddRule(LogRule rule);
+        Result<object> addRule(LogRule rule);
 
         /// <summary>
         /// 删除日志规则
@@ -45,7 +45,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "rules/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> RemoveRule(string id);
+        Result<object> removeRule(string id);
 
         /// <summary>
         /// 编辑日志规则
@@ -54,7 +54,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "rules", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> EditRule(LogRule rule);
+        Result<object> editRule(LogRule rule);
 
         /// <summary>
         /// 获取日志规则
@@ -63,7 +63,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "rules/{id}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetRule(string id);
+        Result<object> getRule(string id);
 
         /// <summary>
         /// 获取全部日志规则
@@ -71,6 +71,6 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "rules", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetRules();
+        Result<object> getRules();
     }
 }

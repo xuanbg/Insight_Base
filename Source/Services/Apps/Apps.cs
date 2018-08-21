@@ -18,7 +18,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 为跨域请求设置响应头信息
         /// </summary>
-        public void ResponseOptions()
+        public void responseOptions()
         {
         }
 
@@ -26,15 +26,15 @@ namespace Insight.Base.Services
         /// 根据关键词查询全部应用集合
         /// </summary>
         /// <returns>Result</returns>
-        public Result<object> GetAllApps()
+        public Result<object> getAllApps()
         {
-            if (!Verify("getApps")) return result;
+            if (!verify("getApps")) return result;
 
             using (var context = new Entities())
             {
                 var list = context.applications.Where(i => !i.isBuiltin).OrderBy(i => i.createTime).ToList();
 
-                return result.Success(list);
+                return result.success(list);
             }
         }
 
@@ -42,9 +42,9 @@ namespace Insight.Base.Services
         /// 根据关键词查询租户绑定应用集合
         /// </summary>
         /// <returns>Result</returns>
-        public Result<object> GetApps()
+        public Result<object> getApps()
         {
-            if (!Verify()) return result;
+            if (!verify()) return result;
 
             using (var context = new Entities())
             {
@@ -54,7 +54,7 @@ namespace Insight.Base.Services
                     orderby a.createTime
                     select a;
 
-                return result.Success(list.ToList());
+                return result.success(list.ToList());
             }
         }
 
@@ -63,19 +63,19 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">应用ID</param>
         /// <returns>Result</returns>
-        public Result<object> GetApp(string id)
+        public Result<object> getApp(string id)
         {
-            if (!Verify("getTenants")) return result;
+            if (!verify("getTenants")) return result;
 
-            var data = DbHelper.Find<Application>(id);
-            if (data == null) return result.NotFound();
+            var data = DbHelper.find<Application>(id);
+            if (data == null) return result.notFound();
 
             var app = new App()
             {
                 navs = new List<AppTree>()
             };
 
-            return result.Success(app);
+            return result.success(app);
         }
 
         /// <summary>
@@ -83,19 +83,19 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="app">应用实体数据</param>
         /// <returns>Result</returns>
-        public Result<object> AddApp(Application app)
+        public Result<object> addApp(Application app)
         {
-            if (!Verify("newApp")) return result;
+            if (!verify("newApp")) return result;
 
-            if (app == null) return result.BadRequest();
+            if (app == null) return result.badRequest();
 
-            if (Existed(app)) return result.DataAlreadyExists();
+            if (existed(app)) return result.dataAlreadyExists();
 
-            app.id = Util.NewId();
+            app.id = Util.newId();
             app.creatorId = userId;
             app.createTime = DateTime.Now;
 
-            return DbHelper.Insert(app) ? result.Created(app) : result.DataBaseError();
+            return DbHelper.insert(app) ? result.created(app) : result.dataBaseError();
         }
 
         /// <summary>
@@ -104,14 +104,14 @@ namespace Insight.Base.Services
         /// <param name="id">应用ID</param>
         /// <param name="app">应用实体数据</param>
         /// <returns>Result</returns>
-        public Result<object> EditApp(string id, Application app)
+        public Result<object> editApp(string id, Application app)
         {
-            if (!Verify("editApp")) return result;
+            if (!verify("editApp")) return result;
 
-            if (app == null) return result.BadRequest();
+            if (app == null) return result.badRequest();
 
-            var data = DbHelper.Find<Application>(id);
-            if (data == null) return result.NotFound();
+            var data = DbHelper.find<Application>(id);
+            if (data == null) return result.notFound();
 
             data.index = app.index;
             data.name = app.name;
@@ -122,7 +122,7 @@ namespace Insight.Base.Services
             data.iconurl = app.iconurl;
             data.remark = app.remark;
 
-            return DbHelper.Update(data) ? result.Success() : result.DataBaseError();
+            return DbHelper.update(data) ? result.success() : result.dataBaseError();
         }
 
         /// <summary>
@@ -130,14 +130,14 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">应用ID</param>
         /// <returns>Result</returns>
-        public Result<object> DeleteApp(string id)
+        public Result<object> deleteApp(string id)
         {
-            if (!Verify("deleteApp")) return result;
+            if (!verify("deleteApp")) return result;
 
-            var data = DbHelper.Find<Application>(id);
-            if (data == null) return result.NotFound();
+            var data = DbHelper.find<Application>(id);
+            if (data == null) return result.notFound();
 
-            return DbHelper.Delete(data) ? result.Success() : result.DataBaseError();
+            return DbHelper.delete(data) ? result.success() : result.dataBaseError();
         }
 
         /// <summary>
@@ -145,19 +145,19 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="nav">导航实体数据</param>
         /// <returns>Result</returns>
-        public Result<object> AddNav(Navigator nav)
+        public Result<object> addNav(Navigator nav)
         {
-            if (!Verify("newNav")) return result;
+            if (!verify("newNav")) return result;
 
-            if (nav == null) return result.BadRequest();
+            if (nav == null) return result.badRequest();
 
-            if (Existed(nav)) return result.DataAlreadyExists();
+            if (existed(nav)) return result.dataAlreadyExists();
 
-            nav.id = Util.NewId();
+            nav.id = Util.newId();
             nav.creatorId = userId;
             nav.createTime = DateTime.Now;
 
-            return DbHelper.Insert(nav) ? result.Created(nav) : result.DataBaseError();
+            return DbHelper.insert(nav) ? result.created(nav) : result.dataBaseError();
         }
 
         /// <summary>
@@ -166,14 +166,14 @@ namespace Insight.Base.Services
         /// <param name="id">导航ID</param>
         /// <param name="nav">应用导航实体数据</param>
         /// <returns>Result</returns>
-        public Result<object> EditNav(string id, Navigator nav)
+        public Result<object> editNav(string id, Navigator nav)
         {
-            if (!Verify("editNav")) return result;
+            if (!verify("editNav")) return result;
 
-            if (nav == null) return result.BadRequest();
+            if (nav == null) return result.badRequest();
 
-            var data = DbHelper.Find<Navigator>(id);
-            if (data == null) return result.NotFound();
+            var data = DbHelper.find<Navigator>(id);
+            if (data == null) return result.notFound();
 
             data.parentId = nav.parentId;
             data.appId = nav.appId;
@@ -186,7 +186,7 @@ namespace Insight.Base.Services
             data.remark = nav.remark;
             data.isDefault = nav.isDefault;
 
-            return DbHelper.Update(data) ? result.Success() : result.DataBaseError();
+            return DbHelper.update(data) ? result.success() : result.dataBaseError();
         }
 
         /// <summary>
@@ -194,14 +194,14 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">导航ID</param>
         /// <returns>Result</returns>
-        public Result<object> DeleteNav(string id)
+        public Result<object> deleteNav(string id)
         {
-            if (!Verify("deleteNav")) return result;
+            if (!verify("deleteNav")) return result;
 
-            var data = DbHelper.Find<Navigator>(id);
-            if (data == null) return result.NotFound();
+            var data = DbHelper.find<Navigator>(id);
+            if (data == null) return result.notFound();
 
-            return DbHelper.Delete(data) ? result.Success() : result.DataBaseError();
+            return DbHelper.delete(data) ? result.success() : result.dataBaseError();
         }
 
         /// <summary>
@@ -209,20 +209,20 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="fun">功能实体数据</param>
         /// <returns>Result</returns>
-        public Result<object> AddFun(Function fun)
+        public Result<object> addFun(Function fun)
         {
-            if (!Verify("newFun")) return result;
+            if (!verify("newFun")) return result;
 
-            if (fun == null) return result.BadRequest();
+            if (fun == null) return result.badRequest();
 
-            if (Existed(fun)) return result.DataAlreadyExists();
+            if (existed(fun)) return result.dataAlreadyExists();
 
-            fun.id = Util.NewId();
+            fun.id = Util.newId();
             fun.isVisible = true;
             fun.creatorId = userId;
             fun.createTime = DateTime.Now;
 
-            return DbHelper.Insert(fun) ? result.Created(fun) : result.DataBaseError();
+            return DbHelper.insert(fun) ? result.created(fun) : result.dataBaseError();
         }
 
         /// <summary>
@@ -231,14 +231,14 @@ namespace Insight.Base.Services
         /// <param name="id">功能ID</param>
         /// <param name="fun">功能实体数据</param>
         /// <returns>Result</returns>
-        public Result<object> EditFun(string id, Function fun)
+        public Result<object> editFun(string id, Function fun)
         {
-            if (!Verify("editFun")) return result;
+            if (!verify("editFun")) return result;
 
-            if (fun == null) return result.BadRequest();
+            if (fun == null) return result.badRequest();
 
-            var data = DbHelper.Find<Function>(id);
-            if (data == null) return result.NotFound();
+            var data = DbHelper.find<Function>(id);
+            if (data == null) return result.notFound();
 
             data.navigatorId = fun.navigatorId;
             data.index = fun.index;
@@ -253,7 +253,7 @@ namespace Insight.Base.Services
             data.isShowText = fun.isShowText;
             data.isVisible = fun.isVisible;
 
-            return DbHelper.Update(data) ? result.Success() : result.DataBaseError();
+            return DbHelper.update(data) ? result.success() : result.dataBaseError();
         }
 
         /// <summary>
@@ -261,14 +261,14 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">功能ID</param>
         /// <returns>Result</returns>
-        public Result<object> DeleteFun(string id)
+        public Result<object> deleteFun(string id)
         {
-            if (!Verify("deleteFun")) return result;
+            if (!verify("deleteFun")) return result;
 
-            var data = DbHelper.Find<Function>(id);
-            if (data == null) return result.NotFound();
+            var data = DbHelper.find<Function>(id);
+            if (data == null) return result.notFound();
 
-            return DbHelper.Delete(data) ? result.Success() : result.DataBaseError();
+            return DbHelper.delete(data) ? result.success() : result.dataBaseError();
         }
 
         /// <summary>
@@ -276,13 +276,13 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">应用ID</param>
         /// <returns>Result</returns>
-        public Result<object> GetNavigations(string id)
+        public Result<object> getNavigations(string id)
         {
             using (var context = new Entities())
             {
                 var list = context.navigators.Where(i => i.appId == id).OrderBy(i => i.index);
 
-                return result.Success(list.ToList());
+                return result.success(list.ToList());
             }
         }
 
@@ -291,13 +291,13 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">导航ID</param>
         /// <returns>Result</returns>
-        public Result<object> GetFunctions(string id)
+        public Result<object> getFunctions(string id)
         {
             using (var context = new Entities())
             {
                 var list = context.functions.Where(i => i.navigatorId == id).OrderBy(i => i.index);
 
-                return result.Success(list.ToList());
+                return result.success(list.ToList());
             }
         }
 
@@ -306,7 +306,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="app">应用实体数据</param>
         /// <returns>bool 是否已存在</returns>
-        private static bool Existed(Application app)
+        private static bool existed(Application app)
         {
             using (var context = new Entities())
             {
@@ -319,7 +319,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="nav">导航实体数据</param>
         /// <returns>bool 是否已存在</returns>
-        private static bool Existed(Navigator nav)
+        private static bool existed(Navigator nav)
         {
             using (var context = new Entities())
             {
@@ -332,7 +332,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="fun">功能实体数据</param>
         /// <returns>bool 是否已存在</returns>
-        private static bool Existed(Function fun)
+        private static bool existed(Function fun)
         {
             using (var context = new Entities())
             {

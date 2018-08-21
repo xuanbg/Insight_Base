@@ -18,7 +18,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 为跨域请求设置响应头信息
         /// </summary>
-        public void ResponseOptions()
+        public void responseOptions()
         {
         }
 
@@ -32,11 +32,11 @@ namespace Insight.Base.Services
         /// <param name="key">查询用的关键字段</param>
         /// <param name="userid">事件源用户ID（可为空）</param>
         /// <returns>Result</returns>
-        public Result<object> WriteToLog(string code, string message, string source, string action, string key, string userid)
+        public Result<object> writeToLog(string code, string message, string source, string action, string key, string userid)
         {
-            if (!Verify()) return result;
+            if (!verify()) return result;
 
-            new Thread(() => Logger.Write(code, message, source, action, key, userid)).Start();
+            new Thread(() => Logger.write(code, message, source, action, key, userid)).Start();
 
             return result;
         }
@@ -46,26 +46,26 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="rule">日志规则数据对象</param>
         /// <returns>Result</returns>
-        public Result<object> AddRule(LogRule rule)
+        public Result<object> addRule(LogRule rule)
         {
-            if (!Verify("60A97A33-0E6E-4856-BB2B-322FEEEFD96A")) return result;
+            if (!verify("60A97A33-0E6E-4856-BB2B-322FEEEFD96A")) return result;
 
-            if (string.IsNullOrEmpty(rule.code) || !Regex.IsMatch(rule.code, @"^\d{6}$")) return result.InvalidEventCode();
+            if (string.IsNullOrEmpty(rule.code) || !Regex.IsMatch(rule.code, @"^\d{6}$")) return result.invalidEventCode();
 
             var level = Convert.ToInt32(rule.code.Substring(0, 1));
-            if (level <= 1 || level == 7) return result.EventWithoutConfig();
+            if (level <= 1 || level == 7) return result.eventWithoutConfig();
 
-            if (Params.rules.Any(r => r.code == rule.code)) return result.EventCodeUsed();
+            if (Params.rules.Any(r => r.code == rule.code)) return result.eventCodeUsed();
 
             rule.creatorId = userId;
-            if (!Insert(rule)) return result.DataBaseError();
+            if (!insert(rule)) return result.dataBaseError();
 
             var log = new
             {
                 UserID = userId,
-                Message = $"事件代码【{rule.code}】已由{userName}创建和配置为：{Util.Serialize(rule)}"
+                Message = $"事件代码【{rule.code}】已由{userName}创建和配置为：{Util.serialize(rule)}"
             };
-            new Thread(() => Logger.Write("600601", Util.Serialize(log))).Start();
+            new Thread(() => Logger.write("600601", Util.serialize(log))).Start();
 
             return result;
         }
@@ -75,18 +75,18 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">日志规则ID</param>
         /// <returns>Result</returns>
-        public Result<object> RemoveRule(string id)
+        public Result<object> removeRule(string id)
         {
-            if (!Verify("BBC43098-A030-46CA-A681-0C3D1ECC15AB")) return result;
+            if (!verify("BBC43098-A030-46CA-A681-0C3D1ECC15AB")) return result;
 
-            if (!DeleteRule(id)) return result.DataBaseError();
+            if (!deleteRule(id)) return result.dataBaseError();
 
             var log = new
             {
                 UserID = userId,
                 Message = $"事件配置【{id}】已被{userName}删除"
             };
-            new Thread(() => Logger.Write("600602", Util.Serialize(log))).Start();
+            new Thread(() => Logger.write("600602", Util.serialize(log))).Start();
 
             return result;
         }
@@ -96,18 +96,18 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="rule">日志规则数据对象</param>
         /// <returns>Result</returns>
-        public Result<object> EditRule(LogRule rule)
+        public Result<object> editRule(LogRule rule)
         {
-            if (!Verify("9FF1547D-2E3F-4552-963F-5EA790D586EA")) return result;
+            if (!verify("9FF1547D-2E3F-4552-963F-5EA790D586EA")) return result;
 
-            if (!Update(rule)) return result.DataBaseError();
+            if (!update(rule)) return result.dataBaseError();
 
             var log = new
             {
                 UserID = userId,
-                Message = $"事件代码【{rule.code}】已被{userName}修改为：{Util.Serialize(rule)}"
+                Message = $"事件代码【{rule.code}】已被{userName}修改为：{Util.serialize(rule)}"
             };
-            new Thread(() => Logger.Write("600603", Util.Serialize(log))).Start();
+            new Thread(() => Logger.write("600603", Util.serialize(log))).Start();
 
             return result;
         }
@@ -117,23 +117,23 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">日志规则ID</param>
         /// <returns>Result</returns>
-        public Result<object> GetRule(string id)
+        public Result<object> getRule(string id)
         {
-            if (!Verify("E3CFC5AA-CD7D-4A3C-8900-8132ADB7099F")) return result;
+            if (!verify("E3CFC5AA-CD7D-4A3C-8900-8132ADB7099F")) return result;
 
             var rule = Params.rules.SingleOrDefault(r => r.id == id);
-            return rule == null ? result.NotFound() : result.Success(rule);
+            return rule == null ? result.notFound() : result.success(rule);
         }
 
         /// <summary>
         /// 获取全部日志规则
         /// </summary>
         /// <returns>Result</returns>
-        public Result<object> GetRules()
+        public Result<object> getRules()
         {
-            if (!Verify("E3CFC5AA-CD7D-4A3C-8900-8132ADB7099F")) return result;
+            if (!verify("E3CFC5AA-CD7D-4A3C-8900-8132ADB7099F")) return result;
 
-            return Params.rules.Any() ? result.Success(Params.rules) : result.NoContent(new List<object>());
+            return Params.rules.Any() ? result.success(Params.rules) : result.noContent(new List<object>());
         }
     }
 }

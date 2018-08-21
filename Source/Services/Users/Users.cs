@@ -17,7 +17,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 为跨域请求设置响应头信息
         /// </summary>
-        public void ResponseOptions()
+        public void responseOptions()
         {
         }
 
@@ -26,30 +26,30 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="user">用户对象</param>
         /// <returns>Result</returns>
-        public Result<object> AddUser(User user)
+        public Result<object> addUser(User user)
         {
-            if (!Verify("newUser")) return result;
+            if (!verify("newUser")) return result;
 
-            if (user == null) return result.BadRequest();
+            if (user == null) return result.badRequest();
 
-            if (Core.IsExisted(user)) return result.AccountExists();
+            if (Core.isExisted(user)) return result.accountExists();
 
-            user.id = Util.NewId();
-            user.password = Util.Hash("123456");
+            user.id = Util.newId();
+            user.password = Util.hash("123456");
             user.creatorId = userId;
             user.createTime = DateTime.Now;
-            if (!DbHelper.Insert(user)) return result.DataBaseError();
+            if (!DbHelper.insert(user)) return result.dataBaseError();
 
             var tu = new TenantUser
             {
-                id = Util.NewId(),
+                id = Util.newId(),
                 tenantId = tenantId,
                 userId = user.id,
                 creatorId = userId,
                 createTime = DateTime.Now
             };
 
-            return DbHelper.Insert(tu) ? result.Created(user) : result.DataBaseError();
+            return DbHelper.insert(tu) ? result.created(user) : result.dataBaseError();
         }
 
         /// <summary>
@@ -57,14 +57,14 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">用户ID</param>
         /// <returns>Result</returns>
-        public Result<object> RemoveUser(string id)
+        public Result<object> removeUser(string id)
         {
-            if (!Verify("deleteUser")) return result;
+            if (!verify("deleteUser")) return result;
 
-            var user = Core.GetUserById(id);
-            if (user == null) return result.NotFound();
+            var user = Core.getUserById(id);
+            if (user == null) return result.notFound();
 
-            return DbHelper.Delete(user) ? result : result.DataBaseError();
+            return DbHelper.delete(user) ? result : result.dataBaseError();
         }
 
         /// <summary>
@@ -73,31 +73,31 @@ namespace Insight.Base.Services
         /// <param name="id"></param>
         /// <param name="user">用户数据对象</param>
         /// <returns>Result</returns>
-        public Result<object> UpdateUserInfo(string id, User user)
+        public Result<object> updateUserInfo(string id, User user)
         {
-            if (!Verify("editUser")) return result;
+            if (!verify("editUser")) return result;
 
-            if (user == null) return result.BadRequest();
+            if (user == null) return result.badRequest();
 
-            var data = Core.GetUserById(user.id);
-            if (data == null) return result.NotFound();
+            var data = Core.getUserById(user.id);
+            if (data == null) return result.notFound();
 
             data.name = user.name;
             data.account = user.account;
             data.mobile = user.mobile;
             data.email = user.email;
             data.remark = user.remark;
-            if (!DbHelper.Update(data)) return result.DataBaseError();
+            if (!DbHelper.update(data)) return result.dataBaseError();
 
-            var session = Core.GetUserCache(user.id);
+            var session = Core.getUserCache(user.id);
             if (session == null) return result;
 
             session.userName = user.name;
             session.account = user.account;
             session.mobile = user.mobile;
             session.email = user.email;
-            session.SetChanged();
-            Core.SetUserCache(session);
+            session.setChanged();
+            Core.setUserCache(session);
 
             return result;
         }
@@ -106,15 +106,15 @@ namespace Insight.Base.Services
         /// 获取登录用户的用户对象实体
         /// </summary>
         /// <returns>Result</returns>
-        public Result<object> GetMyself()
+        public Result<object> getMyself()
         {
-            if (!Verify()) return result;
+            if (!verify()) return result;
 
-            var data = Core.GetUserById(userId);
+            var data = Core.getUserById(userId);
             data.password = null;
             data.payPassword = null;
 
-            return data == null ? result.NotFound() : result.Success(data);
+            return data == null ? result.notFound() : result.success(data);
         }
 
         /// <summary>
@@ -122,16 +122,16 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">用户ID</param>
         /// <returns>Result</returns>
-        public Result<object> GetUser(string id)
+        public Result<object> getUser(string id)
         {
-            if (!Verify("getUsers", id)) return result;
+            if (!verify("getUsers", id)) return result;
 
-            var data = Core.GetUserById(id);
-            if (data == null) return result.NotFound();
+            var data = Core.getUserById(id);
+            if (data == null) return result.notFound();
 
-            var user = new UserDto {funcs = Core.GetPermitAppTree(tenantId, id), datas = new List<AppTree>()};
+            var user = new UserDto {funcs = Core.getPermitAppTree(tenantId, id), datas = new List<AppTree>()};
 
-            return result.Success(user);
+            return result.success(user);
         }
 
         /// <summary>
@@ -141,11 +141,11 @@ namespace Insight.Base.Services
         /// <param name="page">当前页</param>
         /// <param name="key">关键词</param>
         /// <returns>Result</returns>
-        public Result<object> GetUsers(int rows, int page, string key)
+        public Result<object> getUsers(int rows, int page, string key)
         {
-            if (!Verify("getUsers")) return result;
+            if (!verify("getUsers")) return result;
 
-            if (page < 1 || rows > 100) return result.BadRequest();
+            if (page < 1 || rows > 100) return result.badRequest();
 
             using (var context = new Entities())
             {
@@ -170,7 +170,7 @@ namespace Insight.Base.Services
                 var skip = rows * (page - 1);
                 var users = list.OrderBy(u => u.createTime).Skip(skip).Take(rows).ToList();
 
-                return result.Success(users, list.Count());
+                return result.success(users, list.Count());
             }
         }
 
@@ -181,33 +181,33 @@ namespace Insight.Base.Services
         /// <param name="code">验证码</param>
         /// <param name="user">用户对象</param>
         /// <returns>Result</returns>
-        public Result<object> SignUp(string aid, string code, User user)
+        public Result<object> signUp(string aid, string code, User user)
         {
-            if (user == null) return result.BadRequest();
+            if (user == null) return result.badRequest();
 
-            var fingerprint = GetFingerprint();
-            var limitKey = Util.Hash("signUp" + fingerprint + Util.Serialize(code));
-            var surplus = Params.callManage.GetSurplus(limitKey, 60);
-            if (surplus > 0) return result.TooFrequent(surplus);
+            var fingerprint = getFingerprint();
+            var limitKey = Util.hash("signUp" + fingerprint + Util.serialize(code));
+            var surplus = Params.callManage.getSurplus(limitKey, 60);
+            if (surplus > 0) return result.tooFrequent(surplus);
 
-            if (!Core.VerifySmsCode(1, user.mobile, code)) return result.SMSCodeError();
+            if (!Core.verifySmsCode(1, user.mobile, code)) return result.smsCodeError();
 
-            if (Core.IsExisted(user)) return result.AccountExists();
+            if (Core.isExisted(user)) return result.accountExists();
 
-            if (string.IsNullOrEmpty(user.id)) user.id = Util.NewId();
+            if (string.IsNullOrEmpty(user.id)) user.id = Util.newId();
 
-            if (string.IsNullOrEmpty(user.password)) user.password = Util.Hash("123456");
+            if (string.IsNullOrEmpty(user.password)) user.password = Util.hash("123456");
 
             user.creatorId = user.id;
             user.createTime = DateTime.Now;
-            if (!DbHelper.Insert(user)) return result.DataBaseError();
+            if (!DbHelper.insert(user)) return result.dataBaseError();
 
-            var id = Core.GetUserId(user.account);
-            manage = Core.GetUserCache(id);
-            var tokens = manage.Creator(Util.NewId("N"), aid);
-            Core.SetUserCache(manage);
+            var id = Core.getUserId(user.account);
+            manage = Core.getUserCache(id);
+            var tokens = manage.creator(Util.newId("N"), aid);
+            Core.setUserCache(manage);
 
-            return result.Created(tokens);
+            return result.created(tokens);
         }
 
         /// <summary>
@@ -216,24 +216,24 @@ namespace Insight.Base.Services
         /// <param name="id">用户ID</param>
         /// <param name="password">新密码（RSA加密）</param>
         /// <returns>Result</returns>
-        public Result<object> UpdateSignature(string id, string password)
+        public Result<object> updateSignature(string id, string password)
         {
-            if (!Verify("resetPassword", id)) return result;
+            if (!verify("resetPassword", id)) return result;
 
-            var user = Core.GetUserById(id);
-            if (user == null) return result.NotFound();
+            var user = Core.getUserById(id);
+            if (user == null) return result.notFound();
 
-            if (user.password == password) result.BadRequest("密码不能与原密码相同");
+            if (user.password == password) result.badRequest("密码不能与原密码相同");
 
             user.password = password;
-            if (!DbHelper.Update(user)) return result.DataBaseError();
+            if (!DbHelper.update(user)) return result.dataBaseError();
 
-            manage = Core.GetUserCache(id);
+            manage = Core.getUserCache(id);
             if (manage == null) return result;
 
             manage.password = password;
-            manage.SetChanged();
-            Core.SetUserCache(manage);
+            manage.setChanged();
+            Core.setUserCache(manage);
 
             return result;
         }
@@ -247,34 +247,34 @@ namespace Insight.Base.Services
         /// <param name="code">短信验证码</param>
         /// <param name="mobile">手机号，默认为空。如为空，则使用account</param>
         /// <returns>Result</returns>
-        public Result<object> ResetSignature(string aid, string account, string password, string code, string mobile = null)
+        public Result<object> resetSignature(string aid, string account, string password, string code, string mobile = null)
         {
-            if (string.IsNullOrEmpty(aid) || string.IsNullOrEmpty(password)) return result.InvalidValue();
+            if (string.IsNullOrEmpty(aid) || string.IsNullOrEmpty(password)) return result.invalidValue();
 
-            var fingerprint = GetFingerprint();
-            var limitKey = Util.Hash("resetSignature" + fingerprint + Util.Serialize(code));
-            var surplus = Params.callManage.GetSurplus(limitKey, 10);
-            if (surplus > 0) return result.TooFrequent(surplus);
+            var fingerprint = getFingerprint();
+            var limitKey = Util.hash("resetSignature" + fingerprint + Util.serialize(code));
+            var surplus = Params.callManage.getSurplus(limitKey, 10);
+            if (surplus > 0) return result.tooFrequent(surplus);
 
-            if (!Core.VerifySmsCode(2, mobile ?? account, code)) return result.SMSCodeError();
+            if (!Core.verifySmsCode(2, mobile ?? account, code)) return result.smsCodeError();
 
-            userId = Core.GetUserId(account);
-            if (userId == null) return result.NotFound();
+            userId = Core.getUserId(account);
+            if (userId == null) return result.notFound();
 
-            manage = Core.GetUserCache(userId);
+            manage = Core.getUserCache(userId);
             if (manage.password != password)
             {
-                var user = Core.GetUserById(userId);
+                var user = Core.getUserById(userId);
                 user.password = password;
-                if (!DbHelper.Update(user)) return result.DataBaseError();
+                if (!DbHelper.update(user)) return result.dataBaseError();
             }
 
             manage.password = password;
-            manage.SetChanged();
-            var tokens = manage.Creator(Util.NewId("N"), aid);
-            Core.SetUserCache(manage);
+            manage.setChanged();
+            var tokens = manage.creator(Util.newId("N"), aid);
+            Core.setUserCache(manage);
 
-            return result.Created(tokens);
+            return result.created(tokens);
         }
 
         /// <summary>
@@ -282,7 +282,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="account">用户登录名</param>
         /// <returns>Result</returns>
-        public Result<object> GetTenants(string account)
+        public Result<object> getTenants(string account)
         {
             throw new NotImplementedException();
         }
@@ -292,12 +292,12 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="account">用户登录名</param>
         /// <returns>Result</returns>
-        public Result<object> GetLoginDepts(string account)
+        public Result<object> getLoginDepts(string account)
         {
             using (var context = new Entities())
             {
                 var user = context.users.SingleOrDefault(u => u.account == account || u.mobile == account || u.email == account);
-                if (user == null) return result.NotFound();
+                if (user == null) return result.notFound();
 
                 var list = new List<Org>();
                 var orgs = (from o in context.orgs
@@ -319,7 +319,7 @@ namespace Insight.Base.Services
                     }
                 }
 
-                return result.Success(list);
+                return result.success(list);
             }
         }
 
@@ -329,25 +329,25 @@ namespace Insight.Base.Services
         /// <param name="id">用户ID</param>
         /// <param name="invalid">失效状态</param>
         /// <returns>Result</returns>
-        public Result<object> SetUserStatus(string id, bool invalid)
+        public Result<object> setUserStatus(string id, bool invalid)
         {
             var action = invalid ? "bannedUser" : "releaseUser";
-            if (!Verify(action)) return result;
+            if (!verify(action)) return result;
 
-            var user = Core.GetUserById(id);
-            if (user == null) return result.NotFound();
+            var user = Core.getUserById(id);
+            if (user == null) return result.notFound();
 
             if (user.isInvalid == invalid) return result;
 
             user.isInvalid = invalid;
-            if (!DbHelper.Update(user)) return result.DataBaseError();
+            if (!DbHelper.update(user)) return result.dataBaseError();
 
-            var session = Core.GetUserCache(user.id);
+            var session = Core.getUserCache(user.id);
             if (session == null) return result;
 
             session.isInvalid = invalid;
-            session.SetChanged();
-            Core.SetUserCache(session);
+            session.setChanged();
+            Core.setUserCache(session);
 
             return result;
         }
@@ -357,11 +357,11 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">用户账号</param>
         /// <returns>Result</returns>
-        public Result<object> UserSignOut(string id)
+        public Result<object> userSignOut(string id)
         {
-            if (!Verify()) return result;
+            if (!verify()) return result;
 
-            manage.Delete(tokenId);
+            TokenManage.delete(tokenId);
             return result;
         }
 
@@ -371,14 +371,14 @@ namespace Insight.Base.Services
         /// <param name="id">用户ID</param>
         /// <param name="deptid">登录部门ID</param>
         /// <returns>Result</returns>
-        public Result<object> GetUserRoles(string id, string deptid)
+        public Result<object> getUserRoles(string id, string deptid)
         {
-            if (!Verify()) return result;
+            if (!verify()) return result;
 
             using (var context = new Entities())
             {
                 var list = context.userRoles.ToList();
-                return result.Success(list);
+                return result.success(list);
             }
         }
     }

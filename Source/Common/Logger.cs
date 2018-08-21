@@ -21,7 +21,7 @@ namespace Insight.Base.Common
         /// <param name="key">查询关键字</param>
         /// <param name="userId">事件源用户ID</param>
         /// <returns>bool 是否写入成功</returns>
-        public static bool? Write(string code, string message = null, string source = null, string action = null, string key = null, string userId = null)
+        public static bool? write(string code, string message = null, string source = null, string action = null, string key = null, string userId = null)
         {
             if (string.IsNullOrEmpty(code) || !Regex.IsMatch(code, @"^\d{6}$")) return null;
 
@@ -31,7 +31,7 @@ namespace Insight.Base.Common
 
             var log = new Log
             {
-                id = Util.NewId(),
+                id = Util.newId(),
                 code = code,
                 level = level,
                 source = rule?.source ?? source,
@@ -42,7 +42,7 @@ namespace Insight.Base.Common
                 createTime = DateTime.Now
             };
 
-            return (rule?.isFile ?? true) ? WriteToFile(log) : WriteToDB(log);
+            return (rule?.isFile ?? true) ? writeToFile(log) : writeToDb(log);
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Insight.Base.Common
         /// </summary>
         /// <param name="log"></param>
         /// <returns>bool 是否写入成功</returns>
-        private static bool WriteToDB(Log log)
+        private static bool writeToDb(Log log)
         {
             using (var context = new Entities())
             {
@@ -64,10 +64,10 @@ namespace Insight.Base.Common
         /// </summary>
         /// <param name="log"></param>
         /// <returns>bool 是否写入成功</returns>
-        private static bool WriteToFile(Log log)
+        private static bool writeToFile(Log log)
         {
             Params.mutex.WaitOne();
-            var path = $"{Util.GetAppSetting("LogLocal")}\\{GetLevelName(log.level)}\\";
+            var path = $"{Util.getAppSetting("LogLocal")}\\{getLevelName(log.level)}\\";
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
@@ -98,7 +98,7 @@ namespace Insight.Base.Common
         /// </summary>
         /// <param name="level"></param>
         /// <returns></returns>
-        private static string GetLevelName(int level)
+        private static string getLevelName(int level)
         {
             var name = (Level)level;
             return name.ToString();

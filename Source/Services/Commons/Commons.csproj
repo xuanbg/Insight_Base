@@ -45,7 +45,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="FastReport">
-      <HintPath>..\..\..\..\util\FastReport.dll</HintPath>
+      <HintPath>..\..\..\..\Utility\FastReport.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />

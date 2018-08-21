@@ -15,7 +15,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 为跨域请求设置响应头信息
         /// </summary>
-        public void ResponseOptions()
+        public void responseOptions()
         {
         }
 
@@ -24,13 +24,13 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">模块ID</param>
         /// <returns>Result</returns>
-        public Result<object> GetCategorys(string id)
+        public Result<object> getCategorys(string id)
         {
-            if (!Verify("getTemplets")) return result;
+            if (!verify("getTemplets")) return result;
 
-            var list = CatalogHelper.GetCatalogs(tenantId, id);
+            var list = CatalogHelper.getCatalogs(tenantId, id);
 
-            return result.Success(list);
+            return result.success(list);
         }
 
         /// <summary>
@@ -38,17 +38,17 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="catalog"></param>
         /// <returns>Result</returns>
-        public Result<object> AddCategory(Catalog catalog)
+        public Result<object> addCategory(Catalog catalog)
         {
-            if (!Verify("newTempletCatalog")) return result;
+            if (!verify("newTempletCatalog")) return result;
 
             catalog.tenantId = tenantId;
             catalog.creatorDeptId = deptId;
             catalog.creator = userName;
             catalog.creatorId = userId;
-            if (CatalogHelper.Existed(catalog)) return result.DataAlreadyExists();
+            if (CatalogHelper.existed(catalog)) return result.dataAlreadyExists();
 
-            return CatalogHelper.Add(catalog) ? result.Success(catalog) : result.DataBaseError();
+            return CatalogHelper.add(catalog) ? result.success(catalog) : result.dataBaseError();
         }
 
         /// <summary>
@@ -57,9 +57,9 @@ namespace Insight.Base.Services
         /// <param name="id">报表分类ID</param>
         /// <param name="catalog"></param>
         /// <returns>Result</returns>
-        public Result<object> EditCategory(string id, Catalog catalog)
+        public Result<object> editCategory(string id, Catalog catalog)
         {
-            return Verify("editTempletCatalog") ? CatalogHelper.Edit(id, catalog) : result;
+            return verify("editTempletCatalog") ? CatalogHelper.edit(id, catalog) : result;
         }
 
         /// <summary>
@@ -67,9 +67,9 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">报表分类ID</param>
         /// <returns>Result</returns>
-        public Result<object> DeleteCategory(string id)
+        public Result<object> deleteCategory(string id)
         {
-            return Verify("deleteTempletCatalog") ? CatalogHelper.Delete(id) : result;
+            return verify("deleteTempletCatalog") ? CatalogHelper.delete(id) : result;
         }
 
         /// <summary>
@@ -79,11 +79,11 @@ namespace Insight.Base.Services
         /// <param name="rows">每页行数</param>
         /// <param name="page">当前页</param>
         /// <returns>Result</returns>
-        public Result<object> GetTemplates(string id, int rows, int page)
+        public Result<object> getTemplates(string id, int rows, int page)
         {
-            if (!Verify("getTemplets")) return result;
+            if (!verify("getTemplets")) return result;
 
-            if (page < 1 || rows > 100) return result.BadRequest();
+            if (page < 1 || rows > 100) return result.badRequest();
 
             var skip = rows * (page - 1);
             using (var context = new Entities())
@@ -92,7 +92,7 @@ namespace Insight.Base.Services
                     .Select(i => new {i.id, i.tenantId, i.categoryId, i.name, i.remark, i.creator, i.createTime});
                 var templates = list.OrderBy(i => i.createTime).Skip(skip).Take(rows).ToList();
 
-                return result.Success(templates, list.Count());
+                return result.success(templates, list.Count());
             }
         }
 
@@ -100,9 +100,9 @@ namespace Insight.Base.Services
         /// 获取所有报表模板
         /// </summary>
         /// <returns>Result</returns>
-        public Result<object> GetAllTemplates()
+        public Result<object> getAllTemplates()
         {
-            if (!Verify()) return result;
+            if (!verify()) return result;
 
             using (var context = new Entities())
             {
@@ -115,7 +115,7 @@ namespace Insight.Base.Services
                     select new {t.id, parentId = c.id, index = 0, t.name};
                 var list = cats.Union(temps).OrderBy(i => new {i.index, i.name}).ToList();
 
-                return result.Success(list);
+                return result.success(list);
             }
         }
 
@@ -124,13 +124,13 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">模板ID</param>
         /// <returns>Result</returns>
-        public Result<object> GetTemplate(string id)
+        public Result<object> getTemplate(string id)
         {
-            if (!Verify("getTemplets")) return result;
+            if (!verify("getTemplets")) return result;
 
-            var data = DbHelper.Find<ReportTemplet>(id);
+            var data = DbHelper.find<ReportTemplet>(id);
 
-            return data == null ? result.NotFound() : result.Success(data);
+            return data == null ? result.notFound() : result.success(data);
         }
 
         /// <summary>
@@ -138,20 +138,20 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="template">报表模板</param>
         /// <returns>Result</returns>
-        public Result<object> ImportTemplate(ReportTemplet template)
+        public Result<object> importTemplate(ReportTemplet template)
         {
-            if (!Verify("importTemplet")) return result;
+            if (!verify("importTemplet")) return result;
 
-            template.id = Util.NewId();
+            template.id = Util.newId();
             template.tenantId = tenantId;
             template.isBuiltin = false;
             template.creatorDeptId = deptId;
             template.creator = userName;
             template.creatorId = userId;
             template.createTime = DateTime.Now;
-            if (Existed(template)) return result.DataAlreadyExists();
+            if (existed(template)) return result.dataAlreadyExists();
 
-            return DbHelper.Insert(template) ? result.Success(template) : result.DataBaseError();
+            return DbHelper.insert(template) ? result.success(template) : result.dataBaseError();
         }
 
         /// <summary>
@@ -160,14 +160,14 @@ namespace Insight.Base.Services
         /// <param name="id">报表模板ID</param>
         /// <param name="templet">报表模板</param>
         /// <returns>Result</returns>
-        public Result<object> CopyTemplate(string id, ReportTemplet templet)
+        public Result<object> copyTemplate(string id, ReportTemplet templet)
         {
-            if (!Verify("copyTemplet")) return result;
+            if (!verify("copyTemplet")) return result;
 
-            var data = DbHelper.Find<ReportTemplet>(id);
-            if (data == null) return result.NotFound();
+            var data = DbHelper.find<ReportTemplet>(id);
+            if (data == null) return result.notFound();
 
-            templet.id = Util.NewId();
+            templet.id = Util.newId();
             templet.tenantId = tenantId;
             templet.content = data.content;
             templet.isBuiltin = false;
@@ -175,9 +175,9 @@ namespace Insight.Base.Services
             templet.creator = userName;
             templet.creatorId = userId;
             templet.createTime = DateTime.Now;
-            if (Existed(templet)) return result.DataAlreadyExists();
+            if (existed(templet)) return result.dataAlreadyExists();
 
-            return DbHelper.Insert(templet) ? result.Success(templet) : result.DataBaseError();
+            return DbHelper.insert(templet) ? result.success(templet) : result.dataBaseError();
         }
 
         /// <summary>
@@ -186,19 +186,19 @@ namespace Insight.Base.Services
         /// <param name="id">报表模板ID</param>
         /// <param name="templet">报表模板</param>
         /// <returns>Result</returns>
-        public Result<object> EditTemplate(string id, ReportTemplet templet)
+        public Result<object> editTemplate(string id, ReportTemplet templet)
         {
-            if (!Verify("editTemplet")) return result;
+            if (!verify("editTemplet")) return result;
 
-            var data = DbHelper.Find<ReportTemplet>(id);
-            if (data == null) return result.NotFound();
+            var data = DbHelper.find<ReportTemplet>(id);
+            if (data == null) return result.notFound();
 
             data.categoryId = templet.categoryId;
             data.name = templet.name;
             data.remark = templet.remark;
-            if (Existed(data)) return result.DataAlreadyExists();
+            if (existed(data)) return result.dataAlreadyExists();
 
-            return DbHelper.Update(data) ? result : result.DataBaseError();
+            return DbHelper.update(data) ? result : result.dataBaseError();
         }
 
         /// <summary>
@@ -207,16 +207,16 @@ namespace Insight.Base.Services
         /// <param name="id">报表模板ID</param>
         /// <param name="content">模板内容</param>
         /// <returns>Result</returns>
-        public Result<object> DesignTemplet(string id, string content)
+        public Result<object> designTemplet(string id, string content)
         {
-            if (!Verify("designTemplet")) return result;
+            if (!verify("designTemplet")) return result;
 
-            var data = DbHelper.Find<ReportTemplet>(id);
-            if (data == null) return result.NotFound();
+            var data = DbHelper.find<ReportTemplet>(id);
+            if (data == null) return result.notFound();
 
             data.content = content;
 
-            return DbHelper.Update(data) ? result : result.DataBaseError();
+            return DbHelper.update(data) ? result : result.dataBaseError();
         }
 
         /// <summary>
@@ -224,14 +224,14 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">报表模板ID</param>
         /// <returns>Result</returns>
-        public Result<object> DeleteTemplate(string id)
+        public Result<object> deleteTemplate(string id)
         {
-            if (!Verify("deleteTemplet")) return result;
+            if (!verify("deleteTemplet")) return result;
 
-            var data = DbHelper.Find<ReportTemplet>(id);
-            if (data == null) return result.NotFound();
+            var data = DbHelper.find<ReportTemplet>(id);
+            if (data == null) return result.notFound();
 
-            return DbHelper.Delete(data) ? result : result.DataBaseError();
+            return DbHelper.delete(data) ? result : result.dataBaseError();
         }
 
         /// <summary>
@@ -239,7 +239,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="templet"></param>
         /// <returns>bool 是否存在</returns>
-        private static bool Existed(ReportTemplet templet)
+        private static bool existed(ReportTemplet templet)
         {
             using (var context = new Entities())
             {

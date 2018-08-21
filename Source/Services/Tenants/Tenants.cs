@@ -17,7 +17,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 为跨域请求设置响应头信息
         /// </summary>
-        public void ResponseOptions()
+        public void responseOptions()
         {
         }
 
@@ -28,11 +28,11 @@ namespace Insight.Base.Services
         /// <param name="page">当前页</param>
         /// <param name="key">查询关键词</param>
         /// <returns>Result</returns>
-        public Result<object> GetTenants(int rows, int page, string key)
+        public Result<object> getTenants(int rows, int page, string key)
         {
-            if (!Verify("getTenants")) return result;
+            if (!verify("getTenants")) return result;
 
-            if (page < 1 || rows > 100) return result.BadRequest();
+            if (page < 1 || rows > 100) return result.badRequest();
 
             using (var context = new Entities())
             {
@@ -57,7 +57,7 @@ namespace Insight.Base.Services
                 var skip = rows * (page - 1);
                 var tenants = list.OrderBy(i => i.createTime).Skip(skip).Take(rows).ToList();
 
-                return result.Success(tenants, list.Count());
+                return result.success(tenants, list.Count());
             }
         }
 
@@ -66,20 +66,20 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">租户ID</param>
         /// <returns>Result</returns>
-        public Result<object> GetTenant(string id)
+        public Result<object> getTenant(string id)
         {
-            if (!Verify("getTenants")) return result;
+            if (!verify("getTenants")) return result;
 
-            var data = GetData(id);
-            if (data == null) return result.NotFound();
+            var data = getData(id);
+            if (data == null) return result.notFound();
 
             var tenant = new TenantInfo
             {
-                apps = GetApps(id),
-                users = GetUsers(id),
+                apps = getApps(id),
+                users = getUsers(id),
             };
 
-            return result.Success(tenant);
+            return result.success(tenant);
         }
 
         /// <summary>
@@ -87,35 +87,35 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="tenant">租户实体数据</param>
         /// <returns>Result</returns>
-        public Result<object> AddTenant(Tenant tenant)
+        public Result<object> addTenant(Tenant tenant)
         {
-            if (!Verify("newTenant")) return result;
+            if (!verify("newTenant")) return result;
 
-            if (tenant == null) return result.BadRequest();
+            if (tenant == null) return result.badRequest();
 
-            if (Existed(tenant)) return result.DataAlreadyExists();
+            if (existed(tenant)) return result.dataAlreadyExists();
 
             // 初始化管理员用户并持久化用户数据
             var user = new User
             {
-                id = Util.NewId(),
+                id = Util.newId(),
                 name = "管理员",
-                account = Params.Random.Next(0, 9999).ToString("D4"),
-                password = Util.Hash("123456"),
+                account = Params.random.Next(0, 9999).ToString("D4"),
+                password = Util.hash("123456"),
                 remark = tenant.name + "租户管理员",
                 creatorId = userId,
                 createTime = DateTime.Now
             };
 
-            while (Core.IsExisted(user))
+            while (Core.isExisted(user))
             {
-                user.account = Params.Random.Next(0, 9999).ToString("D4");
+                user.account = Params.random.Next(0, 9999).ToString("D4");
             }
 
-            if (!DbHelper.Insert(user)) return result.DataBaseError();
+            if (!DbHelper.insert(user)) return result.dataBaseError();
 
             // 持久化租户数据
-            tenant.id = Util.NewId();
+            tenant.id = Util.newId();
             tenant.expireDate = DateTime.Now.AddDays(90);
             tenant.isBuiltin = false;
             tenant.isInvalid = false;
@@ -125,7 +125,7 @@ namespace Insight.Base.Services
             {
                 new TenantApp
                 {
-                    id = Util.NewId(),
+                    id = Util.newId(),
                     tenantId = tenant.id,
                     appId = "e46c0d4f-85f2-4f75-9ad4-d86b9505b1d4",
                     creatorId = userId,
@@ -136,19 +136,19 @@ namespace Insight.Base.Services
             {
                 new TenantUser
                 {
-                    id = Util.NewId(),
+                    id = Util.newId(),
                     tenantId = tenant.id,
                     userId = user.id,
                     creatorId = userId,
                     createTime = DateTime.Now
                 }
             };
-            if (!DbHelper.Insert(tenant)) return result.DataBaseError();
+            if (!DbHelper.insert(tenant)) return result.dataBaseError();
 
             // 初始化租户管理员角色并持久化角色数据
             var role = new Role
             {
-                id = Util.NewId(),
+                id = Util.newId(),
                 tenantId = tenant.id,
                 name = "管理员",
                 remark = "内置管理员角色",
@@ -160,7 +160,7 @@ namespace Insight.Base.Services
             {
                 new RoleMember
                 {
-                    id = Util.NewId(),
+                    id = Util.newId(),
                     roleId = role.id,
                     memberType = 1,
                     memberId = user.id,
@@ -181,10 +181,10 @@ namespace Insight.Base.Services
                         creatorId = userId,
                         createTime = DateTime.Now
                     };
-                role.funcs = Util.ConvertTo<List<RoleFunction>>(list.ToList());
-                role.funcs.ForEach(i => i.id = Util.NewId());
+                role.funcs = Util.convertTo<List<RoleFunction>>(list.ToList());
+                role.funcs.ForEach(i => i.id = Util.newId());
             }
-            if (!DbHelper.Insert(role)) return result.DataBaseError();
+            if (!DbHelper.insert(role)) return result.dataBaseError();
 
             // 初始化根机构并持久化组织机构数据
             var org = new Org
@@ -197,12 +197,12 @@ namespace Insight.Base.Services
                 creatorId = userId,
                 createTime = DateTime.Now
             };
-            if (!DbHelper.Insert(org)) return result.DataBaseError();
+            if (!DbHelper.insert(org)) return result.dataBaseError();
 
             tenant.apps = null;
             tenant.users = null;
 
-            return result.Success(tenant);
+            return result.success(tenant);
         }
 
         /// <summary>
@@ -211,14 +211,14 @@ namespace Insight.Base.Services
         /// <param name="id"></param>
         /// <param name="tenant">租户实体数据</param>
         /// <returns>Result</returns>
-        public Result<object> EditTenant(string id, Tenant tenant)
+        public Result<object> editTenant(string id, Tenant tenant)
         {
-            if (!Verify("editTenant")) return result;
+            if (!verify("editTenant")) return result;
 
-            if (tenant == null) return result.BadRequest();
+            if (tenant == null) return result.badRequest();
 
-            var data = GetData(tenant.id);
-            if (data == null) return result.NotFound();
+            var data = getData(tenant.id);
+            if (data == null) return result.notFound();
 
             data.name = tenant.name;
             data.alias = tenant.alias;
@@ -232,7 +232,7 @@ namespace Insight.Base.Services
             data.address = tenant.address;
             data.remark = tenant.remark;
 
-            return DbHelper.Update(data) ? result.Success() : result.DataBaseError();
+            return DbHelper.update(data) ? result.success() : result.dataBaseError();
         }
 
         /// <summary>
@@ -241,18 +241,18 @@ namespace Insight.Base.Services
         /// <param name="id">租户ID</param>
         /// <param name="expire">续租天数</param>
         /// <returns>Result</returns>
-        public Result<object> ExtendTenant(string id, int expire)
+        public Result<object> extendTenant(string id, int expire)
         {
-            if (!Verify("extend")) return result;
+            if (!verify("extend")) return result;
 
-            if (expire < 30) return result.BadRequest("续租时间不能少于30天");
+            if (expire < 30) return result.badRequest("续租时间不能少于30天");
 
-            var data = GetData(id);
-            if (data == null) return result.NotFound();
+            var data = getData(id);
+            if (data == null) return result.notFound();
 
             data.expireDate = data.expireDate.AddDays(expire);
 
-            return DbHelper.Update(data) ? result.Success() : result.DataBaseError();
+            return DbHelper.update(data) ? result.success() : result.dataBaseError();
         }
 
         /// <summary>
@@ -260,16 +260,16 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">租户ID</param>
         /// <returns>Result</returns>
-        public Result<object> DeleteTenant(string id)
+        public Result<object> deleteTenant(string id)
         {
-            if (!Verify("deleteTenant")) return result;
+            if (!verify("deleteTenant")) return result;
 
-            var data = GetData(id);
-            if (data == null) return result.NotFound();
+            var data = getData(id);
+            if (data == null) return result.notFound();
 
             data.isInvalid = true;
 
-            return DbHelper.Update(data) ? result.Success() : result.DataBaseError();
+            return DbHelper.update(data) ? result.success() : result.dataBaseError();
         }
 
         /// <summary>
@@ -278,28 +278,28 @@ namespace Insight.Base.Services
         /// <param name="id">租户ID</param>
         /// <param name="apps">绑定应用ID集合</param>
         /// <returns>Result</returns>
-        public Result<object> BindApp(string id, List<string> apps)
+        public Result<object> bindApp(string id, List<string> apps)
         {
-            if (!Verify("bindApp")) return result;
+            if (!verify("bindApp")) return result;
 
-            var data = GetData(id);
-            if (data == null) return result.NotFound();
+            var data = getData(id);
+            if (data == null) return result.notFound();
 
             using (var context = new Entities())
             {
                 var list = context.tenantApps.Where(i => i.tenantId == id && i.appId != "e46c0d4f-85f2-4f75-9ad4-d86b9505b1d4").ToList();
-                if (!DbHelper.Delete(list)) return result.DataBaseError();
+                if (!DbHelper.delete(list)) return result.dataBaseError();
 
                 list = apps.Select(i => new TenantApp
                 {
-                    id = Util.NewId(),
+                    id = Util.newId(),
                     tenantId = id,
                     appId = i,
                     creatorId = userId,
                     createTime = DateTime.Now
                 }).ToList();
 
-                return DbHelper.Insert(list) ? result.Success() : result.DataBaseError();
+                return DbHelper.insert(list) ? result.success() : result.dataBaseError();
             }
         }
 
@@ -309,19 +309,19 @@ namespace Insight.Base.Services
         /// <param name="id">租户ID</param>
         /// <param name="tenant">租户-用户关系实体数据</param>
         /// <returns>Result</returns>
-        public Result<object> AddTenantUser(string id, TenantUser tenant)
+        public Result<object> addTenantUser(string id, TenantUser tenant)
         {
-            if (!Verify()) return result;
+            if (!verify()) return result;
 
-            var data = GetData(tenant.tenantId);
-            var user = DbHelper.Find<Application>(tenant.userId);
-            if (data == null || user == null) return result.NotFound();
+            var data = getData(tenant.tenantId);
+            var user = DbHelper.find<Application>(tenant.userId);
+            if (data == null || user == null) return result.notFound();
 
-            tenant.id = Util.NewId();
+            tenant.id = Util.newId();
             tenant.creatorId = userId;
             tenant.createTime = DateTime.Now;
 
-            return DbHelper.Insert(tenant) ? result.Success(user) : result.DataBaseError();
+            return DbHelper.insert(tenant) ? result.success(user) : result.dataBaseError();
         }
 
         /// <summary>
@@ -329,14 +329,14 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">租户-用户关系ID</param>
         /// <returns>Result</returns>
-        public Result<object> DeleteTenantUser(string id)
+        public Result<object> deleteTenantUser(string id)
         {
-            if (!Verify()) return result;
+            if (!verify()) return result;
 
-            var data = DbHelper.Find<TenantUser>(id);
-            if (data == null) return result.NotFound();
+            var data = DbHelper.find<TenantUser>(id);
+            if (data == null) return result.notFound();
 
-            return DbHelper.Delete(data) ? result.Success() : result.DataBaseError();
+            return DbHelper.delete(data) ? result.success() : result.dataBaseError();
         }
 
         /// <summary>
@@ -344,7 +344,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="tenant">租户</param>
         /// <returns>是否已存在</returns>
-        private static bool Existed(Tenant tenant)
+        private static bool existed(Tenant tenant)
         {
             using (var context = new Entities())
             {
@@ -357,7 +357,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">租户ID</param>
         /// <returns>租户</returns>
-        private static Tenant GetData(string id)
+        private static Tenant getData(string id)
         {
             using (var context = new Entities())
             {
@@ -370,7 +370,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        private static List<Application> GetApps(string id)
+        private static List<Application> getApps(string id)
         {
             using (var context = new Entities())
             {
@@ -387,7 +387,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        private static List<User> GetUsers(string id)
+        private static List<User> getUsers(string id)
         {
             using (var context = new Entities())
             {

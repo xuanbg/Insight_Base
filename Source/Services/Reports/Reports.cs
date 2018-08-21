@@ -15,7 +15,7 @@ namespace Insight.Base.Services
         /// <summary>
         /// 为跨域请求设置响应头信息
         /// </summary>
-        public void ResponseOptions()
+        public void responseOptions()
         {
         }
 
@@ -24,13 +24,13 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">模块ID</param>
         /// <returns>Result</returns>
-        public Result<object> GetCategorys(string id)
+        public Result<object> getCategorys(string id)
         {
-            if (!Verify("getReports")) return result;
+            if (!verify("getReports")) return result;
 
-            var list = CatalogHelper.GetCatalogs(tenantId, id);
+            var list = CatalogHelper.getCatalogs(tenantId, id);
 
-            return result.Success(list);
+            return result.success(list);
         }
 
         /// <summary>
@@ -38,17 +38,17 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="catalog"></param>
         /// <returns>Result</returns>
-        public Result<object> AddCategory(Catalog catalog)
+        public Result<object> addCategory(Catalog catalog)
         {
-            if (!Verify("newReportCatalog")) return result;
+            if (!verify("newReportCatalog")) return result;
 
             catalog.tenantId = tenantId;
             catalog.creatorDeptId = deptId;
             catalog.creator = userName;
             catalog.creatorId = userId;
-            if (CatalogHelper.Existed(catalog)) return result.DataAlreadyExists();
+            if (CatalogHelper.existed(catalog)) return result.dataAlreadyExists();
 
-            return CatalogHelper.Add(catalog) ? result.Success(catalog) : result.DataBaseError();
+            return CatalogHelper.add(catalog) ? result.success(catalog) : result.dataBaseError();
         }
 
         /// <summary>
@@ -57,9 +57,9 @@ namespace Insight.Base.Services
         /// <param name="id">报表分类ID</param>
         /// <param name="catalog"></param>
         /// <returns>Result</returns>
-        public Result<object> EditCategory(string id, Catalog catalog)
+        public Result<object> editCategory(string id, Catalog catalog)
         {
-            return Verify("editReportCatalog") ? CatalogHelper.Edit(id, catalog) : result;
+            return verify("editReportCatalog") ? CatalogHelper.edit(id, catalog) : result;
         }
 
         /// <summary>
@@ -67,9 +67,9 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">报表分类ID</param>
         /// <returns>Result</returns>
-        public Result<object> DeleteCategory(string id)
+        public Result<object> deleteCategory(string id)
         {
-            return Verify("deleteReportCatalog") ? CatalogHelper.Delete(id) : result;
+            return verify("deleteReportCatalog") ? CatalogHelper.delete(id) : result;
         }
 
         /// <summary>
@@ -79,11 +79,11 @@ namespace Insight.Base.Services
         /// <param name="rows">每页行数</param>
         /// <param name="page">页码</param>
         /// <returns>Result</returns>
-        public Result<object> GetReports(string id, int rows, int page)
+        public Result<object> getReports(string id, int rows, int page)
         {
-            if (!Verify("getReports")) return result;
+            if (!verify("getReports")) return result;
 
-            if (page < 1 || rows > 100) return result.BadRequest();
+            if (page < 1 || rows > 100) return result.badRequest();
 
             var skip = rows * (page - 1);
             using (var context = new Entities())
@@ -91,7 +91,7 @@ namespace Insight.Base.Services
                 var list = context.definitions.Where(i => i.tenantId == tenantId && i.categoryId == id);
                 var definitions = list.OrderBy(i => i.createTime).Skip(skip).Take(rows).ToList();
 
-                return result.Success(definitions, list.Count());
+                return result.success(definitions, list.Count());
             }
         }
 
@@ -100,14 +100,14 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">ID</param>
         /// <returns>Result</returns>
-        public Result<object> GetReport(string id)
+        public Result<object> getReport(string id)
         {
-            if (!Verify("getReports")) return result;
+            if (!verify("getReports")) return result;
 
-            var data = DbHelper.Find<ReportDefinition>(id);
-            if (data == null) return result.NotFound();
+            var data = DbHelper.find<ReportDefinition>(id);
+            if (data == null) return result.notFound();
 
-            var report = Util.ConvertTo<Definition>(data);
+            var report = Util.convertTo<Definition>(data);
             using (var context = new Entities())
             {
                 var periods = from p in context.periods
@@ -123,7 +123,7 @@ namespace Insight.Base.Services
                 report.entities = entities.ToList();
             }
 
-            return result.Success(report);
+            return result.success(report);
         }
 
         /// <summary>
@@ -131,28 +131,28 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="report">报表</param>
         /// <returns>Result</returns>
-        public Result<object> AddReport(Definition report)
+        public Result<object> addReport(Definition report)
         {
-            if (!Verify("newReport")) return result;
+            if (!verify("newReport")) return result;
 
-            var data = Util.ConvertTo<ReportDefinition>(report);
-            data.id = Util.NewId();
+            var data = Util.convertTo<ReportDefinition>(report);
+            data.id = Util.newId();
             data.tenantId = tenantId;
             data.creatorDeptId = deptId;
             data.creator = userName;
             data.creatorId = userId;
             data.createTime = DateTime.Now;
-            if (Existed(data)) return result.DataAlreadyExists();
+            if (existed(data)) return result.dataAlreadyExists();
 
             data.periods = report.periods.Select(i => new ReportPeriod
                 {
-                    id = Util.NewId(),
+                    id = Util.newId(),
                     reportId = data.id,
                     ruleId = i.ruleId
                 }).ToList();
             data.entities = report.entities.Select(i => new ReportEntity
                 {
-                    id = Util.NewId(),
+                    id = Util.newId(),
                     reportId = data.id,
                     orgId = i.orgId,
                     name = i.name
@@ -161,19 +161,19 @@ namespace Insight.Base.Services
             {
                 i.members = report.members.Where(m => m.entityId == i.id).Select(r => new EntityMember
                     {
-                        id = Util.NewId(),
+                        id = Util.newId(),
                         entityId = i.id,
                         roleId = r.roleId,
                         name = r.name
                     }).ToList();
             });
-            if (!DbHelper.Insert(data)) return result.DataBaseError();
+            if (!DbHelper.insert(data)) return result.dataBaseError();
 
             report.id = data.id;
             report.creator = data.creator;
             report.createTime = data.createTime;
 
-            return result.Created(report);
+            return result.created(report);
         }
 
         /// <summary>
@@ -182,12 +182,12 @@ namespace Insight.Base.Services
         /// <param name="id">报表ID</param>
         /// <param name="report">报表</param>
         /// <returns>Result</returns>
-        public Result<object> EditReport(string id, ReportDefinition report)
+        public Result<object> editReport(string id, ReportDefinition report)
         {
-            if (!Verify("editReport")) return result;
+            if (!verify("editReport")) return result;
 
-            var data = DbHelper.Find<ReportDefinition>(id);
-            if (data == null) return result.NotFound();
+            var data = DbHelper.find<ReportDefinition>(id);
+            if (data == null) return result.notFound();
 
             data.categoryId = report.categoryId;
             data.name = report.name;
@@ -196,9 +196,9 @@ namespace Insight.Base.Services
             data.reportType = report.reportType;
             data.dataSource = report.dataSource;
             data.remark = report.remark;
-            if (Existed(data)) return result.DataAlreadyExists();
+            if (existed(data)) return result.dataAlreadyExists();
 
-            return DbHelper.Update(data) ? result : result.DataBaseError();
+            return DbHelper.update(data) ? result : result.dataBaseError();
         }
 
         /// <summary>
@@ -206,14 +206,14 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="id">报表ID</param>
         /// <returns>Result</returns>
-        public Result<object> DeleteReport(string id)
+        public Result<object> deleteReport(string id)
         {
-            if (!Verify("deleteReport")) return result;
+            if (!verify("deleteReport")) return result;
 
-            var data = DbHelper.Find<ReportDefinition>(id);
-            if (data == null) return result.NotFound();
+            var data = DbHelper.find<ReportDefinition>(id);
+            if (data == null) return result.notFound();
 
-            return DbHelper.Delete(data) ? result : result.DataBaseError();
+            return DbHelper.delete(data) ? result : result.dataBaseError();
         }
 
         /// <summary>
@@ -221,7 +221,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="definition"></param>
         /// <returns>bool 是否存在</returns>
-        public static bool Existed(ReportDefinition definition)
+        public static bool existed(ReportDefinition definition)
         {
             using (var context = new Entities())
             {

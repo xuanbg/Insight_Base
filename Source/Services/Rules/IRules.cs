@@ -13,7 +13,7 @@ namespace Insight.Base.Services
         /// </summary>
         [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        void ResponseOptions();
+        void responseOptions();
 
         /// <summary>
         /// 获取所有报表分期规则
@@ -23,7 +23,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "rules?rows={rows}&page={page}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetRules(int rows, int page);
+        Result<object> getRules(int rows, int page);
 
         /// <summary>
         /// 获取报表分期
@@ -32,7 +32,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "rules/{id}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetRule(string id);
+        Result<object> getRule(string id);
 
         /// <summary>
         /// 新建报表分期
@@ -41,7 +41,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "rules", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> AddRule(ReportRule rule);
+        Result<object> addRule(ReportRule rule);
 
         /// <summary>
         /// 编辑报表分期
@@ -51,7 +51,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "rules/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> EditRule(string id, ReportRule rule);
+        Result<object> editRule(string id, ReportRule rule);
 
         /// <summary>
         /// 删除报表分期
@@ -60,6 +60,6 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "rules/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> DeleteRule(string id);
+        Result<object> deleteRule(string id);
     }
 }

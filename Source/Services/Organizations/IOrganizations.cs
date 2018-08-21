@@ -14,7 +14,7 @@ namespace Insight.Base.Services
         /// </summary>
         [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        void ResponseOptions();
+        void responseOptions();
 
         /// <summary>
         /// 根据对象实体数据新增一个组织机构节点
@@ -23,7 +23,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "orgs", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> AddOrg(Org org);
+        Result<object> addOrg(Org org);
 
         /// <summary>
         /// 根据ID删除组织机构节点
@@ -32,7 +32,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "orgs/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> RemoveOrg(string id);
+        Result<object> removeOrg(string id);
 
         /// <summary>
         /// 根据对象实体数据更新组织机构信息
@@ -42,7 +42,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "orgs/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> UpdateOrg(string id, Org org);
+        Result<object> updateOrg(string id, Org org);
 
         /// <summary>
         /// 根据ID获取机构对象实体
@@ -51,7 +51,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "orgs/{id}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetOrg(string id);
+        Result<object> getOrg(string id);
 
         /// <summary>
         /// 获取组织机构树
@@ -59,7 +59,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "orgs", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetOrgs();
+        Result<object> getOrgs();
 
         /// <summary>
         /// 新增职位成员关系
@@ -69,7 +69,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "orgs/{id}/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> AddOrgMember(string id, List<string> members);
+        Result<object> addOrgMember(string id, List<string> members);
 
         /// <summary>
         /// 根删除职位成员关系
@@ -79,7 +79,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "DELETE", UriTemplate = "orgs/{id}/members", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> RemoveOrgMember(string id, List<string> members);
+        Result<object> removeOrgMember(string id, List<string> members);
 
         /// <summary>
         /// 获取职位成员之外的所有用户
@@ -88,6 +88,6 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "orgs/{id}/other", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetOtherOrgMember(string id);
+        Result<object> getOtherOrgMember(string id);
     }
 }

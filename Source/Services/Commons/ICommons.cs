@@ -14,7 +14,7 @@ namespace Insight.Base.Services
         /// </summary>
         [WebInvoke(Method = "OPTIONS", UriTemplate = "*", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        void ResponseOptions();
+        void responseOptions();
 
         /// <summary>
         /// 获取登录用户的导航信息
@@ -22,7 +22,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "navigations", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetNavigation();
+        Result<object> getNavigation();
 
         /// <summary>
         /// 获取用户启动模块的工具栏操作信息
@@ -31,7 +31,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "navigations/{id}/functions", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetFunctions(string id);
+        Result<object> getFunctions(string id);
 
         /// <summary>
         /// 获取模块有效选项参数
@@ -40,7 +40,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "navigations/{id}/params", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetModuleParam(string id);
+        Result<object> getModuleParam(string id);
 
         /// <summary>
         /// 保存选项数据
@@ -50,7 +50,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "PUT", UriTemplate = "navigations/{id}/params", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> SaveModuleParam(string id, List<Parameter> list);
+        Result<object> saveModuleParam(string id, List<Parameter> list);
 
         /// <summary>
         /// 获取行政区划
@@ -59,7 +59,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "regions?pid={id}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetRegions(string id);
+        Result<object> getRegions(string id);
 
         /// <summary>
         /// 获取应用客户端文件信息集合
@@ -68,7 +68,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "apps/{id}/files", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetFiles(string id);
+        Result<object> getFiles(string id);
 
         /// <summary>
         /// 获取指定名称的文件
@@ -77,7 +77,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "apps/files/{id}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetFile(string id);
+        Result<object> getFile(string id);
 
         /// <summary>
         /// 获取指定ID的电子影像数据
@@ -86,7 +86,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "images/{id}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetImageData(string id);
+        Result<object> getImageData(string id);
 
         /// <summary>
         /// 生成指定业务数据ID的报表
@@ -97,7 +97,7 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebInvoke(Method = "POST", UriTemplate = "images/{id}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> BuildImageData(string id, string templateId, string deptName);
+        Result<object> buildImageData(string id, string templateId, string deptName);
 
         /// <summary>
         /// 获取报表模板
@@ -106,6 +106,6 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         [WebGet(UriTemplate = "templates/{id}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> GetTemplate(string id);
+        Result<object> getTemplate(string id);
     }
 }
