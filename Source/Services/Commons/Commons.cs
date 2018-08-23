@@ -52,17 +52,15 @@ namespace Insight.Base.Services
         /// <summary>
         /// 获取模块有效选项参数
         /// </summary>
-        /// <param name="id">业务模块ID</param>
         /// <returns>Result</returns>
-        public Result<object> getModuleParam(string id)
+        public Result<object> getModuleParam()
         {
             if (!verify()) return result;
 
             using (var context = new Entities())
             {
-                var list = context.moduleParams.Where(i => i.tenantId == tenantId && i.moduleId == id);
-                var param = list.Where(i =>
-                    i.deptId == null || i.userId == null || i.deptId == deptId || i.userId == userId);
+                var list = context.moduleParams.Where(i => i.tenantId == tenantId);
+                var param = list.Where(i => i.deptId == null || i.userId == null || i.deptId == deptId || i.userId == userId);
 
                 return result.success(param.ToList());
             }
@@ -71,10 +69,9 @@ namespace Insight.Base.Services
         /// <summary>
         /// 保存选项数据
         /// </summary>
-        /// <param name="id">业务模块ID</param>
         /// <param name="list">选项数据集合</param>
         /// <returns>Result</returns>
-        public Result<object> saveModuleParam(string id, List<Parameter> list)
+        public Result<object> saveModuleParam(List<Parameter> list)
         {
             if (!verify()) return result;
 
@@ -86,11 +83,10 @@ namespace Insight.Base.Services
                     if (data == null)
                     {
                         param.tenantId = tenantId;
-                        param.moduleId = id;
                         param.creatorId = userId;
                         param.createTime = DateTime.Now;
 
-                        context.Set<Parameter>().Add(param);
+                        context.moduleParams.Add(param);
                     }
                     else
                     {

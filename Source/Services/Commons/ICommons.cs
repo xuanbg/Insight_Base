@@ -37,22 +37,19 @@ namespace Insight.Base.Services
         /// <summary>
         /// 获取模块有效选项参数
         /// </summary>
-        /// <param name="id">业务模块ID</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "navigations/{id}/params", ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "params", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Result<object> getModuleParam(string id);
+        Result<object> getModuleParam();
 
         /// <summary>
         /// 保存选项数据
         /// </summary>
-        /// <param name="id">业务模块ID</param>
         /// <param name="list">选项数据集合</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "navigations/{id}/params", ResponseFormat = WebMessageFormat.Json,
-            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "params", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
-        Result<object> saveModuleParam(string id, List<Parameter> list);
+        Result<object> saveModuleParam(List<Parameter> list);
 
         /// <summary>
         /// 获取行政区划
