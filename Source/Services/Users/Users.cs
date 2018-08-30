@@ -249,8 +249,7 @@ namespace Insight.Base.Services
         /// <param name="code">短信验证码</param>
         /// <param name="mobile">手机号，默认为空。如为空，则使用account</param>
         /// <returns>Result</returns>
-        public Result<object> resetSignature(string aid, string account, string password, string code,
-            string mobile = null)
+        public Result<object> resetSignature(string aid, string account, string password, string code, string mobile)
         {
             if (string.IsNullOrEmpty(aid) || string.IsNullOrEmpty(password)) return result.invalidValue();
 
