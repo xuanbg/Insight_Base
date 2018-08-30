@@ -27,11 +27,11 @@ namespace Insight.Base.OAuth
             manage = verify.manage;
             if (manage == null) return false;
 
-            tenantId = manage.tenantId;
-            appId = manage.appId;
+            tenantId = manage.getTenantId();
+            appId = manage.getAppId();
             userId = manage.userId;
             userName = manage.userName;
-            deptId = manage.deptId;
+            deptId = manage.getDeptId();
             result = verify.compare(userId == id ? null : key);
 
             return result.successful;

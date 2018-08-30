@@ -111,10 +111,12 @@ namespace Insight.Base.Services
             if (!verify()) return result;
 
             var data = Core.getUserById(userId);
+            if (data == null) return result.notFound();
+
             data.password = null;
             data.payPassword = null;
 
-            return data == null ? result.notFound() : result.success(data);
+            return result.success(data);
         }
 
         /// <summary>

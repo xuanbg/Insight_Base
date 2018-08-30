@@ -44,28 +44,29 @@ namespace Insight.Base.OAuth
         {
             this.tokenType = tokenType;
 
-            var requst = WebOperationContext.Current.IncomingRequest;
+            var requst = WebOperationContext.Current?.IncomingRequest;
+            if (requst == null) return;
+
             ip = getIp(requst.Headers);
             userAgent = requst.UserAgent;
 
             var auth = requst.Headers[HttpRequestHeader.Authorization];
             var accessToken = Util.base64ToAccessToken(auth);
-            switch (accessToken)
+            if (accessToken != null)
             {
-                case null when checkAuth:
-                    var msg = $"提取验证信息失败。Token is:{auth ?? "null"}";
-                    new Thread(() => Logger.write("500101", msg)).Start();
-                    return;
+                tokenId = accessToken.id;
+                secret = accessToken.secret;
+                hash = Util.hash(auth);
+                manage = Core.getUserCache(accessToken.userId);
+                manage?.getToken(tokenId);
 
-                case null:
-                    return;
+                return;
             }
 
-            tokenId = accessToken.id;
-            secret = accessToken.secret;
-            hash = Util.hash(auth);
-            manage = Core.getUserCache(accessToken.userId);
-            manage?.getToken(tokenId);
+            if (!checkAuth) return;
+
+            var msg = $"提取验证信息失败。Token is:{auth ?? "null"}";
+            new Thread(() => Logger.write("500101", msg)).Start();
         }
 
         /// <summary>
@@ -94,8 +95,8 @@ namespace Insight.Base.OAuth
                 var info = new UserInfo
                 {
                     id = manage.userId,
-                    tenantId = manage.tenantId,
-                    deptId = manage.deptId,
+                    tenantId = manage.getTenantId(),
+                    deptId = manage.getDeptId(),
                     name = manage.userName,
                     account = manage.account,
                     mobile = manage.mobile,

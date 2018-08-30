@@ -4,7 +4,6 @@ using Insight.Base.Common.Entity;
 using Insight.Utils.Common;
 using Insight.Utils.Entity;
 using Insight.Utils.Redis;
-using Newtonsoft.Json;
 
 namespace Insight.Base.OAuth
 {
@@ -18,30 +17,6 @@ namespace Insight.Base.OAuth
 
         // 当前令牌对应的关键数据集
         private Token token;
-
-        /// <summary>
-        /// 令牌生命周期(秒)
-        /// </summary>
-        [JsonIgnore]
-        public int life => token?.life ?? 7200;
-
-        /// <summary>
-        /// 租户ID
-        /// </summary>
-        [JsonIgnore]
-        public string tenantId => token?.tenantId;
-
-        /// <summary>
-        /// 应用ID
-        /// </summary>
-        [JsonIgnore]
-        public string appId => token?.appId;
-
-        /// <summary>
-        /// 登录部门ID
-        /// </summary>
-        [JsonIgnore]
-        public string deptId => token?.deptId;
 
         /// <summary>
         /// 用户ID
@@ -141,16 +116,17 @@ namespace Insight.Base.OAuth
         /// <param name="code">Code</param>
         /// <param name="aid">应用ID</param>
         /// <param name="tid">租户ID</param>
-        /// <returns>令牌数据包</returns>
-        public TokenPackage creator(string code, string aid, string tid = null)
+        /// <param name="did">登录部门ID</param>
+        /// <returns>TokenPackage 令牌数据包</returns>
+        public TokenPackage creator(string code, string aid, string tid = null, string did = null)
         {
             if (string.IsNullOrEmpty(aid)) aid = "Default APP";
 
-            var funs = Core.getPermitFuncs(tid, userId, deptId, false, aid)
+            var funs = Core.getPermitFuncs(tid, userId, did, false, aid)
                 .Where(i => i.permit > 0)
                 .Select(i => i.key)
                 .ToList();
-            token = new Token(tid, aid) {permitFuncs = funs};
+            token = new Token(tid, aid) {permitFuncs = funs, deptId = did, deptCode = getDeptCode(tid, did)};
 
             var package = initPackage(code);
             RedisHelper.stringSet($"Token:{code}", token, token.failureTime);
@@ -163,7 +139,7 @@ namespace Insight.Base.OAuth
         /// 刷新Secret过期时间
         /// </summary>
         /// <param name="tokenId">令牌ID</param>
-        /// <returns>令牌数据包</returns>
+        /// <returns>TokenPackage 令牌数据包</returns>
         public TokenPackage refresh(string tokenId)
         {
             token.refresh();
@@ -188,7 +164,7 @@ namespace Insight.Base.OAuth
         /// Token是否合法
         /// </summary>
         /// <param name="code">Code</param>
-        /// <returns>令牌数据包</returns>
+        /// <returns>TokenPackage 令牌数据包</returns>
         private TokenPackage initPackage(string code)
         {
             var accessToken = new AccessToken {id = code, userId = userId, secret = token.secretKey};
@@ -211,7 +187,7 @@ namespace Insight.Base.OAuth
         /// </summary>
         /// <param name="key">密钥</param>
         /// <param name="tokenType">令牌类型</param>
-        /// <returns>Token是否合法</returns>
+        /// <returns>bool Token是否合法</returns>
         public bool verify(string key, TokenType tokenType)
         {
             return token != null && token.verifyKey(key, tokenType);
@@ -234,7 +210,7 @@ namespace Insight.Base.OAuth
         /// <returns>bool 是否通过验证</returns>
         public bool verifyKey(string key)
         {
-            var permits = Core.getPermitFuncs(tenantId, userId, deptId).Where(i => i.permit > 0);
+            var permits = Core.getPermitFuncs(token.tenantId, userId, token.deptId).Where(i => i.permit > 0);
             using (var context = new Entities())
             {
                 var list = from f in context.functions.ToList()
@@ -261,7 +237,7 @@ namespace Insight.Base.OAuth
         /// 验证支付密码
         /// </summary>
         /// <param name="key">支付密码</param>
-        /// <returns>支付密码是否通过验证</returns>
+        /// <returns>bool 支付密码是否通过验证</returns>
         public bool? verifyPayPassword(string key)
         {
             if (payPassword == null) return null;
@@ -273,16 +249,16 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// Token是否过期
         /// </summary>
-        /// <returns>Token是否过期</returns>
+        /// <returns>bool Token是否过期</returns>
         public bool tenantIsExpiry()
         {
-            return token == null || tenantId != null && DateTime.Now > token.expireDate;
+            return token == null || token.tenantId != null && DateTime.Now > token.expireDate;
         }
 
         /// <summary>
         /// Token是否过期
         /// </summary>
-        /// <returns>Token是否过期</returns>
+        /// <returns>bool Token是否过期</returns>
         public bool isExpiry()
         {
             return token == null || token.isExpiry();
@@ -294,12 +270,12 @@ namespace Insight.Base.OAuth
         /// <param name="tokenId">令牌ID</param>
         /// <param name="hash">令牌哈希值</param>
         /// <param name="type">令牌类型</param>
-        /// <returns>Token是否失效</returns>
+        /// <returns>bool Token是否失效</returns>
         public bool isFailure(string tokenId, string hash, TokenType type)
         {
             if (token == null || token.hash != hash && type == TokenType.ACCESS_TOKEN) return true;
 
-            var code = RedisHelper.hashGet($"Apps:{userId}", appId);
+            var code = RedisHelper.hashGet($"Apps:{userId}", token.appId);
 
             return token.signInOne && code != tokenId || token.isFailure();
         }
@@ -307,7 +283,7 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 用户是否失效状态
         /// </summary>
-        /// <returns>用户是否失效状态</returns>
+        /// <returns>bool 用户是否失效状态</returns>
         public bool userIsLocked()
         {
             var now = DateTime.Now;
@@ -324,7 +300,7 @@ namespace Insight.Base.OAuth
         /// <summary>
         /// 是否已修改
         /// </summary>
-        /// <returns></returns>
+        /// <returns>bool 是否已修改</returns>
         public bool isChanged()
         {
             return changed;
@@ -336,6 +312,58 @@ namespace Insight.Base.OAuth
         public void setChanged()
         {
             changed = true;
+        }
+
+        /// <summary>
+        /// 获取令牌生命周期(秒)
+        /// </summary>
+        /// <returns>int 令牌生命周期(</returns>
+        public int getLife()
+        {
+            return token?.life ?? 7200;
+        }
+
+        /// <summary>
+        /// 获取租户ID
+        /// </summary>
+        /// <returns>string 租户ID</returns>
+        public string getTenantId()
+        {
+            return token?.tenantId;
+        }
+
+        /// <summary>
+        /// 获取AppID
+        /// </summary>
+        /// <returns>string AppID</returns>
+        public string getAppId()
+        {
+            return token?.appId ?? "Default APP";
+        }
+
+        /// <summary>
+        /// 获取用户当前登录部门ID
+        /// </summary>
+        /// <returns>string 用户当前登录部门ID</returns>
+        public string getDeptId()
+        {
+            return token?.deptId;
+        }
+
+        /// <summary>
+        /// 获取指定ID的部门编码
+        /// </summary>
+        /// <param name="tid">租户ID</param>
+        /// <param name="did">部门ID</param>
+        /// <returns>部门编码</returns>
+        private string getDeptCode(string tid, string did)
+        {
+            if (string.IsNullOrEmpty(did)) return null;
+
+            using (var context = new Entities())
+            {
+                return context.orgs.SingleOrDefault(i => !i.isInvalid && i.tenantId == tid && i.id == did)?.code;
+            }
         }
     }
 }

@@ -28,7 +28,7 @@ namespace Insight.Base.Common.Entity
         public string tenantId { get; set; }
 
         /// <summary>
-        /// 序号
+        /// 节点类型
         /// </summary>
         [Column("node_type")]
         public int nodeType { get; set; }

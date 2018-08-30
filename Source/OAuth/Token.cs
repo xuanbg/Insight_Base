@@ -30,6 +30,11 @@ namespace Insight.Base.OAuth
         public string deptId { get; set; }
 
         /// <summary>
+        /// 登录部门编码
+        /// </summary>
+        public string deptCode { get; set; }
+
+        /// <summary>
         /// 应用ID
         /// </summary>
         public string appId { get; set; }

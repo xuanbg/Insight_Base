@@ -58,9 +58,9 @@ namespace Insight.Base.Services
         /// <param name="aid">应用ID</param>
         /// <param name="account">登录账号</param>
         /// <param name="signature">用户签名</param>
-        /// <param name="deptid">登录部门ID（可为空）</param>
+        /// <param name="did">登录部门ID（可为空）</param>
         /// <returns>Result</returns>
-        public Result<object> getToken(string tid, string aid, string account, string signature, string deptid)
+        public Result<object> getToken(string tid, string aid, string account, string signature, string did)
         {
             // 限流,每客户端每天可访问100次
             var key = Util.hash("GetToken" + getFingerprint());
@@ -80,7 +80,7 @@ namespace Insight.Base.Services
                     new Thread(() => Logger.write("400101", msg)).Start();
                 }
 
-                return manage.userIsLocked() ? result.locked() : result.invalidAuth();
+                return result.invalidAuth();
             }
 
             userId = RedisHelper.stringGet(code);
@@ -104,7 +104,7 @@ namespace Insight.Base.Services
             }
 
             // 创建令牌数据并返回
-            var tokens = manage.creator(code, aid, tid);
+            var tokens = manage.creator(code, aid, tid, did);
             Core.setUserCache(manage);
 
             return result.success(tokens);
@@ -135,7 +135,7 @@ namespace Insight.Base.Services
 
             // 限流,令牌在其有效期内可刷新60次
             var key = Util.hash("RefreshToken" + tokenId);
-            var limited = Params.callManage.isLimited(key, manage.life * 12, 60);
+            var limited = Params.callManage.isLimited(key, manage.getLife() * 12, 60);
             if (limited) return result.badRequest("刷新次数已用完,请合理刷新");
 
             result = verify.compare();
