@@ -25,6 +25,11 @@ namespace Insight.Base.OAuth
         public string tenantId { get; set; }
 
         /// <summary>
+        /// 租户名称
+        /// </summary>
+        public string tenantName { get; set; }
+
+        /// <summary>
         /// 登录部门ID
         /// </summary>
         public string deptId { get; set; }
@@ -33,6 +38,11 @@ namespace Insight.Base.OAuth
         /// 登录部门编码
         /// </summary>
         public string deptCode { get; set; }
+
+        /// <summary>
+        /// 登录部门名称
+        /// </summary>
+        public string deptName { get; set; }
 
         /// <summary>
         /// 应用ID

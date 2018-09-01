@@ -89,7 +89,10 @@ namespace Insight.Base.OAuth
 
             if (!manage.verify(secret, tokenType)) return result.invalidAuth();
 
-            if (tokenType == TokenType.REFRESH_TOKEN) result.success();
+            if (tokenType == TokenType.REFRESH_TOKEN)
+            {
+                result.success();
+            }
             else
             {
                 var info = new UserInfo

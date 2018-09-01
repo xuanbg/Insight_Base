@@ -197,6 +197,7 @@ namespace Insight.Base.Services
                 nodeType = 1,
                 index = 0,
                 name = tenant.name,
+                fullname = tenant.name,
                 creatorId = userId,
                 createTime = DateTime.Now
             };

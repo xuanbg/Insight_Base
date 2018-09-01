@@ -154,7 +154,10 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> removeToken()
         {
-            if (!verify()) return result;
+            var verify = new Verify();
+            manage = verify.manage;
+            tokenId = verify.tokenId;
+            if (manage == null) return result.invalidToken();
 
             TokenManage.delete(tokenId);
             Core.setUserCache(manage);

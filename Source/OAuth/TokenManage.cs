@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Insight.Base.Common.Entity;
 using Insight.Utils.Common;
@@ -126,7 +127,16 @@ namespace Insight.Base.OAuth
                 .Where(i => i.permit > 0)
                 .Select(i => i.key)
                 .ToList();
-            token = new Token(tid, aid) {permitFuncs = funs, deptId = did, deptCode = getDeptCode(tid, did)};
+            var info = getDeptInfo(tid, did);
+            var dept = info.SingleOrDefault(i => i.nodeType == 2);
+            token = new Token(tid, aid)
+            {
+                tenantName = info.SingleOrDefault(i => i.nodeType == 1)?.fullname,
+                permitFuncs = funs,
+                deptId = did,
+                deptCode = dept?.code,
+                deptName = dept?.fullname,
+            };
 
             var package = initPackage(code);
             RedisHelper.stringSet($"Token:{code}", token, token.failureTime);
@@ -273,11 +283,16 @@ namespace Insight.Base.OAuth
         /// <returns>bool Token是否失效</returns>
         public bool isFailure(string tokenId, string hash, TokenType type)
         {
-            if (token == null || token.hash != hash && type == TokenType.ACCESS_TOKEN) return true;
+            if (token == null) return true;
+
+            var checkHash = token.hash == hash || type == TokenType.REFRESH_TOKEN;
+            if (!checkHash || token.isFailure()) return true;
+
+            if (!token.signInOne) return false;
 
             var code = RedisHelper.hashGet($"Apps:{userId}", token.appId);
 
-            return token.signInOne && code != tokenId || token.isFailure();
+            return code != tokenId;
         }
 
         /// <summary>
@@ -356,13 +371,13 @@ namespace Insight.Base.OAuth
         /// <param name="tid">租户ID</param>
         /// <param name="did">部门ID</param>
         /// <returns>部门编码</returns>
-        private string getDeptCode(string tid, string did)
+        private List<Org> getDeptInfo(string tid, string did)
         {
             if (string.IsNullOrEmpty(did)) return null;
 
             using (var context = new Entities())
             {
-                return context.orgs.SingleOrDefault(i => !i.isInvalid && i.tenantId == tid && i.id == did)?.code;
+                return context.orgs.Where(i => !i.isInvalid && i.tenantId == tid && (i.id == did || i.id == tid)).ToList();
             }
         }
     }
