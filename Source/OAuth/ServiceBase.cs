@@ -8,11 +8,15 @@ namespace Insight.Base.OAuth
         protected Result<object> result = new Result<object>();
         protected TokenManage manage;
         protected string tokenId;
-        protected string tenantId;
         protected string appId;
+        protected string tenantId;
+        protected string tenantCode;
+        protected string tenantName;
+        protected string deptId;
+        protected string deptCode;
+        protected string deptName;
         protected string userId;
         protected string userName;
-        protected string deptId;
 
         /// <summary>
         /// 会话合法性验证
@@ -27,11 +31,15 @@ namespace Insight.Base.OAuth
             manage = verify.manage;
             if (manage == null) return false;
 
-            tenantId = manage.getTenantId();
             appId = manage.getAppId();
+            tenantId = manage.getTenantId();
+            tenantCode = manage.getTenantCode();
+            tenantName = manage.getTenantName();
+            deptId = manage.getDeptId();
+            deptCode = manage.getDeptCode();
+            deptName = manage.getDeptName();
             userId = manage.userId;
             userName = manage.userName;
-            deptId = manage.getDeptId();
             result = verify.compare(userId == id ? null : key);
 
             return result.successful;

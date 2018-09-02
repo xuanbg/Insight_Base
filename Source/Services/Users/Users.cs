@@ -113,10 +113,15 @@ namespace Insight.Base.Services
             var data = Core.getUserById(userId);
             if (data == null) return result.notFound();
 
-            data.password = null;
-            data.payPassword = null;
+            var info = Util.convertTo<UserInfo>(data);
+            info.tenantId = tenantId;
+            info.tenantCode = tenantCode;
+            info.tenantName = tenantName;
+            info.deptId = deptId;
+            info.deptCode = deptCode;
+            info.deptName = deptName;
 
-            return result.success(data);
+            return result.success(info);
         }
 
         /// <summary>

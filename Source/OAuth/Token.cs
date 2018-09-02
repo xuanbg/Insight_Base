@@ -25,6 +25,11 @@ namespace Insight.Base.OAuth
         public string tenantId { get; set; }
 
         /// <summary>
+        /// 租户编码
+        /// </summary>
+        public string tenantCode { get; set; }
+
+        /// <summary>
         /// 租户名称
         /// </summary>
         public string tenantName { get; set; }

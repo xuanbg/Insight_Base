@@ -128,14 +128,16 @@ namespace Insight.Base.OAuth
                 .Select(i => i.key)
                 .ToList();
             var info = getDeptInfo(tid, did);
+            var tenant = info.SingleOrDefault(i => i.nodeType == 1);
             var dept = info.SingleOrDefault(i => i.nodeType == 2);
             token = new Token(tid, aid)
             {
-                tenantName = info.SingleOrDefault(i => i.nodeType == 1)?.fullname,
-                permitFuncs = funs,
+                tenantCode = tenant?.code,
+                tenantName = tenant?.fullname,
                 deptId = did,
                 deptCode = dept?.code,
                 deptName = dept?.fullname,
+                permitFuncs = funs,
             };
 
             var package = initPackage(code);
@@ -339,15 +341,6 @@ namespace Insight.Base.OAuth
         }
 
         /// <summary>
-        /// 获取租户ID
-        /// </summary>
-        /// <returns>string 租户ID</returns>
-        public string getTenantId()
-        {
-            return token?.tenantId;
-        }
-
-        /// <summary>
         /// 获取AppID
         /// </summary>
         /// <returns>string AppID</returns>
@@ -357,24 +350,67 @@ namespace Insight.Base.OAuth
         }
 
         /// <summary>
+        /// 获取租户ID
+        /// </summary>
+        /// <returns>string 租户ID</returns>
+        public string getTenantId()
+        {
+            return token?.tenantId;
+        }
+
+        /// <summary>
+        /// 获取租户编码
+        /// </summary>
+        /// <returns>string 租户编码</returns>
+        public string getTenantCode()
+        {
+            return token?.tenantCode;
+        }
+
+        /// <summary>
+        /// 获取租户名称
+        /// </summary>
+        /// <returns>string 租户名称</returns>
+        public string getTenantName()
+        {
+            return token?.tenantName;
+        }
+
+        /// <summary>
         /// 获取用户当前登录部门ID
         /// </summary>
-        /// <returns>string 用户当前登录部门ID</returns>
+        /// <returns>string 部门ID</returns>
         public string getDeptId()
         {
             return token?.deptId;
         }
 
         /// <summary>
-        /// 获取指定ID的部门编码
+        /// 获取用户当前登录部门编码
+        /// </summary>
+        /// <returns>string 部门编码</returns>
+        public string getDeptCode()
+        {
+            return token?.deptCode;
+        }
+
+        /// <summary>
+        /// 获取用户当前登录部门名称
+        /// </summary>
+        /// <returns>string 部门名称</returns>
+        public string getDeptName()
+        {
+            return token?.deptName;
+        }
+
+        /// <summary>
+        /// 获取指定ID的部门信息
         /// </summary>
         /// <param name="tid">租户ID</param>
         /// <param name="did">部门ID</param>
-        /// <returns>部门编码</returns>
+        /// <returns>相关组织机构对象集合</returns>
         private List<Org> getDeptInfo(string tid, string did)
         {
-            if (string.IsNullOrEmpty(did)) return null;
-
             using (var context = new Entities())
             {
                 return context.orgs.Where(i => !i.isInvalid && i.tenantId == tid && (i.id == did || i.id == tid)).ToList();

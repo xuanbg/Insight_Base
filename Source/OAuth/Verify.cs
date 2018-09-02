@@ -98,12 +98,17 @@ namespace Insight.Base.OAuth
                 var info = new UserInfo
                 {
                     id = manage.userId,
-                    tenantId = manage.getTenantId(),
-                    deptId = manage.getDeptId(),
                     name = manage.userName,
                     account = manage.account,
                     mobile = manage.mobile,
-                    email = manage.email
+                    email = manage.email,
+                    appId = manage.getAppId(),
+                    tenantId = manage.getTenantId(),
+                    tenantCode = manage.getTenantCode(),
+                    tenantName = manage.getTenantName(),
+                    deptId = manage.getDeptId(),
+                    deptCode = manage.getDeptCode(),
+                    deptName = manage.getDeptName()
                 };
                 result.success(info);
             }
