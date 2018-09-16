@@ -75,7 +75,7 @@ namespace Insight.Base.OAuth
         public static string generateCode(TokenManage token, string account, int type)
         {
             string key;
-            var life = 60;
+            var life = 5;
             switch (type)
             {
                 case 0:

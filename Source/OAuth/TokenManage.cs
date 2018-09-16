@@ -140,9 +140,13 @@ namespace Insight.Base.OAuth
                 permitFuncs = funs,
             };
 
+            var key = "Apps:" + userId;
+            var value = RedisHelper.hashGet(key, "Codes");
+            var codes = string.IsNullOrEmpty(value) ? "" : value + ",";
             var package = initPackage(code);
             RedisHelper.stringSet($"Token:{code}", token, token.failureTime);
-            RedisHelper.hashSet($"Apps:{userId}", aid, code);
+            RedisHelper.hashSet(key, aid, code);
+            RedisHelper.hashSet(key, "Codes", codes + code);
 
             return package;
         }
@@ -170,6 +174,21 @@ namespace Insight.Base.OAuth
             if (!RedisHelper.hasKey($"Token:{tokenId}")) return;
 
             RedisHelper.delete($"Token:{tokenId}");
+        }
+
+        /// <summary>
+        /// 清除用户Token
+        /// </summary>
+        public void clear()
+        {
+            var key = "Apps:" + userId;
+            var codes = RedisHelper.hashGet(key, "Codes").Split(',');
+            foreach (var code in codes)
+            {
+                delete(code);
+            }
+
+            RedisHelper.hashSet(key, "Codes", null);
         }
 
         /// <summary>

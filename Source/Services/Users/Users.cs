@@ -278,6 +278,8 @@ namespace Insight.Base.Services
 
             manage.password = password;
             manage.setChanged();
+            manage.clear();
+
             var tokens = manage.creator(Util.newId("N"), aid);
             Core.setUserCache(manage);
 
