@@ -124,7 +124,7 @@ namespace Insight.Base.OAuth
             var code = Params.random.Next(0, (int) max).ToString("D" + length);
             var msg = $"为手机号 {mobile} 生成了类型为 {type} 的验证码 {code}, 有效时间 {life} 分钟.";
             new Thread(() => Logger.write("600501", msg)).Start();
-            var key = Util.hash(type + mobile + code);
+            var key = "SMSCode:" + Util.hash(type + mobile + code);
             if (type == 4) return code;
 
             RedisHelper.stringSet(key, code, TimeSpan.FromMinutes(life));
@@ -150,7 +150,7 @@ namespace Insight.Base.OAuth
         /// <returns>是否通过验证</returns>
         public static bool verifySmsCode(int type, string mobile, string code, bool isCheck = false)
         {
-            var key = Util.hash(type + mobile + code);
+            var key = "SMSCode:" + Util.hash(type + mobile + code);
             var isExisted = RedisHelper.hasKey(key);
             if (!isExisted || isCheck) return isExisted;
 
