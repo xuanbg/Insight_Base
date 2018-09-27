@@ -27,42 +27,52 @@ namespace Insight.Base.OAuth
             if (!string.IsNullOrEmpty(userId)) return userId;
 
             mutex.WaitOne();
-            userId = RedisHelper.stringGet(account);
-            if (!string.IsNullOrEmpty(userId))
+            try
             {
+                userId = RedisHelper.stringGet(account);
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    mutex.ReleaseMutex();
+                    return userId;
+                }
+
+                var user = getUser(account);
+                if (user == null)
+                {
+                    mutex.ReleaseMutex();
+                    return null;
+                }
+
+                // 缓存用户ID到Redis
+                userId = user.id;
+                key = "ID:" + user.account;
+                RedisHelper.stringSet(key, userId);
+
+                if (!string.IsNullOrEmpty(user.mobile))
+                {
+                    key = "ID:" + user.mobile;
+                    RedisHelper.stringSet(key, userId);
+                }
+
+                if (!string.IsNullOrEmpty(user.email))
+                {
+                    key = "ID:" + user.email;
+                    RedisHelper.stringSet(key, userId);
+                }
+
+                var token = new TokenManage(user);
+                setUserCache(token);
                 mutex.ReleaseMutex();
+
                 return userId;
             }
-
-            var user = getUser(account);
-            if (user == null)
+            catch(Exception ex)
             {
+                new Thread(() => Logger.write("200100", ex.StackTrace, "Core", "getUserId")).Start();
                 mutex.ReleaseMutex();
+
                 return null;
             }
-
-            // 缓存用户ID到Redis
-            userId = user.id;
-            key = "ID:" + user.account;
-            RedisHelper.stringSet(key, userId);
-
-            if (!string.IsNullOrEmpty(user.mobile))
-            {
-                key = "ID:" + user.mobile;
-                RedisHelper.stringSet(key, userId);
-            }
-
-            if (!string.IsNullOrEmpty(user.email))
-            {
-                key = "ID:" + user.email;
-                RedisHelper.stringSet(key, userId);
-            }
-
-            var token = new TokenManage(user);
-            setUserCache(token);
-            mutex.ReleaseMutex();
-
-            return userId;
         }
 
         /// <summary>
