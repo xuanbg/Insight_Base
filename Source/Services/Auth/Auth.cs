@@ -32,7 +32,7 @@ namespace Insight.Base.Services
         {
             // 限流,每客户端每天可访问100次
             var key = Util.hash("GetCode" + getFingerprint());
-            var limited = Params.callManage.isLimited(key, 3600 * 24, 100);
+            var limited = Params.callManage.isLimited(key, 3600 * 24, Params.tokenLimit);
             if (limited) return result.badRequest("当天获取Code次数已用完,请合理使用接口");
 
             userId = Core.getUserId(account);
@@ -64,7 +64,7 @@ namespace Insight.Base.Services
         {
             // 限流,每客户端每天可访问100次
             var key = Util.hash("GetToken" + getFingerprint());
-            var limited = Params.callManage.isLimited(key, 3600 * 24, 100);
+            var limited = Params.callManage.isLimited(key, 3600 * 24, Params.tokenLimit);
             if (limited) return result.badRequest("当天获取Token次数已用完,请合理使用接口");
 
             var code = Core.getCode(signature);

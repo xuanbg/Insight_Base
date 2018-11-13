@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Insight.Base.Common.Entity;
+using Insight.Utils.Common;
 using Insight.Utils.Entity;
 using Insight.Utils.Redis;
 
@@ -10,11 +11,16 @@ namespace Insight.Base.Common
 {
     public static class Params
     {
-        public static Dictionary<string, ClientFile> fileList = new Dictionary<string, ClientFile>();
         private static List<LogRule> ruleList;
+
+        // 客户端文件信息集合
+        public static readonly Dictionary<string, ClientFile> fileList = new Dictionary<string, ClientFile>();
 
         // 日志进程同步基元
         public static readonly Mutex mutex = new Mutex();
+
+        // 每日每用户Token配额
+        public static readonly int tokenLimit = Convert.ToInt32(Util.getAppSetting("TokenLimit"));
 
         // 访问管理器
         public static CallManage callManage { get; } = new CallManage();
