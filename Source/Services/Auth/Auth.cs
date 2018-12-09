@@ -258,9 +258,8 @@ namespace Insight.Base.Services
         /// <returns>Result</returns>
         public Result<object> verifyCode(SmsCode code)
         {
-            var fingerprint = getFingerprint();
-            var limitKey = Util.hash("VerifyCode" + fingerprint + Util.serialize(code));
-            var surplus = Params.callManage.getSurplus(limitKey, 600);
+            var limitKey = Util.hash("VerifyCode" + code.type + code.mobile);
+            var surplus = Params.callManage.getSurplus(limitKey, 10);
             if (surplus > 0) return result.tooFrequent(surplus);
 
             var verify = Core.verifySmsCode(code.type, code.mobile, code.code, !code.remove);
