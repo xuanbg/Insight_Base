@@ -37,10 +37,7 @@ namespace Insight.Base.Services
         /// <param name="signature">用户签名</param>
         /// <param name="deptId">登录部门ID（可为空）</param>
         /// <returns>Result</returns>
-        [WebGet(
-            UriTemplate =
-                "tokens?tenantid={tenantId}&appid={appId}&account={account}&signature={signature}&deptid={deptId}",
-            ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "tokens?tenantid={tenantId}&appid={appId}&account={account}&signature={signature}&deptid={deptId}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         Result<object> getToken(string tenantId, string appId, string account, string signature, string deptId);
 
@@ -57,8 +54,7 @@ namespace Insight.Base.Services
         /// 刷新AccessToken，延长过期时间
         /// </summary>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "PUT", UriTemplate = "tokens", ResponseFormat = WebMessageFormat.Json,
-            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "PUT", UriTemplate = "tokens", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> refreshToken();
 
@@ -66,8 +62,7 @@ namespace Insight.Base.Services
         /// 移除指定账户的AccessToken
         /// </summary>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "DELETE", UriTemplate = "tokens", ResponseFormat = WebMessageFormat.Json,
-            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "DELETE", UriTemplate = "tokens", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> removeToken();
 
@@ -86,8 +81,7 @@ namespace Insight.Base.Services
         /// <param name="code">短信验证码</param>
         /// <param name="password">支付密码</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "POST", UriTemplate = "paypws", ResponseFormat = WebMessageFormat.Json,
-            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "POST", UriTemplate = "paypws", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> setPayPw(string code, string password);
 
@@ -112,8 +106,7 @@ namespace Insight.Base.Services
         /// <param name="life">过期时间（分钟）</param>
         /// <param name="length">字符长度</param>
         /// <returns>Result</returns>
-        [WebGet(UriTemplate = "smscodes?mobile={mobile}&type={type}&life={life}&length={length}",
-            ResponseFormat = WebMessageFormat.Json)]
+        [WebGet(UriTemplate = "smscodes?mobile={mobile}&type={type}&life={life}&length={length}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         Result<object> newCode(string mobile, int type, int life, int length);
 
@@ -122,8 +115,7 @@ namespace Insight.Base.Services
         /// </summary>
         /// <param name="code">验证码对象</param>
         /// <returns>Result</returns>
-        [WebInvoke(Method = "DELETE", UriTemplate = "smscodes", ResponseFormat = WebMessageFormat.Json,
-            BodyStyle = WebMessageBodyStyle.WrappedRequest)]
+        [WebInvoke(Method = "DELETE", UriTemplate = "smscodes", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.WrappedRequest)]
         [OperationContract]
         Result<object> verifyCode(SmsCode code);
 

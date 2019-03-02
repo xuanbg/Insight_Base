@@ -145,8 +145,12 @@ namespace Insight.Base.OAuth
             var codes = string.IsNullOrEmpty(value) ? "" : value + ",";
             var package = initPackage(code);
             RedisHelper.stringSet($"Token:{code}", token, token.failureTime);
-            RedisHelper.hashSet(key, aid, code);
-            RedisHelper.hashSet(key, "Codes", codes + code);
+
+            if (!isBuiltIn)
+            {
+                RedisHelper.hashSet(key, aid, code);
+                RedisHelper.hashSet(key, "Codes", codes + code);
+            }
 
             return package;
         }
@@ -192,7 +196,7 @@ namespace Insight.Base.OAuth
         }
 
         /// <summary>
-        /// Token是否合法
+        /// 生成用户令牌数据包
         /// </summary>
         /// <param name="code">Code</param>
         /// <returns>TokenPackage 令牌数据包</returns>
@@ -278,7 +282,7 @@ namespace Insight.Base.OAuth
         }
 
         /// <summary>
-        /// Token是否过期
+        /// 租户是否过期
         /// </summary>
         /// <returns>bool Token是否过期</returns>
         public bool tenantIsExpiry()
