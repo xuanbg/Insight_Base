@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.ServiceModel;
 using Insight.Base.Common;
+using Insight.Base.Common.DTO;
 using Insight.Base.Common.Entity;
 using Insight.Base.OAuth;
 using Insight.Utils.Common;
@@ -84,7 +86,12 @@ namespace Insight.Base.Services
             if (!verify("getGroups")) return result;
 
             var data = getData(id);
-            return data == null ? result.notFound() : result.success(data);
+            if (data == null) return result.notFound();
+
+            var group = Util.convertTo<GroupInfo>(data);
+            group.members = getMember(id);
+
+            return result.success(group);
         }
 
         /// <summary>
@@ -103,9 +110,7 @@ namespace Insight.Base.Services
             using (var context = new Entities())
             {
                 var skip = rows * (page - 1);
-                var list = context.groups.Where(i =>
-                    i.tenantId == tenantId &&
-                    (string.IsNullOrEmpty(key) || i.name.Contains(key) || i.remark.Contains(key)));
+                var list = context.groups.Where(i => i.tenantId == tenantId && (string.IsNullOrEmpty(key) || i.name.Contains(key) || i.remark.Contains(key)));
                 var data = list.OrderBy(i => i.createTime).Skip(skip).Take(rows).ToList();
 
                 return result.success(data, list.Count());
@@ -113,42 +118,80 @@ namespace Insight.Base.Services
         }
 
         /// <summary>
+        /// 获取用户组成员
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Result</returns>
+        public Result<object> getMembers(string id)
+        {
+            if (!verify("getGroups")) return result;
+
+            var data = getData(id);
+            if (data == null) return result.notFound();
+
+            var members = getMember(id);
+            return result.success(members);
+        }
+
+        /// <summary>
         /// 根据参数组集合批量插入用户组成员关系
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="group">UserGroup</param>
+        /// <param name="members"></param>
         /// <returns>Result</returns>
-        public Result<object> addGroupMember(string id, Group @group)
+        public Result<object> addGroupMember(string id, List<string> members)
         {
             if (!verify("addGroupMember")) return result;
 
-            var data = getData(group.id);
+            var data = getData(id);
             if (data == null) return result.notFound();
 
-            group.members.ForEach(i =>
+            var list = new List<GroupMember>();
+            members.ForEach(i =>
             {
-                i.groupId = group.id;
-                i.creatorId = userId;
-                i.createTime = DateTime.Now;
+                var member = new GroupMember
+                {
+                    id = Util.newId(),
+                    groupId = id,
+                    userId = i,
+                    creatorId = userId,
+                    createTime = DateTime.Now
+                };
+                list.Add(member);
             });
+            if (!DbHelper.insert(list)) return result.dataBaseError();
 
-            return DbHelper.insert(group.members) ? result.success(group) : result.dataBaseError();
+            var group = Util.convertTo<GroupInfo>(data);
+            group.members = getMember(id);
+
+            return result.success(group);
         }
 
         /// <summary>
         /// 根据ID集合删除用户组成员关系
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="group">UserGroup</param>
+        /// <param name="members"></param>
         /// <returns>Result</returns>
-        public Result<object> removeMember(string id, Group @group)
+        public Result<object> removeMember(string id, List<string> members)
         {
             if (!verify("removeGroupMember")) return result;
 
-            var data = getData(group.id);
+            var data = getData(id);
             if (data == null) return result.notFound();
 
-            return DbHelper.delete(group.members) ? result.success(group) : result.dataBaseError();
+            using (var context = new Entities())
+            {
+                foreach (var mid in members)
+                {
+                    var member = context.groupMembers.SingleOrDefault(i => i.id == mid);
+                    if (member == null) continue;
+
+                    context.Entry(member).State = EntityState.Deleted;
+                }
+
+                return context.SaveChanges() > 0 ? result.success() : result.dataBaseError();
+            }
         }
 
         /// <summary>
@@ -184,6 +227,30 @@ namespace Insight.Base.Services
             using (var context = new Entities())
             {
                 return context.groups.SingleOrDefault(i => i.id == id);
+            }
+        }
+
+        /// <summary>
+        /// 获取用户组成员
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        private List<MemberUser> getMember(string id)
+        {
+            using (var context = new Entities())
+            {
+                var members = from m in context.groupMembers
+                    join u in context.users on m.userId equals u.id
+                    where m.groupId == id
+                    select new MemberUser
+                    {
+                        id = m.id,
+                        name = u.name, 
+                        account = u.account,
+                        remark = u.remark,
+                        isInvalid = u.isInvalid
+                    };
+                return members.ToList();
             }
         }
 
