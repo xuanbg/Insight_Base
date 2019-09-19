@@ -7,7 +7,7 @@ namespace Insight.Base.Common.Entity
     /// <summary>
     /// 组织机构
     /// </summary>
-    [Table("uco_org")]
+    [Table("uco_organization")]
     public class Org
     {
         /// <summary>
